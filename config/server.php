@@ -1,5 +1,4 @@
-<?php namespace services;
-
+<?php
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,9 @@
  * limitations under the License.
  **/
 
-use App;
-use Illuminate\Support\ServiceProvider;
-
-/***
- * Class ServicesProvider
- * @package services
- */
-class ServicesProvider extends ServiceProvider
-{
-    protected $defer = false;
-
-    public function boot()
-    {
-    }
-
-    public function register()
-    {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
-    }
-}
+return array
+(
+    'ssl_enabled'    => env('SSL_ENABLED', false),
+    'oauth2_enabled' => env('OAUTH2_ENABLED', true),
+    'db_log_enabled' => env('DB_LOG_ENABLED', false),
+);

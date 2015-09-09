@@ -1,5 +1,4 @@
-<?php namespace services;
-
+<?php
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,21 @@
  * limitations under the License.
  **/
 
-use App;
-use Illuminate\Support\ServiceProvider;
+namespace models\summit;
 
-/***
- * Class ServicesProvider
- * @package services
+use models\utils\SilverstripeBaseModel;
+
+/**
+ * Class SummitEventType
+ * @package models\summit
  */
-class ServicesProvider extends ServiceProvider
+class SummitEventType extends SilverstripeBaseModel
 {
-    protected $defer = false;
+    protected $table = 'SummitEventType';
 
-    public function boot()
-    {
-    }
-
-    public function register()
-    {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
-    }
+    protected $array_mappings = array
+    (
+        'ID'   => 'id:json_int',
+        'Type' => 'type:json_string',
+    );
 }
