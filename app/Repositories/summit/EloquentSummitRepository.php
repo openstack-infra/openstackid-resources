@@ -1,4 +1,5 @@
-<?php
+<?php namespace repositories\summit;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,20 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+use models\summit\ISummitRepository;
+use models\summit\Summit;
+use models\utils\EloquentBaseRepository;
 
 /**
- * Class TestSeeder
+ * Class EloquentSummitRepository
  */
-class TestSeeder extends Seeder
+class EloquentSummitRepository extends EloquentBaseRepository implements ISummitRepository
 {
-    public function run()
+    /**
+     * @param Summit $summit
+     */
+    public function __construct(Summit $summit)
     {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
+        $this->entity       = $summit;
     }
 }

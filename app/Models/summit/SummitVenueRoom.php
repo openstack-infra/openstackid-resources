@@ -12,19 +12,21 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\summit;
 
 /**
- * Class TestSeeder
+ * Class SummitVenueRoom
+ * @package models\summit
  */
-class TestSeeder extends Seeder
+class SummitVenueRoom extends SummitAbstractLocation
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    protected $mtiClassType = 'concrete';
+
+    protected $array_mappings = array
+    (
+        'ID'          => 'id',
+        'Name'        => 'name',
+        'Description' => 'description',
+        'Capacity'    => 'Capacity',
+     );
 }

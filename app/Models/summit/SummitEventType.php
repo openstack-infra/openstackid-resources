@@ -12,19 +12,21 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\summit;
+
+use models\utils\SilverstripeBaseModel;
 
 /**
- * Class TestSeeder
+ * Class SummitEventType
+ * @package models\summit
  */
-class TestSeeder extends Seeder
+class SummitEventType extends SilverstripeBaseModel
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    protected $table = 'SummitEventType';
+
+    protected $array_mappings = array
+    (
+        'ID'   => 'id',
+        'Type' => 'type',
+    );
 }
