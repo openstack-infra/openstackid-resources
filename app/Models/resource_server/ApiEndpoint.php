@@ -13,6 +13,7 @@
 **/
 
 use models\utils\BaseModelEloquent;
+
 /**
 * Class ApiEndpoint
 * @package models\resource_server
@@ -130,5 +131,13 @@ class ApiEndpoint extends BaseModelEloquent implements IApiEndpoint
 	public function supportCredentials()
 	{
 		return (bool)$this->allow_credentials;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getIdentifier()
+	{
+		return (int)$this->id;
 	}
 }
