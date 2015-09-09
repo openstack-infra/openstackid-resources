@@ -12,19 +12,28 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace services\utils;
+
+use Closure;
+use libs\utils\ITransactionService;
+use DB;
 
 /**
- * Class TestSeeder
+ * Class EloquentTransactionService
+ * @package services\utils
  */
-class TestSeeder extends Seeder
-{
-    public function run()
+final class EloquentTransactionService implements ITransactionService {
+
+    /**
+     * Execute a Closure within a transaction.
+     *
+     * @param  Closure $callback
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function transaction(Closure $callback)
     {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
+        return DB::transaction($callback);
     }
 }
