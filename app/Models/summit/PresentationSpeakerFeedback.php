@@ -12,19 +12,23 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\summit;
 
 /**
- * Class TestSeeder
+ * Class PresentationSpeakerFeedback
+ * @package models\summit
  */
-class TestSeeder extends Seeder
+class PresentationSpeakerFeedback extends SummitEventFeedback
 {
-    public function run()
+    protected $table = 'PresentationSpeakerFeedback';
+
+    protected $mtiClassType = 'concrete';
+
+    /**
+     * @return PresentationSpeaker
+     */
+    public function speaker()
     {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
+        return $this->hasOne('models\summit\PresentationSpeaker', 'ID', 'SpeakerID')->first();
     }
 }

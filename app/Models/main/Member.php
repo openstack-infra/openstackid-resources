@@ -12,19 +12,12 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\main;
 
-/**
- * Class TestSeeder
- */
-class TestSeeder extends Seeder
+
+use models\utils\SilverstripeBaseModel;
+
+class Member extends SilverstripeBaseModel
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    protected $table = 'Member';
 }
