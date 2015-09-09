@@ -1,5 +1,4 @@
-<?php namespace services;
-
+<?php
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,36 @@
  * limitations under the License.
  **/
 
-use App;
-use Illuminate\Support\ServiceProvider;
+namespace models\summit;
 
-/***
- * Class ServicesProvider
- * @package services
+/**
+ * Class SummitVenue
+ * @package models\summit
  */
-class ServicesProvider extends ServiceProvider
+class SummitVenue extends SummitGeoLocatedLocation
 {
-    protected $defer = false;
+    protected $mtiClassType = 'abstract';
 
-    public function boot()
+    private $rooms = array();
+
+    public function addRoom(SummitVenueRoom $room)
     {
+        array_push($this->rooms, $room);
     }
 
-    public function register()
+    public function toArray()
     {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
+        $values = parent::toArray();
+
+        $rooms = array();
+
+        foreach($this->rooms as $r)
+        {
+            array_push($rooms, $r->toArray());
+        }
+
+        $values['rooms'] = $rooms;
+
+        return $values;
     }
 }

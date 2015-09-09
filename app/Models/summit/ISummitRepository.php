@@ -1,4 +1,6 @@
-<?php namespace services;
+<?php namespace models\summit;
+
+use models\utils\IBaseRepository;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -12,25 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use App;
-use Illuminate\Support\ServiceProvider;
-
-/***
- * Class ServicesProvider
- * @package services
- */
-class ServicesProvider extends ServiceProvider
+interface ISummitRepository extends IBaseRepository
 {
-    protected $defer = false;
-
-    public function boot()
-    {
-    }
-
-    public function register()
-    {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
-    }
+    /**
+     * @return Summit
+     */
+    public function getCurrent();
 }

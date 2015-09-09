@@ -1,4 +1,6 @@
-<?php namespace services;
+<?php namespace models\main;
+
+use models\utils\SilverstripeBaseModel;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -12,25 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use App;
-use Illuminate\Support\ServiceProvider;
-
-/***
- * Class ServicesProvider
- * @package services
- */
-class ServicesProvider extends ServiceProvider
+class Company extends SilverstripeBaseModel
 {
-    protected $defer = false;
+    protected $table = 'Company';
 
-    public function boot()
-    {
-    }
+    protected $array_mappings = array
+    (
+        'ID'   => 'id',
+        'Name' => 'name',
+    );
 
-    public function register()
-    {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
-    }
 }
