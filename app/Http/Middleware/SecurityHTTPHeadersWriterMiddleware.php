@@ -44,7 +44,7 @@ class SecurityHTTPHeadersWriterMiddleware implements Middleware
 		 * applies to the domain of the issuing HSTS Host and all of its
 		 * subdomains:
 		 */
-		$response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+		//$response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 		return $response;
 	}
 }
