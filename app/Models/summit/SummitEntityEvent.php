@@ -12,19 +12,25 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\summit;
+
+use models\utils\SilverstripeBaseModel;
 
 /**
- * Class TestSeeder
+ * Class SummitEntityEvent
+ * @package models\summit
  */
-class TestSeeder extends Seeder
+final class SummitEntityEvent extends SilverstripeBaseModel
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    protected $table = 'SummitEntityEvent';
+
+    protected $array_mappings = array
+    (
+        'ID'              => 'id:json_int',
+        'EntityID'        => 'entity_id:json_int',
+        'EntityClassName' => 'entity_class:json_string',
+        'Created'         => 'created:datetime_epoch',
+        'Type'            => 'type',
+    );
+
 }
