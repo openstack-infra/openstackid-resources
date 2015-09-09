@@ -1,5 +1,4 @@
-<?php namespace App\Http\Controllers;
-
+<?php
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,33 +12,24 @@
  * limitations under the License.
  **/
 
-use models\oauth2\IResourceServerContext;
-use models\utils\IBaseRepository;
+namespace models\utils;
 
 /**
- * Class OAuth2ProtectedController
- * OAuth2 Protected Base API
+ * Class EloquentBaseRepository
+ * @package models\utils
  */
-abstract class OAuth2ProtectedController extends JsonController
+abstract class EloquentBaseRepository implements IBaseRepository
 {
-
     /**
-     * @var IResourceServerContext
+     * @var IEntity
      */
-    protected $resource_server_context;
-
+    protected $entity;
     /**
-     * @var IBaseRepository
+     * @param int $id
+     * @return \models\utils\IEntity
      */
-    protected $repository;
-
-    /**
-     * @param IResourceServerContext $resource_server_context
-     */
-    public function __construct(IResourceServerContext $resource_server_context)
+    public function getById($id)
     {
-        parent::__construct();
-        $this->resource_server_context = $resource_server_context;
+        return $this->entity->find($id);
     }
-
 }
