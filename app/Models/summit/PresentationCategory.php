@@ -12,19 +12,22 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\summit;
+
+
+use models\utils\SilverstripeBaseModel;
 
 /**
- * Class TestSeeder
+ * Class PresentationCategory
+ * @package models\summit
  */
-class TestSeeder extends Seeder
+class PresentationCategory extends SilverstripeBaseModel
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    protected $table = 'PresentationCategory';
+
+    protected $array_mappings = array
+    (
+        'ID'    => 'id:json_int',
+        'Title' => 'name:json_string',
+    );
 }

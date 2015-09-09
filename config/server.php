@@ -12,19 +12,10 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
-
-/**
- * Class TestSeeder
- */
-class TestSeeder extends Seeder
-{
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
-}
+return array
+(
+    'ssl_enabled'                 => env('SSL_ENABLED', false),
+    'oauth2_enabled'              => env('OAUTH2_ENABLED', true),
+    'db_log_enabled'              => env('DB_LOG_ENABLED', false),
+    'access_token_cache_lifetime' => env('ACCESS_TOKEN_CACHE_LIFETIME', 300),
+);

@@ -1,4 +1,7 @@
-<?php
+<?php namespace models\main;
+
+use models\utils\SilverstripeBaseModel;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,20 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
-
-/**
- * Class TestSeeder
- */
-class TestSeeder extends Seeder
+class Company extends SilverstripeBaseModel
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    protected $table = 'Company';
+
+    protected $array_mappings = array
+    (
+        'ID'   => 'id:json_int',
+        'Name' => 'name:json_string',
+    );
+
 }
