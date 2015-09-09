@@ -1,5 +1,4 @@
-<?php namespace services;
-
+<?php
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,24 @@
  * limitations under the License.
  **/
 
-use App;
-use Illuminate\Support\ServiceProvider;
+namespace models\utils;
 
-/***
- * Class ServicesProvider
- * @package services
+/**
+ * Class EloquentBaseRepository
+ * @package models\utils
  */
-class ServicesProvider extends ServiceProvider
+abstract class EloquentBaseRepository implements IBaseRepository
 {
-    protected $defer = false;
-
-    public function boot()
+    /**
+     * @var IEntity
+     */
+    protected $entity;
+    /**
+     * @param int $id
+     * @return \models\utils\IEntity
+     */
+    public function getById($id)
     {
-    }
-
-    public function register()
-    {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
+        return $this->entity->find($id);
     }
 }
