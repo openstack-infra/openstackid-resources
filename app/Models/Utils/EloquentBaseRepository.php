@@ -12,19 +12,24 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\utils;
 
 /**
- * Class TestSeeder
+ * Class EloquentBaseRepository
+ * @package models\utils
  */
-class TestSeeder extends Seeder
+abstract class EloquentBaseRepository implements IBaseRepository
 {
-    public function run()
+    /**
+     * @var IEntity
+     */
+    protected $entity;
+    /**
+     * @param int $id
+     * @return \models\utils\IEntity
+     */
+    public function getById($id)
     {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
+        return $this->entity->find($id);
     }
 }
