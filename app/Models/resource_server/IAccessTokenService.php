@@ -1,4 +1,5 @@
-<?php
+<?php namespace models\resource_server;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +13,19 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+use libs\oauth2\OAuth2InvalidIntrospectionResponse;
+use models\oauth2\AccessToken;
 
 /**
- * Class TestSeeder
+ * Interface IAccessTokenService
+ * @package models\resource_server
  */
-class TestSeeder extends Seeder
+interface IAccessTokenService
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    /**
+     * @param string $token_value
+     * @return AccessToken
+     * @throws OAuth2InvalidIntrospectionResponse
+     */
+    public function get($token_value);
 }

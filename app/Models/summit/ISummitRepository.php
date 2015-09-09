@@ -1,4 +1,7 @@
-<?php
+<?php namespace models\summit;
+
+use models\utils\IBaseRepository;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,20 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
-
-/**
- * Class TestSeeder
- */
-class TestSeeder extends Seeder
+interface ISummitRepository extends IBaseRepository
 {
-    public function run()
-    {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
-    }
+    /**
+     * @return Summit
+     */
+    public function getCurrent();
 }
