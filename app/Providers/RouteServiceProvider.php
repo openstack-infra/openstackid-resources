@@ -32,14 +32,14 @@ class RouteServiceProvider extends ServiceProvider {
 		// Route::filter('filter.name',function($route, $request){ .... });
 
 		Route::filter("ssl", function () {
-			if (!Request::secure() && Config::get("SSL.Enable", false))
+			if (!Request::secure() && Config::get("server.ssl_enabled", false))
 			{
 				return Redirect::secure(Request::getRequestUri());
 			}
 		});
 
 		Route::filter("oauth2.enabled", function () {
-			if (!Config::get("OAuth2.Enable", true))
+			if (!Config::get("server.oauth2_enabled", true))
 			{
 				return View::make('errors.404');
 			}
