@@ -12,19 +12,24 @@
  * limitations under the License.
  **/
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Seeder;
+namespace models\utils;
 
-/**
- * Class TestSeeder
+/***
+ * Class SilverstripeBaseModel
+ * @package models\utils
  */
-class TestSeeder extends Seeder
+class SilverstripeBaseModel extends BaseModelEloquent
 {
-    public function run()
+    protected $primaryKey ='ID';
+
+    protected $connection = 'ss';
+
+    protected $stiClassField = 'ClassName';
+
+    protected function isAllowedParent($parent_name)
     {
-        Model::unguard();
-        $this->call('ApiSeeder');
-        $this->call('ApiScopesSeeder');
-        $this->call('ApiEndpointsSeeder');
+        $res = parent::isAllowedParent($parent_name);
+        if(!$res) return false;
+        return !(str_contains($parent_name, 'SilverstripeBaseModel'));
     }
 }
