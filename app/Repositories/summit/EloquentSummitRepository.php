@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers;
+<?php namespace repositories\summit;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -12,34 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use models\oauth2\IResourceServerContext;
-use models\utils\IBaseRepository;
+use models\summit\ISummitRepository;
+use models\summit\Summit;
+use models\utils\EloquentBaseRepository;
 
 /**
- * Class OAuth2ProtectedController
- * OAuth2 Protected Base API
+ * Class EloquentSummitRepository
  */
-abstract class OAuth2ProtectedController extends JsonController
+class EloquentSummitRepository extends EloquentBaseRepository implements ISummitRepository
 {
-
     /**
-     * @var IResourceServerContext
+     * @param Summit $summit
      */
-    protected $resource_server_context;
-
-    /**
-     * @var IBaseRepository
-     */
-    protected $repository;
-
-    /**
-     * @param IResourceServerContext $resource_server_context
-     */
-    public function __construct(IResourceServerContext $resource_server_context)
+    public function __construct(Summit $summit)
     {
-        parent::__construct();
-        $this->resource_server_context = $resource_server_context;
+        $this->entity = $summit;
     }
 
+    /**
+     * @return Summit
+     */
+    public function getCurrent()
+    {
+        //$now = new \DateTime('now', new DateTimeZone('UTC'));
+        return $this->entity
+            ->where('Active','=',1)
+            ->first();
+    }
 }
