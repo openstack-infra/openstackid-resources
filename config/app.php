@@ -4,7 +4,7 @@ return [
     //oauth2.0 params from openstackid server resource server admin console
     'openstackid_client_id'     => env('APP_OAUTH_2_0_CLIENT_ID'),
 	'openstackid_client_secret' => env('APP_OAUTH_2_0_CLIENT_SECRET'),
-	'openstackid_base_url' => env('APP_OAUTH_2_0_AUTH_SERVER_BASE_URL'),
+	'openstackid_base_url'      => env('APP_OAUTH_2_0_AUTH_SERVER_BASE_URL'),
 	/*
 	|--------------------------------------------------------------------------
 	| Application Debug Mode
