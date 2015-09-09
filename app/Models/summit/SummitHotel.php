@@ -1,5 +1,4 @@
-<?php namespace services;
-
+<?php
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,24 +12,13 @@
  * limitations under the License.
  **/
 
-use App;
-use Illuminate\Support\ServiceProvider;
+namespace models\summit;
 
-/***
- * Class ServicesProvider
- * @package services
+/**
+ * Class SummitHotel
+ * @package models\summit
  */
-class ServicesProvider extends ServiceProvider
+class SummitHotel extends SummitExternalLocation
 {
-    protected $defer = false;
-
-    public function boot()
-    {
-    }
-
-    public function register()
-    {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
-    }
+    protected $mtiClassType = 'concrete';
 }

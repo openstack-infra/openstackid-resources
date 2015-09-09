@@ -1,4 +1,4 @@
-<?php namespace services;
+<?php namespace repositories\summit;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -12,25 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\ISummitRepository;
+use models\summit\Summit;
+use models\utils\EloquentBaseRepository;
 
-use App;
-use Illuminate\Support\ServiceProvider;
-
-/***
- * Class ServicesProvider
- * @package services
+/**
+ * Class EloquentSummitRepository
  */
-class ServicesProvider extends ServiceProvider
+class EloquentSummitRepository extends EloquentBaseRepository implements ISummitRepository
 {
-    protected $defer = false;
-
-    public function boot()
+    /**
+     * @param Summit $summit
+     */
+    public function __construct(Summit $summit)
     {
+        $this->entity = $summit;
     }
 
-    public function register()
+    /**
+     * @return Summit
+     */
+    public function getCurrent()
     {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
+        //$now = new \DateTime('now', new DateTimeZone('UTC'));
+        return $this->entity
+            ->where('Active','=',1)
+            ->first();
     }
 }

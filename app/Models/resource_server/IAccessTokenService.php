@@ -1,4 +1,4 @@
-<?php namespace services;
+<?php namespace models\resource_server;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -13,24 +13,19 @@
  * limitations under the License.
  **/
 
-use App;
-use Illuminate\Support\ServiceProvider;
+use libs\oauth2\OAuth2InvalidIntrospectionResponse;
+use models\oauth2\AccessToken;
 
-/***
- * Class ServicesProvider
- * @package services
+/**
+ * Interface IAccessTokenService
+ * @package models\resource_server
  */
-class ServicesProvider extends ServiceProvider
+interface IAccessTokenService
 {
-    protected $defer = false;
-
-    public function boot()
-    {
-    }
-
-    public function register()
-    {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
-    }
+    /**
+     * @param string $token_value
+     * @return AccessToken
+     * @throws OAuth2InvalidIntrospectionResponse
+     */
+    public function get($token_value);
 }
