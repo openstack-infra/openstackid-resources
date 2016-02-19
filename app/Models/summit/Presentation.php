@@ -46,6 +46,8 @@ class Presentation extends SummitEvent
         'ModeratorID'   => 'moderator_speaker_id:json_int',
         'Level'         => 'level',
         'AllowFeedBack' => 'allow_feedback:json_boolean',
+        'AvgFeedbackRate' => 'avg_feedback_rate:json_float',
+        'Published'       => 'is_published:json_boolean',
     );
 
     /**
