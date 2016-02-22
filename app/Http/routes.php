@@ -13,12 +13,12 @@
 //OAuth2 Protected API
 Route::group(array(
     'prefix' => 'api/v1',
-    'before' => ['ssl', 'oauth2.enabled'],
-    'after' => '',
-    'middleware' => ['oauth2.protected', 'rate.limit','etags']
+    'before' => [],
+    'after' => [],
+    'middleware' => ['ssl', 'oauth2.protected', 'rate.limit','etags']
 ), function () {
 
-    Route::group(array('prefix' => 'marketplace'), function () {
+        Route::group(array('prefix' => 'marketplace'), function () {
 
         Route::group(array('prefix' => 'public-clouds'), function () {
             Route::get('', 'OAuth2PublicCloudApiController@getClouds');

@@ -31,6 +31,7 @@ class Kernel extends HttpKernel
         'rate.limit'       => 'App\Http\Middleware\RateLimitMiddleware',
         'etags'            => 'App\Http\Middleware\ETagsMiddleware',
         'cache'            => 'App\Http\Middleware\CacheMiddleware',
+        'ssl'              => 'App\Http\Middleware\SSLMiddleware',
     ];
 
 }

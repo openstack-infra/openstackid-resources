@@ -12,11 +12,25 @@
  * limitations under the License.
  **/
 
-return array
-(
-    'ssl_enabled'                 => env('SSL_ENABLED', false),
-    'db_log_enabled'              => env('DB_LOG_ENABLED', false),
-    'access_token_cache_lifetime' => env('ACCESS_TOKEN_CACHE_LIFETIME', 300),
-    'assets_base_url'             => env('ASSETS_BASE_URL', null),
-    'response_cache_lifetime'     => env('API_RESPONSE_CACHE_LIFETIME', 300),
-);
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Contracts\Routing\Middleware;
+
+/**
+ * Class SSLMiddleware
+ * @package App\Http\Middleware
+ */
+final class SSLMiddleware implements Middleware
+{
+    public function handle($request, Closure $next)
+    {
+        if (!Request::secure() && Config::get("server.ssl_enabled", false)) {
+            return Redirect::secure(Request::getRequestUri());
+        }
+        return $next($request);
+    }
+}
