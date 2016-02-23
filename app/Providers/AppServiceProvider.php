@@ -18,6 +18,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $monolog = Log::getMonolog();
+        foreach($monolog->getHandlers() as $handler) {
+            $handler->setLevel(Config::get('log.level', 'error'));
+        }
 
         //set email log
         $to   = Config::get('log.to_email');
