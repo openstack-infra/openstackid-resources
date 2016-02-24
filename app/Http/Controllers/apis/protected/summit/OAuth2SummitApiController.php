@@ -578,7 +578,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check($speaker_id, $summit);
             if (is_null($speaker)) return $this->error404();
 
-            $data = $speaker->toArray();
+            $data = $speaker->toArray($summit->ID);
 
             if (!empty($expand)) {
                 $expand = explode(',', $expand);
@@ -587,7 +587,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                         case 'presentations': {
                             $presentations = array();
                             unset($data['presentations']);
-                            foreach ($speaker->presentations() as $event) {
+                            foreach ($speaker->presentations($summit->ID) as $event) {
                                 $event->setFromSpeaker();
                                 array_push($presentations, $event->toArray());
                             }
