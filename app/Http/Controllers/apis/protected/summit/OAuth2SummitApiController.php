@@ -108,16 +108,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 $expand = explode(',', $expand);
                 foreach ($expand as $relation) {
                     switch (trim($relation)) {
-                        case 'attendees': {
-                            $attendees = array();
-                            list($total, $per_page, $current_page, $last_page, $items) = $summit->attendees(1,
-                                PHP_INT_MAX);
-                            foreach ($items as $attendee) {
-                                array_push($attendees, $attendee->toArray());
-                            }
-                            $data['attendees'] = $attendees;
-                        }
-                        break;
                         case 'schedule': {
                             $event_types = array();
                             foreach ($summit->event_types() as $event_type) {
@@ -135,7 +125,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                             $res = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo(1 , PHP_INT_MAX));
 
                             foreach ($res->getItems() as $speaker) {
-                                array_push($speakers, $speaker->toArray());
+                                array_push($speakers, $speaker->toArray($summit->ID));
                             }
                             $data['speakers'] = $speakers;
 

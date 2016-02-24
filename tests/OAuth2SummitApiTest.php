@@ -87,7 +87,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
 
         $params  = array
         (
-            'expand' => 'attendees,schedule' ,
+            'expand' => 'schedule' ,
             'id'     => 'current'
         );
 
