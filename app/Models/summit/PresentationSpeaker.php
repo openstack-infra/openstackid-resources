@@ -39,17 +39,34 @@ class PresentationSpeaker extends SilverstripeBaseModel
     );
 
     /**
+     * @param null|int $summit_id
+     * @param bool|true $published_ones
      * @return Presentation[]
      */
-    public function presentations()
+    public function presentations($summit_id = null, $published_ones = true)
     {
-        return $this->belongsToMany('models\summit\Presentation','Presentation_Speakers','PresentationSpeakerID','PresentationID')->get();
+        if(is_null($summit_id))
+            $summit_id = Summit::where('Active','=',1)->first()->ID;
+
+        $presentations = $this
+            ->belongsToMany('models\summit\Presentation','Presentation_Speakers','PresentationSpeakerID','PresentationID')
+            ->where('SummitEvent.SummitID','=', $summit_id);
+        if($published_ones)
+        {
+            $presentations = $presentations->where('SummitEvent.Published','=', 1);
+        }
+        return $presentations->get();
     }
 
-    public function getPresentationIds()
+    /**
+     * @param null $summit_id
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getPresentationIds($summit_id = null, $published_ones = true)
     {
         $ids = array();
-        foreach($this->presentations() as $p)
+        foreach($this->presentations($summit_id, $published_ones) as $p)
         {
             array_push($ids, intval($p->ID));
         }
@@ -72,10 +89,15 @@ class PresentationSpeaker extends SilverstripeBaseModel
         return $this->hasOne('models\main\Member', 'ID', 'MemberID')->first();
     }
 
-    public function toArray()
+    /**
+     * @param null $summit_id
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function toArray($summit_id = null, $published_ones = true)
     {
         $values = parent::toArray();
-        $values['presentations'] = $this->getPresentationIds();
+        $values['presentations'] = $this->getPresentationIds($summit_id, $published_ones);
         $member = $this->member();
         $values['pic'] = Config::get("server.assets_base_url", 'https://www.openstack.org/'). 'profile_images/speakers/'. $this->ID;
         if(!is_null($member))
