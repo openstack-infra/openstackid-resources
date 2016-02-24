@@ -48,6 +48,14 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
     }
 
     /**
+     * @return SummitLocationImage[]
+     */
+    public function images()
+    {
+        return $this->hasMany('models\summit\SummitLocationImage', 'LocationID', 'ID')->orderBy('Order','ASC')->get();
+    }
+
+    /**
      * @return array
      */
     public function toArray()
@@ -60,6 +68,14 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
             array_push($maps, $m->toArray());
         }
         $values['maps'] = $maps;
+
+
+        $images   = array();
+        foreach($this->images() as $i)
+        {
+            array_push($images, $i->toArray());
+        }
+        $values['images'] = $images;
 
         return $values;
     }
