@@ -567,6 +567,17 @@ final class SummitService implements ISummitService
                 }
                 $data['sponsors'] = $sponsors;
             }
+
+            if($entity instanceof PresentationCategoryGroup)
+            {
+                $categories = array();
+                foreach($entity->categories() as $c)
+                {
+                    array_push($categories, $c->toArray());
+                }
+                $values['tracks'] = $categories;
+            }
+
             $row['entity'] = $data;
         }
 
