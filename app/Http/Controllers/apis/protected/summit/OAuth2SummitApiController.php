@@ -57,8 +57,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         $this->service                    = $service;
     }
 
-
-
     public function getSummits()
     {
         try {
@@ -593,7 +591,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                             }
                             $data['presentations'] = $presentations;
                         }
-                        break;
+                            break;
                     }
                 }
             }
@@ -652,10 +650,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'), array
                 (
-                    'title'      => array('=@', '=='),
-                    'tags'       => array('=@', '=='),
-                    'start_date' => array('>', '<', '<=', '>=', '=='),
-                    'end_date'   => array('>', '<', '<=', '>=', '=='),
+                    'title'          => array('=@', '=='),
+                    'tags'           => array('=@', '=='),
+                    'start_date'     => array('>', '<', '<=', '>=', '=='),
+                    'end_date'       => array('>', '<', '<=', '>=', '=='),
+                    'summit_type_id' => array('=='),
+                    'event_type_id'  => array('=='),
                 ));
             }
 
@@ -669,9 +669,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                         switch (trim($relation)) {
                             case 'feedback': {
                                 $feedback = array();
-                                list($total, $per_page, $current_page, $last_page, $items) = $event->feedback(1,
+                                list($total2, $per_page2, $current_page2, $last_page2, $items2) = $event->feedback(1,
                                     PHP_INT_MAX);
-                                foreach ($items as $f) {
+                                foreach ($items2 as $f) {
                                     array_push($feedback, $f->toArray());
                                 }
                                 $data['feedback'] = $feedback;
@@ -742,10 +742,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'), array
                 (
-                    'title'      => array('=@', '=='),
-                    'tags'       => array('=@', '=='),
-                    'start_date' => array('>', '<', '<=', '>=', '=='),
-                    'end_date'   => array('>', '<', '<=', '>=', '=='),
+                    'title'          => array('=@', '=='),
+                    'tags'           => array('=@', '=='),
+                    'start_date'     => array('>', '<', '<=', '>=', '=='),
+                    'end_date'       => array('>', '<', '<=', '>=', '=='),
+                    'summit_type_id' => array('=='),
+                    'event_type_id'  => array('=='),
                 ));
             }
 
@@ -759,14 +761,14 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                         switch (trim($relation)) {
                             case 'feedback': {
                                 $feedback = array();
-                                list($total, $per_page, $current_page, $last_page, $items) = $event->feedback(1,
+                                list($total2, $per_page2, $current_page2, $last_page2, $items2) = $event->feedback(1,
                                     PHP_INT_MAX);
-                                foreach ($items as $f) {
+                                foreach ($items2 as $f) {
                                     array_push($feedback, $f->toArray());
                                 }
                                 $data['feedback'] = $feedback;
                             }
-                                break;
+                            break;
                         }
                     }
                 }
@@ -790,7 +792,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
-
 
     /**
      * @param $summit_id
@@ -826,7 +827,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                             }
                             $data['feedback'] = $feedback;
                         }
-                        break;
+                            break;
                         case 'speakers':{
                             if($event instanceof Presentation){
                                 unset($data['speakers']);
@@ -838,7 +839,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                                 $data['speakers'] = $speakers;
                             }
                         }
-                        break;
+                            break;
                     }
                 }
             }
@@ -1074,7 +1075,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
-
 
     /**
      * @param $summit_id
@@ -1395,13 +1395,13 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
             return $this->ok
             (
-                //todo: send this new response once that testing is done!
-                /*array
-                (
-                    'events'          => $list,
-                    'last_event_id'   => $last_event_id,
-                    'last_event_date' => $last_event_date->getTimestamp()
-                )*/
+            //todo: send this new response once that testing is done!
+            /*array
+            (
+                'events'          => $list,
+                'last_event_id'   => $last_event_id,
+                'last_event_date' => $last_event_date->getTimestamp()
+            )*/
                 $list
             );
         }
