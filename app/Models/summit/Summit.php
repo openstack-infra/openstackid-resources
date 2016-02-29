@@ -173,52 +173,23 @@ class Summit extends SilverstripeBaseModel
      */
     public function schedule($page = 1, $per_page = 100, Filter $filter = null)
     {
-        $rel = $this->hasMany('models\summit\SummitEvent', 'SummitID', 'ID')
-                     ->where('Published','=','1');
-
-        if(!is_null($filter))
-        {
-            $filter->apply2Relation($rel, array
-            (
-                'title'      => 'SummitEvent.Title',
-                'start_date' => 'SummitEvent.StartDate:datetime_epoch',
-                'end_date'   => 'SummitEvent.EndDate:datetime_epoch',
-             ));
-        }
-        $tags = !is_null($filter) ? $filter->getFilter('tags'): null;
-        if(!is_null($tags)) {
-            $op  = $tags->getOperator();
-            $val = $tags->getValue();
-            $rel->getBaseQuery()->whereRaw(" EXISTS ( SELECT T.ID FROM Tag T INNER JOIN SummitEvent_Tags ST ON ST.TagID = T.ID WHERE ST.SummitEventID = SummitEvent.ID AND T.Tag {$op} '{$val}' ) ");
-        }
-        $rel = $rel->orderBy('StartDate','asc')->orderBy('EndDate','asc');
-
-        $pagination_result = $rel->paginate($per_page);
-        $total             = $pagination_result->total();
-        $items             = $pagination_result->items();
-        $per_page          = $pagination_result->perPage();
-        $current_page      = $pagination_result->currentPage();
-        $last_page         = $pagination_result->lastPage();
-        $events = array();
-        foreach($items as $e)
-        {
-            $class = 'models\\summit\\'.$e->ClassName;
-            $entity = $class::find($e->ID);
-            array_push($events, $entity);
-        }
-        return array($total,$per_page, $current_page, $last_page, $events);
+        return $this->events($page, $per_page, $filter, true);
     }
-
 
     /**
      * @param int $page
      * @param int $per_page
      * @param Filter|null $filter
+     * @param bool|false $published
      * @return array
      */
-    public function events($page = 1, $per_page = 100, Filter $filter = null)
+    public function events($page = 1, $per_page = 100, Filter $filter = null, $published = false)
     {
         $rel = $this->hasMany('models\summit\SummitEvent', 'SummitID', 'ID');
+        if($published)
+        {
+            $rel = $rel->where('Published','=','1');
+        }
 
         if(!is_null($filter))
         {
@@ -229,12 +200,31 @@ class Summit extends SilverstripeBaseModel
                 'end_date'   => 'SummitEvent.EndDate:datetime_epoch',
             ));
         }
+
         $tags = !is_null($filter) ? $filter->getFilter('tags'): null;
         if(!is_null($tags)) {
             $op  = $tags->getOperator();
             $val = $tags->getValue();
             $rel->getBaseQuery()->whereRaw(" EXISTS ( SELECT T.ID FROM Tag T INNER JOIN SummitEvent_Tags ST ON ST.TagID = T.ID WHERE ST.SummitEventID = SummitEvent.ID AND T.Tag {$op} '{$val}' ) ");
         }
+
+        $summit_type = !is_null($filter) ? $filter->getFilter('summit_type_id'): null;
+        if(!is_null($summit_type)) {
+            $op  = $summit_type->getOperator();
+            $val = $summit_type->getValue();
+            $rel->getBaseQuery()->whereRaw(" EXISTS ( SELECT 1 FROM SummitEvent_AllowedSummitTypes INNER JOIN SummitType
+            ON
+            SummitType.ID = SummitEvent_AllowedSummitTypes.SummitTypeID WHERE SummitType.ID= {$val} AND SummitEvent_AllowedSummitTypes.SummitEventID = SummitEvent.ID ) ");
+        }
+
+        $event_type = !is_null($filter) ? $filter->getFilter('event_type_id'): null;
+        if(!is_null($event_type)) {
+            $op  = $event_type->getOperator();
+            $val = $event_type->getValue();
+            $rel->getBaseQuery()->whereRaw(" EXISTS ( SELECT 1 FROM SummitEventType
+            WHERE SummitEventType.ID = {$val} AND SummitEventType.ID = SummitEvent.TypeID ) ");
+        }
+
         $rel = $rel->orderBy('StartDate','asc')->orderBy('EndDate','asc');
 
         $pagination_result = $rel->paginate($per_page);
@@ -272,7 +262,7 @@ class Summit extends SilverstripeBaseModel
         return $this->hasMany('models\summit\SummitAttendee', 'SummitID', 'ID')->where('SummitAttendee.ID','=',$attendee_id)->first();
     }
 
-     /**
+    /**
      * @param int $event_id
      * @return null|SummitEvent
      */
@@ -325,8 +315,8 @@ class Summit extends SilverstripeBaseModel
     public function getCategoryGroup($group_id)
     {
         return $this->hasMany('models\summit\PresentationCategoryGroup', 'SummitID', 'ID')
-                ->where('PresentationCategoryGroup.ID','=', intval($group_id))
-                ->first();
+            ->where('PresentationCategoryGroup.ID','=', intval($group_id))
+            ->first();
     }
 
     public function sponsors()
@@ -352,7 +342,16 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
      */
     public function getSpeakerById($speaker_id)
     {
-        return $this->hasMany('models\summit\PresentationSpeaker', 'SummitID', 'ID')->where('PresentationSpeaker.ID','=', intval($speaker_id))->first();
+        return  PresentationSpeaker::where('PresentationSpeaker.ID','=', intval($speaker_id))
+            ->getBaseQuery()
+            ->whereRaw(" EXISTS (
+           SELECT 1 FROM Presentation_Speakers INNER JOIN SummitEvent
+            ON
+            SummitEvent.ID = Presentation_Speakers.PresentationID
+            WHERE
+            Presentation_Speakers.PresentationSpeakerID = PresentationSpeaker.ID
+            AND SummitEvent.SummitID =  {$this->ID}) ")
+            ->first();
     }
 
     /**
@@ -361,7 +360,17 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
      */
     public function getSpeakerByMemberId($member_id)
     {
-        return $this->hasMany('models\summit\PresentationSpeaker', 'SummitID', 'ID')->where('PresentationSpeaker.MemberID','=', intval($member_id))->first();
+
+       return  PresentationSpeaker::where('PresentationSpeaker.MemberID','=', intval($member_id))
+           ->getBaseQuery()
+           ->whereRaw(" EXISTS (
+           SELECT 1 FROM Presentation_Speakers INNER JOIN SummitEvent
+            ON
+            SummitEvent.ID = Presentation_Speakers.PresentationID
+            WHERE
+            Presentation_Speakers.PresentationSpeakerID = PresentationSpeaker.ID
+            AND SummitEvent.SummitID =  {$this->ID}) ")
+           ->first();
     }
 
     /**

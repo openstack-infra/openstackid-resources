@@ -396,6 +396,80 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
+    public function testCurrentSummitEventsBySummitType()
+    {
+        $params  = array
+        (
+            'id'     => 'current',
+            'expand' => 'feedback' ,
+            'filter' => array
+            (
+                'summit_type_id==1',
+            )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testCurrentSummitEventsByEventType()
+    {
+        $params  = array
+        (
+            'id'     => 'current',
+            'expand' => 'feedback' ,
+            'filter' => array
+            (
+                'event_type_id==4,event_type_id==5',
+            )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
     public function testGetEvent(){
         $params  = array
         (
