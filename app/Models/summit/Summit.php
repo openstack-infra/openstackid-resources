@@ -18,6 +18,8 @@ use models\main\Company;
 use models\main\Image;
 use DB;
 use models\utils\SilverstripeBaseModel;
+use utils\ExistsFilterManyManyMapping;
+use utils\ExistsFilterManyToOneMapping;
 use utils\Filter;
 use utils\Order;
 
@@ -195,34 +197,29 @@ class Summit extends SilverstripeBaseModel
         {
             $filter->apply2Relation($rel, array
             (
-                'title'      => 'SummitEvent.Title',
-                'start_date' => 'SummitEvent.StartDate:datetime_epoch',
-                'end_date'   => 'SummitEvent.EndDate:datetime_epoch',
+                'title'         => 'SummitEvent.Title',
+                'start_date'    => 'SummitEvent.StartDate:datetime_epoch',
+                'end_date'      => 'SummitEvent.EndDate:datetime_epoch',
+                'tags'          => new ExistsFilterManyManyMapping
+                (
+                    'Tag',
+                    'SummitEvent_Tags',
+                    'SummitEvent_Tags.TagID = Tag.ID',
+                    "SummitEvent_Tags.SummitEventID = SummitEvent.ID AND Tag.Tag :operator ':value'"
+                ),
+                'summit_type_id'=> new ExistsFilterManyManyMapping
+                (
+                    'SummitType',
+                    'SummitEvent_AllowedSummitTypes',
+                    'SummitType.ID = SummitEvent_AllowedSummitTypes.SummitTypeID',
+                    'SummitEvent_AllowedSummitTypes.SummitEventID = SummitEvent.ID AND SummitType.ID :operator :value'
+                ),
+                'event_type_id' => new ExistsFilterManyToOneMapping
+                (
+                    'SummitEventType',
+                    'SummitEventType.ID = SummitEvent.TypeID AND SummitEventType.ID :operator :value'
+                ),
             ));
-        }
-
-        $tags = !is_null($filter) ? $filter->getFilter('tags'): null;
-        if(!is_null($tags)) {
-            $op  = $tags->getOperator();
-            $val = $tags->getValue();
-            $rel->getBaseQuery()->whereRaw(" EXISTS ( SELECT T.ID FROM Tag T INNER JOIN SummitEvent_Tags ST ON ST.TagID = T.ID WHERE ST.SummitEventID = SummitEvent.ID AND T.Tag {$op} '{$val}' ) ");
-        }
-
-        $summit_type = !is_null($filter) ? $filter->getFilter('summit_type_id'): null;
-        if(!is_null($summit_type)) {
-            $op  = $summit_type->getOperator();
-            $val = $summit_type->getValue();
-            $rel->getBaseQuery()->whereRaw(" EXISTS ( SELECT 1 FROM SummitEvent_AllowedSummitTypes INNER JOIN SummitType
-            ON
-            SummitType.ID = SummitEvent_AllowedSummitTypes.SummitTypeID WHERE SummitType.ID= {$val} AND SummitEvent_AllowedSummitTypes.SummitEventID = SummitEvent.ID ) ");
-        }
-
-        $event_type = !is_null($filter) ? $filter->getFilter('event_type_id'): null;
-        if(!is_null($event_type)) {
-            $op  = $event_type->getOperator();
-            $val = $event_type->getValue();
-            $rel->getBaseQuery()->whereRaw(" EXISTS ( SELECT 1 FROM SummitEventType
-            WHERE SummitEventType.ID = {$val} AND SummitEventType.ID = SummitEvent.TypeID ) ");
         }
 
         $rel = $rel->orderBy('StartDate','asc')->orderBy('EndDate','asc');
@@ -343,7 +340,7 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
     public function getSpeakerById($speaker_id)
     {
         return  PresentationSpeaker::where('PresentationSpeaker.ID','=', intval($speaker_id))
-           ->whereRaw(" EXISTS (
+            ->whereRaw(" EXISTS (
            SELECT 1 FROM Presentation_Speakers INNER JOIN SummitEvent
             ON
             SummitEvent.ID = Presentation_Speakers.PresentationID
@@ -360,15 +357,15 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
     public function getSpeakerByMemberId($member_id)
     {
 
-       return  PresentationSpeaker::where('PresentationSpeaker.MemberID','=', intval($member_id))
-           ->whereRaw(" EXISTS (
+        return  PresentationSpeaker::where('PresentationSpeaker.MemberID','=', intval($member_id))
+            ->whereRaw(" EXISTS (
            SELECT 1 FROM Presentation_Speakers INNER JOIN SummitEvent
             ON
             SummitEvent.ID = Presentation_Speakers.PresentationID
             WHERE
             Presentation_Speakers.PresentationSpeakerID = PresentationSpeaker.ID
             AND SummitEvent.SummitID =  {$this->ID}) ")
-           ->first();
+            ->first();
     }
 
     /**

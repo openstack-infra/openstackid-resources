@@ -33,18 +33,31 @@ final class Filter
 
     /**
      * @param string $field
-     * @return null|FilterElement
+     * @return null|FilterElement[]
      */
     public function getFilter($field)
     {
-        foreach($this->filters as $f)
+        $res = array();
+        foreach($this->filters as $filter)
         {
-            if($f->getField() === $field)
+            if($filter instanceof FilterElement && $filter->getField() === $field) {
+                array_push($res, $filter);
+            }
+            else if(is_array($filter))
             {
-                return $f;
+                // OR
+                $or_res = array();
+                foreach($filter as $e)
+                {
+                    if($e instanceof FilterElement && $e->getField() === $field)
+                    {
+                        array_push($or_res, $e);
+                    }
+                }
+                if(count($or_res)) array_push($res, $or_res);
             }
         }
-        return null;
+        return $res;
     }
 
     /**
@@ -61,13 +74,19 @@ final class Filter
                 if(isset($mappings[$filter->getField()]))
                 {
                     $mapping = $mappings[$filter->getField()];
-                    $mapping = explode(':', $mapping);
-                    $value   = $filter->getValue();
-                    if(count($mapping) > 1)
+
+                    if($mapping instanceof FilterMapping)
                     {
-                        $value = $this->convertValue($value, $mapping[1]);
+                        $relation->getQuery()->whereRaw($mapping->toRawSQL($filter));
                     }
-                    $relation->getQuery()->where($mapping[0], $filter->getOperator(), $value);
+                    else {
+                        $mapping = explode(':', $mapping);
+                        $value = $filter->getValue();
+                        if (count($mapping) > 1) {
+                            $value = $this->convertValue($value, $mapping[1]);
+                        }
+                        $relation->getQuery()->where($mapping[0], $filter->getOperator(), $value);
+                    }
                 }
             }
             else if(is_array($filter))
@@ -78,14 +97,19 @@ final class Filter
                         if($e instanceof FilterElement && isset($mappings[$e->getField()]))
                         {
                             $mapping = $mappings[$e->getField()];
-                            $mapping = explode(':', $mapping);
-                            $value   = $e->getValue();
-                            if(count($mapping) > 1)
+                            if($mapping instanceof FilterMapping)
                             {
-                                $value = $this->convertValue($value, $mapping[1]);
+                                $query->orWhereRaw($mapping->toRawSQL($e));
                             }
-
-                            $query->orWhere($mapping[0], $e->getOperator(),$value);
+                            else
+                            {
+                                $mapping = explode(':', $mapping);
+                                $value = $filter->getValue();
+                                if (count($mapping) > 1) {
+                                    $value = $this->convertValue($value, $mapping[1]);
+                                }
+                                $query->orWhere($mapping[0], $e->getOperator(), $value);
+                            }
                         }
                     }
                 });
@@ -159,21 +183,21 @@ final class Filter
                 $sql_or = '';
                 foreach($filter as $e)
                 {
-                        if($e instanceof FilterElement && isset($mappings[$e->getField()]))
+                    if($e instanceof FilterElement && isset($mappings[$e->getField()]))
+                    {
+                        $mapping = $mappings[$e->getField()];
+                        $mapping = explode(':', $mapping);
+                        $value   = $e->getValue();
+                        $op      = $e->getOperator();
+                        if(count($mapping) > 1)
                         {
-                            $mapping = $mappings[$e->getField()];
-                            $mapping = explode(':', $mapping);
-                            $value   = $e->getValue();
-                            $op      = $e->getOperator();
-                            if(count($mapping) > 1)
-                            {
-                                $e->setValue( $this->convertValue($value, $mapping[1]));
-                            }
-                            $cond    = sprintf(' %s %s :%s', $mapping[0], $op, $e->getField());
-                            $this->bindings[$e->getField()] =  $e->getValue();
-                            if(!empty($sql_or)) $sql_or .= " OR ";
-                            $sql_or .= $cond;
+                            $e->setValue( $this->convertValue($value, $mapping[1]));
                         }
+                        $cond    = sprintf(' %s %s :%s', $mapping[0], $op, $e->getField());
+                        $this->bindings[$e->getField()] =  $e->getValue();
+                        if(!empty($sql_or)) $sql_or .= " OR ";
+                        $sql_or .= $cond;
+                    }
                 }
                 $sql .= $sql_or. " ) ";
             }

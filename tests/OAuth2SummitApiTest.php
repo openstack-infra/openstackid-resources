@@ -266,9 +266,9 @@ class OAuth2SummitApiTest extends ProtectedApiTest
 
         $params  = array
         (
-              'expand'      => 'presentations' ,
-              'id'          => 'current',
-              'speaker_id' => 'me'
+            'expand'      => 'presentations' ,
+            'id'          => 'current',
+            'speaker_id' => 'me'
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " .$this->access_token);
@@ -376,6 +376,81 @@ class OAuth2SummitApiTest extends ProtectedApiTest
             (
                 'summit_type_id==1',
             )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testCurrentSummitEventsBySummitTypeOR()
+    {
+        $params  = array
+        (
+            'id'     => 'current',
+            'expand' => 'feedback' ,
+            'filter' => array
+            (
+                'summit_type_id==2,tags=@Trove',
+            )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testCurrentSummitEventsBySummitTypeAND()
+    {
+        $params  = array
+        (
+            'id'     => 'current',
+            'expand' => 'feedback' ,
+            'filter' => array
+            (
+                'summit_type_id==2',
+                'tags=@Trove',
+            ),
         );
 
         $headers = array
