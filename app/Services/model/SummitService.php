@@ -235,6 +235,23 @@ final class SummitService implements ISummitService
                     }
                 }
                 break;
+                case 'Summit':
+                {
+                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
+                    if(intval($e->EntityID) !== intval($summit->ID)) continue; // only current summit
+                    array_push($ops_dictionary[$e->Type], $e->EntityClassName.$e->EntityID);
+                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
+                    {
+                        $entity = Summit::find(intval($e->EntityID));
+                        if(is_null($entity)) continue;
+                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                    }
+                    else if($e->Type === 'DELETE')
+                    {
+                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                    }
+                }
+                break;
                 case 'SummitType':
                 {
                     if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
