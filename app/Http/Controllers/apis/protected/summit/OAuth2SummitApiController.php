@@ -614,90 +614,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getEvents($summit_id)
     {
-        try {
-
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $values = Input::all();
-
-            $rules = array
-            (
-                'page'     => 'integer|min:1',
-                'per_page' => 'required_with:page|integer|min:5|max:100',
-            );
-
-            $validation = Validator::make($values, $rules);
-
-            if ($validation->fails()) {
-                $messages = $validation->messages()->toArray();
-
-                return $this->error412($messages);
-            }
-
-            $expand = Request::input('expand', '');
-
-            // default values
-            $page     = 1;
-            $per_page = 5;
-
-            if (Input::has('page')) {
-                $page = intval(Input::get('page'));
-                $per_page = intval(Input::get('per_page'));
-            }
-
-            $filter = null;
-            if (Input::has('filter')) {
-                $filter = FilterParser::parse(Input::get('filter'), array
-                (
-                    'title'          => array('=@', '=='),
-                    'tags'           => array('=@', '=='),
-                    'start_date'     => array('>', '<', '<=', '>=', '=='),
-                    'end_date'       => array('>', '<', '<=', '>=', '=='),
-                    'summit_type_id' => array('=='),
-                    'event_type_id'  => array('=='),
-                ));
-            }
-
-            $schedule = array();
-            list($total, $per_page, $current_page, $last_page, $items) = $summit->events($page, $per_page, $filter);
-
-            foreach ($items as $event) {
-                $data = $event->toArray();
-                if (!empty($expand)) {
-                    foreach (explode(',', $expand) as $relation) {
-                        switch (trim($relation)) {
-                            case 'feedback': {
-                                $feedback = array();
-                                list($total2, $per_page2, $current_page2, $last_page2, $items2) = $event->feedback(1,
-                                    PHP_INT_MAX);
-                                foreach ($items2 as $f) {
-                                    array_push($feedback, $f->toArray());
-                                }
-                                $data['feedback'] = $feedback;
-                            }
-                            break;
-                        }
-                    }
-                }
-                array_push($schedule, $data);
-            }
-
-            return $this->ok
-            (
-                array
-                (
-                    'total'        => $total,
-                    'per_page'     => $per_page,
-                    'current_page' => $current_page,
-                    'last_page'    => $last_page,
-                    'data'         => $schedule,
-                )
-            );
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
+        return $this->_getEvents($summit_id);
     }
 
     /**
@@ -705,6 +622,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      * @return mixed
      */
     public function getScheduleEvents($summit_id)
+    {
+        return $this->_getEvents($summit_id, true);
+    }
+
+
+    private function _getEvents($summit_id, $published = false)
     {
         try {
 
@@ -751,8 +674,10 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 ));
             }
 
-            $schedule = array();
-            list($total, $per_page, $current_page, $last_page, $items) = $summit->schedule($page, $per_page, $filter);
+            $events = array();
+            list($total, $per_page, $current_page, $last_page, $items) = $published ?
+                $summit->schedule($page, $per_page, $filter):
+                $summit->events($page, $per_page, $filter);
 
             foreach ($items as $event) {
                 $data = $event->toArray();
@@ -769,10 +694,16 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                                 $data['feedback'] = $feedback;
                             }
                             break;
+                            case 'location': {
+                                $location         = $event->getLocation();
+                                $data['location'] = $location->toArray();
+                                unset($data['location_id']);
+                            }
+                            break;
                         }
                     }
                 }
-                array_push($schedule, $data);
+                array_push($events, $data);
             }
 
             return $this->ok
@@ -783,7 +714,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                     'per_page'     => $per_page,
                     'current_page' => $current_page,
                     'last_page'    => $last_page,
-                    'data'         => $schedule,
+                    'data'         => $events,
                 )
             );
         } catch (Exception $ex) {
@@ -792,7 +723,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
-
     /**
      * @param $summit_id
      * @param $event_id
@@ -839,7 +769,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                                 $data['speakers'] = $speakers;
                             }
                         }
-                            break;
+                        break;
+                        case 'location': {
+                            $location         = $event->getLocation();
+                            $data['location'] = $location->toArray();
+                            unset($data['location_id']);
+                        }
                     }
                 }
             }

@@ -108,37 +108,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($summit));
     }
 
-    /*
-    public function testGetCurrentSummitAttendees()
-    {
-        $params  = array
-        (
-            'id'              => 'current',
-            'page'            => 1,
-            'per_page'        => 15,
-            'filter'          => array
-                                (
-                                    'first_name==sebastian,email=@smarcet',
-                                )
-        );
 
-        $headers = array("HTTP_Authorization" => " Bearer " .$this->access_token);
-        $response = $this->action(
-            "GET",
-            "OAuth2SummitApiController@getAttendees",
-            $params,
-            array(),
-            array(),
-            array(),
-            $headers
-        );
-
-        $content = $response->getContent();
-        $this->assertResponseStatus(200);
-        $attendees  = json_decode($content);
-        $this->assertTrue(!is_null($attendees));
-    }
-    */
     public function testGetCurrentSummitSpeakers()
     {
         $params  = array
@@ -441,7 +411,44 @@ class OAuth2SummitApiTest extends ProtectedApiTest
             'expand' => 'feedback' ,
             'filter' => array
             (
-                'event_type_id==4,event_type_id==5',
+                'event_type_id==4',
+            )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testCurrentSummitEventsByEventTypeExpandLocation()
+    {
+        $params  = array
+        (
+            'id'     => 'current',
+            'expand' => 'feedback,location' ,
+            'filter' => array
+            (
+                'event_type_id==4',
             )
         );
 

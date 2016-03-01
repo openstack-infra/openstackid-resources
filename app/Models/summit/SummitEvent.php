@@ -49,6 +49,7 @@ class SummitEvent extends SilverstripeBaseModel
         'AllowFeedBack'   => 'allow_feedback:json_boolean',
         'AvgFeedbackRate' => 'avg_feedback_rate:json_float',
         'Published'       => 'is_published:json_boolean',
+        'HeadCount'       => 'head_count:json_int',
     );
 
     /**
@@ -194,7 +195,10 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function getLocation()
     {
-        return $this->hasOne('models\summit\SummitAbstractLocation', 'ID', 'LocationID')->first();
+        $location =  $this->hasOne('models\summit\SummitAbstractLocation', 'ID', 'LocationID')->first();
+        if(is_null($location)) return null;
+        $class = 'models\\summit\\'.$location->ClassName;
+        return $class::find($location->ID);
     }
 
     /**
