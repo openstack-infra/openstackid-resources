@@ -51,7 +51,7 @@ Route::group(array(
         Route::group(array('prefix' => '{id}'), function () {
             Route::get('', [ 'middleware' => 'cache', 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
 
-            Route::get('entity-events', 'OAuth2SummitApiController@getAllScheduledEvents');
+            Route::get('entity-events', 'OAuth2SummitApiController@getSummitEntityEvents');
             // attendees
             Route::group(array('prefix' => 'attendees'), function () {
 
