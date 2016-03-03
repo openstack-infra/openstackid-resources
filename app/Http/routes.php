@@ -43,10 +43,15 @@ Route::group(array(
     // summits
     Route::group(array('prefix' => 'summits'), function () {
         Route::get('', 'OAuth2SummitApiController@getSummits');
+        Route::group(array('prefix' => 'events'), function () {
+            Route::get('', 'OAuth2SummitApiController@getAllEvents');
+            Route::get('published', 'OAuth2SummitApiController@getAllEvents');
+        });
+
         Route::group(array('prefix' => '{id}'), function () {
             Route::get('', [ 'middleware' => 'cache', 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
 
-            Route::get('entity-events', 'OAuth2SummitApiController@getSummitEntityEvents');
+            Route::get('entity-events', 'OAuth2SummitApiController@getAllScheduledEvents');
             // attendees
             Route::group(array('prefix' => 'attendees'), function () {
 
@@ -83,12 +88,12 @@ Route::group(array(
             Route::group(array('prefix' => 'events'), function () {
 
                 Route::get('', 'OAuth2SummitApiController@getEvents');
-                Route::get('/published', 'OAuth2SummitApiController@getScheduleEvents');
+                Route::get('/published', 'OAuth2SummitApiController@getScheduledEvents');
                 Route::post('', 'OAuth2SummitApiController@addEvent');
                 Route::group(array('prefix' => '{event_id}'), function () {
 
                     Route::get('', 'OAuth2SummitApiController@getEvent');
-                    Route::get('/published', 'OAuth2SummitApiController@getScheduleEvent');
+                    Route::get('/published', 'OAuth2SummitApiController@getScheduledEvent');
                     Route::put('', 'OAuth2SummitApiController@updateEvent');
                     Route::delete('', 'OAuth2SummitApiController@deleteEvent');
                     Route::put('/publish', 'OAuth2SummitApiController@publishEvent');

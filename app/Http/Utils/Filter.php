@@ -1,5 +1,6 @@
 <?php namespace utils;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 /**
@@ -61,12 +62,14 @@ final class Filter
     }
 
     /**
-     * @param Relation $relation
+     * @param $relation
      * @param array $mappings
      * @return $this
      */
-    public function apply2Relation(Relation $relation, array $mappings)
+    public function apply2Relation($relation, array $mappings)
     {
+        $builder = $relation instanceof Relation ?  $relation->getQuery(): $relation;
+        if(!$builder instanceof Builder) throw new \InvalidArgumentException;
         foreach($this->filters as $filter)
         {
             if($filter instanceof FilterElement)
@@ -77,7 +80,7 @@ final class Filter
 
                     if($mapping instanceof FilterMapping)
                     {
-                        $relation->getQuery()->whereRaw($mapping->toRawSQL($filter));
+                        $builder->whereRaw($mapping->toRawSQL($filter));
                     }
                     else {
                         $mapping = explode(':', $mapping);
@@ -85,14 +88,14 @@ final class Filter
                         if (count($mapping) > 1) {
                             $value = $this->convertValue($value, $mapping[1]);
                         }
-                        $relation->getQuery()->where($mapping[0], $filter->getOperator(), $value);
+                        $builder->where($mapping[0], $filter->getOperator(), $value);
                     }
                 }
             }
             else if(is_array($filter))
             {
                 // OR
-                $relation->getQuery()->where(function ($query) use($filter, $mappings){
+                $builder->where(function ($query) use($filter, $mappings){
                     foreach($filter as $e) {
                         if($e instanceof FilterElement && isset($mappings[$e->getField()]))
                         {

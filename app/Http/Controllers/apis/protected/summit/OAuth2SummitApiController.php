@@ -3,19 +3,20 @@
 use Exception;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\summit\ISummitEventRepository;
 use models\summit\Presentation;
-use utils\FilterParser;
 use Illuminate\Http\Request as LaravelRequest;
-use Input;
-use Log;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitRepository;
-use Request;
 use services\model\ISummitService;
 use utils\OrderParser;
 use utils\PagingInfo;
+use utils\FilterParser;
+use Request;
 use Validator;
+use Input;
+use Log;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -42,10 +43,16 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     private $speaker_repository;
 
+    /**
+     * @var ISummitEventRepository
+     */
+    private $event_repository;
+
 
     public function __construct
     (
         ISummitRepository $summit_repository,
+        ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
         ISummitService $service,
         IResourceServerContext $resource_server_context
@@ -54,6 +61,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
         $this->repository                 = $summit_repository;
         $this->speaker_repository         = $speaker_repository;
+        $this->event_repository           = $event_repository;
         $this->service                    = $service;
     }
 
@@ -614,115 +622,100 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getEvents($summit_id)
     {
-        return $this->_getEvents($summit_id);
+        try
+        {
+            $strategy = new RetrieveAllSummitEventsBySummitStrategy($this->repository);
+            return $this->ok($strategy->getEvents(array('summit_id' => $summit_id))->toArray());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 
     /**
      * @param $summit_id
      * @return mixed
      */
-    public function getScheduleEvents($summit_id)
+    public function getScheduledEvents($summit_id)
     {
-        return $this->_getEvents($summit_id, true);
-    }
-
-
-    private function _getEvents($summit_id, $published = false)
-    {
-        try {
-
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $values = Input::all();
-
-            $rules = array
-            (
-                'page'     => 'integer|min:1',
-                'per_page' => 'required_with:page|integer|min:5|max:100',
-            );
-
-            $validation = Validator::make($values, $rules);
-
-            if ($validation->fails()) {
-                $messages = $validation->messages()->toArray();
-
-                return $this->error412($messages);
-            }
-
-            $expand = Request::input('expand', '');
-
-            // default values
-            $page     = 1;
-            $per_page = 5;
-
-            if (Input::has('page')) {
-                $page = intval(Input::get('page'));
-                $per_page = intval(Input::get('per_page'));
-            }
-
-            $filter = null;
-            if (Input::has('filter')) {
-                $filter = FilterParser::parse(Input::get('filter'), array
-                (
-                    'title'          => array('=@', '=='),
-                    'tags'           => array('=@', '=='),
-                    'start_date'     => array('>', '<', '<=', '>=', '=='),
-                    'end_date'       => array('>', '<', '<=', '>=', '=='),
-                    'summit_type_id' => array('=='),
-                    'event_type_id'  => array('=='),
-                ));
-            }
-
-            $events = array();
-            list($total, $per_page, $current_page, $last_page, $items) = $published ?
-                $summit->schedule($page, $per_page, $filter):
-                $summit->events($page, $per_page, $filter);
-
-            foreach ($items as $event) {
-                $data = $event->toArray();
-                if (!empty($expand)) {
-                    foreach (explode(',', $expand) as $relation) {
-                        switch (trim($relation)) {
-                            case 'feedback': {
-                                $feedback = array();
-                                list($total2, $per_page2, $current_page2, $last_page2, $items2) = $event->feedback(1,
-                                    PHP_INT_MAX);
-                                foreach ($items2 as $f) {
-                                    array_push($feedback, $f->toArray());
-                                }
-                                $data['feedback'] = $feedback;
-                            }
-                            break;
-                            case 'location': {
-                                $location         = $event->getLocation();
-                                $data['location'] = $location->toArray();
-                                unset($data['location_id']);
-                            }
-                            break;
-                        }
-                    }
-                }
-                array_push($events, $data);
-            }
-
-            return $this->ok
-            (
-                array
-                (
-                    'total'        => $total,
-                    'per_page'     => $per_page,
-                    'current_page' => $current_page,
-                    'last_page'    => $last_page,
-                    'data'         => $events,
-                )
-            );
-        } catch (Exception $ex) {
+        try
+        {
+            $strategy = new RetrievePublishedSummitEventsBySummitStrategy($this->repository);
+            return $this->ok($strategy->getEvents(array('summit_id' => $summit_id))->toArray());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
             Log::error($ex);
-
             return $this->error500($ex);
         }
     }
+
+    public function getAllEvents()
+    {
+        try
+        {
+            $strategy = new RetrieveAllSummitEventsStrategy($this->event_repository);
+            return $this->ok($strategy->getEvents()->toArray());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function getAllScheduledEvents()
+    {
+        try
+        {
+            $strategy = new RetrieveAllPublishedSummitEventsStrategy($this->event_repository);
+            return $this->ok($strategy->getEvents()->toArray());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * @param $summit_id
      * @param $event_id
@@ -790,7 +783,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      * @param $event_id
      * @return mixed
      */
-    public function getScheduleEvent($summit_id, $event_id)
+    public function getScheduledEvent($summit_id, $event_id)
     {
         try {
 

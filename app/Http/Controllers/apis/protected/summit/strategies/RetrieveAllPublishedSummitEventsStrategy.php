@@ -12,31 +12,25 @@
  * limitations under the License.
  **/
 
-namespace models\exceptions;
+namespace App\Http\Controllers;
 
-use Exception;
+use utils\Filter;
 
 /**
- * Class ValidationException
- * @package models\exceptions
+ * Class RetrieveAllPublishedSummitEventsStrategy
+ * @package App\Http\Controllers
  */
-class ValidationException extends Exception
+final class RetrieveAllPublishedSummitEventsStrategy extends RetrieveAllSummitEventsStrategy
 {
-    private $messages;
 
-    public function __construct($message, $code, Exception $previous)
+    /**
+     * @param int $page
+     * @param int $per_page
+     * @param Filter $filter
+     * @return array
+     */
+    public function retrieveEventsFromSource($page, $per_page, Filter $filter)
     {
-        parent::__construct($message, $code, $previous);
-    }
-
-    public function setMessages($messages)
-    {
-        $this->messages = $messages;
-        return $this;
-    }
-
-    public function getMessages()
-    {
-        $this->messages;
+        return $this->event_repository->getAllPublishedByPage($page, $per_page, $filter);
     }
 }

@@ -15,6 +15,7 @@
 namespace models\summit;
 
 use models\utils\IBaseRepository;
+use utils\Filter;
 
 /**
  * Interface ISummitEventRepository
@@ -27,4 +28,20 @@ interface ISummitEventRepository extends IBaseRepository
      * @return SummitEvent[]
      */
     public function getPublishedOnSameTimeFrame(SummitEvent $event);
+
+    /**
+     * @param int $page
+     * @param int $per_page
+     * @param Filter $filter
+     * @return array
+     */
+    public function getAllByPage($page, $per_page, Filter $filter);
+
+    /**
+     * @param int $page
+     * @param int $per_page
+     * @param Filter $filter
+     * @return array
+     */
+    public function getAllPublishedByPage($page, $per_page, Filter $filter);
 }

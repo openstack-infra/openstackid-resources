@@ -34,20 +34,23 @@ class Presentation extends SummitEvent
 
     protected $array_mappings = array
     (
-        'ID'            => 'id:json_int',
-        'Title'         => 'title:json_string',
-        'Description'   => 'description:json_string',
-        'StartDate'     => 'start_date:datetime_epoch',
-        'EndDate'       => 'end_date:datetime_epoch',
-        'LocationID'    => 'location_id:json_int',
-        'TypeID'        => 'type_id:json_int',
-        'ClassName'     => 'class_name',
-        'CategoryID'    => 'track_id:json_int',
-        'ModeratorID'   => 'moderator_speaker_id:json_int',
-        'Level'         => 'level',
-        'AllowFeedBack' => 'allow_feedback:json_boolean',
+        'ID'              => 'id:json_int',
+        'Title'           => 'title:json_string',
+        'Description'     => 'description:json_string',
+        'StartDate'       => 'start_date:datetime_epoch',
+        'EndDate'         => 'end_date:datetime_epoch',
+        'LocationID'      => 'location_id:json_int',
+        'SummitID'        => 'summit_id:json_int',
+        'TypeID'          => 'type_id:json_int',
+        'ClassName'       => 'class_name',
+        'CategoryID'      => 'track_id:json_int',
+        'ModeratorID'     => 'moderator_speaker_id:json_int',
+        'Level'           => 'level',
+        'AllowFeedBack'   => 'allow_feedback:json_boolean',
         'AvgFeedbackRate' => 'avg_feedback_rate:json_float',
         'Published'       => 'is_published:json_boolean',
+        'HeadCount'       => 'head_count:json_int',
+        'RSVPLink'        => 'rsvp_link:json_string',
     );
 
     /**

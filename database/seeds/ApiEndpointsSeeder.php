@@ -342,6 +342,26 @@ class ApiEndpointsSeeder extends Seeder
 
         ApiEndpoint::create(
             array(
+                'name' => 'get-all-events',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/events',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-all-published-events',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/events/published',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
                 'name' => 'get-event',
                 'active' => true,
                 'api_id' => $summit->id,
@@ -504,6 +524,10 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint = ApiEndpoint::where('name', '=', 'get-events')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-published-events')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-all-events')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-all-published-events')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-event')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
