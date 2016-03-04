@@ -592,7 +592,7 @@ final class SummitService implements ISummitService
                 {
                     array_push($categories, $c->toArray());
                 }
-                $values['tracks'] = $categories;
+                $data['tracks'] = $categories;
             }
 
             $row['entity'] = $data;
