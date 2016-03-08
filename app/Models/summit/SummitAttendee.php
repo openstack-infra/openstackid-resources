@@ -50,11 +50,14 @@ class SummitAttendee extends SilverstripeBaseModel
         )->withPivot('IsCheckedIn')->get();
 
         $events = array();
+
         foreach($res as $e)
         {
             $class = 'models\\summit\\'.$e->ClassName;
             $entity = $class::find($e->ID);
+            if(!$entity->isPublished()) continue;
             $entity->attributes['IsCheckedIn'] = $e->pivot->IsCheckedIn;
+
             array_push($events, $entity);
         }
         return $events;

@@ -446,7 +446,7 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function isPublished()
     {
-        return  $this->Published;
+        return  (bool)$this->Published;
     }
 
     /**
