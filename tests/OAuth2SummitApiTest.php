@@ -327,7 +327,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
 
     }
 
-    public function testCurrentSummitEvents()
+    public function testCurrentSummitEventsWithFilter()
     {
         $params  = array
         (
@@ -338,6 +338,39 @@ class OAuth2SummitApiTest extends ProtectedApiTest
                 'tags=@design',
                 'start_date>1445895000'
             )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testCurrentSummitEvents()
+    {
+        $params  = array
+        (
+            'id'     => 'current',
+            'expand' => 'feedback' ,
         );
 
         $headers = array

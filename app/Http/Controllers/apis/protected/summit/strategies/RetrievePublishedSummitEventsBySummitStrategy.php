@@ -24,12 +24,12 @@ final class RetrievePublishedSummitEventsBySummitStrategy extends RetrieveSummit
 {
 
     /**
-     * @param int $page
-     * @param int $per_page
-     * @param Filter $filter
+     * @param $page
+     * @param $per_page
+     * @param Filter|null $filter
      * @return array
      */
-    public function retrieveEventsFromSource($page, $per_page, Filter $filter)
+    public function retrieveEventsFromSource($page, $per_page, Filter $filter = null)
     {
         return $this->summit->schedule($page, $per_page, $filter);
     }

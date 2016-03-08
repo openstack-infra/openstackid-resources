@@ -112,12 +112,12 @@ abstract class RetrieveSummitEventsStrategy
         }
 
     /**
-     * @param int $page
-     * @param int $per_page
-     * @param Filter $filter
+     * @param $page
+     * @param $per_page
+     * @param Filter|null $filter
      * @return array
      */
-    abstract public function retrieveEventsFromSource($page, $per_page, Filter $filter);
+    abstract public function retrieveEventsFromSource($page, $per_page, Filter $filter = null);
 
     /**
      * @return array
