@@ -443,7 +443,45 @@ class OAuth2SummitApiTest extends ProtectedApiTest
             'expand' => 'feedback' ,
             'filter' => array
             (
-                'summit_type_id==1',
+                'summit_type_id==2',
+            )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getScheduledEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testCurrentSummitPublishedEventsSummitTypeDesign()
+    {
+        $params  = array
+        (
+            'id'     => 'current',
+            'expand' => 'location' ,
+            'filter' => array
+            (
+                "summit_type_id==2",
+                "tags=@Magnum"
             )
         );
 
@@ -944,7 +982,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testGetEntityEventsFromCurrentSummitGreatherThanGivenID()
+    public function testGetEntityEventsFromCurrentSummitGreaterThanGivenID()
     {
         $params  = array
         (

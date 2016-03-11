@@ -14,9 +14,10 @@
 
 namespace models\summit;
 
+use DB;
+use Config;
 use models\main\Company;
 use models\main\Image;
-use DB;
 use models\utils\SilverstripeBaseModel;
 use utils\ExistsFilterManyManyMapping;
 use utils\ExistsFilterManyToOneMapping;
@@ -406,7 +407,7 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
             $time_zone_info['offset'] = $time_zone->getOffset($now);
             $values['time_zone']      = $time_zone_info;
         }
-        $values['logo']           = ($this->logo() !== null) ? Config::get("server.assets_base_url", 'https://www.openstack.org/'). $this->logo()->photo()->Filename : null;
+        $values['logo']           = ($this->logo() !== null) ? Config::get("server.assets_base_url", 'https://www.openstack.org/'). $this->logo()->Filename : null;
         if(empty($values['name']))
         {
             $values['name'] = $this->Title;

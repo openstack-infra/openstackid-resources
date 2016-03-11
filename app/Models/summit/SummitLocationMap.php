@@ -36,6 +36,7 @@ class SummitLocationMap extends SilverstripeBaseModel
         'LocationID'   => 'location_id:json_int',
         'Name'         => 'name:json_text',
         'Description'  => 'description:json_text',
+        'Order'        => 'order:json_int',
     );
 
     /**

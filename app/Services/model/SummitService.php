@@ -24,6 +24,7 @@ use models\summit\SummitEventFeedback;
 use models\summit\SummitEventType;
 use models\summit\SummitHotel;
 use models\summit\SummitLocationMap;
+use models\summit\SummitLocationImage;
 use models\summit\SummitTicketType;
 use models\summit\SummitType;
 use models\summit\SummitVenue;
@@ -363,6 +364,23 @@ final class SummitService implements ISummitService
                     if($e->Type === 'UPDATE' || $e->Type === "INSERT")
                     {
                         $entity = SummitLocationMap::find(intval($e->EntityID));
+                        if(is_null($entity)) continue;
+                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                    }
+                    else if($e->Type === 'DELETE')
+                    {
+                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                    }
+                }
+                break;
+                case 'SummitLocationImage':
+                {
+                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
+                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+
+                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
+                    {
+                        $entity = SummitLocationImage::find(intval($e->EntityID));
                         if(is_null($entity)) continue;
                         array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
                     }
