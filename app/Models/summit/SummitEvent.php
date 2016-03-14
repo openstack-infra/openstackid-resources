@@ -297,6 +297,13 @@ class SummitEvent extends SilverstripeBaseModel
     public function toArray()
     {
         $values = parent::toArray();
+        //check if description is empty, if so, set short description
+        $description = $values['description'];
+        if(empty($description))
+        {
+            $values['description'] = $this->ShortDescription;
+        }
+
         $values['summit_types'] = $this->getSummitTypesIds();
         $values['sponsors']     = $this->getSponsorsIds();
         $tags = array();
