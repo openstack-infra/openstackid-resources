@@ -20,6 +20,7 @@ use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
 use utils\Filter;
 use utils\Order;
+use libs\utils\JsonUtils;
 
 /**
  * Class SummitEvent
@@ -297,6 +298,13 @@ class SummitEvent extends SilverstripeBaseModel
     public function toArray()
     {
         $values = parent::toArray();
+        //check if description is empty, if so, set short description
+        $description = $values['description'];
+        if(empty($description))
+        {
+            $values['description'] = JsonUtils::toJsonString($this->ShortDescription);
+        }
+
         $values['summit_types'] = $this->getSummitTypesIds();
         $values['sponsors']     = $this->getSponsorsIds();
         $tags = array();
