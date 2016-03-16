@@ -188,18 +188,18 @@ final class SummitService implements ISummitService
                 {
                     $entity = $summit->getScheduleEvent($e->EntityID);
 
-                    if($e->Type === 'UPDATE')
+                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
                     {
                         $metadata          = !empty($metadata) ? json_decode($metadata, true): array();
                         $published_old     = isset($metadata['pub_old']) ? (bool)intval($metadata['pub_old']) : false;
                         $published_current = isset($metadata['pub_new']) ? (bool)intval($metadata['pub_new']) : false;
 
                         // the event was not published at the moment of UPDATE .. then skip it!
-                        if(!isset($metadata['pub_old']) && isset($metadata['pub_new']) && !$published_current) continue;
+                        if(!$published_old && !$published_current) continue;
 
                         if(!is_null($entity)) // if event exists its bc its published
                         {
-                            $type = $published_current && !$published_old && isset($metadata['pub_old']) ?  'INSERT' : 'UPDATE';
+                            $type = $published_current && !$published_old ?  'INSERT' : 'UPDATE';
                             if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$type])) continue;
                             array_push($ops_dictionary[$type],$e->EntityClassName.$e->EntityID);
                             array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $type, $entity));

@@ -33,8 +33,8 @@ class PresentationSpeaker extends SilverstripeBaseModel
         'LastName'      => 'last_name:json_string',
         'Title'         => 'title:json_string',
         'Bio'           => 'bio:json_string',
-        'IRCHandle'     => 'irc',
-        'TwitterHandle' => 'twitter',
+        'IRCHandle'     => 'irc:json_string',
+        'TwitterName'   => 'twitter:json_string',
         'MemberID'      => 'member_id:json_int',
     );
 
