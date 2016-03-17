@@ -179,7 +179,8 @@ final class AccessTokenService implements IAccessTokenService
 
             return $token_info;
 
-        } catch (RequestException $ex)
+        }
+        catch (RequestException $ex)
         {
             Log::error($ex->getMessage());
             $response     = $ex->getResponse();

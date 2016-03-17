@@ -81,9 +81,9 @@ class OAuth2BearerAccessTokenRequestValidator implements Middleware
      */
     public function handle($request, Closure $next)
     {
-        $url = $request->getRequestUri();
+        $url    = $request->getRequestUri();
         $method = $request->getMethod();
-        $realm = $request->getHost();
+        $realm  = $request->getHost();
 
         try {
             $route = RequestUtils::getCurrentRoutePath($request);
@@ -163,7 +163,7 @@ class OAuth2BearerAccessTokenRequestValidator implements Middleware
 
             //check token available scopes vs. endpoint scopes
             if (count(array_intersect($endpoint_scopes, $token_scopes)) == 0) {
-                Log::error(
+                Log::warning(
                     sprintf(
                         'access token scopes (%s) does not allow to access to api url %s , needed scopes %s',
                         $token_info->getScope(),
@@ -201,7 +201,7 @@ class OAuth2BearerAccessTokenRequestValidator implements Middleware
         }
         catch (OAuth2ResourceServerException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             $response = new OAuth2WWWAuthenticateErrorResponse(
                 $realm,
                 $ex1->getError(),
@@ -216,7 +216,7 @@ class OAuth2BearerAccessTokenRequestValidator implements Middleware
         }
         catch (InvalidGrantTypeException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             $response = new OAuth2WWWAuthenticateErrorResponse(
                 $realm,
                 OAuth2Protocol::OAuth2Protocol_Error_InvalidToken,
@@ -229,7 +229,7 @@ class OAuth2BearerAccessTokenRequestValidator implements Middleware
 
             return $http_response;
         } catch (\Exception $ex) {
-            Log::error($ex);
+            Log::warning($ex);
             $response = new OAuth2WWWAuthenticateErrorResponse(
                 $realm,
                 OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest,
