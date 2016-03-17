@@ -30,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
         if (!empty($to) && !empty($from)) {
             $subject = 'openstackid-resource-server error';
             $mono_log = Log::getMonolog();
-            $handler = new NativeMailerHandler($to, $subject, $from, $level = Logger::WARNING);
+            $handler = new NativeMailerHandler($to, $subject, $from);
+            $handler->setLevel(Config::get('log.level', 'error'));
             $mono_log->pushHandler($handler);
         }
 
