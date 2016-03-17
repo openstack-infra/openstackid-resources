@@ -320,7 +320,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->ok($data);
         }
         catch (\HTTP401UnauthorizedException $ex1) {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error401();
         }
         catch (Exception $ex) {
@@ -354,7 +354,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (\HTTP401UnauthorizedException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error401();
         }
         catch (Exception $ex) {
@@ -385,17 +385,17 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array( $ex1->getMessage()));
         }
         catch (EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message' => $ex2->getMessage()));
         }
         catch(\HTTP401UnauthorizedException $ex3)
         {
-            Log::error($ex3);
+            Log::warning($ex3);
             return $this->error401();
         }
         catch (Exception $ex)
@@ -428,17 +428,17 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array( $ex1->getMessage()));
         }
         catch (EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message' => $ex2->getMessage()));
         }
         catch(\HTTP401UnauthorizedException $ex3)
         {
-            Log::error($ex3);
+            Log::warning($ex3);
             return $this->error401();
         }
         catch (Exception $ex)
@@ -470,17 +470,17 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array( $ex1->getMessage()));
         }
         catch (EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message' => $ex2->getMessage()));
         }
         catch(\HTTP401UnauthorizedException $ex3)
         {
-            Log::error($ex3);
+            Log::warning($ex3);
             return $this->error401();
         }
         catch (Exception $ex) {
@@ -634,6 +634,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex2)
         {
+            Log::warning($ex2);
             return $this->error412($ex2->getMessages());
         }
         catch (Exception $ex)
@@ -661,6 +662,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex2)
         {
+            Log::warning($ex2);
             return $this->error412($ex2->getMessages());
         }
         catch (Exception $ex)
@@ -684,6 +686,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex2)
         {
+            Log::warning($ex2);
             return $this->error412($ex2->getMessages());
         }
         catch (Exception $ex)
@@ -707,6 +710,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex2)
         {
+            Log::warning($ex2);
             return $this->error412($ex2->getMessages());
         }
         catch (Exception $ex)
@@ -877,12 +881,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->created($event);
         }
         catch (ValidationException $ex1) {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
         }
         catch(EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex) {
@@ -937,12 +941,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
         }
         catch(EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex) {
@@ -990,12 +994,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
         }
         catch(EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex) {
@@ -1024,12 +1028,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
         }
         catch(EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex) {
@@ -1055,12 +1059,12 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (ValidationException $ex1)
         {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
         }
         catch(EntityNotFoundException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex) {
@@ -1176,7 +1180,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
         } catch (Exception $ex) {
             Log::error($ex);
-
             return $this->error500($ex);
         }
     }
@@ -1243,17 +1246,17 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return !is_null($res) ? $this->created($res->ID) : $this->error400();
         }
         catch (EntityNotFoundException $ex1) {
-            Log::error($ex1);
+            Log::warning($ex1);
             return $this->error404();
         }
         catch(ValidationException $ex2)
         {
-            Log::error($ex2);
+            Log::warning($ex2);
             return $this->error412(array($ex2->getMessage()));
         }
         catch(\HTTP401UnauthorizedException $ex3)
         {
-            Log::error($ex3);
+            Log::warning($ex3);
             return $this->error401();
         }
         catch (Exception $ex) {
@@ -1357,7 +1360,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->ok($locations);
         } catch (Exception $ex) {
             Log::error($ex);
-
             return $this->error500($ex);
         }
     }
@@ -1381,7 +1383,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->ok($location);
         } catch (Exception $ex) {
             Log::error($ex);
-
             return $this->error500($ex);
         }
     }
@@ -1405,7 +1406,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->ok($list);
         } catch (Exception $ex) {
             Log::error($ex);
-
             return $this->error500($ex);
         }
     }
@@ -1428,7 +1428,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->ok($list);
         } catch (Exception $ex) {
             Log::error($ex);
-
             return $this->error500($ex);
         }
     }

@@ -57,7 +57,6 @@ class SummitAttendee extends SilverstripeBaseModel
             $entity = $class::find($e->ID);
             if(!$entity->isPublished()) continue;
             $entity->attributes['IsCheckedIn'] = $e->pivot->IsCheckedIn;
-
             array_push($events, $entity);
         }
         return $events;
@@ -75,19 +74,9 @@ class SummitAttendee extends SilverstripeBaseModel
      */
     public function getScheduleIds()
     {
-        $res =  $this->belongsToMany
-        (
-            'models\summit\SummitEvent',
-            'SummitAttendee_Schedule',
-            'SummitAttendeeID',
-            'SummitEventID'
-        )->withPivot('IsCheckedIn')->get();
-
         $ids = array();
-        foreach($res as $e)
-        {
+        foreach($this->schedule() as $e)
             array_push($ids, intval($e->ID));
-        }
         return $ids;
     }
 

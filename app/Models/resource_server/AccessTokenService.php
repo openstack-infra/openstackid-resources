@@ -182,7 +182,7 @@ final class AccessTokenService implements IAccessTokenService
         }
         catch (RequestException $ex)
         {
-            Log::error($ex->getMessage());
+            Log::warning($ex->getMessage());
             $response     = $ex->getResponse();
             $content_type = $response->getHeader('content-type');
             $is_json      = str_contains($content_type, 'application/json');
