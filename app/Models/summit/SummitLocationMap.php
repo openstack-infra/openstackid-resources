@@ -22,11 +22,11 @@ use Config;
  * Class SummitLocationMap
  * @package models\summit
  */
-class SummitLocationMap extends SilverstripeBaseModel
+class SummitLocationMap extends SummitLocationImage
 {
-    protected $table = 'SummitLocationMap';
-
     protected $stiBaseClass = 'models\summit\SummitLocationMap';
+
+    protected $table = 'SummitLocationImage';
 
     protected $mtiClassType = 'concrete';
 
@@ -36,6 +36,7 @@ class SummitLocationMap extends SilverstripeBaseModel
         'LocationID'   => 'location_id:json_int',
         'Name'         => 'name:json_text',
         'Description'  => 'description:json_text',
+        'ClassName'    => 'class_name:json_text',
         'Order'        => 'order:json_int',
     );
 
@@ -44,7 +45,7 @@ class SummitLocationMap extends SilverstripeBaseModel
      */
     public function map()
     {
-        return $this->hasOne('models\main\Image', 'ID', 'MapID')->first();
+        return $this->hasOne('models\main\Image', 'ID', 'PictureID')->first();
     }
 
     public function toArray()

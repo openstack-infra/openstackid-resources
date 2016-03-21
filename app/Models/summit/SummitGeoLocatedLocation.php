@@ -44,7 +44,9 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
      */
     public function maps()
     {
-        return $this->hasMany('models\summit\SummitLocationMap', 'LocationID', 'ID')->orderBy('Order','ASC')->get();
+        return $this->hasMany('models\summit\SummitLocationImage', 'LocationID', 'ID')
+                    ->where('ClassName','=', 'SummitLocationMap')
+                    ->orderBy('Order','ASC')->get();
     }
 
     /**
@@ -52,7 +54,9 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
      */
     public function images()
     {
-        return $this->hasMany('models\summit\SummitLocationImage', 'LocationID', 'ID')->orderBy('Order','ASC')->get();
+        return $this->hasMany('models\summit\SummitLocationImage', 'LocationID', 'ID')
+            ->where('ClassName','=', 'SummitLocationImage')
+            ->orderBy('Order','ASC')->get();
     }
 
     /**
