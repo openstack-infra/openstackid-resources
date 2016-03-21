@@ -363,7 +363,7 @@ final class SummitService implements ISummitService
 
                     if($e->Type === 'UPDATE' || $e->Type === "INSERT")
                     {
-                        $entity = SummitLocationMap::find(intval($e->EntityID));
+                        $entity = SummitLocationImage::find(intval($e->EntityID));
                         if(is_null($entity)) continue;
                         array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
                     }
