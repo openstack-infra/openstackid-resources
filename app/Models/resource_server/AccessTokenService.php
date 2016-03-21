@@ -184,6 +184,9 @@ final class AccessTokenService implements IAccessTokenService
         {
             Log::warning($ex->getMessage());
             $response     = $ex->getResponse();
+            if(is_null($response))
+                throw new OAuth2InvalidIntrospectionResponse(sprintf('http code %s', $ex->getCode()));
+
             $content_type = $response->getHeader('content-type');
             $is_json      = str_contains($content_type, 'application/json');
             $body         = ($is_json) ? $response->json(): $response->getBody();
