@@ -59,10 +59,10 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     ) {
         parent::__construct($resource_server_context);
 
-        $this->repository                 = $summit_repository;
-        $this->speaker_repository         = $speaker_repository;
-        $this->event_repository           = $event_repository;
-        $this->service                    = $service;
+        $this->repository          = $summit_repository;
+        $this->speaker_repository  = $speaker_repository;
+        $this->event_repository    = $event_repository;
+        $this->service             = $service;
     }
 
     public function getSummits()
@@ -1427,6 +1427,57 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             }
             return $this->ok($list);
         } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
+    public function getExternalOrder($summit_id, $external_order_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $order = $this->service->getExternalOrder($summit, $external_order_id);
+            return $this->ok($order);
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404(array('message' => $ex1->getMessage()));
+        }
+        catch (ValidationException $ex2) {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function confirmExternalOrderAttendee($summit_id, $external_order_id, $external_attendee_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($member_id)) {
+                throw new \HTTP401UnauthorizedException;
+            }
+            $attendee = $this->service->confirmExternalOrderAttendee($summit, $member_id, $external_order_id, $external_attendee_id);
+            return $this->ok($attendee);
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404(array('message' => $ex1->getMessage()));
+        }
+        catch (ValidationException $ex2) {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (\HTTP401UnauthorizedException $ex3) {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

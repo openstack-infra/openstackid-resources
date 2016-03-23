@@ -140,6 +140,26 @@ class ApiScopesSeeder extends Seeder
                 'system' => false
             )
         );
+
+        ApiScope::create(
+            array(
+                'name' => sprintf('%s/summits/read-external-orders', $current_realm),
+                'short_description' => 'Allow to read External Orders',
+                'description' => 'Allow to read External Orders',
+                'api_id' => $summits->id,
+                'system' => false
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name' => sprintf('%s/summits/confirm-external-orders', $current_realm),
+                'short_description' => 'Allow to confirm External Orders',
+                'description' => 'Allow to confirm External Orders',
+                'api_id' => $summits->id,
+                'system' => false
+            )
+        );
     }
 
 }

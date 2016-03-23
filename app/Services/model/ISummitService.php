@@ -97,4 +97,21 @@ interface ISummitService
      * @return array
      */
     public function getSummitEntityEvents(Summit $summit, $member_id = null, \DateTime $from_date = null, $from_id = null);
+
+
+    /**
+     * @param Summit $summit
+     * @param $external_order_id
+     * @return array
+     */
+    public function getExternalOrder(Summit $summit, $external_order_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $me_id
+     * @param int $external_order_id
+     * @param int $external_attendee_id
+     * @return SummitAttendee
+     */
+    public function confirmExternalOrderAttendee(Summit $summit, $me_id, $external_order_id, $external_attendee_id);
 }

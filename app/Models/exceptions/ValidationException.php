@@ -37,6 +37,10 @@ class ValidationException extends Exception
 
     public function getMessages()
     {
-        $this->messages;
+        if(is_null($this->messages))
+        {
+            $this->messages = array($this->getMessage());
+        }
+        return $this->messages;
     }
 }

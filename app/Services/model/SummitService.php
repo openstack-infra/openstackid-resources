@@ -2,6 +2,7 @@
 
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
 use libs\utils\ITransactionService;
@@ -17,6 +18,7 @@ use models\summit\PresentationVideo;
 use models\summit\Summit;
 use models\summit\SummitAirport;
 use models\summit\SummitAttendee;
+use models\summit\SummitAttendeeTicket;
 use models\summit\SummitEntityEvent;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFactory;
@@ -30,6 +32,8 @@ use models\summit\SummitType;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueRoom;
 use Log;
+use services\apis\IEventbriteAPI;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,13 +64,25 @@ final class SummitService implements ISummitService
     private $event_repository;
 
     /**
+     * @var IEventbriteAPI
+     */
+    private $eventbrite_api;
+
+    /**
      * SummitService constructor.
      * @param ISummitEventRepository $event_repository
+     * @param IEventbriteAPI $eventbrite_api
      * @param ITransactionService $tx_service
      */
-    public function __construct(ISummitEventRepository $event_repository, ITransactionService $tx_service)
+    public function __construct
+    (
+        ISummitEventRepository $event_repository,
+        IEventbriteAPI $eventbrite_api,
+        ITransactionService $tx_service
+    )
     {
         $this->event_repository = $event_repository;
+        $this->eventbrite_api   = $eventbrite_api;
         $this->tx_service       = $tx_service;
     }
 
@@ -905,6 +921,151 @@ final class SummitService implements ISummitService
             $event_repository->delete($event);
 
             return true;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param $external_order_id
+     * @return array
+     * @throws ValidationException
+     * @throws \Exception
+     */
+    public function getExternalOrder(Summit $summit, $external_order_id)
+    {
+        try{
+            $external_order = $this->eventbrite_api->getOrder($external_order_id);
+            if (isset($external_order['attendees']))
+            {
+                $status             = $external_order['status'];
+                $summit_external_id = $external_order['event_id'];
+                $summit             = Summit::where('ExternalEventId', '=', $summit_external_id)->first();
+                if(is_null($summit)) throw new EntityNotFoundException('summit does not exists!');
+                if(intval($summit->ID) !== intval($summit->ID)) throw new ValidationException('order does not belongs to current summit!');
+                if($status !== 'placed') throw new ValidationException($status);
+
+                $attendees = array();
+                foreach($external_order['attendees'] as $a)
+                {
+
+                   $ticket_external_id = intval($a['ticket_class_id']);
+                   $ticket_type = SummitTicketType::where('ExternalId', '=', $ticket_external_id)->first();
+                   if(is_null($ticket_type)) continue;
+                   array_push($attendees, array(
+                       'external_id' => intval($a['id']),
+                       'first_name'  => $a['profile']['first_name'],
+                       'last_name'   => $a['profile']['last_name'],
+                       'company'     => $a['profile']['company'],
+                       'email'       => $a['profile']['email'],
+                       'job_title'   => $a['profile']['job_title'],
+                       'status'      => $a['status'],
+                       'ticket_type' => array
+                       (
+                           'id' => intval($ticket_type->ID),
+                           'name' => $ticket_type->Name,
+                           'external_id' => $ticket_external_id,
+                       )
+                   ));
+                }
+
+                return array('id' => intval($external_order_id), 'attendees' => $attendees);
+            }
+        }
+        catch(ClientException $ex1){
+            if($ex1->getCode() === 400)
+                throw new ValidationException('external order does not exists!');
+            throw $ex1;
+        }
+        catch(\Exception $ex){
+            throw $ex;
+        }
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $me_id
+     * @param int $external_order_id
+     * @param int $external_attendee_id
+     * @return SummitAttendee
+     */
+    public function confirmExternalOrderAttendee(Summit $summit, $me_id, $external_order_id, $external_attendee_id)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $me_id, $external_order_id, $external_attendee_id){
+
+            try{
+                $external_order = $this->eventbrite_api->getOrder($external_order_id);
+                if (isset($external_order['attendees']))
+                {
+                    $external_attendee = null;
+                    foreach($external_order['attendees'] as $a)
+                    {
+                        if(intval($a['id']) === intval($external_attendee_id)) {
+                            $external_attendee = $a;
+                            break;
+                        }
+                    }
+
+                    if(is_null($external_attendee)) throw new EntityNotFoundException('Attendee not found!');
+
+                    $ticket_external_id = intval($external_attendee['ticket_class_id']);
+                    $ticket_type = SummitTicketType::where('ExternalId', '=', $ticket_external_id)->first();
+                    if(is_null($ticket_type)) throw new EntityNotFoundException('Ticket Type not found!');;
+
+                    $status             = $external_order['status'];
+                    $summit_external_id = $external_order['event_id'];
+                    $summit             = Summit::where('ExternalEventId', '=', $summit_external_id)->first();
+                    if(is_null($summit)) throw new EntityNotFoundException('summit does not exists!');
+                    if(intval($summit->ID) !== intval($summit->ID)) throw new ValidationException('order does not belongs to current summit!');
+                    if($status !== 'placed') throw new ValidationException($status);
+
+                    $old_attendee = SummitAttendee::where('MemberID', '=', $me_id)->where('SummitID','=', $summit->ID)->first();
+
+                    if(!is_null($old_attendee))
+                        throw new ValidationException
+                        (
+                            'Attendee Already Exist for current summit!'
+                        );
+
+                    $old_ticket = SummitAttendeeTicket
+                        ::where('ExternalOrderId','=', $external_order_id)
+                        ->where('ExternalAttendeeId','=', $external_attendee_id)->first();
+
+                    if(!is_null($old_ticket))
+                        throw new ValidationException
+                        (
+                            sprintf
+                            (
+                                'Ticket already redeem for attendee id %s !',
+                                $old_ticket->OwnerID
+                            )
+                        );
+
+                    $attendee = new SummitAttendee;
+                    $attendee->MemberID = $me_id;
+                    $attendee->SummitID = $summit->ID;
+                    $attendee->save();
+
+                    $ticket = new SummitAttendeeTicket;
+                    $ticket->ExternalOrderId    = intval($external_order_id);
+                    $ticket->ExternalAttendeeId = intval($external_attendee_id);
+                    $ticket->TicketBoughtDate   = $external_attendee['created'];
+                    $ticket->TicketChangedDate  = $external_attendee['changed'];
+                    $ticket->TicketTypeID       = $ticket_type->getIdentifier();
+                    $ticket->OwnerID            = $attendee->ID;
+                    $ticket->save();
+
+                    return $attendee;
+                }
+            }
+            catch(ClientException $ex1){
+                if($ex1->getCode() === 400)
+                    throw new ValidationException('external order does not exists!');
+                throw $ex1;
+            }
+            catch(\Exception $ex){
+                throw $ex;
+            }
+
         });
     }
 }

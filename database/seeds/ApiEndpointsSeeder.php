@@ -496,11 +496,35 @@ class ApiEndpointsSeeder extends Seeder
             )
         );
 
-        $summit_read_scope          = ApiScope::where('name', '=', sprintf('%s/summits/read', $current_realm))->first();
-        $summit_write_scope         = ApiScope::where('name', '=', sprintf('%s/summits/write', $current_realm))->first();
-        $summit_write_event_scope   = ApiScope::where('name', '=', sprintf('%s/summits/write-event', $current_realm))->first();
-        $summit_publish_event_scope = ApiScope::where('name', '=', sprintf('%s/summits/publish-event', $current_realm))->first();
-        $summit_delete_event_scope  = ApiScope::where('name', '=', sprintf('%s/summits/delete-event', $current_realm))->first();
+        //external orders
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-external-order',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/external-orders/{external_order_id}',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'confirm-external-order',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/external-orders/{external_order_id}/external-attendees/{external_attendee_id}/confirm',
+                'http_method' => 'POST'
+            )
+        );
+
+        $summit_read_scope             = ApiScope::where('name', '=', sprintf('%s/summits/read', $current_realm))->first();
+        $summit_write_scope            = ApiScope::where('name', '=', sprintf('%s/summits/write', $current_realm))->first();
+        $summit_write_event_scope      = ApiScope::where('name', '=', sprintf('%s/summits/write-event', $current_realm))->first();
+        $summit_publish_event_scope    = ApiScope::where('name', '=', sprintf('%s/summits/publish-event', $current_realm))->first();
+        $summit_delete_event_scope     = ApiScope::where('name', '=', sprintf('%s/summits/delete-event', $current_realm))->first();
+        $summit_external_order_read    = ApiScope::where('name', '=', sprintf('%s/summits/read-external-orders', $current_realm))->first();
+        $summit_external_order_confirm = ApiScope::where('name', '=', sprintf('%s/summits/confirm-external-orders', $current_realm))->first();
 
         // read
         $endpoint = ApiEndpoint::where('name', '=', 'get-summits')->first();
@@ -543,9 +567,11 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-summit-types')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-external-order')->first();
+        $endpoint->scopes()->attach($summit_external_order_read->id);
 
         // write
-        $endpoint->scopes()->attach($summit_write_scope->id);
+
         $endpoint = ApiEndpoint::where('name', '=', 'delete-event-attendee-schedule')->first();
         $endpoint->scopes()->attach($summit_write_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'checking-event-attendee-schedule')->first();
@@ -554,6 +580,7 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint->scopes()->attach($summit_write_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'add-event-feedback')->first();
         $endpoint->scopes()->attach($summit_write_scope->id);
+
         // write events
         $endpoint = ApiEndpoint::where('name', '=', 'add-event')->first();
         $endpoint->scopes()->attach($summit_write_event_scope->id);
@@ -568,6 +595,11 @@ class ApiEndpointsSeeder extends Seeder
 
         $endpoint = ApiEndpoint::where('name', '=', 'delete-event')->first();
         $endpoint->scopes()->attach($summit_delete_event_scope->id);
+
+        //confirm external order
+
+        $endpoint = ApiEndpoint::where('name', '=', 'confirm-external-order')->first();
+        $endpoint->scopes()->attach($summit_external_order_confirm->id);
 
     }
 

@@ -73,8 +73,10 @@ class BaseModelEloquent extends Eloquent
                     {
                         case 'datetime_epoch':
                         {
-                            $datetime = new \DateTime($value);
-                            $value = $datetime->getTimestamp();
+                            if(!is_null($value)) {
+                                $datetime = new \DateTime($value);
+                                $value = $datetime->getTimestamp();
+                            }
                         }
                         break;
                         case 'json_string':

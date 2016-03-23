@@ -124,6 +124,12 @@ Route::group(array(
                 Route::get('', 'OAuth2SummitApiController@getSummitTypes');
             });
 
+            // summit types
+            Route::group(array('prefix' => 'external-orders'), function () {
+                Route::get('{external_order_id}', 'OAuth2SummitApiController@getExternalOrder');
+                Route::post('{external_order_id}/external-attendees/{external_attendee_id}/confirm', 'OAuth2SummitApiController@confirmExternalOrderAttendee');
+            });
+
         });
     });
 });

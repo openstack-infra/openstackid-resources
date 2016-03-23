@@ -1,6 +1,7 @@
 <?php
+namespace services\apis;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,13 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+interface IEventbriteAPI
+{
+    /**
+     * @param array $auth_info
+     * @return $this
+     */
+    public function setCredentials(array $auth_info);
 
-return array
-(
-    'ssl_enabled'                      => env('SSL_ENABLED', false),
-    'db_log_enabled'                   => env('DB_LOG_ENABLED', false),
-    'access_token_cache_lifetime'      => env('ACCESS_TOKEN_CACHE_LIFETIME', 300),
-    'assets_base_url'                  => env('ASSETS_BASE_URL', null),
-    'response_cache_lifetime'          => env('API_RESPONSE_CACHE_LIFETIME', 300),
-    'eventbrite_oauth2_personal_token' => env('EVENTBRITE_OAUTH2_PERSONAL_TOKEN', ''),
-);
+     /**
+     * @param string $order_id
+     * @return mixed
+     */
+    public function getOrder($order_id);
+}

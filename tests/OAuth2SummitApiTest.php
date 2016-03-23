@@ -1146,4 +1146,69 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($locations));
     }
 
+    public function testGetCurrentSummitExternalOrder()
+    {
+        $params  = array
+        (
+            'id'        => 'current',
+            'external_order_id' => 484446336
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getExternalOrder",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $order  = json_decode($content);
+        $this->assertTrue(!is_null($order));
+    }
+
+
+    public function testGetCurrentSummitConfirmExternalOrder()
+    {
+        $params  = array
+        (
+            'id'                   => 'current',
+            'external_order_id'    => 484446336,
+            'external_attendee_id' => 611227262
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "POST",
+            "OAuth2SummitApiController@confirmExternalOrderAttendee",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $attendee  = json_decode($content);
+        $this->assertTrue(!is_null($attendee));
+    }
 }
