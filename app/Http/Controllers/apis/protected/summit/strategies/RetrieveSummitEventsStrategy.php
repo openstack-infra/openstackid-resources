@@ -91,6 +91,7 @@ abstract class RetrieveSummitEventsStrategy
                             break;
                             case 'location': {
                                 $location         = $event->getLocation();
+                                if(is_null($location)) continue;
                                 $data['location'] = $location->toArray();
                                 unset($data['location_id']);
                             }
