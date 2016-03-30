@@ -1179,6 +1179,39 @@ class OAuth2SummitApiTest extends ProtectedApiTest
     }
 
 
+    public function testGetCurrentSummitExternalOrderNonExistent()
+    {
+        $params  = array
+        (
+            'id'        => 'current',
+            'external_order_id' => 'ADDDD'
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getExternalOrder",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(404);
+
+        $order  = json_decode($content);
+        $this->assertTrue(!is_null($order));
+    }
+
+
     public function testGetCurrentSummitConfirmExternalOrder()
     {
         $params  = array

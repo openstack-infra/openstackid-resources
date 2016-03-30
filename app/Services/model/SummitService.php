@@ -942,14 +942,18 @@ final class SummitService implements ISummitService
                 $summit             = Summit::where('ExternalEventId', '=', $summit_external_id)->first();
                 if(is_null($summit)) throw new EntityNotFoundException('summit does not exists!');
                 if(intval($summit->ID) !== intval($summit->ID)) throw new ValidationException('order does not belongs to current summit!');
-                if($status !== 'placed') throw new ValidationException($status);
-
+                if($status !== 'placed') throw new ValidationException(sprintf('invalid order status %s',$status));
                 $attendees = array();
                 foreach($external_order['attendees'] as $a)
                 {
 
                    $ticket_external_id = intval($a['ticket_class_id']);
-                   $ticket_type = SummitTicketType::where('ExternalId', '=', $ticket_external_id)->first();
+                   $ticket_type        = SummitTicketType::where('ExternalId', '=', $ticket_external_id)->first();
+                   $redeem_attendee    = SummitAttendeeTicket::where('ExternalOrderId', '=' , trim($external_order_id))
+                       ->where('ExternalAttendeeId','=',$a['id'])
+                       ->first();;
+
+                   if(!is_null($redeem_attendee)) continue;
                    if(is_null($ticket_type)) continue;
                    array_push($attendees, array(
                        'external_id' => intval($a['id']),
@@ -967,13 +971,16 @@ final class SummitService implements ISummitService
                        )
                    ));
                 }
+                if(count($attendees) === 0) throw new ValidationException('Order already redeem!');
 
                 return array('id' => intval($external_order_id), 'attendees' => $attendees);
             }
         }
         catch(ClientException $ex1){
             if($ex1->getCode() === 400)
-                throw new ValidationException('external order does not exists!');
+                throw new EntityNotFoundException('external order does not exists!');
+            if($ex1->getCode() === 403)
+                throw new EntityNotFoundException('external order does not exists!');
             throw $ex1;
         }
         catch(\Exception $ex){
@@ -1059,7 +1066,9 @@ final class SummitService implements ISummitService
             }
             catch(ClientException $ex1){
                 if($ex1->getCode() === 400)
-                    throw new ValidationException('external order does not exists!');
+                    throw new EntityNotFoundException('external order does not exists!');
+                if($ex1->getCode() === 403)
+                    throw new EntityNotFoundException('external order does not exists!');
                 throw $ex1;
             }
             catch(\Exception $ex){
