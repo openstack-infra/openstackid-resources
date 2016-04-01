@@ -1178,7 +1178,6 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($order));
     }
 
-
     public function testGetCurrentSummitExternalOrderNonExistent()
     {
         $params  = array
@@ -1210,7 +1209,6 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $order  = json_decode($content);
         $this->assertTrue(!is_null($order));
     }
-
 
     public function testGetCurrentSummitConfirmExternalOrder()
     {

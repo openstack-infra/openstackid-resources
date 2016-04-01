@@ -1,12 +1,21 @@
 <?php namespace services\model;
-
+/**
+ * Copyright 2015 OpenStack Foundation
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
-use libs\utils\ITransactionService;
-use libs\utils\JsonUtils;
 use models\exceptions\ValidationException;
 use models\summit\ISummitEventRepository;
 use models\summit\Presentation;
@@ -25,27 +34,21 @@ use models\summit\SummitEventFactory;
 use models\summit\SummitEventFeedback;
 use models\summit\SummitEventType;
 use models\summit\SummitHotel;
-use models\summit\SummitLocationMap;
 use models\summit\SummitLocationImage;
 use models\summit\SummitTicketType;
 use models\summit\SummitType;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueRoom;
-use Log;
 use services\apis\IEventbriteAPI;
+use libs\utils\ITransactionService;
+use libs\utils\JsonUtils;
+use Log;
+use DB;
 
 /**
- * Copyright 2015 OpenStack Foundation
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * http://www.apache.org/licenses/LICENSE-2.0
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- **/
+ * Class SummitService
+ * @package services\model
+ */
 final class SummitService implements ISummitService
 {
 
@@ -170,7 +173,6 @@ final class SummitService implements ISummitService
             return $newFeedback;
         });
     }
-
 
     /**
      * @param Summit $summit
@@ -656,6 +658,12 @@ final class SummitService implements ISummitService
         return $this->saveOrUpdateEvent($summit, $data, $event_id);
     }
 
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @param null|int $event_id
+     * @return SummitEvent
+     */
     private function saveOrUpdateEvent(Summit $summit, array $data, $event_id = null)
     {
         $event_repository = $this->event_repository;
@@ -730,6 +738,7 @@ final class SummitService implements ISummitService
 
             if(isset($data['allow_feedback']))
                 $event->setAllowFeedBack($data['allow_feedback']);
+
             if(!is_null($event_type))
                 $event->setType($event_type);
 
@@ -755,8 +764,6 @@ final class SummitService implements ISummitService
                         )
                     );
             }
-
-
 
             $event_repository->add($event);
 
@@ -895,6 +902,7 @@ final class SummitService implements ISummitService
 
             $event->unPublish();
             $event_repository->add($event);
+            $this->cleanupAttendeesSchedule($event_id);
             return $event;
         });
     }
@@ -919,11 +927,18 @@ final class SummitService implements ISummitService
                 throw new ValidationException(sprintf("event %s does not belongs to summit id %s", $event_id, $summit->getIdentifier()));
 
             $event_repository->delete($event);
-
+            // clean up summit attendees schedule
+            $this->cleanupAttendeesSchedule($event_id);
             return true;
         });
     }
 
+    /**
+     * @param int $event_id
+     */
+    private function cleanupAttendeesSchedule($event_id){
+        DB::connection('ss')->delete("DELETE SummitAttendee_Schedule FROM SummitAttendee_Schedule WHERE SummitEventID = {$event_id};");
+    }
     /**
      * @param Summit $summit
      * @param $external_order_id
