@@ -54,39 +54,36 @@ class SummitEventFeedback extends SilverstripeBaseModel
     }
 
     /**
-     * @param bool|false $show_attendee_info
+     * @param bool|false $expand_owner_info
      * @return array
      */
-    public function toArray($show_attendee_info = false)
+    public function toArray($expand_owner_info = false)
     {
         $data      = parent::toArray();
         $member_id = $data['owner_id'];
         unset($data['owner_id']);
+        $member    = Member::where('ID', '=', $member_id)->first();
+        if(is_null($member)) return $data;
+
         $attendee  = SummitAttendee::where('MemberID', '=', $member_id)->first();
 
-        if (!is_null($attendee))
-        {
+        if($expand_owner_info){
+            $owner = array
+            (
+                'id'         => intval($member->ID),
+                'first_name' => JsonUtils::toJsonString($member->FirstName),
+                'last_name'  => JsonUtils::toJsonString($member->Surname)
+            );
+            if (!is_null($attendee)) $owner['attendee_id'] = intval($attendee->ID);
 
-            if ($show_attendee_info)
-            {
-
-                $member = $attendee->member();
-                $data['owner'] = array
-                (
-                    'id'         => intval($attendee->ID),
-                    'first_name' => JsonUtils::toJsonString($member->FirstName),
-                    'last_name'  => JsonUtils::toJsonString($member->Surname)
-                );
-            }
-            else
-            {
-                $data['owner_id'] = intval($attendee->ID);
-            }
+            $data['owner'] = $owner;
         }
         else
         {
-            $data['member_id'] =  intval($member_id);
+            $data['member_id'] =  intval($member->ID);
+            if (!is_null($attendee)) $data['attendee_id'] = intval($attendee->ID);
         }
+
         return $data;
     }
 }
