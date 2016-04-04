@@ -369,6 +369,7 @@ class SummitEvent extends SilverstripeBaseModel
         {
             $class = 'models\\summit\\'.$e->ClassName;
             $entity = $class::find($e->ID);
+            if(is_null($entity)) continue;
             array_push($feedback, $entity);
         }
         return array($total,$per_page, $current_page, $last_page, $feedback);
