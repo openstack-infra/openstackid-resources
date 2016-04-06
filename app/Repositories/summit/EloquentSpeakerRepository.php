@@ -54,7 +54,7 @@ final class EloquentSpeakerRepository extends EloquentBaseRepository implements 
 
         $bindings      = array
         (
-            'summit_id'  => $summit->getIdentifier(),
+            'summit_id'   => $summit->getIdentifier(),
         );
 
         if(!is_null($filter))
@@ -78,15 +78,19 @@ final class EloquentSpeakerRepository extends EloquentBaseRepository implements 
         }
 
         $total     = DB::connection('ss')->select("
-SELECT COUNT(S.ID) AS QTY From PresentationSpeaker S
+SELECT COUNT(DISTINCT S.ID) AS QTY From PresentationSpeaker S
 LEFT JOIN Member M ON M.ID = S.MemberID
-WHERE EXISTS
+WHERE
+EXISTS
 (
     SELECT E.ID FROM SummitEvent E
     INNER JOIN Presentation P ON E.ID = P.ID
     INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
-    WHERE E.SummitID = :summit_id AND E.Published = 1 AND PS.PresentationSpeakerID = S.ID
-) {$extra_filters};", $bindings);
+    WHERE E.SummitID = :summit_id AND E.Published = 1 AND ( PS.PresentationSpeakerID = S.ID OR P.ModeratorID = S.ID)
+)
+{$extra_filters};
+
+", $bindings);
         $total     = intval($total[0]->QTY);
 
         $bindings = array_merge( $bindings, array
@@ -95,15 +99,17 @@ WHERE EXISTS
             'offset'    => $paging_info->getOffset(),
         ));
         $rows      = DB::connection('ss')->select("
-SELECT S.* From PresentationSpeaker S
+SELECT DISTINCT S.* From PresentationSpeaker S
 LEFT JOIN Member M ON M.ID = S.MemberID
-WHERE EXISTS
+WHERE
+EXISTS
 (
     SELECT E.ID FROM SummitEvent E
     INNER JOIN Presentation P ON E.ID = P.ID
     INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
-    WHERE E.SummitID = :summit_id AND E.Published = 1 AND PS.PresentationSpeakerID = S.ID
-) {$extra_filters} {$extra_orders} limit :per_page offset :offset;", $bindings);
+    WHERE E.SummitID = :summit_id AND E.Published = 1 AND ( PS.PresentationSpeakerID = S.ID OR P.ModeratorID = S.ID)
+)
+{$extra_filters} {$extra_orders} limit :per_page offset :offset;", $bindings);
 
         $items = array();
         foreach($rows as $row)
