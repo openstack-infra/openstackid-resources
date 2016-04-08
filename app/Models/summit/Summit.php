@@ -386,7 +386,8 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
         }
         if(!is_null($from_date))
         {
-            $filters .= " AND SummitEntityEvent.Created >= '{$from_date}' ";
+            $str_date = $from_date->format("Y-m-d H:i:s");
+            $filters .= " AND SummitEntityEvent.Created >= '{$str_date}' ";
         }
 
 
