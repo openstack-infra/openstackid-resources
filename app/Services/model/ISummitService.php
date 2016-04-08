@@ -94,10 +94,10 @@ interface ISummitService
      * @param null|int $member_id
      * @param null|\DateTime $from_date
      * @param null|int $from_id
+     * @param null|int $limit
      * @return array
      */
-    public function getSummitEntityEvents(Summit $summit, $member_id = null, \DateTime $from_date = null, $from_id = null);
-
+    public function getSummitEntityEvents(Summit $summit, $member_id = null, \DateTime $from_date = null, $from_id = null, $limit = 25);
 
     /**
      * @param Summit $summit

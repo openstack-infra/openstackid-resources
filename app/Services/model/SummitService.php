@@ -179,402 +179,335 @@ final class SummitService implements ISummitService
      * @param null|int $member_id
      * @param null|\DateTime $from_date
      * @param null|int $from_id
+     * @param int $limit
      * @return array
      */
-    public function getSummitEntityEvents(Summit $summit, $member_id = null, \DateTime $from_date = null, $from_id = null)
+    public function getSummitEntityEvents(Summit $summit, $member_id = null, \DateTime $from_date = null, $from_id = null, $limit = 25)
     {
-        $events         = $summit->getEntityEvents($from_id, $from_date);
-        $list           = array();
-        $ops_dictionary = array();
+        $last_event_id   = 0;
+        $last_event_date = 0;
+        $count           = 0;
+        $list            = array();
 
-        $ops_dictionary['UPDATE'] = array();
-        $ops_dictionary['DELETE'] = array();
-        $ops_dictionary['INSERT'] = array();
-        $last_event_id             = 0;
-        $last_event_date           = 0;
+        do {
 
-        foreach($events as $e)
-        {
-            $last_event_id   = intval($e->ID);
-            $last_event_date = $e->Created;
+            $events = $summit->getEntityEvents($member_id, $from_id, $from_date, $limit);
 
-            $metadata = $e->Metadata;
-            switch($e->EntityClassName)
-            {
-                case 'Presentation':
-                case 'SummitEvent':
-                {
-                    $entity = $summit->getScheduleEvent($e->EntityID);
+            $ops_dictionary = array();
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $metadata          = !empty($metadata) ? json_decode($metadata, true): array();
-                        $published_old     = isset($metadata['pub_old']) ? (bool)intval($metadata['pub_old']) : false;
-                        $published_current = isset($metadata['pub_new']) ? (bool)intval($metadata['pub_new']) : false;
+            $ops_dictionary['UPDATE'] = array();
+            $ops_dictionary['DELETE'] = array();
+            $ops_dictionary['INSERT'] = array();
 
-                        // the event was not published at the moment of UPDATE .. then skip it!
-                        if(!$published_old && !$published_current) continue;
+            foreach ($events as $e) {
+                $last_event_id = intval($e->ID);
+                $last_event_date = $e->Created;
+                ++$count;
+                $metadata = $e->Metadata;
+                switch ($e->EntityClassName) {
+                    case 'Presentation':
+                    case 'SummitEvent': {
+                        $entity = $summit->getScheduleEvent($e->EntityID);
 
-                        if(!is_null($entity)) // if event exists its bc its published
-                        {
-                            $type = $published_current && !$published_old ?  'INSERT' : 'UPDATE';
-                            if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$type])) continue;
-                            array_push($ops_dictionary[$type],$e->EntityClassName.$e->EntityID);
-                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $type, $entity));
-                        }
-                        else // if does not exists on schedule delete it
-                        {
-                            if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary['DELETE'])) continue;
-                            array_push($ops_dictionary['DELETE'],$e->EntityClassName.$e->EntityID);
-                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, 'DELETE'));
-                        }
-                    }
-                    else if($e->Type === 'DELETE')
-                    {
-                        if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                        array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'MySchedule':
-                {
-                    if(!is_null($member_id) && intval($member_id) === intval($e->OwnerID))
-                    {
-                        if($e->Type === 'INSERT')
-                        {
-                            $entity = $summit->getScheduleEvent($e->EntityID);
-                            if(is_null($entity)) continue;
-                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
-                        }
-                        else if($e->Type === 'DELETE')
-                        {
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $metadata = !empty($metadata) ? json_decode($metadata, true) : array();
+                            $published_old = isset($metadata['pub_old']) ? (bool)intval($metadata['pub_old']) : false;
+                            $published_current = isset($metadata['pub_new']) ? (bool)intval($metadata['pub_new']) : false;
+
+                            // the event was not published at the moment of UPDATE .. then skip it!
+                            if (!$published_old && !$published_current) continue;
+
+                            if (!is_null($entity)) // if event exists its bc its published
+                            {
+                                $type = $published_current && !$published_old ? 'INSERT' : 'UPDATE';
+                                if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$type])) continue;
+                                array_push($ops_dictionary[$type], $e->EntityClassName . $e->EntityID);
+                                array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $type, $entity));
+                            } else // if does not exists on schedule delete it
+                            {
+                                if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary['DELETE'])) continue;
+                                array_push($ops_dictionary['DELETE'], $e->EntityClassName . $e->EntityID);
+                                array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, 'DELETE'));
+                            }
+                        } else if ($e->Type === 'DELETE') {
+                            if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                            array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
                             array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
                         }
                     }
-                }
-                break;
-                case 'Summit':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    if(intval($e->EntityID) !== intval($summit->ID)) continue; // only current summit
-                    array_push($ops_dictionary[$e->Type], $e->EntityClassName.$e->EntityID);
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = Summit::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        break;
+                    case 'MySchedule': {
+                        if (!is_null($member_id) && intval($member_id) === intval($e->OwnerID)) {
+                            if ($e->Type === 'INSERT') {
+                                $entity = $summit->getScheduleEvent($e->EntityID);
+                                if (is_null($entity)) continue;
+                                array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                            } else if ($e->Type === 'DELETE') {
+                                array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                            }
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        break;
+                    case 'Summit': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        if (intval($e->EntityID) !== intval($summit->ID)) continue; // only current summit
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = Summit::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                }
-                break;
-                case 'SummitType':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitType': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitType::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
-                    }
-                    else if($e->Type === 'DELETE')
-                    {
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitType::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
 
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                }
-                break;
-                case 'SummitEventType':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitEventType': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitEventType::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitEventType::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'PresentationSpeaker':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'PresentationSpeaker': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = PresentationSpeaker::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = PresentationSpeaker::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'SummitTicketType':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitTicketType': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitTicketType::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitTicketType::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'SummitVenueRoom':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitVenueRoom': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitVenueRoom::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitVenueRoom::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'SummitVenue':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitVenue': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitVenue::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitVenue::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'SummitLocationMap':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitLocationMap': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitLocationImage::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitLocationImage::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'SummitLocationImage':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitLocationImage': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitLocationImage::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitLocationImage::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'SummitHotel':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitHotel': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitHotel::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitHotel::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'SummitAirport':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'SummitAirport': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = SummitAirport::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = SummitAirport::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'PresentationCategory':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'PresentationCategory': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = PresentationCategory::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = PresentationCategory::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'PresentationCategoryGroup':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'PresentationCategoryGroup': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = PresentationCategoryGroup::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = PresentationCategoryGroup::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        break;
+                    case 'TrackFromTrackGroup': {
+                        $metadata = !empty($metadata) ? json_decode($metadata, true) : array();
+                        if (count($metadata) === 0) continue;
+                        $group_id = isset($metadata['group_id']) ? intval($metadata['group_id']) : null;
+                        if (is_null($group_id)) continue;
+                        $entity = $summit->getCategoryGroup($group_id);
+                        if (is_null($entity)) continue;
+                        if (in_array('PresentationCategoryGroup' . $group_id, $ops_dictionary['UPDATE'])) continue;
+                        array_push($ops_dictionary['UPDATE'], 'PresentationCategoryGroup' . $group_id);
+                        array_push($list, $this->serializeSummitEntityEvent($e, 'PresentationCategoryGroup', 'UPDATE', $entity));
                     }
-                }
-                break;
-                case 'TrackFromTrackGroup':
-                {
-                    $metadata        = !empty($metadata) ? json_decode($metadata, true): array();
-                    if(count($metadata) === 0) continue;
-                    $group_id = isset($metadata['group_id']) ? intval($metadata['group_id']) : null;
-                    if(is_null($group_id)) continue;
-                    $entity          = $summit->getCategoryGroup($group_id);
-                    if(is_null($entity)) continue;
-                    if(in_array('PresentationCategoryGroup'.$group_id, $ops_dictionary['UPDATE'])) continue;
-                    array_push($ops_dictionary['UPDATE'],'PresentationCategoryGroup'.$group_id);
-                    array_push($list, $this->serializeSummitEntityEvent($e, 'PresentationCategoryGroup', 'UPDATE', $entity));
-                }
-                break;
-                case 'PresentationSlide':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = PresentationSlide::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        break;
+                    case 'PresentationSlide': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = PresentationSlide::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
-                    }
-                }
-                break;
-                case 'PresentationVideo':
-                {
-                    if(in_array($e->EntityClassName.$e->EntityID, $ops_dictionary[$e->Type])) continue;
-                    array_push($ops_dictionary[$e->Type],$e->EntityClassName.$e->EntityID);
+                        break;
+                    case 'PresentationVideo': {
+                        if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
+                        array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
 
-                    if($e->Type === 'UPDATE' || $e->Type === "INSERT")
-                    {
-                        $entity = PresentationVideo::find(intval($e->EntityID));
-                        if(is_null($entity)) continue;
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        if ($e->Type === 'UPDATE' || $e->Type === "INSERT") {
+                            $entity = PresentationVideo::find(intval($e->EntityID));
+                            if (is_null($entity)) continue;
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type, $entity));
+                        } else if ($e->Type === 'DELETE') {
+                            array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        }
                     }
-                    else if($e->Type === 'DELETE')
-                    {
-                        array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
+                        break;
+                    case 'SpeakerFromPresentation': {
+                        $metadata = !empty($metadata) ? json_decode($metadata, true) : array();
+                        if (count($metadata) === 0) continue;
+                        $presentation_id = isset($metadata['presentation_id']) ? intval($metadata['presentation_id']) : null;
+                        if (is_null($presentation_id)) continue;
+                        $entity = $summit->getScheduleEvent($presentation_id);
+                        if (is_null($entity)) continue;
+                        if (in_array('Presentation' . $presentation_id, $ops_dictionary['UPDATE'])) continue;
+                        array_push($ops_dictionary['UPDATE'], 'Presentation' . $presentation_id);
+                        array_push($list, $this->serializeSummitEntityEvent($e, 'Presentation', 'UPDATE', $entity));
                     }
-                }
-                break;
-                case 'SpeakerFromPresentation':
-                {
-                    $metadata        = !empty($metadata) ? json_decode($metadata, true): array();
-                    if(count($metadata) === 0) continue;
-                    $presentation_id = isset($metadata['presentation_id']) ? intval($metadata['presentation_id']) : null;
-                    if(is_null($presentation_id)) continue;
-                    $entity          = $summit->getScheduleEvent($presentation_id);
-                    if(is_null($entity)) continue;
-                    if(in_array('Presentation'.$presentation_id, $ops_dictionary['UPDATE'])) continue;
-                    array_push($ops_dictionary['UPDATE'],'Presentation'.$presentation_id);
-                    array_push($list, $this->serializeSummitEntityEvent($e, 'Presentation', 'UPDATE', $entity));
-                }
-                break;
-                case 'SummitTypeFromEvent':
-                {
-                    $metadata        = !empty($metadata) ? json_decode($metadata, true): array();
-                    if(count($metadata) === 0) continue;
-                    $event_id = isset($metadata['event_id']) ? intval($metadata['event_id']) : null;
-                    if(is_null($event_id)) continue;
-                    $entity          = $summit->getScheduleEvent($event_id);
-                    if(is_null($entity)) continue;
-                    if(in_array('SummitEvent'.$event_id, $ops_dictionary['UPDATE'])) continue;
-                    array_push($ops_dictionary['UPDATE'],'SummitEvent'.$event_id);
-                    array_push($list, $this->serializeSummitEntityEvent($e, 'SummitEvent', 'UPDATE', $entity));
-                }
-                break;
-                case 'SponsorFromEvent':
-                {
-                    $metadata        = !empty($metadata) ? json_decode($metadata, true): array();
-                    if(count($metadata) === 0) continue;
-                    $event_id = isset($metadata['event_id']) ? intval($metadata['event_id']) : null;
-                    if(is_null($event_id)) continue;
-                    $entity          = $summit->getScheduleEvent($event_id);
-                    if(is_null($entity)) continue;
-                    if(in_array('SummitEvent'.$event_id, $ops_dictionary['UPDATE'])) continue;
-                    array_push($ops_dictionary['UPDATE'],'SummitEvent'.$event_id);
-                    array_push($list, $this->serializeSummitEntityEvent($e, 'SummitEvent', 'UPDATE', $entity));
-                }
-                break;
-                case 'WipeData':
-                {
-                    // if event is for a particular user
-                    if(intval($e->EntityID) > 0 )
-                    {
-                        // if we are not the recipient or its already processed then continue
-                        if( intval($member_id) !== intval($e->EntityID))
-                            continue;
+                        break;
+                    case 'SummitTypeFromEvent': {
+                        $metadata = !empty($metadata) ? json_decode($metadata, true) : array();
+                        if (count($metadata) === 0) continue;
+                        $event_id = isset($metadata['event_id']) ? intval($metadata['event_id']) : null;
+                        if (is_null($event_id)) continue;
+                        $entity = $summit->getScheduleEvent($event_id);
+                        if (is_null($entity)) continue;
+                        if (in_array('SummitEvent' . $event_id, $ops_dictionary['UPDATE'])) continue;
+                        array_push($ops_dictionary['UPDATE'], 'SummitEvent' . $event_id);
+                        array_push($list, $this->serializeSummitEntityEvent($e, 'SummitEvent', 'UPDATE', $entity));
                     }
-                    array_push($list, $this->serializeSummitEntityEvent($e, 'TRUNCATE', 'TRUNCATE'));
+                        break;
+                    case 'SponsorFromEvent': {
+                        $metadata = !empty($metadata) ? json_decode($metadata, true) : array();
+                        if (count($metadata) === 0) continue;
+                        $event_id = isset($metadata['event_id']) ? intval($metadata['event_id']) : null;
+                        if (is_null($event_id)) continue;
+                        $entity = $summit->getScheduleEvent($event_id);
+                        if (is_null($entity)) continue;
+                        if (in_array('SummitEvent' . $event_id, $ops_dictionary['UPDATE'])) continue;
+                        array_push($ops_dictionary['UPDATE'], 'SummitEvent' . $event_id);
+                        array_push($list, $this->serializeSummitEntityEvent($e, 'SummitEvent', 'UPDATE', $entity));
+                    }
+                        break;
+                    case 'WipeData': {
+                        // if event is for a particular user
+                        if (intval($e->EntityID) > 0) {
+                            // if we are not the recipient or its already processed then continue
+                            if (intval($member_id) !== intval($e->EntityID))
+                                continue;
+                        }
+                        array_push($list, $this->serializeSummitEntityEvent($e, 'TRUNCATE', 'TRUNCATE'));
+                    }
+                        break;
                 }
-                break;
             }
-        }
+            // reset if we do not get any data so far, to get next batch
+            $from_id   = $last_event_id;
+            $from_date = null;
+
+        } while(count($list) === 0);
         return array($last_event_id, $last_event_date, $list);
     }
 

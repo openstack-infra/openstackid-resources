@@ -371,24 +371,86 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
     }
 
     /**
+     * @param int|null $member_id
      * @param int|null $from_id
      * @param \DateTime|null $from_date
+     * @param int $limit
      * @return SummitEntityEvent[]
      */
-    public function getEntityEvents($from_id = null, \DateTime $from_date = null)
+    public function getEntityEvents($member_id = null, $from_id = null, \DateTime $from_date = null, $limit = 25)
     {
-        $relation = $this->hasMany('models\summit\SummitEntityEvent', 'SummitID', 'ID');
+        $filters = '';
         if(!is_null($from_id))
         {
-            $relation = $relation->where('SummitEntityEvent.ID','>', intval($from_id));
+            $filters .= " AND SummitEntityEvent.ID > {$from_id} ";
         }
         if(!is_null($from_date))
         {
-            $relation = $relation->where('SummitEntityEvent.Created','>=', $from_date);
+            $filters .= " AND SummitEntityEvent.Created >= '{$from_date}' ";
         }
-        return $relation
-            ->orderBy('Created','asc')
-            ->get();
+
+
+        $query = <<<SQL
+SELECT * FROM
+(
+	SELECT * FROM SummitEntityEvent
+	WHERE
+	(
+		(EntityClassName <> 'MySchedule' AND EntityClassName <> 'SummitAttendee')
+		-- GLOBAL TRUNCATE
+		OR (EntityClassName = 'WipeData' AND EntityID = 0)
+	)
+	AND SummitID = {$this->ID}
+	{$filters}
+	LIMIT {$limit}
+)
+AS GLOBAL_EVENTS
+SQL;
+
+        if(!is_null($member_id)){
+            $query .= <<<SQL
+ UNION
+SELECT * FROM
+(
+	SELECT * FROM SummitEntityEvent
+	WHERE
+	(
+		EntityClassName = 'MySchedule'
+		AND OwnerID = {$member_id}
+	)
+	AND SummitID = {$this->ID}
+	{$filters}
+	LIMIT {$limit}
+)
+AS MY_SCHEDULE
+UNION
+SELECT * FROM
+(
+	SELECT * FROM SummitEntityEvent
+	WHERE
+	(
+		EntityClassName = 'WipeData' AND EntityID = {$member_id}
+	)
+	AND SummitID = {$this->ID}
+	{$filters}
+	LIMIT {$limit}
+) AS USER_WIPE_DATA
+SQL;
+        }
+
+        $query .= <<<SQL
+ ORDER BY Created ASC LIMIT 25;
+SQL;
+
+        $rows = DB::connection('ss')->select($query);
+        $items = array();
+        foreach($rows as $row)
+        {
+            $instance = new SummitEntityEvent();
+            $instance->setRawAttributes((array)$row, true);
+            array_push($items, $instance);
+        }
+        return $items;
     }
 
     public function toArray()

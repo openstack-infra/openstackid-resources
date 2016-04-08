@@ -1279,11 +1279,13 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
             $last_event_id = Request::input('last_event_id', null);
             $from_date     = Request::input('from_date', null);
+            $limit         = Request::input('limit', 25);
 
             $rules = array
             (
                 'last_event_id' => 'sometimes|required|integer',
                 'from_date'     => 'sometimes|required|integer',
+                'limit'         => 'sometimes|required|integer',
             );
 
             $data = array();
@@ -1296,6 +1298,10 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if (!is_null($from_date))
             {
                 $data['from_date'] = $from_date;
+            }
+
+            if(!is_null($limit)){
+                $data['limit'] = $limit;
             }
 
             // Creates a Validator instance and validates the data.
@@ -1321,7 +1327,8 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 $summit,
                 $this->resource_server_context->getCurrentUserExternalId(),
                 $from_date,
-                $last_event_id
+                $last_event_id,
+                $limit
             );
 
             return $this->ok
