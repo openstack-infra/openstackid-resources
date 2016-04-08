@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use Exception;
+use libs\utils\HTMLCleaner;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\ISummitEventRepository;
@@ -876,7 +877,13 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 );
             }
 
-            $event = $this->service->addEvent($summit, $data->all());
+            $fields = array
+            (
+                'title',
+                'description'
+            );
+
+            $event = $this->service->addEvent($summit, HTMLCleaner::cleanData($data->all(), $fields));
 
             return $this->created($event);
         }
@@ -934,7 +941,13 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 );
             }
 
-            $event = $this->service->updateEvent($summit, $event_id, $data->all());
+            $fields = array
+            (
+                'title',
+                'description'
+            );
+
+            $event = $this->service->updateEvent($summit, $event_id, HTMLCleaner::cleanData($data->all(), $fields));
 
             return $this->ok($event);
 
