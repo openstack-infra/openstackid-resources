@@ -453,6 +453,19 @@ SQL;
         return $items;
     }
 
+    /**
+     * @return int
+     */
+    public function getLastEntityEventId(){
+        $query = <<<SQL
+SELECT ID FROM SummitEntityEvent WHERE SummitID = {$this->ID} ORDER BY ID DESC LIMIT 1;
+SQL;
+
+        $last_id     = DB::connection('ss')->select($query);
+        $last_id     = intval($last_id[0]->ID);
+        return $last_id;
+    }
+
     public function toArray()
     {
         $values = parent::toArray();
