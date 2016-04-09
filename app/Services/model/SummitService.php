@@ -185,15 +185,15 @@ final class SummitService implements ISummitService
     public function getSummitEntityEvents(Summit $summit, $member_id = null, \DateTime $from_date = null, $from_id = null, $limit = 25)
     {
         return $this->tx_service->transaction(function() use($summit, $member_id, $from_date, $from_id, $limit) {
-
-            $last_event_id   = 0;
-            $last_event_date = 0;
-            $count           = 0;
-            $list            = array();
             $global_last_id  = $summit->getLastEntityEventId();
             $from_id         = !is_null($from_id)? intval($from_id) : null;
 
             do {
+                $last_event_id   = 0;
+                $last_event_date = 0;
+                $count           = 0;
+                $list            = array();
+
                 if(!is_null($from_id) && $global_last_id <= $from_id) break;
 
                 $events = $summit->getEntityEvents($member_id, $from_id, $from_date, $limit);
@@ -508,7 +508,8 @@ final class SummitService implements ISummitService
                             break;
                     }
                 }
-                if($global_last_id <= $last_event_id) break;
+                // we dont have any any to processs
+                if($last_event_id == 0 || $global_last_id <= $last_event_id) break;
                 // reset if we do not get any data so far, to get next batch
                 $from_id   = $last_event_id;
                 $from_date = null;
