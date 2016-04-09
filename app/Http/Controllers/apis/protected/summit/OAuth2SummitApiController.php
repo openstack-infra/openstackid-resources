@@ -130,7 +130,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
                             $speakers = array();
                             $res = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo(1 , PHP_INT_MAX));
-
                             foreach ($res->getItems() as $speaker) {
                                 array_push($speakers, $speaker->toArray($summit->ID));
                             }

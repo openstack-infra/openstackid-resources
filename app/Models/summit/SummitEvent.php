@@ -220,7 +220,7 @@ class SummitEvent extends SilverstripeBaseModel
     public function getSummitTypesIds()
     {
         $ids = array();
-        foreach($this->summit_types() as $type)
+        foreach($this->summit_types(array('SummitType.ID')) as $type)
         {
             array_push($ids, intval($type->ID));
         }
@@ -233,7 +233,7 @@ class SummitEvent extends SilverstripeBaseModel
     public function getSponsorsIds()
     {
         $ids = array();
-        foreach($this->sponsors() as $company)
+        foreach($this->sponsors(array('Company.ID')) as $company)
         {
             array_push($ids, intval($company->ID));
         }
@@ -241,11 +241,12 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
+     * @param array $fields
      * @return SummitType[]
      */
-    public function summit_types()
+    public function summit_types(array $fields = array('*'))
     {
-        return $this->belongsToMany('models\summit\SummitType','SummitEvent_AllowedSummitTypes', 'SummitEventID','SummitTypeID')->get();
+        return $this->belongsToMany('models\summit\SummitType','SummitEvent_AllowedSummitTypes', 'SummitEventID','SummitTypeID')->get($fields);
     }
 
     /**
@@ -262,11 +263,12 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
+     * @param array $fields
      * @return Company[]
      */
-    public function sponsors()
+    public function sponsors(array $fields = array('*'))
     {
-        return $this->belongsToMany('models\main\Company','SummitEvent_Sponsors','SummitEventID', 'CompanyID')->get();
+        return $this->belongsToMany('models\main\Company','SummitEvent_Sponsors','SummitEventID', 'CompanyID')->get($fields);
     }
 
     /**
@@ -367,10 +369,7 @@ class SummitEvent extends SilverstripeBaseModel
         $feedback = array();
         foreach($items as $e)
         {
-            $class = 'models\\summit\\'.$e->ClassName;
-            $entity = $class::find($e->ID);
-            if(is_null($entity)) continue;
-            array_push($feedback, $entity);
+            array_push($feedback, $e);
         }
         return array($total,$per_page, $current_page, $last_page, $feedback);
     }
@@ -385,7 +384,9 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function tags()
     {
-        return $this->belongsToMany('models\main\Tag','SummitEvent_Tags','SummitEventID','TagID')->get();
+        return $this->belongsToMany('models\main\Tag','SummitEvent_Tags','SummitEventID','TagID')
+            ->select('Tag.ID','Tag.Tag')
+            ->get();
     }
 
     /**
@@ -396,7 +397,7 @@ class SummitEvent extends SilverstripeBaseModel
         $t = Tag::where('Tag','=', trim($tag))->first();
         if(is_null($t))
         {
-            $t = new Tag;
+            $t      = new Tag;
             $t->Tag = trim($tag);
             $t->save();
         }

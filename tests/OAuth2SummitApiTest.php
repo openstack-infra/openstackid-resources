@@ -50,7 +50,8 @@ class OAuth2SummitApiTest extends ProtectedApiTest
             'id'     => 6
         );
 
-        $headers = array("HTTP_Authorization" => " Bearer " .$this->access_token);
+        $headers  = array("HTTP_Authorization" => " Bearer " .$this->access_token);
+        $start    = time();
         $response = $this->action(
             "GET",
             "OAuth2SummitApiController@getSummit",
@@ -60,7 +61,9 @@ class OAuth2SummitApiTest extends ProtectedApiTest
             array(),
             $headers
         );
-
+        $end   = time();
+        $delta = $end - $start;
+        echo "execution call ".$delta." seconds ...";
         $content = $response->getContent();
         $summit  = json_decode($content);
         $this->assertTrue(!is_null($summit));
@@ -115,7 +118,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
             'id'              => 'current',
             'page'            => 1,
             'per_page'        => 15,
-            'filter'          => 'first_name=@slack,last_name=@slack',
+            'filter'          => 'first_name=@John,last_name=@Bryce,email=@sebastian@',
             'order'          => '+first_name,-last_name'
         );
 
@@ -365,7 +368,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testCurrentSummitEvents()
+    public function testCurrentSelectionMotiveSummitEvents()
     {
         $params  = array
         (

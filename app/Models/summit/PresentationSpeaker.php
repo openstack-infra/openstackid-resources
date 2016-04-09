@@ -18,6 +18,7 @@ use DB;
 use models\utils\SilverstripeBaseModel;
 use Config;
 use libs\utils\JsonUtils;
+
 /**
  * Class PresentationSpeaker
  * @package models\summit
@@ -28,34 +29,36 @@ class PresentationSpeaker extends SilverstripeBaseModel
 
     protected $array_mappings = array
     (
-        'ID'            => 'id:json_int',
-        'FirstName'     => 'first_name:json_string',
-        'LastName'      => 'last_name:json_string',
-        'Title'         => 'title:json_string',
-        'Bio'           => 'bio:json_string',
-        'IRCHandle'     => 'irc:json_string',
-        'TwitterName'   => 'twitter:json_string',
-        'MemberID'      => 'member_id:json_int',
+        'ID' => 'id:json_int',
+        'FirstName' => 'first_name:json_string',
+        'LastName' => 'last_name:json_string',
+        'Title' => 'title:json_string',
+        'Bio' => 'bio:json_string',
+        'IRCHandle' => 'irc:json_string',
+        'TwitterName' => 'twitter:json_string',
+        'MemberID' => 'member_id:json_int',
     );
 
     /**
      * @param null|int $summit_id
      * @param bool|true $published_ones
+     * @param array $fields
      * @return Presentation[]
      */
-    public function presentations($summit_id = null, $published_ones = true)
+    public function presentations($summit_id = null, $published_ones = true, array $fields = array('*'))
     {
-        if(is_null($summit_id))
-            $summit_id = Summit::where('Active','=',1)->first()->ID;
+        if (is_null($summit_id))
+            $summit_id = Summit::where('Active', '=', 1)->first()->ID;
 
         $presentations = $this
-            ->belongsToMany('models\summit\Presentation','Presentation_Speakers','PresentationSpeakerID','PresentationID')
-            ->where('SummitEvent.SummitID','=', $summit_id);
-        if($published_ones)
-        {
-            $presentations = $presentations->where('SummitEvent.Published','=', 1);
+            ->belongsToMany('models\summit\Presentation', 'Presentation_Speakers', 'PresentationSpeakerID', 'PresentationID')
+            ->where('SummitEvent.SummitID', '=', $summit_id);
+
+        if ($published_ones) {
+            $presentations = $presentations->where('SummitEvent.Published', '=', 1);
         }
-        return $presentations->get();
+
+        return $presentations->get($fields);
     }
 
     /**
@@ -66,8 +69,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function getPresentationIds($summit_id = null, $published_ones = true)
     {
         $ids = array();
-        foreach($this->presentations($summit_id, $published_ones) as $p)
-        {
+        foreach ($this->presentations($summit_id, $published_ones, array('SummitEvent.ID', 'SummitEvent.ClassName')) as $p) {
             array_push($ids, intval($p->ID));
         }
         return $ids;
@@ -99,9 +101,8 @@ class PresentationSpeaker extends SilverstripeBaseModel
         $values = parent::toArray();
         $values['presentations'] = $this->getPresentationIds($summit_id, $published_ones);
         $member = $this->member();
-        $values['pic'] = Config::get("server.assets_base_url", 'https://www.openstack.org/'). 'profile_images/speakers/'. $this->ID;
-        if(!is_null($member))
-        {
+        $values['pic'] = Config::get("server.assets_base_url", 'https://www.openstack.org/') . 'profile_images/speakers/' . $this->ID;
+        if (!is_null($member)) {
             $values['gender'] = $member->Gender;
         }
         return $values;
@@ -114,8 +115,8 @@ class PresentationSpeaker extends SilverstripeBaseModel
      */
     public function getPresentation($presentation_id)
     {
-        return $this->belongsToMany('models\summit\Presentation','Presentation_Speakers','PresentationSpeakerID', 'PresentationID')
-            ->where('PresentationID','=',$presentation_id)
+        return $this->belongsToMany('models\summit\Presentation', 'Presentation_Speakers', 'PresentationSpeakerID', 'PresentationID')
+            ->where('PresentationID', '=', $presentation_id)
             ->first();
     }
 }

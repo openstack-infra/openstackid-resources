@@ -51,19 +51,15 @@ final class EloquentSpeakerRepository extends EloquentBaseRepository implements 
 
         $extra_filters = '';
         $extra_orders  = '';
-
-        $bindings      = array
-        (
-            'summit_id'   => $summit->getIdentifier(),
-        );
+        $bindings      = array();
 
         if(!is_null($filter))
         {
-            $extra_filters = ' AND '.$filter->toRawSQL(array
+            $extra_filters = ' WHERE '. $filter->toRawSQL(array
                 (
-                    'first_name' => 'M.FirstName',
-                    'last_name'  => 'M.Surname',
-                    'email'      => 'M.Email',
+                    'first_name' => 'FirstName',
+                    'last_name'  => 'LastName',
+                    'email'      => 'Email',
                 ));
             $bindings = array_merge($bindings, $filter->getSQLBindings());
         }
@@ -72,25 +68,51 @@ final class EloquentSpeakerRepository extends EloquentBaseRepository implements 
         {
             $extra_orders = $order->toRawSQL(array
             (
-                    'first_name' => 'M.FirstName',
-                    'last_name'  => 'M.Surname',
+                    'first_name' => 'FirstName',
+                    'last_name'  => 'LastName',
             ));
         }
 
-        $total     = DB::connection('ss')->select("
-SELECT COUNT(DISTINCT S.ID) AS QTY From PresentationSpeaker S
-LEFT JOIN Member M ON M.ID = S.MemberID
-WHERE
-EXISTS
-(
-    SELECT E.ID FROM SummitEvent E
-    INNER JOIN Presentation P ON E.ID = P.ID
-    INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
-    WHERE E.SummitID = :summit_id AND E.Published = 1 AND ( PS.PresentationSpeakerID = S.ID OR P.ModeratorID = S.ID)
+$query_count = <<<SQL
+SELECT COUNT(DISTINCT(ID)) AS QTY
+FROM (
+	SELECT S.ID,
+	IFNULL(M.FirstName, S.FirstName) AS FirstName,
+	IFNULL(M.Surname,S.LastName) AS LastName,
+	IFNULL(M.Email,R.Email) AS Email
+	FROM PresentationSpeaker S
+	LEFT JOIN Member M ON M.ID = S.MemberID
+	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
+	WHERE
+	EXISTS
+	(
+		SELECT E.ID FROM SummitEvent E
+		INNER JOIN Presentation P ON E.ID = P.ID
+		INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
+		WHERE E.SummitID = {$summit->ID} AND E.Published = 1 AND PS.PresentationSpeakerID = S.ID
+	)
+	UNION
+	SELECT S.ID,
+	IFNULL(M.FirstName, S.FirstName) AS FirstName,
+	IFNULL(M.Surname,S.LastName) AS LastName,
+	IFNULL(M.Email,R.Email) AS Email
+	FROM PresentationSpeaker S
+	LEFT JOIN Member M ON M.ID = S.MemberID
+	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
+	WHERE
+	EXISTS
+	(
+		SELECT E.ID FROM SummitEvent E
+		INNER JOIN Presentation P ON E.ID = P.ID
+		INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
+		WHERE E.SummitID = {$summit->ID} AND E.Published = 1 AND P.ModeratorID = S.ID
+	)
 )
-{$extra_filters};
+SUMMIT_SPEAKERS
+{$extra_filters}
+SQL;
 
-", $bindings);
+        $total     = DB::connection('ss')->select($query_count, $bindings);
         $total     = intval($total[0]->QTY);
 
         $bindings = array_merge( $bindings, array
@@ -98,18 +120,79 @@ EXISTS
             'per_page'  => $paging_info->getPerPage(),
             'offset'    => $paging_info->getOffset(),
         ));
-        $rows      = DB::connection('ss')->select("
-SELECT DISTINCT S.* From PresentationSpeaker S
-LEFT JOIN Member M ON M.ID = S.MemberID
-WHERE
-EXISTS
-(
-    SELECT E.ID FROM SummitEvent E
-    INNER JOIN Presentation P ON E.ID = P.ID
-    INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
-    WHERE E.SummitID = :summit_id AND E.Published = 1 AND ( PS.PresentationSpeakerID = S.ID OR P.ModeratorID = S.ID)
+
+$query = <<<SQL
+SELECT *
+FROM (
+	SELECT
+    S.ID,
+    S.ClassName,
+    S.Created,
+    S.LastEdited,
+    S.Title,
+    S.Bio,
+    S.IRCHandle,
+    S.AvailableForBureau,
+    S.FundedTravel,
+    S.Country,
+    S.PhotoID,
+    S.MemberID,
+    S.WillingToTravel,
+    S.WillingToPresentVideo,
+    S.Notes,
+    S.TwitterName,
+    IFNULL(M.FirstName, S.FirstName) AS FirstName,
+    IFNULL(M.Surname,S.LastName) AS LastName,
+    IFNULL(M.Email,R.Email) AS Email
+	FROM PresentationSpeaker S
+	LEFT JOIN Member M ON M.ID = S.MemberID
+    LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
+	WHERE
+	EXISTS
+	(
+		SELECT E.ID FROM SummitEvent E
+		INNER JOIN Presentation P ON E.ID = P.ID
+		INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
+		WHERE E.SummitID = {$summit->ID} AND E.Published = 1 AND PS.PresentationSpeakerID = S.ID
+	)
+	UNION
+	SELECT
+    S.ID,
+    S.ClassName,
+    S.Created,
+    S.LastEdited,
+    S.Title,
+    S.Bio,
+    S.IRCHandle,
+    S.AvailableForBureau,
+    S.FundedTravel,
+    S.Country,
+    S.PhotoID,
+    S.MemberID,
+    S.WillingToTravel,
+    S.WillingToPresentVideo,
+    S.Notes,
+    S.TwitterName,
+    IFNULL(M.FirstName, S.FirstName) AS FirstName,
+    IFNULL(M.Surname,S.LastName) AS LastName,
+    IFNULL(M.Email,R.Email) AS Email
+	FROM PresentationSpeaker S
+	LEFT JOIN Member M ON M.ID = S.MemberID
+    LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
+	WHERE
+	EXISTS
+	(
+		SELECT E.ID FROM SummitEvent E
+		INNER JOIN Presentation P ON E.ID = P.ID
+		INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
+		WHERE E.SummitID = {$summit->ID} AND E.Published = 1 AND P.ModeratorID = S.ID
+	)
 )
-{$extra_filters} {$extra_orders} limit :per_page offset :offset;", $bindings);
+SUMMIT_SPEAKERS
+{$extra_filters} {$extra_orders} limit :per_page offset :offset;
+SQL;
+
+        $rows      = DB::connection('ss')->select($query, $bindings);
 
         $items = array();
         foreach($rows as $row)

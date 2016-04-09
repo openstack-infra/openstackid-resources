@@ -29,6 +29,17 @@ class BaseModelEloquent extends Eloquent
     protected $array_mappings = array();
 
     /**
+     * Register a restoring model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @param  int  $priority
+     * @return void
+     */
+    public static function restoring($callback, $priority = 0)
+    {
+        static::registerModelEvent('restoring', $callback, $priority);
+    }
+    /**
      * @param $query
      * @param array $filters
      * @return mixed

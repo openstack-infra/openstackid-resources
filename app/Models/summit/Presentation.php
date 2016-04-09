@@ -54,21 +54,23 @@ class Presentation extends SummitEvent
     );
 
     /**
+     * @param array $fields
      * @return PresentationSpeaker[]
      */
-    public function speakers()
+    public function speakers(array $fields = array('*'))
     {
-        return $this->belongsToMany('models\summit\PresentationSpeaker','Presentation_Speakers','PresentationID','PresentationSpeakerID')->get();
+        return $this->belongsToMany('models\summit\PresentationSpeaker','Presentation_Speakers','PresentationID','PresentationSpeakerID')->get($fields);
     }
-
 
     public function getSpeakerIds()
     {
         $ids = array();
-        foreach($this->speakers() as $speaker)
+
+        foreach($this->speakers(array('PresentationSpeaker.ID')) as $speaker)
         {
             array_push($ids, intval($speaker->ID));
         }
+
         return $ids;
     }
 
@@ -138,5 +140,16 @@ where `PresentationMaterial`.`PresentationID` = :presentation_id and `Presentati
             array_push($slides, $instance);
         }
         return $slides;
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @return Presentation
+     */
+    public static function toPresentation(SummitEvent $event){
+        $presentation  = new Presentation();
+        $attributes    = $event->getAttributes();
+        $presentation->setRawAttributes($attributes);
+        return $presentation;
     }
 }

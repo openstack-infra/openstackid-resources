@@ -59,6 +59,7 @@ class Summit extends SilverstripeBaseModel
 
             $class  = 'models\\summit\\'.$l->ClassName;
             $entity = $class::find($l->ID);
+            if(is_null($entity)) continue;
             array_push($locations, $entity);
         }
         return $locations;
@@ -188,7 +189,30 @@ class Summit extends SilverstripeBaseModel
      */
     public function events($page = 1, $per_page = 100, Filter $filter = null, $published = false)
     {
-        $rel = $this->hasMany('models\summit\SummitEvent', 'SummitID', 'ID');
+        $rel = $this
+            ->hasMany('models\summit\SummitEvent', 'SummitID', 'ID')
+            ->select
+            (
+                array
+                (
+                    'SummitEvent.*',
+                    'Presentation.Priority',
+                    'Presentation.Level',
+                    'Presentation.Status',
+                    'Presentation.OtherTopic',
+                    'Presentation.Progress',
+                    'Presentation.Slug',
+                    'Presentation.CreatorID',
+                    'Presentation.CategoryID',
+                    'Presentation.Views',
+                    'Presentation.ModeratorID',
+                    'Presentation.ProblemAddressed',
+                    'Presentation.AttendeesExpectedLearnt',
+                    'Presentation.SelectionMotive',
+                )
+            );
+
+        $rel = $rel->leftJoin('Presentation', 'SummitEvent.ID', '=', 'Presentation.ID');
         if($published)
         {
             $rel = $rel->where('Published','=','1');
@@ -234,10 +258,9 @@ class Summit extends SilverstripeBaseModel
         $events = array();
         foreach($items as $e)
         {
-            $class = 'models\\summit\\'.$e->ClassName;
-            $entity = $class::find($e->ID);
-            if(is_null($entity)) continue;
-            array_push($events, $entity);
+            if($e->ClassName === 'Presentation')
+                $e = Presentation::toPresentation($e);
+            array_push($events, $e);
         }
         return array($total,$per_page, $current_page, $last_page, $events);
     }

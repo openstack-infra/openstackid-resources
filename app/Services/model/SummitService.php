@@ -189,11 +189,12 @@ final class SummitService implements ISummitService
             $from_id         = !is_null($from_id)? intval($from_id) : null;
 
             do {
+
                 $last_event_id   = 0;
                 $last_event_date = 0;
                 $count           = 0;
                 $list            = array();
-
+                // if we got a from id and its greater than the last one, then break
                 if(!is_null($from_id) && $global_last_id <= $from_id) break;
 
                 $events = $summit->getEntityEvents($member_id, $from_id, $from_date, $limit);
@@ -508,7 +509,7 @@ final class SummitService implements ISummitService
                             break;
                     }
                 }
-                // we dont have any any to processs
+                // we do not  have any any to process
                 if($last_event_id == 0 || $global_last_id <= $last_event_id) break;
                 // reset if we do not get any data so far, to get next batch
                 $from_id   = $last_event_id;
