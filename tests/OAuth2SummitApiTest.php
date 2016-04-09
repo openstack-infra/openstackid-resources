@@ -954,7 +954,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $params  = array
         (
             'id'        => 'current',
-            'from_date' => '1449152383'
+            'from_date' => 1460148342
         );
 
         $headers = array
@@ -1015,7 +1015,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $params  = array
         (
             'id'            => 6,
-            'last_event_id' => 32536
+            'last_event_id' => 32795
         );
 
         $headers = array
