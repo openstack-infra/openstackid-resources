@@ -22,6 +22,12 @@ interface ISummitService
 {
     /**
      * @param Summit $summit
+     * @param string $expand
+     * @return array
+     */
+    public function getSummitData(Summit $summit, $expand);
+    /**
+     * @param Summit $summit
      * @param array $data
      * @return SummitEvent
      */

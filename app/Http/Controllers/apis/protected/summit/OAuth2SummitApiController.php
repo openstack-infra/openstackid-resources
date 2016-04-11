@@ -84,83 +84,10 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     public function getSummit($summit_id)
     {
         $expand = Request::input('expand', '');
-
         try {
-
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-
-            $data = $summit->toArray();
-            // summit types
-            $summit_types = array();
-            foreach ($summit->summit_types() as $type) {
-                array_push($summit_types, $type->toArray());
-            }
-            $data['summit_types'] = $summit_types;
-            // tickets
-            $ticket_types = array();
-            foreach ($summit->ticket_types() as $ticket) {
-                array_push($ticket_types, $ticket->toArray());
-            }
-            $data['ticket_types'] = $ticket_types;
-            //locations
-            $locations = array();
-            foreach ($summit->locations() as $location) {
-                array_push($locations, $location->toArray());
-            }
-            $data['locations'] = $locations;
-
-            $data['ticket_types'] = $ticket_types;
-            if (!empty($expand)) {
-                $expand = explode(',', $expand);
-                foreach ($expand as $relation) {
-                    switch (trim($relation)) {
-                        case 'schedule': {
-                            $event_types = array();
-                            foreach ($summit->event_types() as $event_type) {
-                                array_push($event_types, $event_type->toArray());
-                            }
-                            $data['event_types'] = $event_types;
-
-                            $sponsors = array();
-                            foreach ($summit->sponsors() as $company) {
-                                array_push($sponsors, $company->toArray());
-                            }
-                            $data['sponsors'] = $sponsors;
-
-                            $speakers = array();
-                            $res = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo(1 , PHP_INT_MAX));
-                            foreach ($res->getItems() as $speaker) {
-                                array_push($speakers, $speaker->toArray($summit->ID));
-                            }
-                            $data['speakers'] = $speakers;
-
-                            $presentation_categories = array();
-                            foreach ($summit->presentation_categories() as $cat) {
-                                array_push($presentation_categories, $cat->toArray());
-                            }
-                            $data['tracks'] = $presentation_categories;
-
-                            // track_groups
-                            $track_groups = array();
-                            foreach ($summit->category_groups() as $group) {
-                                array_push($track_groups, $group->toArray());
-                            }
-                            $data['track_groups'] = $track_groups;
-                            $schedule = array();
-                            list($total, $per_page, $current_page, $last_page, $items) = $summit->schedule(1,
-                                PHP_INT_MAX);
-                            foreach ($items as $event) {
-                                array_push($schedule, $event->toArray());
-                            }
-                            $data['schedule'] = $schedule;
-
-                        }
-                            break;
-                    }
-                }
-            }
-            $data['timestamp'] = time();
+            $data = $this->service->getSummitData($summit, $expand);
             return $this->ok($data);
         } catch (Exception $ex) {
             Log::error($ex);
