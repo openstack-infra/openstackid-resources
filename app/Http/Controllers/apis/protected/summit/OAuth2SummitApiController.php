@@ -1266,8 +1266,8 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 $summit,
                 $this->resource_server_context->getCurrentUserExternalId(),
                 $from_date,
-                $last_event_id,
-                $limit
+                intval($last_event_id),
+                intval($limit)
             );
 
             return $this->ok

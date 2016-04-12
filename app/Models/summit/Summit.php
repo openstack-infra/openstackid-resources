@@ -413,7 +413,6 @@ INNER JOIN Company C ON C.ID = S.CompanyID");
             $filters .= " AND SummitEntityEvent.Created >= '{$str_date}' ";
         }
 
-
         $query = <<<SQL
 SELECT * FROM
 (
@@ -463,7 +462,7 @@ SQL;
         }
 
         $query .= <<<SQL
- ORDER BY Created ASC LIMIT 25;
+ ORDER BY Created ASC LIMIT {$limit};
 SQL;
 
         $rows = DB::connection('ss')->select($query);

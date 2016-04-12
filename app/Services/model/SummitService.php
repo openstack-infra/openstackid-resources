@@ -196,31 +196,34 @@ final class SummitService implements ISummitService
     public function getSummitEntityEvents(Summit $summit, $member_id = null, \DateTime $from_date = null, $from_id = null, $limit = 25)
     {
         return $this->tx_service->transaction(function() use($summit, $member_id, $from_date, $from_id, $limit) {
+
             $global_last_id  = $summit->getLastEntityEventId();
             $from_id         = !is_null($from_id)? intval($from_id) : null;
+            $list            = array();
+            $ops_dictionary  = array();
+
+            $ops_dictionary['UPDATE'] = array();
+            $ops_dictionary['DELETE'] = array();
+            $ops_dictionary['INSERT'] = array();
 
             do {
 
                 $last_event_id   = 0;
                 $last_event_date = 0;
                 $count           = 0;
-                $list            = array();
+
                 // if we got a from id and its greater than the last one, then break
                 if(!is_null($from_id) && $global_last_id <= $from_id) break;
 
                 $events = $summit->getEntityEvents($member_id, $from_id, $from_date, $limit);
 
-                $ops_dictionary = array();
-
-                $ops_dictionary['UPDATE'] = array();
-                $ops_dictionary['DELETE'] = array();
-                $ops_dictionary['INSERT'] = array();
-
                 foreach ($events as $e) {
-                    $last_event_id = intval($e->ID);
+                    if(count($list) === $limit) break;
+                    $last_event_id   = intval($e->ID);
                     $last_event_date = $e->Created;
+                    $metadata        = $e->Metadata;
                     ++$count;
-                    $metadata = $e->Metadata;
+
                     switch ($e->EntityClassName) {
                         case 'Presentation':
                         case 'SummitEvent': {
@@ -517,7 +520,7 @@ final class SummitService implements ISummitService
                             }
                             array_push($list, $this->serializeSummitEntityEvent($e, 'TRUNCATE', 'TRUNCATE'));
                         }
-                            break;
+                        break;
                     }
                 }
                 // we do not  have any any to process
@@ -526,7 +529,7 @@ final class SummitService implements ISummitService
                 $from_id   = $last_event_id;
                 $from_date = null;
 
-            } while(count($list) === 0);
+            } while(count($list) < $limit);
             return array($last_event_id, $last_event_date, $list);
         });
 

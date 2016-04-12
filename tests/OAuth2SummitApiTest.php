@@ -957,7 +957,41 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $params  = array
         (
             'id'        => 'current',
-            'from_date' => 1460148342
+            'from_date' => 1460148342,
+            'limit'     => 100
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getSummitEntityEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testGetEntityEventsFromCurrentSummitFromGivenDate()
+    {
+        $params  = array
+        (
+            'id'        => 'current',
+            'from_date' => 1766620800,
+            'limit'     => 100
         );
 
         $headers = array
@@ -990,6 +1024,68 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         (
             'id'            => 6,
             'last_event_id' => 0
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getSummitEntityEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+
+        $params  = array
+        (
+            'id'            => 6,
+            'last_event_id' => 32795
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getSummitEntityEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testGetEntityEventsFromCurrentSummitGreaterThanGivenIDMax()
+    {
+        $params  = array
+        (
+            'id'            => 6,
+            'last_event_id' => PHP_INT_MAX,
+            'limit' => 250,
         );
 
         $headers = array
