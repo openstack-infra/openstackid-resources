@@ -205,7 +205,8 @@ final class SummitService implements ISummitService
             $ops_dictionary['UPDATE'] = array();
             $ops_dictionary['DELETE'] = array();
             $ops_dictionary['INSERT'] = array();
-
+            //special treatement for summit events
+            $summit_events_ops        = array();
             do {
 
                 $last_event_id   = 0;
@@ -222,6 +223,7 @@ final class SummitService implements ISummitService
                     $last_event_id   = intval($e->ID);
                     $last_event_date = $e->Created;
                     $metadata        = $e->Metadata;
+                    $key             = $e->EntityClassName.'.'.$e->EntityID;
                     ++$count;
 
                     switch ($e->EntityClassName) {
@@ -240,16 +242,19 @@ final class SummitService implements ISummitService
                                 if (!is_null($entity)) // if event exists its bc its published
                                 {
                                     $type = $published_current && !$published_old ? 'INSERT' : 'UPDATE';
-                                    if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$type])) continue;
-                                    array_push($ops_dictionary[$type], $e->EntityClassName . $e->EntityID);
                                     array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $type, $entity));
-                                } else // if does not exists on schedule delete it
-                                {
-                                    if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary['DELETE'])) continue;
-                                    array_push($ops_dictionary['DELETE'], $e->EntityClassName . $e->EntityID);
-                                    array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, 'DELETE'));
+                                    if(!isset($summit_events_ops[$key])) $summit_events_ops[$key] = array();
+                                    array_push($summit_events_ops[$key], array('idx' => count($list)-1, 'op' => $type));
+                                    continue;
                                 }
-                            } else if ($e->Type === 'DELETE') {
+                                // if does not exists on schedule delete it
+
+                                if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary['DELETE'])) continue;
+                                array_push($ops_dictionary['DELETE'], $e->EntityClassName . $e->EntityID);
+                                array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, 'DELETE'));
+
+                            }
+                            else if ($e->Type === 'DELETE') {
                                 if (in_array($e->EntityClassName . $e->EntityID, $ops_dictionary[$e->Type])) continue;
                                 array_push($ops_dictionary[$e->Type], $e->EntityClassName . $e->EntityID);
                                 array_push($list, $this->serializeSummitEntityEvent($e, $e->EntityClassName, $e->Type));
@@ -523,12 +528,30 @@ final class SummitService implements ISummitService
                         break;
                     }
                 }
-                // we do not  have any any to process
-                if($last_event_id == 0 || $global_last_id <= $last_event_id) break;
+
                 // reset if we do not get any data so far, to get next batch
                 $from_id   = $last_event_id;
                 $from_date = null;
+                //post process for summit events , we should send only te last one
+                foreach($summit_events_ops as $key => $ops)
+                {
+                    $last_idx    = null;
+                    $last_op     = null;
+                    $must_insert = false;
+                    foreach($ops as $op)
+                    {
+                        if(!is_null($last_idx)) unset($list[$last_idx]);
+                        $last_op     = $op['op'];
+                        $last_idx    = intval($op['idx']);
+                        $must_insert = !$must_insert  && $last_op === 'INSERT' ? true : $must_insert;
 
+                    }
+                    $last_op = $must_insert && $last_op !== 'DELETE' ? 'INSERT' : $last_op;
+                    $summit_events_ops[$key] = array([ 'idx' => $last_idx, 'op' => ( $last_op ) ]);
+                    $list[$last_idx]['type'] = $last_op;
+                }
+                // we do not  have any any to process
+                if($last_event_id == 0 || $global_last_id <= $last_event_id) break;
             } while(count($list) < $limit);
             return array($last_event_id, $last_event_date, $list);
         });
