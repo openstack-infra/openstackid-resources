@@ -149,15 +149,18 @@ class SummitAttendee extends SilverstripeBaseModel
 
     public function toArray()
     {
-        $values = parent::toArray();
-        $member = $this->member();
+        $values             = parent::toArray();
+        $member             = $this->member();
         $values['schedule'] = $this->getScheduleIds();
+
         $tickets = array();
         foreach($this->tickets() as $t)
         {
+            if(is_null($t->ticket_type())) continue;
             array_push($tickets, intval($t->ticket_type()->ID));
         }
         $values['tickets'] = $tickets;
+
         if(!is_null($member))
         {
             $values['first_name'] = JsonUtils::toJsonString($member->FirstName);
