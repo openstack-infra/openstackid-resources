@@ -55,6 +55,31 @@ class SummitEvent extends SilverstripeBaseModel
         'RSVPLink'        => 'rsvp_link:json_string',
     );
 
+    public static $allowed_fields = array
+    (
+        'id',
+        'title',
+        'description',
+        'start_date',
+        'end_date',
+        'location_id',
+        'summit_id',
+        'type_id',
+        'class_name',
+        'allow_feedback',
+        'avg_feedback_rate',
+        'is_published',
+        'head_count',
+        'rsvp_link',
+    );
+
+    public static $allowed_relations = array
+    (
+        'summit_types',
+        'sponsors',
+        'tags',
+    );
+
     /**
      * @param string $title
      * @return $this
@@ -297,8 +322,16 @@ class SummitEvent extends SilverstripeBaseModel
             ->get();
     }
 
-    public function toArray()
+    /**
+     * @param array $fields
+     * @param array $relations
+     * @return array
+     */
+    public function toArray(array $fields = array(), array $relations = array())
     {
+        if(!count($fields)) $fields       = self::$allowed_fields;
+        if(!count($relations)) $relations = self::$allowed_relations;
+
         $values = parent::toArray();
         //check if description is empty, if so, set short description
         $description = $values['description'];
@@ -307,14 +340,28 @@ class SummitEvent extends SilverstripeBaseModel
             $values['description'] = JsonUtils::toJsonString($this->ShortDescription);
         }
 
-        $values['summit_types'] = $this->getSummitTypesIds();
-        $values['sponsors']     = $this->getSponsorsIds();
-        $tags = array();
-        foreach($this->tags() as $t)
-        {
-            array_push($tags, $t->toArray());
+        //check requested fields
+
+        foreach($values as $field => $value){
+            if(in_array($field, $fields)) continue;
+            unset($values[$field]);
         }
-        $values['tags'] = $tags;
+
+        if(in_array('summit_types', $relations))
+            $values['summit_types'] = $this->getSummitTypesIds();
+
+        if(in_array('sponsors', $relations))
+            $values['sponsors']     = $this->getSponsorsIds();
+
+        if(in_array('tags', $relations))
+        {
+            $tags = array();
+            foreach ($this->tags() as $t) {
+                array_push($tags, $t->toArray());
+            }
+            $values['tags'] = $tags;
+        }
+
         return $values;
     }
 

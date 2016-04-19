@@ -53,6 +53,38 @@ class Presentation extends SummitEvent
         'RSVPLink'        => 'rsvp_link:json_string',
     );
 
+    public static $allowed_fields = array
+    (
+        'id',
+        'title',
+        'description',
+        'start_date',
+        'end_date',
+        'location_id',
+        'summit_id',
+        'type_id',
+        'class_name',
+        'track_id',
+        'moderator_speaker_id',
+        'level',
+        'allow_feedback',
+        'avg_feedback_rate',
+        'is_published',
+        'head_count',
+        'rsvp_link',
+    );
+
+    public static $allowed_relations = array
+    (
+        'summit_types',
+        'sponsors',
+        'tags',
+        'slides',
+        'videos',
+        'speakers',
+    );
+
+
     /**
      * @param array $fields
      * @return PresentationSpeaker[]
@@ -80,27 +112,39 @@ class Presentation extends SummitEvent
     }
 
     /**
+     * @param array $fields
+     * @param array $relations
      * @return array
      */
-    public function toArray()
+    public function toArray(array $fields = array(), array $relations = array())
     {
-        $values = parent::toArray();
-        if(!$this->from_speaker)
-        $values['speakers'] = $this->getSpeakerIds();
+        if(!count($fields)) $fields       = self::$allowed_fields;
+        if(!count($relations)) $relations = self::$allowed_relations;
 
-        $slides = array();
-        foreach($this->slides() as $s)
-        {
-            array_push($slides, $s->toArray());
-        }
-        $values['slides'] = $slides;
+        $values = parent::toArray($fields, $relations);
 
-        $videos = array();
-        foreach($this->videos() as $v)
-        {
-            array_push($videos, $v->toArray());
+        if(in_array('speakers', $relations)) {
+            if (!$this->from_speaker)
+                $values['speakers'] = $this->getSpeakerIds();
         }
-        $values['videos'] = $videos;
+
+        if(in_array('slides', $relations))
+        {
+            $slides = array();
+            foreach ($this->slides() as $s) {
+                array_push($slides, $s->toArray());
+            }
+            $values['slides'] = $slides;
+        }
+
+        if(in_array('videos', $relations))
+        {
+            $videos = array();
+            foreach ($this->videos() as $v) {
+                array_push($videos, $v->toArray());
+            }
+            $values['videos'] = $videos;
+        }
 
         return $values;
     }

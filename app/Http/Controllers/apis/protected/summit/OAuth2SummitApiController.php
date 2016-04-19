@@ -14,10 +14,10 @@ use services\model\ISummitService;
 use utils\OrderParser;
 use utils\PagingInfo;
 use utils\FilterParser;
-use Request;
-use Validator;
-use Input;
-use Log;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -650,60 +650,81 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     /**
      * @param $summit_id
      * @param $event_id
+     * @param string $expand
+     * @param string $fields
+     * @param string $relations
+     * @param bool $published
+     * @return array
+     * @throws EntityNotFoundException
+     */
+    private function _getSummitEvent($summit_id, $event_id, $expand = '', $fields = '', $relations = '', $published = true)
+    {
+        $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+        if (is_null($summit)) throw new EntityNotFoundException;
+
+        $event =  $published ? $summit->getScheduleEvent(intval($event_id)) : $summit->getEvent(intval($event_id));
+
+        if (is_null($event)) throw new EntityNotFoundException;
+        $relations = !empty($relations) ? explode(',', $relations) : array();
+        $fields    = !empty($fields) ? explode(',', $fields) : array();
+        $data      = $event->toArray($fields, $relations);
+
+        if (!empty($expand)) {
+            foreach (explode(',', $expand) as $relation) {
+                switch (trim($relation)) {
+                    case 'feedback': {
+                        $feedback = array();
+                        list($total, $per_page, $current_page, $last_page, $items) = $event->feedback(1, PHP_INT_MAX);
+                        foreach ($items as $f) {
+                            array_push($feedback, $f->toArray());
+                        }
+                        $data['feedback'] = $feedback;
+                    }
+                    break;
+                    case 'speakers':{
+                        if($event instanceof Presentation){
+                            unset($data['speakers']);
+                            $speakers = array();
+                            foreach($event->speakers() as $speaker)
+                            {
+                                array_push($speakers, $speaker->toArray());
+                            }
+                            $data['speakers'] = $speakers;
+                        }
+                    }
+                    break;
+                    case 'location': {
+                        $location         = $event->getLocation();
+                        $data['location'] = $location->toArray();
+                        unset($data['location_id']);
+                    }
+                    break;
+                }
+            }
+        }
+        return $data;
+    }
+    /**
+     * @param $summit_id
+     * @param $event_id
      * @return mixed
      */
     public function getEvent($summit_id, $event_id)
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
+            $expand    = Request::input('expand', '');
+            $fields    = Request::input('fields', '');
+            $relations = Request::input('relations', '');
 
-            $expand = Request::input('expand', '');
-
-            $event = $summit->getEvent(intval($event_id));
-
-            if (is_null($event)) {
-                return $this->error404();
-            }
-
-            $data = $event->toArray();
-
-            if (!empty($expand)) {
-                foreach (explode(',', $expand) as $relation) {
-                    switch (trim($relation)) {
-                        case 'feedback': {
-                            $feedback = array();
-                            list($total, $per_page, $current_page, $last_page, $items) = $event->feedback(1,
-                                PHP_INT_MAX);
-                            foreach ($items as $f) {
-                                array_push($feedback, $f->toArray());
-                            }
-                            $data['feedback'] = $feedback;
-                        }
-                            break;
-                        case 'speakers':{
-                            if($event instanceof Presentation){
-                                unset($data['speakers']);
-                                $speakers = array();
-                                foreach($event->speakers() as $speaker)
-                                {
-                                    array_push($speakers, $speaker->toArray());
-                                }
-                                $data['speakers'] = $speakers;
-                            }
-                        }
-                        break;
-                        case 'location': {
-                            $location         = $event->getLocation();
-                            $data['location'] = $location->toArray();
-                            unset($data['location_id']);
-                        }
-                    }
-                }
-            }
+            $data = $this->_getSummitEvent($summit_id, $event_id, $expand, $fields, $relations, false);
             return $this->ok($data);
-        } catch (Exception $ex) {
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -718,49 +739,18 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
+            $expand    = Request::input('expand', '');
+            $fields    = Request::input('fields', '');
+            $relations = Request::input('relations', '');
 
-            $expand = Request::input('expand', '');
-
-            $event = $summit->getScheduleEvent(intval($event_id));
-
-            if (is_null($event)) {
-                return $this->error404();
-            }
-
-            $data = $event->toArray();
-
-            if (!empty($expand)) {
-                foreach (explode(',', $expand) as $relation) {
-                    switch (trim($relation)) {
-                        case 'feedback': {
-                            $feedback = array();
-                            list($total, $per_page, $current_page, $last_page, $items) = $event->feedback(1,
-                                PHP_INT_MAX);
-                            foreach ($items as $f) {
-                                array_push($feedback, $f->toArray());
-                            }
-                            $data['feedback'] = $feedback;
-                        }
-                            break;
-                        case 'speakers':{
-                            if($event instanceof Presentation){
-                                unset($data['speakers']);
-                                $speakers = array();
-                                foreach($event->speakers() as $speaker)
-                                {
-                                    array_push($speakers, $speaker->toArray());
-                                }
-                                $data['speakers'] = $speakers;
-                            }
-                        }
-                            break;
-                    }
-                }
-            }
+            $data = $this->_getSummitEvent($summit_id, $event_id, $expand, $fields, $relations, true);
             return $this->ok($data);
-        } catch (Exception $ex) {
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

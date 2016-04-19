@@ -730,6 +730,112 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
+
+    public function testGetPublishedEventFields(){
+
+
+         $params  = array
+         (
+             'id'        => 'current',
+             'event_id'  => 8900,
+             'fields'    => 'id,avg_feedback_rate,head_count',
+             'relations' => 'none'
+         );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getScheduledEvent",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testGetPublishedEventFieldsNotExists(){
+
+
+        $params  = array
+        (
+            'id'        => 'current',
+            'event_id'  => 8900,
+            'fields'    => 'id_test',
+            'relations' => 'none'
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getScheduledEvent",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testGetPublishedEvent(){
+
+        $params  = array
+        (
+            'id'        => 'current',
+            'event_id'  => 8900,
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getScheduledEvent",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
     public function testPostEvent($start_date = 1461613958, $end_date = 1461613990 )
     {
         $params  = array

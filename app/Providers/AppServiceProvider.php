@@ -74,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
         Validator::extend('string_array', function($attribute, $value, $parameters, $validator)
         {
             $validator->addReplacer('string_array', function($message, $attribute, $rule, $parameters) use ($validator) {
-                return sprintf("%s should be an array of integers", $attribute);
+                return sprintf("%s should be an array of strings", $attribute);
             });
             if(!is_array($value)) return false;
             foreach($value as $element)
