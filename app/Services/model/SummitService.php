@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use GuzzleHttp\Exception\ClientException;
@@ -47,6 +48,8 @@ use utils\PagingInfo;
 use Log;
 use DB;
 use ArrayAccess;
+use Exception;
+
 /**
  * Class EntityEventList
  * @package services\model
@@ -1048,7 +1051,8 @@ final class SummitService implements ISummitService
      * @param $external_order_id
      * @return array
      * @throws ValidationException
-     * @throws \Exception
+     * @throws EntityNotFoundException
+     * @throws Exception
      */
     public function getExternalOrder(Summit $summit, $external_order_id)
     {
@@ -1058,10 +1062,13 @@ final class SummitService implements ISummitService
             {
                 $status             = $external_order['status'];
                 $summit_external_id = $external_order['event_id'];
-                $summit             = Summit::where('ExternalEventId', '=', $summit_external_id)->first();
-                if(is_null($summit)) throw new EntityNotFoundException('summit does not exists!');
-                if(intval($summit->ID) !== intval($summit->ID)) throw new ValidationException('order does not belongs to current summit!');
-                if($status !== 'placed') throw new ValidationException(sprintf('invalid order status %s',$status));
+                $order_summit       = Summit::where('ExternalEventId', '=', $summit_external_id)->first();
+                if(is_null($summit))
+                    throw new EntityNotFoundException('summit does not exists!');
+                if(intval($summit->ID) !== intval($order_summit->ID))
+                    throw new ValidationException('order %s does not belongs to current summit!', $external_order_id);
+                if($status !== 'placed')
+                    throw new ValidationException(sprintf('invalid order status %s for order %s',$status, $external_order_id));
                 $attendees = array();
                 foreach($external_order['attendees'] as $a)
                 {
@@ -1073,7 +1080,9 @@ final class SummitService implements ISummitService
                        ->first();;
 
                    if(!is_null($redeem_attendee)) continue;
-                   if(is_null($ticket_type)) continue;
+                   if(is_null($ticket_type))
+                       throw new EntityNotFoundException(sprintf('external ticket type %s not found!', $ticket_external_id));
+
                    array_push($attendees, array(
                        'external_id' => intval($a['id']),
                        'first_name'  => $a['profile']['first_name'],
@@ -1084,13 +1093,14 @@ final class SummitService implements ISummitService
                        'status'      => $a['status'],
                        'ticket_type' => array
                        (
-                           'id' => intval($ticket_type->ID),
-                           'name' => $ticket_type->Name,
+                           'id'          => intval($ticket_type->ID),
+                           'name'        => $ticket_type->Name,
                            'external_id' => $ticket_external_id,
                        )
                    ));
                 }
-                if(count($attendees) === 0) throw new ValidationException('Order already redeem!');
+                if(count($attendees) === 0)
+                    throw new ValidationException(sprintf('order %s already redeem!', $external_order_id));
 
                 return array('id' => intval($external_order_id), 'attendees' => $attendees);
             }
@@ -1102,7 +1112,7 @@ final class SummitService implements ISummitService
                 throw new EntityNotFoundException('external order does not exists!');
             throw $ex1;
         }
-        catch(\Exception $ex){
+        catch(Exception $ex){
             throw $ex;
         }
     }
@@ -1131,25 +1141,30 @@ final class SummitService implements ISummitService
                         }
                     }
 
-                    if(is_null($external_attendee)) throw new EntityNotFoundException('Attendee not found!');
+                    if(is_null($external_attendee))
+                        throw new EntityNotFoundException(sprintf('attendee %s not found!', $external_attendee_id));
 
                     $ticket_external_id = intval($external_attendee['ticket_class_id']);
                     $ticket_type = SummitTicketType::where('ExternalId', '=', $ticket_external_id)->first();
-                    if(is_null($ticket_type)) throw new EntityNotFoundException('Ticket Type not found!');;
+                    if(is_null($ticket_type))
+                        throw new EntityNotFoundException(sprintf('ticket type %s not found!', $ticket_external_id));;
 
                     $status             = $external_order['status'];
                     $summit_external_id = $external_order['event_id'];
-                    $summit             = Summit::where('ExternalEventId', '=', $summit_external_id)->first();
-                    if(is_null($summit)) throw new EntityNotFoundException('summit does not exists!');
-                    if(intval($summit->ID) !== intval($summit->ID)) throw new ValidationException('order does not belongs to current summit!');
-                    if($status !== 'placed') throw new ValidationException($status);
+                    $order_summit       = Summit::where('ExternalEventId', '=', $summit_external_id)->first();
+                    if(is_null($summit))
+                        throw new EntityNotFoundException('summit does not exists!');
+                    if(intval($summit->ID) !== intval($order_summit->ID))
+                        throw new ValidationException('order %s does not belongs to current summit!', $external_order_id);
+                    if($status !== 'placed')
+                        throw new ValidationException(sprintf('invalid order status %s for order %s',$status, $external_order_id));
 
                     $old_attendee = SummitAttendee::where('MemberID', '=', $me_id)->where('SummitID','=', $summit->ID)->first();
 
                     if(!is_null($old_attendee))
                         throw new ValidationException
                         (
-                            'Attendee Already Exist for current summit!'
+                            'attendee already exist for current summit!'
                         );
 
                     $old_ticket = SummitAttendeeTicket
@@ -1161,17 +1176,18 @@ final class SummitService implements ISummitService
                         (
                             sprintf
                             (
-                                'Ticket already redeem for attendee id %s !',
-                                $old_ticket->OwnerID
+                                'order %s already redeem for attendee id %s !',
+                                $external_order_id,
+                                $external_attendee_id
                             )
                         );
 
-                    $attendee = new SummitAttendee;
+                    $attendee           = new SummitAttendee;
                     $attendee->MemberID = $me_id;
                     $attendee->SummitID = $summit->ID;
                     $attendee->save();
 
-                    $ticket = new SummitAttendeeTicket;
+                    $ticket                     = new SummitAttendeeTicket;
                     $ticket->ExternalOrderId    = intval($external_order_id);
                     $ticket->ExternalAttendeeId = intval($external_attendee_id);
                     $ticket->TicketBoughtDate   = $external_attendee['created'];
@@ -1190,7 +1206,7 @@ final class SummitService implements ISummitService
                     throw new EntityNotFoundException('external order does not exists!');
                 throw $ex1;
             }
-            catch(\Exception $ex){
+            catch(Exception $ex){
                 throw $ex;
             }
 
