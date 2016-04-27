@@ -265,7 +265,6 @@ class Summit extends SilverstripeBaseModel
         return array($total,$per_page, $current_page, $last_page, $events);
     }
 
-
     /**
      * @param int $member_id
      * @return SummitAttendee

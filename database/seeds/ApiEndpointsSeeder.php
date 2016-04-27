@@ -472,6 +472,26 @@ class ApiEndpointsSeeder extends Seeder
             )
         );
 
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-location-events',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/events',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-location-published-events',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/events/published',
+                'http_method' => 'GET'
+            )
+        );
+
         // event types
 
         ApiEndpoint::create(
@@ -567,6 +587,12 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-summit-types')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-location-published-events')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-location-events')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        //read external orders
+
         $endpoint = ApiEndpoint::where('name', '=', 'get-external-order')->first();
         $endpoint->scopes()->attach($summit_external_order_read->id);
 

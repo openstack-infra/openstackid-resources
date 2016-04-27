@@ -82,6 +82,7 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $summit  = json_decode($content);
         $this->assertTrue(!is_null($summit));
+        $this->assertTrue(count($summit->schedule) > 0);
         $this->assertResponseStatus(200);
     }
 
@@ -1475,5 +1476,80 @@ class OAuth2SummitApiTest extends ProtectedApiTest
 
         $attendee  = json_decode($content);
         $this->assertTrue(!is_null($attendee));
+    }
+
+    public function testCurrentSummitLocationEventsWithFilter()
+    {
+        $params  = array
+        (
+            'id'          => 'current',
+            'location_id' => 25,
+            'filter'      => array
+            (
+                'tags=@design',
+                'start_date>1445895000'
+            )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getLocationEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testCurrentSummitPublishedLocationEventsWithFilter()
+    {
+        $params  = array
+        (
+            'id'            => 'current',
+            'location_id'   => 68,
+            /*'filter'      => array
+            (
+                'speaker=@Alex',
+            )*/
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitApiController@getLocationPublishedEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
     }
 }

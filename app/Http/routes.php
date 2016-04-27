@@ -109,8 +109,9 @@ Route::group(array(
                 Route::get('', 'OAuth2SummitApiController@getLocations');
 
                 Route::group(array('prefix' => '{location_id}'), function () {
-
                     Route::get('', 'OAuth2SummitApiController@getLocation');
+                    Route::get('/events/published','OAuth2SummitApiController@getLocationEvents');
+                    Route::get('/events','OAuth2SummitApiController@getLocationPublishedEvents');
                 });
             });
 

@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
+use utils\PagingResponse;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -1318,6 +1319,130 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             }
             return $this->ok($location);
         } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param string $summit_id
+     * @param int $location_id
+     * @param bool $published
+     * @return PagingResponse
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    private function _getLocationEvents($summit_id, $location_id, $published = true)
+    {
+        $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+        if (is_null($summit))
+            throw new EntityNotFoundException;
+
+        $location = $summit->getLocation($location_id);
+        if (is_null($location))
+            throw new EntityNotFoundException;
+
+        $values = Input::all();
+
+        $rules = array
+        (
+            'page'     => 'integer|min:1',
+            'per_page' => 'required_with:page|integer|min:5|max:100',
+        );
+
+        $validation = Validator::make($values, $rules);
+
+        if ($validation->fails()) {
+            $ex = new ValidationException();
+            throw $ex->setMessages($validation->messages()->toArray());
+        }
+
+       // default values
+        $page     = 1;
+        $per_page = 5;
+
+        if (Input::has('page')) {
+            $page     = intval(Input::get('page'));
+            $per_page = intval(Input::get('per_page'));
+        }
+
+        $filter = null;
+        if (Input::has('filter')) {
+            $filter = FilterParser::parse(Input::get('filter'),  array
+            (
+                'title'          => array('=@', '=='),
+                'speaker'        => array('=@', '=='),
+                'tags'           => array('=@', '=='),
+                'start_date'     => array('>', '<', '<=', '>=', '=='),
+                'end_date'       => array('>', '<', '<=', '>=', '=='),
+                'summit_type_id' => array('=='),
+                'event_type_id'  => array('=='),
+                'track_id'       => array('=='),
+            ));
+        }
+
+
+
+        list($total, $per_page, $current_page, $last_page, $events) = $location->events
+        (
+            $page, $per_page, $filter , $published
+        );
+
+        return new PagingResponse
+        (
+            $total,
+            $per_page,
+            $current_page,
+            $last_page,
+            $events
+        );
+    }
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @return mixed
+     */
+    public function getLocationEvents($summit_id, $location_id)
+    {
+        try {
+
+            return $this->ok($this->_getLocationEvents($summit_id, $location_id, false)->toArray());
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2) {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @return mixed
+     */
+    public function getLocationPublishedEvents($summit_id, $location_id)
+    {
+        try {
+
+            return $this->ok($this->_getLocationEvents($summit_id, $location_id, true)->toArray());
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2) {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
