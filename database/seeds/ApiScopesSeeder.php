@@ -160,6 +160,16 @@ class ApiScopesSeeder extends Seeder
                 'system' => false
             )
         );
+
+        ApiScope::create(
+            array(
+                'name' => sprintf('%s/summits/write-videos', $current_realm),
+                'short_description' => 'Allow to write presentation videos',
+                'description' => 'Allow to write presentation videos',
+                'api_id' => $summits->id,
+                'system' => false
+            )
+        );
     }
 
 }
