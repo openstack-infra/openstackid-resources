@@ -15,6 +15,7 @@
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
+use LaravelDoctrine\ORM\Facades\EntityManager;
 
 /**
  * Class RepositoriesProvider
@@ -34,6 +35,7 @@ class RepositoriesProvider extends ServiceProvider
             'models\marketplace\IPublicCloudServiceRepository',
             'repositories\marketplace\EloquentPublicCloudServiceRepository'
         );
+
         App::singleton(
             'models\marketplace\IPrivateCloudServiceRepository',
             'repositories\marketplace\EloquentPrivateCloudServiceRepository'
@@ -49,17 +51,52 @@ class RepositoriesProvider extends ServiceProvider
 
         App::singleton(
             'models\summit\ISummitRepository',
-            'repositories\summit\EloquentSummitRepository'
-        );
+            function(){
+                return  EntityManager::getRepository(\models\summit\Summit::class);
+        });
+
+        App::singleton(
+            'models\summit\IEventFeedbackRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\SummitEventFeedback::class);
+        });
 
         App::singleton(
             'models\summit\ISpeakerRepository',
-            'repositories\summit\EloquentSpeakerRepository'
-        );
+            function(){
+                return  EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
+        });
 
         App::singleton(
             'models\summit\ISummitEventRepository',
-            'repositories\summit\EloquentSummitEventRepository'
-        );
+            function(){
+                return  EntityManager::getRepository(\models\summit\SummitEvent::class);
+        });
+
+        App::singleton(
+            'models\summit\ISummitEntityEventRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\SummitEntityEvent::class);
+        });
+
+
+
+        App::singleton(
+            'Models\foundation\main\repositories\IMemberRepository',
+            function(){
+                return  EntityManager::getRepository(\models\main\Member::class);
+        });
+
+        App::singleton(
+            'models\summit\ISummitAttendeeRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\SummitAttendee::class);
+        });
+
+        App::singleton(
+            'models\summit\ISummitAttendeeTicketRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\SummitAttendeeTicket::class);
+        });
     }
 }
