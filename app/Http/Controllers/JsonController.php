@@ -13,10 +13,10 @@
  * limitations under the License.
  **/
 
+use Exception;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
-use Exception;
 
 /**
  * Class JsonController
@@ -67,11 +67,13 @@ abstract class JsonController extends Controller
         if (Input::has('callback')) {
             $res->setCallback(Input::get('callback'));
         }
-
         return $res;
     }
 
-
+    /**
+     * @param mixed $data
+     * @return mixed
+     */
     protected function ok($data = 'ok')
     {
         $res = Response::json($data, 200);
