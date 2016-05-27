@@ -16,7 +16,6 @@ use Closure;
 use libs\utils\ICacheService;
 use models\resource_server\IApiEndpoint;
 use models\resource_server\IApiEndpointRepository;
-use Illuminate\Contracts\Routing\Middleware;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
@@ -30,7 +29,7 @@ use libs\utils\RequestUtils;
 * @package App\Http\Middleware\
 * Implementation of http://www.w3.org/TR/cors/
 */
-class CORSMiddleware implements Middleware
+class CORSMiddleware
 {
 
 	const CORS_IP_BLACKLIST_PREFIX = 'CORS_IP_BLACKLIST_PREFIX:';

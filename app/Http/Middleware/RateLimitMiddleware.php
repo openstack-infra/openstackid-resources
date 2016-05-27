@@ -14,7 +14,6 @@
  **/
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Support\Facades\Response;
 use libs\utils\ICacheService;
 use libs\utils\RequestUtils;
@@ -24,7 +23,7 @@ use models\resource_server\IApiEndpointRepository;
  * Class RateLimitMiddleware
  * @package App\Http\Middleware
  */
-final class RateLimitMiddleware implements Middleware
+final class RateLimitMiddleware
 {
 
     /**
