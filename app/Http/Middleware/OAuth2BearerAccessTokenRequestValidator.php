@@ -14,7 +14,6 @@
  **/
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -35,7 +34,7 @@ use URL\Normalizer;
  * http://tools.ietf.org/html/rfc6749#section-7
  * @package App\Http\Middleware
  */
-class OAuth2BearerAccessTokenRequestValidator implements Middleware
+class OAuth2BearerAccessTokenRequestValidator
 {
 
     /**
