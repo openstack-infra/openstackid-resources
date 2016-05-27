@@ -44,6 +44,8 @@ class AccessTokenServiceStub implements IAccessTokenService
             $url . '/summits/delete-event',
             $url . '/summits/read-external-orders',
             $url . '/summits/confirm-external-orders',
+            $url . '/summits/write-videos',
+            $url . '/me/read',
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','11624', 3600, 'WEB_APPLICATION', '', '');
@@ -75,6 +77,9 @@ class AccessTokenServiceStub2 implements IAccessTokenService
             $url . '/summits/delete-event',
             $url . '/summits/read-external-orders',
             $url . '/summits/confirm-external-orders',
+            $url . '/summits/write-videos',
+            $url . '/summits/write-videos',
+            $url . '/me/read',
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, null,null, 3600, 'SERVICE', '', '');

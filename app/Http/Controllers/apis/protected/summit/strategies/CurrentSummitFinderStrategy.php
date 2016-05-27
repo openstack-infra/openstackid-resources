@@ -14,8 +14,8 @@
 
 namespace App\Http\Controllers;
 
+use models\summit\ISummitRepository;
 use models\summit\Summit;
-use repositories\summit\EloquentSummitRepository;
 
 /**
  * Class CurrentSummitFinderStrategy
@@ -25,11 +25,11 @@ class CurrentSummitFinderStrategy implements ISummitFinderStrategy
 {
 
     /**
-     * @var EloquentSummitRepository
+     * @var ISummitRepository
      */
     private $repository;
 
-    public function __construct(EloquentSummitRepository $repository)
+    public function __construct(ISummitRepository $repository)
     {
         $this->repository = $repository;
     }

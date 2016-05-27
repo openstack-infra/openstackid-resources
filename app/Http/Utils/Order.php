@@ -1,4 +1,4 @@
-<?php
+<?php namespace utils;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,9 +12,8 @@
  * limitations under the License.
  **/
 
-namespace utils;
-
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * Class Order
@@ -32,19 +31,46 @@ final class Order
         $this->ordering = $ordering;
     }
 
-    public function apply2Relation(Relation $relation, array $mappings)
+    /**
+     * @param QueryBuilder $query
+     * @param array $mappings
+     * @return $this
+     */
+    public function apply2Query(QueryBuilder $query, array $mappings)
     {
         foreach ($this->ordering as $order) {
             if ($order instanceof OrderElement) {
                 if (isset($mappings[$order->getField()])) {
                     $mapping = $mappings[$order->getField()];
-                    $relation->getQuery()->orderBy($mapping, $order->getDirection());
+                    $orders[$mapping] = $order->getDirection();
+                    $query->addOrderBy($mapping, $order->getDirection());
                 }
             }
         }
-
         return $this;
     }
+
+    /**
+     * @param Criteria $criteria
+     * @param array $mappings
+     * @return $this
+     */
+    public function apply2Criteria(Criteria $criteria, array $mappings)
+    {
+        $orders = [];
+        foreach ($this->ordering as $order) {
+            if ($order instanceof OrderElement) {
+                if (isset($mappings[$order->getField()])) {
+                    $mapping = $mappings[$order->getField()];
+                    $orders[$mapping] = $order->getDirection();
+                }
+            }
+        }
+        if(count($orders) > 0)
+            $criteria->orderBy($orders);
+        return $this;
+    }
+
 
     /**
      * @param array $mappings

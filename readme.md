@@ -16,6 +16,7 @@ run following commands on root folder
    * php artisan migrate --env=YOUR_ENVIRONMENT
    * php artisan db:seed --env=YOUR_ENVIRONMENT
    * phpunit --bootstrap vendor/autoload.php
+   * php artisan doctrine:generate:proxies
    * give proper rights to storage folder (775 and proper users)
    
 ## Permissions
