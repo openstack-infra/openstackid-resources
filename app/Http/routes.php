@@ -10,15 +10,17 @@
 | and give it the controller to call when that URI is requested.
 |
 */
+
 //OAuth2 Protected API
 Route::group(array(
+    'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/v1',
     'before' => [],
     'after' => [],
     'middleware' => ['ssl', 'oauth2.protected', 'rate.limit','etags']
 ), function () {
 
-        Route::group(array('prefix' => 'marketplace'), function () {
+    Route::group(array('prefix' => 'marketplace'), function () {
 
         Route::group(array('prefix' => 'public-clouds'), function () {
             Route::get('', 'OAuth2PublicCloudApiController@getClouds');
@@ -102,6 +104,19 @@ Route::group(array(
                     Route::get('/feedback/{attendee_id?}', 'OAuth2SummitApiController@getEventFeedback')->where('attendee_id', 'me|[0-9]+');
                 });
             });
+
+            // presentations
+            Route::group(array('prefix' => 'presentations'), function () {
+                Route::group(array('prefix' => '{presentation_id}'), function () {
+
+                    Route::group(array('prefix' => 'videos'), function () {
+                        Route::get('', 'OAuth2PresentationApiController@getPresentationVideos');
+                        Route::get('{video_id}', 'OAuth2PresentationApiController@getPresentationVideo');
+                        Route::post('', 'OAuth2PresentationApiController@addVideo');
+                    });
+                });
+            });
+
 
             // locations
             Route::group(array('prefix' => 'locations'), function () {

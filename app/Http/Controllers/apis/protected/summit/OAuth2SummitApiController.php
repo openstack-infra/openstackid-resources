@@ -4,6 +4,8 @@ use Exception;
 use libs\utils\HTMLCleaner;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\summit\ConfirmationExternalOrderRequest;
+use models\summit\IEventFeedbackRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\Presentation;
 use Illuminate\Http\Request as LaravelRequest;
@@ -11,6 +13,7 @@ use models\oauth2\IResourceServerContext;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitRepository;
 use services\model\ISummitService;
+use utils\Filter;
 use utils\OrderParser;
 use utils\PagingInfo;
 use utils\FilterParser;
@@ -19,6 +22,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use utils\PagingResponse;
+use ModelSerializers\SerializerRegistry;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -50,27 +54,36 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     private $event_repository;
 
+    /**
+     * @var IEventFeedbackRepository
+     */
+    private $event_feedback_repository;
+
 
     public function __construct
     (
         ISummitRepository $summit_repository,
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
+        IEventFeedbackRepository $event_feedback_repository,
         ISummitService $service,
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
-
-        $this->repository          = $summit_repository;
-        $this->speaker_repository  = $speaker_repository;
-        $this->event_repository    = $event_repository;
-        $this->service             = $service;
+        $this->repository                = $summit_repository;
+        $this->speaker_repository        = $speaker_repository;
+        $this->event_repository          = $event_repository;
+        $this->event_feedback_repository = $event_feedback_repository;
+        $this->service                   = $service;
     }
 
     public function getSummits()
     {
         try {
-            $summits = $this->repository->getAll();
+            $summits = array();
+            foreach($this->repository->getAll() as $summit){
+                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize();
+            }
             return $this->ok($summits);
         }
         catch (Exception $ex) {
@@ -88,8 +101,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            $data = $this->service->getSummitData($summit, $expand);
-            return $this->ok($data);
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($summit)->serialize($expand));
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -104,7 +116,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      * @param $summit_id
      * @return mixed
      */
-    public function getAttendees($summit_id)
+    /*public function getAttendees($summit_id)
     {
         try {
 
@@ -175,7 +187,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             Log::error($ex);
             return $this->error500($ex);
         }
-    }
+    }*/
 
     /**
      * @param $summit_id
@@ -194,58 +206,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if(is_null($attendee)) return $this->error404();
 
-            $data    = $attendee->toArray();
-            $speaker = $summit->getSpeakerByMemberId(intval($data['member_id']));
-
-            if (!is_null($speaker)) {
-                $data['speaker_id'] = intval($speaker->ID);
-            }
-
-            if (!empty($expand)) {
-                $expand = explode(',', $expand);
-                foreach ($expand as $relation) {
-                    switch (trim($relation)) {
-                        case 'schedule': {
-                            unset($data['schedule']);
-                            $schedule = array();
-                            foreach ($attendee->schedule() as $event) {
-                                $event->setFromAttendee();
-                                array_push($schedule, $event->toArray());
-                            }
-                            $data['schedule'] = $schedule;
-                        }
-                        break;
-                        case 'ticket_type': {
-                            unset($data['tickets']);
-                            $tickets = array();
-                            foreach($attendee->tickets() as $t)
-                            {
-                                array_push($tickets, $t->ticket_type()->toArray());
-                            }
-                            $data['tickets'] = $tickets;
-                        }
-                        break;
-                        case 'speaker': {
-                            if (!is_null($speaker))
-                            {
-                                unset($data['speaker_id']);
-                                $data['speaker'] = $speaker->toArray();
-                            }
-                        }
-                        break;
-                        case 'feedback': {
-                            $feedback = array();
-                            foreach ($attendee->emitted_feedback() as $f) {
-                                array_push($feedback, $f->toArray());
-                            }
-                            $data['feedback'] = $feedback;
-                        }
-                        break;
-                    }
-                }
-            }
-
-            return $this->ok($data);
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($attendee)->serialize($expand));
         }
         catch (\HTTP401UnauthorizedException $ex1) {
             Log::warning($ex1);
@@ -273,9 +234,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if(is_null($attendee)) return $this->error404();
 
             $schedule = array();
-            foreach ($attendee->schedule() as $event) {
-                $event->setFromAttendee();
-                array_push($schedule, $event->toArray());
+            foreach ($attendee->getSchedule() as $attendee_schedule)
+            {
+                $schedule[] = SerializerRegistry::getInstance()->getSerializer($attendee_schedule)->serialize();
             }
 
             return $this->ok($schedule);
@@ -307,9 +268,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $res = $this->service->addEventToAttendeeSchedule($summit, $attendee, intval($event_id));
+            $this->service->addEventToAttendeeSchedule($summit, $attendee, intval($event_id));
 
-            return $res ? $this->created() : $this->error400();
+            return $this->created();
         }
         catch (ValidationException $ex1)
         {
@@ -349,9 +310,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $res = $this->service->removeEventFromAttendeeSchedule($summit, $attendee, intval($event_id));
+            $this->service->removeEventFromAttendeeSchedule($summit, $attendee, intval($event_id));
 
-            return $res ? $this->deleted() : $this->error400();
+            return $this->deleted();
 
         }
         catch (ValidationException $ex1)
@@ -392,9 +353,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $res = $this->service->checkInAttendeeOnEvent($summit, $attendee, intval($event_id));
+            $this->service->checkInAttendeeOnEvent($summit, $attendee, intval($event_id));
 
-            return $res ? $this->updated() : $this->error400();
+            return $this->updated();
         }
         catch (ValidationException $ex1)
         {
@@ -460,6 +421,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             }
 
             $filter = null;
+
             if (Input::has('filter'))
             {
                 $filter = FilterParser::parse(Input::get('filter'), array
@@ -469,7 +431,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                     'email'      => array('=@', '=='),
                 ));
             }
-
 
             $order = null;
             if (Input::has('order'))
@@ -485,7 +446,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
             return $this->ok
             (
-                $result->toArray()
+                $result->toArray(Request::input('expand', ''),[],[],['summit_id' => $summit_id, 'published' => true])
             );
         }
         catch (Exception $ex)
@@ -502,9 +463,8 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getSpeaker($summit_id, $speaker_id)
     {
-        $expand = Request::input('expand', '');
-
-        try {
+        try
+        {
 
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -512,27 +472,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check($speaker_id, $summit);
             if (is_null($speaker)) return $this->error404();
 
-            $data = $speaker->toArray($summit->ID);
-
-            if (!empty($expand)) {
-                $expand = explode(',', $expand);
-                foreach ($expand as $relation) {
-                    switch (trim($relation)) {
-                        case 'presentations': {
-                            $presentations = array();
-                            unset($data['presentations']);
-                            foreach ($speaker->presentations($summit->ID) as $event) {
-                                $event->setFromSpeaker();
-                                array_push($presentations, $event->toArray());
-                            }
-                            $data['presentations'] = $presentations;
-                        }
-                            break;
-                    }
-                }
-            }
-
-            return $this->ok($data);
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($speaker)->serialize(Request::input('expand', '')));
 
         } catch (Exception $ex) {
             Log::error($ex);
@@ -552,8 +492,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         try
         {
-            $strategy = new RetrieveAllSummitEventsBySummitStrategy($this->repository);
-            return $this->ok($strategy->getEvents(array('summit_id' => $summit_id))->toArray());
+            $strategy = new RetrieveAllSummitEventsBySummitStrategy($this->repository, $this->event_repository);
+            $response = $strategy->getEvents(['summit_id' => $summit_id]);
+            return $this->ok($response->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -580,8 +521,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         try
         {
-            $strategy = new RetrievePublishedSummitEventsBySummitStrategy($this->repository);
-            return $this->ok($strategy->getEvents(array('summit_id' => $summit_id))->toArray());
+            $strategy = new RetrievePublishedSummitEventsBySummitStrategy($this->repository, $this->event_repository);
+            $response = $strategy->getEvents(['summit_id' => $summit_id]);
+            return $this->ok($response->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -605,7 +547,8 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         try
         {
             $strategy = new RetrieveAllSummitEventsStrategy($this->event_repository);
-            return $this->ok($strategy->getEvents()->toArray());
+            $response = $strategy->getEvents();
+            return $this->ok($response->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -629,7 +572,8 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         try
         {
             $strategy = new RetrieveAllPublishedSummitEventsStrategy($this->event_repository);
-            return $this->ok($strategy->getEvents()->toArray());
+            $response = $strategy->getEvents();
+            return $this->ok($response->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -668,42 +612,8 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         if (is_null($event)) throw new EntityNotFoundException;
         $relations = !empty($relations) ? explode(',', $relations) : array();
         $fields    = !empty($fields) ? explode(',', $fields) : array();
-        $data      = $event->toArray($fields, $relations);
 
-        if (!empty($expand)) {
-            foreach (explode(',', $expand) as $relation) {
-                switch (trim($relation)) {
-                    case 'feedback': {
-                        $feedback = array();
-                        list($total, $per_page, $current_page, $last_page, $items) = $event->feedback(1, PHP_INT_MAX);
-                        foreach ($items as $f) {
-                            array_push($feedback, $f->toArray());
-                        }
-                        $data['feedback'] = $feedback;
-                    }
-                    break;
-                    case 'speakers':{
-                        if($event instanceof Presentation){
-                            unset($data['speakers']);
-                            $speakers = array();
-                            foreach($event->speakers() as $speaker)
-                            {
-                                array_push($speakers, $speaker->toArray());
-                            }
-                            $data['speakers'] = $speakers;
-                        }
-                    }
-                    break;
-                    case 'location': {
-                        $location         = $event->getLocation();
-                        $data['location'] = $location->toArray();
-                        unset($data['location_id']);
-                    }
-                    break;
-                }
-            }
-        }
-        return $data;
+        return SerializerRegistry::getInstance()->getSerializer($event)->serialize($expand, $fields, $relations);
     }
     /**
      * @param $summit_id
@@ -718,8 +628,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $fields    = Request::input('fields', '');
             $relations = Request::input('relations', '');
 
-            $data = $this->_getSummitEvent($summit_id, $event_id, $expand, $fields, $relations, false);
-            return $this->ok($data);
+            return $this->ok($this->_getSummitEvent($summit_id, $event_id, $expand, $fields, $relations, false));
         }
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);
@@ -744,8 +653,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $fields    = Request::input('fields', '');
             $relations = Request::input('relations', '');
 
-            $data = $this->_getSummitEvent($summit_id, $event_id, $expand, $fields, $relations, true);
-            return $this->ok($data);
+            return $this->ok($this->_getSummitEvent($summit_id, $event_id, $expand, $fields, $relations, true));
         }
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);
@@ -802,7 +710,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
             $event = $this->service->addEvent($summit, HTMLCleaner::cleanData($data->all(), $fields));
 
-            return $this->created($event);
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($event)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
@@ -866,7 +774,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
             $event = $this->service->updateEvent($summit, $event_id, HTMLCleaner::cleanData($data->all(), $fields));
 
-            return $this->ok($event);
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($event)->serialize());
 
         }
         catch (ValidationException $ex1)
@@ -1016,8 +924,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $expand = Request::input('expand', '');
-
             $values = Input::all();
 
             $rules = array
@@ -1047,7 +953,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 $member_id = $this->resource_server_context->getCurrentUserExternalId();
                 if (is_null($member_id)) return $this->error404();
 
-                $filter = FilterParser::parse(array('owner_id' => $member_id), array
+                $filter = FilterParser::parse('owner_id=='.$member_id, array
                 (
                     'owner_id'   => array('=='),
                 ));
@@ -1075,38 +981,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 ));
             }
 
-            list($total, $per_page, $current_page, $last_page, $feedback) = $event->feedback($page, $per_page, $filter, $order);
+            $response = $this->event_feedback_repository->getByEvent($event, new PagingInfo($page, $per_page), $filter, $order);
 
-            if (!empty($expand))
-            {
-                foreach (explode(',', $expand) as $relation)
-                {
-                    switch (trim($relation)) {
-                        case 'owner':
-                        {
-                            $res = array();
-                            foreach($feedback as $f)
-                            {
-                                array_push($res, $f->toArray(true));
-                            }
-                            $feedback = $res;
-                        }
-                        break;
-                    }
-                }
-            }
-
-            return $this->ok
-            (
-                array
-                (
-                    'total'        => $total,
-                    'per_page'     => $per_page,
-                    'current_page' => $current_page,
-                    'last_page'    => $last_page,
-                    'data'         => $feedback,
-                )
-            );
+            return $this->ok($response->toArray(Request::input('expand', '')));
 
         } catch (Exception $ex) {
             Log::error($ex);
@@ -1164,7 +1041,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $data['attendee_id'] = intval($attendee->ID);
+            $data['attendee_id'] = intval($attendee->getId());
 
             $res  = $this->service->addEventFeedback
             (
@@ -1173,7 +1050,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 $data
             );
 
-            return !is_null($res) ? $this->created($res->ID) : $this->error400();
+            return !is_null($res) ? $this->created($res->getId()) : $this->error400();
         }
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);
@@ -1290,8 +1167,9 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
 
             //locations
             $locations = array();
-            foreach ($summit->locations() as $location) {
-                array_push($locations, $location->toArray());
+            foreach ($summit->getLocations() as $location)
+            {
+                $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
             }
 
             return $this->ok($locations);
@@ -1317,7 +1195,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if (is_null($location)) {
                 return $this->error404();
             }
-            return $this->ok($location);
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($location)->serialize());
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -1371,31 +1249,26 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             $filter = FilterParser::parse(Input::get('filter'),  array
             (
                 'title'          => array('=@', '=='),
-                'speaker'        => array('=@', '=='),
-                'tags'           => array('=@', '=='),
                 'start_date'     => array('>', '<', '<=', '>=', '=='),
                 'end_date'       => array('>', '<', '<=', '>=', '=='),
+                'speaker'        => array('=@', '=='),
+                'tags'           => array('=@', '=='),
                 'summit_type_id' => array('=='),
                 'event_type_id'  => array('=='),
                 'track_id'       => array('=='),
             ));
         }
 
+        if(is_null($filter)) $filter = new Filter();
 
+        $filter->addFilterCondition(FilterParser::buildFilter('location_id','==', $location_id));
 
-        list($total, $per_page, $current_page, $last_page, $events) = $location->events
-        (
-            $page, $per_page, $filter , $published
-        );
+        if($published)
+        {
+            $filter->addFilterCondition(FilterParser::buildFilter('published','==', 1));
+        }
 
-        return new PagingResponse
-        (
-            $total,
-            $per_page,
-            $current_page,
-            $last_page,
-            $events
-        );
+        return $this->event_repository->getAllByPage(new PagingInfo($page, $per_page), $filter);
     }
 
     /**
@@ -1407,7 +1280,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         try {
 
-            return $this->ok($this->_getLocationEvents($summit_id, $location_id, false)->toArray());
+            return $this->ok($this->_getLocationEvents($summit_id, $location_id, false)->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);
@@ -1432,7 +1305,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         try {
 
-            return $this->ok($this->_getLocationEvents($summit_id, $location_id, true)->toArray());
+            return $this->ok($this->_getLocationEvents($summit_id, $location_id, true)->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);
@@ -1459,12 +1332,13 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if (is_null($summit)) return $this->error404();
 
             //event types
-            $list = array();
-            foreach ($summit->event_types() as $et) {
-                array_push($list, $et->toArray());
+            $event_types = array();
+            foreach ($summit->getEventTypes() as $event_type)
+            {
+                $event_types[] =SerializerRegistry::getInstance()->getSerializer($event_type)->serialize();
             }
 
-            return $this->ok($list);
+            return $this->ok($event_types);
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -1482,11 +1356,13 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if (is_null($summit)) return $this->error404();
 
             //summit types
-            $list = array();
-            foreach ($summit->summit_types() as $st) {
-                array_push($list, $st->toArray());
+            $summit_types = array();
+            foreach ($summit->getSummitTypes() as $summit_type)
+            {
+                $summit_types[] =SerializerRegistry::getInstance()->getSerializer($summit_type)->serialize();
             }
-            return $this->ok($list);
+            return $this->ok($summit_types);
+
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -1523,8 +1399,19 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
             if (is_null($member_id)) {
                 throw new \HTTP401UnauthorizedException;
             }
-            $attendee = $this->service->confirmExternalOrderAttendee($summit, $member_id, $external_order_id, $external_attendee_id);
-            return $this->ok($attendee);
+
+            $attendee = $this->service->confirmExternalOrderAttendee
+            (
+                new ConfirmationExternalOrderRequest
+                (
+                    $summit,
+                    intval($member_id),
+                    trim($external_order_id),
+                    trim($external_attendee_id)
+                )
+            );
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($attendee)->serialize());
         }
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);

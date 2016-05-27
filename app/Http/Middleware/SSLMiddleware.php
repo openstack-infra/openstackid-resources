@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\Http\Middleware;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,16 @@
  * limitations under the License.
  **/
 
-namespace App\Http\Middleware;
-
 use Closure;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Contracts\Routing\Middleware;
 
 /**
  * Class SSLMiddleware
  * @package App\Http\Middleware
  */
-final class SSLMiddleware implements Middleware
+final class SSLMiddleware
 {
     public function handle($request, Closure $next)
     {
