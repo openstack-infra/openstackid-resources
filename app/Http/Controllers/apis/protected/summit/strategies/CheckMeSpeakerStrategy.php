@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\Http\Controllers;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-namespace App\Http\Controllers;
 
 use models\oauth2\IResourceServerContext;
 use models\summit\PresentationSpeaker;
@@ -40,7 +38,7 @@ class CheckMeSpeakerStrategy implements ICheckSpeakerStrategy
     }
 
     /**
-     * @param mixed $speaker_id
+     * @param int $speaker_id
      * @param Summit $summit
      * @return null|PresentationSpeaker
      */
@@ -49,11 +47,11 @@ class CheckMeSpeakerStrategy implements ICheckSpeakerStrategy
         if (strtolower($speaker_id) === 'me') {
             $member_id = $this->resource_server_context->getCurrentUserExternalId();
             if (is_null($member_id)) {
-                return $this->error404();
+                return null;
             }
             $speaker = $summit->getSpeakerByMemberId($member_id);
         } else {
-            $speaker = $summit->getSpeakerById(intval($speaker_id));
+            $speaker = $summit->getSpeaker(intval($speaker_id));
         }
         return $speaker;
     }
