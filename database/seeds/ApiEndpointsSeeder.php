@@ -442,6 +442,16 @@ class ApiEndpointsSeeder extends Seeder
 
         ApiEndpoint::create(
             array(
+                'name' => 'add-event-feedback-v2',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v2/summits/{id}/events/{event_id}/feedback',
+                'http_method' => 'POST'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
                 'name' => 'get-event-feedback',
                 'active' => true,
                 'api_id' => $summit->id,
@@ -538,6 +548,32 @@ class ApiEndpointsSeeder extends Seeder
             )
         );
 
+        //videos
+
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'create-presentation-video',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos',
+                'http_method' => 'POST'
+            )
+        );
+
+        //members
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-own-member',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/members/me',
+                'http_method' => 'GET'
+            )
+        );
+
+        $member_read_scope             = ApiScope::where('name', '=', sprintf('%s/me/read', $current_realm))->first();
         $summit_read_scope             = ApiScope::where('name', '=', sprintf('%s/summits/read', $current_realm))->first();
         $summit_write_scope            = ApiScope::where('name', '=', sprintf('%s/summits/write', $current_realm))->first();
         $summit_write_event_scope      = ApiScope::where('name', '=', sprintf('%s/summits/write-event', $current_realm))->first();
@@ -545,10 +581,13 @@ class ApiEndpointsSeeder extends Seeder
         $summit_delete_event_scope     = ApiScope::where('name', '=', sprintf('%s/summits/delete-event', $current_realm))->first();
         $summit_external_order_read    = ApiScope::where('name', '=', sprintf('%s/summits/read-external-orders', $current_realm))->first();
         $summit_external_order_confirm = ApiScope::where('name', '=', sprintf('%s/summits/confirm-external-orders', $current_realm))->first();
+        $write_videos_scope            = ApiScope::where('name', '=', sprintf('%s/summits/write-videos', $current_realm))->first();
 
         // read
         $endpoint = ApiEndpoint::where('name', '=', 'get-summits')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-own-member')->first();
+        $endpoint->scopes()->attach($member_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-summit')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-summit-entity-events')->first();
@@ -607,6 +646,9 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint = ApiEndpoint::where('name', '=', 'add-event-feedback')->first();
         $endpoint->scopes()->attach($summit_write_scope->id);
 
+        $endpoint = ApiEndpoint::where('name', '=', 'add-event-feedback-v2')->first();
+        $endpoint->scopes()->attach($summit_write_scope->id);
+
         // write events
         $endpoint = ApiEndpoint::where('name', '=', 'add-event')->first();
         $endpoint->scopes()->attach($summit_write_event_scope->id);
@@ -626,6 +668,11 @@ class ApiEndpointsSeeder extends Seeder
 
         $endpoint = ApiEndpoint::where('name', '=', 'confirm-external-order')->first();
         $endpoint->scopes()->attach($summit_external_order_confirm->id);
+
+        //write videos
+        $endpoint = ApiEndpoint::where('name', '=', 'create-presentation-video')->first();
+        $endpoint->scopes()->attach($write_videos_scope->id);
+
 
     }
 

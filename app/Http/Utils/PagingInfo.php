@@ -56,4 +56,12 @@ class PagingInfo
     {
         return ($this->page - 1) * $this->per_page;
     }
+
+    /**
+     * @param int $count
+     * @return int
+     */
+    public function getLastPage($count){
+        return intval(ceil($count/$this->per_page));
+    }
 }
