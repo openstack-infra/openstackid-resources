@@ -1,7 +1,4 @@
 <?php namespace models\main;
-
-use models\utils\SilverstripeBaseModel;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +11,19 @@ use models\utils\SilverstripeBaseModel;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
+use Doctrine\ORM\Mapping AS ORM;
+use models\utils\SilverstripeBaseModel;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="Company")
+ * Class Company
+ * @package models\main
+ */
 class Company extends SilverstripeBaseModel
 {
-    protected $table = 'Company';
-
-    protected $array_mappings = array
+    protected static $array_mappings = array
     (
         'ID'   => 'id:json_int',
         'Name' => 'name:json_string',

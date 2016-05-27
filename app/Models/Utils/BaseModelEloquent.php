@@ -17,7 +17,8 @@ use DB;
 use Eloquent;
 use libs\utils\JsonUtils;
 use ReflectionClass;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Builder;
 /**
  * Class BaseModelEloquent
  */
@@ -26,7 +27,7 @@ class BaseModelEloquent extends Eloquent
 
     private $class = null;
 
-    protected $array_mappings = array();
+    protected static $array_mappings = array();
 
     /**
      * Register a restoring model event with the dispatcher.
@@ -62,13 +63,66 @@ class BaseModelEloquent extends Eloquent
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getAttributeMappings(){
+        $mappings  = array();
+
+        $hierarchy = $this->getClassHierarchy();
+        foreach($hierarchy as $class_name){
+            if($class_name == $this->class->getName()) continue;
+            $class    = new $class_name;
+            if($class instanceof BaseModelEloquent)
+                $mappings = array_merge($mappings, $class->getSelfMappings());
+        }
+        $mappings  = array_merge($mappings, $this->getSelfMappings());
+        return $mappings;
+    }
+
+    public function getSelfMappings(){
+        return static::$array_mappings;
+    }
+
+    /**
+     * @return array
+     */
+    public function getClassHierarchy(){
+        $class_hierarchy = array();
+
+        if ($this->useMti()) {
+            $class = $this->class->getName();
+            $parents = $this->get_class_lineage(new $class);
+
+            if ($this->mtiClassType === 'concrete') {
+                $base_class_name = $this->class->getName();
+                array_push($class_hierarchy, $base_class_name);
+            }
+
+            foreach ($parents as $parent) {
+
+                if (!$this->isAllowedParent($parent)) {
+                    continue;
+                }
+
+                $parent = new $parent;
+                if ($parent->mtiClassType === 'abstract') {
+                    continue;
+                }
+
+                array_push($class_hierarchy, $parent->class->getName());
+            }
+        }
+        return array_reverse($class_hierarchy);
+    }
+
     public function toArray()
     {
-        $values = parent::toArray();
-
-        if (count($this->array_mappings)) {
+        $values   = parent::toArray();
+        $mappings = $this->getAttributeMappings();
+        if (count($mappings)) {
             $new_values = array();
-            foreach ($this->array_mappings as $old_key => $new_key) {
+            foreach ($mappings as $old_key => $new_key) {
                 $value = isset($values[$old_key])? $values[$old_key] :
                     (
                         isset($values['pivot'])? (
@@ -207,5 +261,145 @@ class BaseModelEloquent extends Eloquent
         } else {
             return parent::newFromBuilder($attributes, $connection);
         }
+    }
+
+    /**
+     * Define a one-to-many relationship.
+     *
+     * @param  string  $related
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @param  bool  $prefix_fkey
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function hasMany($related, $foreignKey = null, $localKey = null, $prefix_fkey = true)
+    {
+        $foreignKey = $foreignKey ?: $this->getForeignKey();
+        $instance   = new $related;
+        $table_name = $instance->getTable();
+
+        $localKey = $localKey ?: $this->getKeyName();
+        if($prefix_fkey) $foreignKey = $table_name . '.' . $foreignKey;
+
+        return new HasMany($instance->newQuery(), $this, $foreignKey, $localKey);
+    }
+
+    /**
+     * Save the model to the database.
+     *
+     * @param  array  $options
+     * @return bool
+     */
+    public function save(array $options = array())
+    {
+        $query           = $this->newQueryWithoutScopes();
+
+        // If the "saving" event returns false we'll bail out of the save and return
+        // false, indicating that the save failed. This provides a chance for any
+        // listeners to cancel save operations if validations fail or whatever.
+        if ($this->fireModelEvent('saving') === false)
+        {
+            return false;
+        }
+
+        // If the model already exists in the database we can just update our record
+        // that is already in this database using the current IDs in this "where"
+        // clause to only update this model. Otherwise, we'll just insert them.
+        if ($this->exists)
+        {
+            $saved = $this->performUpdate($query, $options);
+        }
+
+        // If the model is brand new, we'll insert it into our database and set the
+        // ID attribute on the model to the value of the newly inserted row's ID
+        // which is typically an auto-increment value managed by the database.
+        else
+        {
+            $saved = $this->performInsert($query, $options);
+        }
+
+        if ($saved) $this->finishSave($options);
+
+        return $saved;
+    }
+
+    /**
+     * Perform a model insert operation.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  array  $options
+     * @return bool
+     */
+    protected function performInsert(Builder $query, array $options = [])
+    {
+        if ($this->fireModelEvent('creating') === false) return false;
+
+        // First we'll need to create a fresh query instance and touch the creation and
+        // update timestamps on this model, which are maintained by us for developer
+        // convenience. After, we will just continue saving these model instances.
+        if ($this->timestamps && array_get($options, 'timestamps', true))
+        {
+            $this->updateTimestamps();
+        }
+
+        $class_hierarchy = array();
+
+        if ($this->useMti())
+        {
+            $class = $this->class->getName();
+            $parents = $this->get_class_lineage(new $class);
+
+            if ($this->mtiClassType === 'concrete')
+            {
+                $base_class_name = $this->class->getShortName();
+                array_push($class_hierarchy, $base_class_name);
+            }
+
+            foreach ($parents as $parent) {
+
+                if(!$this->isAllowedParent($parent))
+                {
+                    continue;
+                }
+
+                $parent = new $parent;
+                if ($parent->mtiClassType === 'abstract') {
+                    continue;
+                }
+
+                array_push($class_hierarchy, $parent->class->getShortName());
+            }
+            $attributes = $this->attributes;
+            do{
+                $table = array_pop($class_hierarchy);
+                $class = new $table;
+
+            }while(true);
+        }
+        else {
+            // If the model has an incrementing key, we can use the "insertGetId" method on
+            // the query builder, which will give us back the final inserted ID for this
+            // table from the database. Not all tables have to be incrementing though.
+            $attributes = $this->attributes;
+
+            if ($this->incrementing) {
+                $this->insertAndSetId($query, $attributes);
+            }
+
+            // If the table is not incrementing we'll simply insert this attributes as they
+            // are, as this attributes arrays must contain an "id" column already placed
+            // there by the developer as the manually determined key for these models.
+            else {
+                $query->insert($attributes);
+            }
+        }
+        // We will go ahead and set the exists property to true, so that it is set when
+        // the created event is fired, just in case the developer tries to update it
+        // during the event. This will allow them to do so and run an update here.
+        $this->exists = true;
+
+        $this->fireModelEvent('created', false);
+
+        return true;
     }
 }

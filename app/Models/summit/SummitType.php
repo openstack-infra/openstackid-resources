@@ -1,4 +1,4 @@
-<?php
+<?php namespace models\summit;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,36 +12,79 @@
  * limitations under the License.
  **/
 
-namespace models\summit;
-
 use models\utils\SilverstripeBaseModel;
+use Doctrine\ORM\Mapping AS ORM;
 
 /**
+ * @ORM\Entity
+ * @ORM\Table(name="SummitType")
  * Class SummitType
  * @package models\summit
  */
 class SummitType extends SilverstripeBaseModel
 {
-    protected $table = 'SummitType';
+    use SummitOwned;
 
-    protected $array_mappings = array
-    (
-        'ID'    => 'id:json_int',
-        'Title' => 'name:json_string',
-        'Color' => 'color:json_string',
-        'Type'  => 'type:json_string',
-    );
+    /**
+     * @ORM\Column(name="Title", type="string")
+     */
+    private $title;
 
-    public function toArray()
+    /**
+     * @ORM\Column(name="Color", type="string")
+     */
+    private $color;
+
+    /**
+     * @return mixed
+     */
+    public function getTitle()
     {
-        $values = parent::toArray();
-        $color  = isset($values['color']) ? $values['color']:'';
-        if(empty($color))
-            $color = 'f0f0ee';
-        if (strpos($color,'#') === false) {
-            $color = '#'.$color;
-        }
-        $values['color'] = $color;
-        return $values;
+        return $this->title;
     }
+
+    /**
+     * @param mixed $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getColor()
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param mixed $color
+     */
+    public function setColor($color)
+    {
+        $this->color = $color;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param mixed $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @ORM\Column(name="Type", type="string")
+     */
+    private $type;
 }

@@ -1,4 +1,4 @@
-<?php
+<?php namespace models\summit;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,65 +12,286 @@
  * limitations under the License.
  **/
 
-namespace models\summit;
-
-use DB;
-use Config;
-use models\main\Company;
-use models\main\Image;
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Query;
+use models\main\File;
 use models\utils\SilverstripeBaseModel;
-use utils\ExistsFilterManyManyMapping;
-use utils\ExistsFilterManyToOneMapping;
 use utils\Filter;
 use utils\Order;
+use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use DateTimeZone;
+use DateTime;
 
 /**
+ * @ORM\Entity
+ * @ORM\Table(name="Summit")
+ * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitRepository")
  * Class Summit
  * @package models\summit
  */
 class Summit extends SilverstripeBaseModel
 {
-    protected $table = 'Summit';
-
-    protected $array_mappings = array
-    (
-        'ID'                     => 'id:json_int',
-        'Name'                   => 'name:json_string',
-        'SummitBeginDate'        => 'start_date:datetime_epoch',
-        'SummitEndDate'          => 'end_date:datetime_epoch',
-        'StartShowingVenuesDate' => 'start_showing_venues_date:datetime_epoch',
-        'Active'                 => 'active:json_boolean',
-    );
-
-    protected $hidden = array
-    (
-
-    );
-
     /**
-     * @return SummitAbstractLocation[]
+     * @return mixed
      */
-    public function locations()
+    public function getName()
     {
-        $res       = $this->hasMany('models\summit\SummitAbstractLocation', 'SummitID', 'ID')->get();
-        $locations = array();
-        foreach($res as $l)
-        {
-
-            $class  = 'models\\summit\\'.$l->ClassName;
-            $entity = $class::find($l->ID);
-            if(is_null($entity)) continue;
-            array_push($locations, $entity);
-        }
-        return $locations;
+        return $this->name;
     }
 
     /**
-     * @return Image
+     * @param mixed $name
      */
-    public function logo()
+    public function setName($name)
     {
-        return $this->hasOne('models\main\Image', 'ID', 'LogoID')->first();
+        $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBeginDate()
+    {
+        return $this->begin_date;
+    }
+
+    /**
+     * @param mixed $begin_date
+     */
+    public function setBeginDate($begin_date)
+    {
+        $this->begin_date = $begin_date;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEndDate()
+    {
+        return $this->end_date;
+    }
+
+    /**
+     * @param mixed $end_date
+     */
+    public function setEndDate($end_date)
+    {
+        $this->end_date = $end_date;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param mixed $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStartShowingVenuesDate()
+    {
+        return $this->start_showing_venues_date;
+    }
+
+    /**
+     * @param mixed $start_showing_venues_date
+     */
+    public function setStartShowingVenuesDate($start_showing_venues_date)
+    {
+        $this->start_showing_venues_date = $start_showing_venues_date;
+    }
+
+    /**
+     * @ORM\Column(name="Title", type="string")
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(name="SummitBeginDate", type="datetime")
+     */
+    private $begin_date;
+
+    /**
+     * @ORM\Column(name="SummitEndDate", type="datetime")
+     */
+    private $end_date;
+
+    /**
+     * @ORM\Column(name="Active", type="boolean")
+     */
+    private $active;
+
+    public function isActive(){
+        return $this->active;
+    }
+
+    /**
+     * @ORM\Column(name="StartShowingVenuesDate", type="datetime")
+     */
+    private $start_showing_venues_date;
+
+    /**
+     * @ORM\Column(name="TimeZone", type="string")
+     */
+    private $time_zone_id;
+
+    /**
+     * @return mixed
+     */
+    public function getTimeZoneId()
+    {
+        return $this->time_zone_id;
+    }
+
+    /**
+     * @param mixed $time_zone_id
+     */
+    public function setTimeZoneId($time_zone_id)
+    {
+        $this->time_zone_id = $time_zone_id;
+    }
+
+    // ...
+    /**
+     * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"})
+     */
+    private $locations;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"})
+     */
+    private $events;
+
+    /**
+     * Summit constructor.
+     */
+    public function __construct()
+    {
+        $this->locations               = new ArrayCollection();
+        $this->events                  = new ArrayCollection();
+        $this->event_types             = new ArrayCollection();
+        $this->summit_types            = new ArrayCollection();
+        $this->ticket_types            = new ArrayCollection();
+        $this->presentation_categories = new ArrayCollection();
+        $this->category_groups         = new ArrayCollection();
+        $this->attendees               = new ArrayCollection();
+        $this->entity_events           = new ArrayCollection();
+    }
+
+    /**
+     * @param DateTime $value
+     * @return null|DateTime
+     */
+    public function convertDateFromTimeZone2UTC(DateTime $value)
+    {
+        $time_zone_id   = $this->time_zone_id;
+        if(empty($time_zone_id)) return $value;
+        $time_zone_list = timezone_identifiers_list();
+
+        if(isset($time_zone_list[$time_zone_id]) && !empty($value))
+        {
+            $utc_timezone      = new DateTimeZone("UTC");
+            $time_zone_name    = $time_zone_list[$time_zone_id];
+            $summit_time_zone  = new DateTimeZone($time_zone_name);
+            $local_date        = $value->setTimezone($summit_time_zone);
+            return $local_date->setTimezone($utc_timezone);
+        }
+        return null;
+    }
+
+    /**
+     * @param DateTime $value
+     * @return null|DateTime
+     */
+    public function convertDateFromUTC2TimeZone(DateTime $value)
+    {
+        $time_zone_id   = $this->time_zone_id;
+        if(empty($time_zone_id)) return $value;
+        $time_zone_list = timezone_identifiers_list();
+
+        if(isset($time_zone_list[$time_zone_id]) && !empty($value))
+        {
+            $utc_timezone     = new DateTimeZone("UTC");
+            $time_zone_name   = $time_zone_list[$time_zone_id];
+            $summit_time_zone = new DateTimeZone($time_zone_name);
+            $utc_date         = $value->setTimezone($utc_timezone);
+
+            return $utc_date->setTimezone($summit_time_zone);
+        }
+        return null;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getLocalBeginDate()
+    {
+        return $this->convertDateFromUTC2TimeZone($this->begin_date);
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getLocalEndDate()
+    {
+        return $this->convertDateFromUTC2TimeZone($this->end_date);
+    }
+
+    /**
+     * @param SummitAbstractLocation $location
+     */
+    public function addLocation(SummitAbstractLocation $location){
+        $this->locations->add($location);
+        $location->setSummit($this);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getLocations()
+    {
+        return $this->locations;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getEvents(){
+        return $this->events;
+    }
+
+    /**
+     * @param SummitEvent $event
+     */
+    public function addEvent(SummitEvent $event){
+        $this->events->add($event);
+        $event->setSummit($this);
+    }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
+     * @ORM\JoinColumn(name="LogoID", referencedColumnName="ID")
+     * @var File
+     */
+    private $logo;
+
+    /**
+     * @return File
+     */
+    public function getLogo()
+    {
+        return $this->logo;
     }
 
     /**
@@ -79,21 +300,20 @@ class Summit extends SilverstripeBaseModel
      */
     public function getLocation($location_id)
     {
-        $location = $this->hasMany('models\summit\SummitAbstractLocation', 'SummitID', 'ID')->where('SummitAbstractLocation.ID', '=', $location_id)->get()->first();
-        if(!is_null($location))
-        {
-            $class    = 'models\\summit\\'.$location->ClassName;
-            $location = $class::find($location->ID);
-        }
-        return $location;
+        return $this->locations->get($location_id);
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEventType", mappedBy="summit", cascade={"persist"})
+     */
+    private $event_types;
 
     /**
      * @return SummitEventType[]
      */
-    public function event_types()
+    public function getEventTypes()
     {
-        return $this->hasMany('models\summit\SummitEventType', 'SummitID', 'ID')->get();
+        return $this->event_types;
     }
 
     /**
@@ -102,15 +322,20 @@ class Summit extends SilverstripeBaseModel
      */
     public function getEventType($event_type_id)
     {
-        return $this->hasMany('models\summit\SummitEventType', 'SummitID', 'ID')->where('ID','=', intval($event_type_id))->first();
+        return $this->event_types->get($event_type_id);
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitType", mappedBy="summit", cascade={"persist"})
+     */
+    private $summit_types;
 
     /**
      * @return SummitType[]
      */
-    public function summit_types()
+    public function getSummitTypes()
     {
-        return $this->hasMany('models\summit\SummitType', 'SummitID', 'ID')->get();
+        return $this->summit_types;
     }
 
     /**
@@ -119,16 +344,91 @@ class Summit extends SilverstripeBaseModel
      */
     public function getSummitType($summit_type_id)
     {
-        return $this->hasMany('models\summit\SummitType', 'SummitID', 'ID')->where('ID','=', intval($summit_type_id))->first();
+        return $this->summit_types->get($summit_type_id);
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"})
+     */
+    private $ticket_types;
 
     /**
      * @return SummitTicketType[]
      */
-    public function ticket_types()
+    public function getTicketTypes()
     {
-        return $this->hasMany('models\summit\SummitTicketType', 'SummitID', 'ID')->get();
+        return $this->ticket_types;
     }
+
+    /**
+     * @param int $event_id
+     * @return null|SummitEvent
+     */
+    public function getScheduleEvent($event_id)
+    {
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('published', 1));
+        $criteria->andWhere(Criteria::expr()->eq('id', intval($event_id)));
+        return $this->events->matching($criteria)->first();
+    }
+
+    public function getPresentations(){
+       $query = $this->createQuery("SELECT p from models\summit\Presentation p JOIN p.summit s WHERE s.id = :summit_id");
+       return $query->setParameter('summit_id', $this->getIdentifier())->getResult();
+    }
+    /**
+     * @param int $event_id
+     * @return null|SummitEvent
+     */
+    public function getEvent($event_id)
+    {
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($event_id)));
+        return $this->events->matching($criteria)->first();
+    }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategory", mappedBy="summit", cascade={"persist"})
+     * @var PresentationCategory[]
+     */
+    private $presentation_categories;
+
+    /**
+     * @return PresentationCategory[]
+     */
+    public function getPresentationCategories()
+    {
+        return $this->presentation_categories;
+    }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"})
+     * @var PresentationCategoryGroup[]
+     */
+    private $category_groups;
+
+    /**
+     * @return PresentationCategoryGroup[]
+     */
+    public function getCategoryGroups()
+    {
+        return $this->category_groups;
+    }
+
+    /**
+     * @param int $group_id
+     * @return null|PresentationCategoryGroup
+     */
+    public function getCategoryGroup($group_id)
+    {
+        return $this->category_groups->get($group_id);
+    }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitAttendee", mappedBy="summit", cascade={"persist"})
+     * @var SummitAttendee[]
+     */
+    private $attendees;
 
     /**
      * @param int $page
@@ -169,101 +469,7 @@ class Summit extends SilverstripeBaseModel
 
         return array ($total,$per_page, $current_page, $last_page, $items);
     }
-    /**
-     * @param int $page
-     * @param int $per_page
-     * @param Filter|null $filter
-     * @return array
-     */
-    public function schedule($page = 1, $per_page = 100, Filter $filter = null)
-    {
-        return $this->events($page, $per_page, $filter, true);
-    }
 
-    /**
-     * @param int $page
-     * @param int $per_page
-     * @param Filter|null $filter
-     * @param bool|false $published
-     * @return array
-     */
-    public function events($page = 1, $per_page = 100, Filter $filter = null, $published = false)
-    {
-        $rel = $this
-            ->hasMany('models\summit\SummitEvent', 'SummitID', 'ID')
-            ->select
-            (
-                array
-                (
-                    'SummitEvent.*',
-                    'Presentation.Priority',
-                    'Presentation.Level',
-                    'Presentation.Status',
-                    'Presentation.OtherTopic',
-                    'Presentation.Progress',
-                    'Presentation.Slug',
-                    'Presentation.CreatorID',
-                    'Presentation.CategoryID',
-                    'Presentation.Views',
-                    'Presentation.ModeratorID',
-                    'Presentation.ProblemAddressed',
-                    'Presentation.AttendeesExpectedLearnt',
-                    'Presentation.SelectionMotive',
-                )
-            );
-
-        $rel = $rel->leftJoin('Presentation', 'SummitEvent.ID', '=', 'Presentation.ID');
-        if($published)
-        {
-            $rel = $rel->where('Published','=','1');
-        }
-
-        if(!is_null($filter))
-        {
-            $filter->apply2Relation($rel, array
-            (
-                'title'         => 'SummitEvent.Title',
-                'start_date'    => 'SummitEvent.StartDate:datetime_epoch',
-                'end_date'      => 'SummitEvent.EndDate:datetime_epoch',
-                'tags'          => new ExistsFilterManyManyMapping
-                (
-                    'Tag',
-                    'SummitEvent_Tags',
-                    'SummitEvent_Tags.TagID = Tag.ID',
-                    "SummitEvent_Tags.SummitEventID = SummitEvent.ID AND Tag.Tag :operator ':value'"
-                ),
-                'summit_type_id'=> new ExistsFilterManyManyMapping
-                (
-                    'SummitType',
-                    'SummitEvent_AllowedSummitTypes',
-                    'SummitType.ID = SummitEvent_AllowedSummitTypes.SummitTypeID',
-                    'SummitEvent_AllowedSummitTypes.SummitEventID = SummitEvent.ID AND SummitType.ID :operator :value'
-                ),
-                'event_type_id' => new ExistsFilterManyToOneMapping
-                (
-                    'SummitEventType',
-                    'SummitEventType.ID = SummitEvent.TypeID AND SummitEventType.ID :operator :value'
-                ),
-            ));
-        }
-
-        $rel = $rel->orderBy('StartDate','asc')->orderBy('EndDate','asc');
-
-        $pagination_result = $rel->paginate($per_page);
-        $total             = $pagination_result->total();
-        $items             = $pagination_result->items();
-        $per_page          = $pagination_result->perPage();
-        $current_page      = $pagination_result->currentPage();
-        $last_page         = $pagination_result->lastPage();
-        $events = array();
-        foreach($items as $e)
-        {
-            if($e->ClassName === 'Presentation')
-                $e = Presentation::toPresentation($e);
-            array_push($events, $e);
-        }
-        return array($total,$per_page, $current_page, $last_page, $events);
-    }
 
     /**
      * @param int $member_id
@@ -271,7 +477,9 @@ class Summit extends SilverstripeBaseModel
      */
     public function getAttendeeByMemberId($member_id)
     {
-        return $this->hasMany('models\summit\SummitAttendee', 'SummitID', 'ID')->where('MemberID','=',$member_id)->first();
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('member.id', intval($member_id)));
+        return $this->attendees->matching()->first();
     }
 
     /**
@@ -280,117 +488,17 @@ class Summit extends SilverstripeBaseModel
      */
     public function getAttendeeById($attendee_id)
     {
-        return $this->hasMany('models\summit\SummitAttendee', 'SummitID', 'ID')->where('SummitAttendee.ID','=',$attendee_id)->first();
-    }
-
-    /**
-     * @param int $event_id
-     * @return null|SummitEvent
-     */
-    public function getScheduleEvent($event_id)
-    {
-        $e = $this->hasMany('models\summit\SummitEvent', 'SummitID', 'ID')
-            ->where('SummitEvent.ID','=', intval($event_id))
-            ->where('Published','=','1')
-            ->first();
-        if(is_null($e)) return null;
-        $class = 'models\\summit\\'.$e->ClassName;
-        return $class::find($e->ID);
-    }
-
-    /**
-     * @param int $event_id
-     * @return null|SummitEvent
-     */
-    public function getEvent($event_id)
-    {
-        $e = $this->hasMany('models\summit\SummitEvent', 'SummitID', 'ID')
-            ->where('SummitEvent.ID','=', intval($event_id))
-            ->first();
-        if(is_null($e)) return null;
-        $class = 'models\\summit\\'.$e->ClassName;
-        return $class::find($e->ID);
-    }
-
-    /**
-     * @return PresentationCategory[]
-     */
-    public function presentation_categories()
-    {
-        return $this->hasMany('models\summit\PresentationCategory', 'SummitID', 'ID')->get();
-    }
-
-    /**
-     * @return PresentationCategoryGroup[]
-     */
-    public function category_groups()
-    {
-        return $this->hasMany('models\summit\PresentationCategoryGroup', 'SummitID', 'ID')->get();
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($attendee_id)));
+        return $this->attendees->matching()->first();
     }
 
 
     /**
-     * @param int $group_id
-     * @return null|PresentationCategoryGroup
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEntityEvent", mappedBy="summit", cascade={"persist"})
+     * @var SummitEntityEvent[]
      */
-    public function getCategoryGroup($group_id)
-    {
-        return $this->hasMany('models\summit\PresentationCategoryGroup', 'SummitID', 'ID')
-            ->where('PresentationCategoryGroup.ID','=', intval($group_id))
-            ->first();
-    }
-
-    public function sponsors()
-    {
-        $summit_id = $this->ID;
-        $rows =   DB::connection('ss')->select("SELECT DISTINCT C.* FROM SummitEvent_Sponsors S
-INNER JOIN SummitEvent E ON E.ID = S.SummitEventID AND E.SummitID = {$summit_id}
-INNER JOIN Company C ON C.ID = S.CompanyID");
-
-        $sponsors = array();
-        foreach($rows as $row)
-        {
-            $instance = new Company;
-            $instance->setRawAttributes((array)$row, true);
-            array_push($sponsors, $instance);
-        }
-        return $sponsors;
-    }
-
-    /**
-     * @param int $speaker_id
-     * @return null|PresentationSpeaker
-     */
-    public function getSpeakerById($speaker_id)
-    {
-        return  PresentationSpeaker::where('PresentationSpeaker.ID','=', intval($speaker_id))
-            ->whereRaw(" EXISTS (
-           SELECT 1 FROM Presentation_Speakers INNER JOIN SummitEvent
-            ON
-            SummitEvent.ID = Presentation_Speakers.PresentationID
-            WHERE
-            Presentation_Speakers.PresentationSpeakerID = PresentationSpeaker.ID
-            AND SummitEvent.SummitID =  {$this->ID}) ")
-            ->first();
-    }
-
-    /**
-     * @param int $member_id
-     * @return null|PresentationSpeaker
-     */
-    public function getSpeakerByMemberId($member_id)
-    {
-
-        return  PresentationSpeaker::where('PresentationSpeaker.MemberID','=', intval($member_id))
-            ->whereRaw(" EXISTS (
-           SELECT 1 FROM Presentation_Speakers INNER JOIN SummitEvent
-            ON
-            SummitEvent.ID = Presentation_Speakers.PresentationID
-            WHERE
-            Presentation_Speakers.PresentationSpeakerID = PresentationSpeaker.ID
-            AND SummitEvent.SummitID =  {$this->ID}) ")
-            ->first();
-    }
+    private $entity_events;
 
     /**
      * @param int|null $member_id
@@ -488,106 +596,20 @@ SQL;
         return $last_id;
     }
 
-    public function toArray()
-    {
-        $values = parent::toArray();
-        $time_zone_list      = timezone_identifiers_list();
-        $time_zone_id        = $this->TimeZone;
-        $values['time_zone'] = null;
-        if(!empty($time_zone_id) && isset($time_zone_list[$time_zone_id]))
-        {
-
-            $time_zone_name           = $time_zone_list[$time_zone_id];
-            $time_zone                = new \DateTimeZone($time_zone_name);
-            $time_zone_info           = $time_zone->getLocation();
-            $time_zone_info['name']   = $time_zone->getName();
-            $now                      = new \DateTime("now", $time_zone);
-            $time_zone_info['offset'] = $time_zone->getOffset($now);
-            $values['time_zone']      = $time_zone_info;
-        }
-        $values['logo']           = ($this->logo() !== null) ? Config::get("server.assets_base_url", 'https://www.openstack.org/'). $this->logo()->Filename : null;
-        if(empty($values['name']))
-        {
-            $values['name'] = $this->Title;
-        }
-        return $values;
-    }
-
-
-    /**
-     * @param $value
-     * @return null|string
-     */
-    public function convertDateFromTimeZone2UTC($value)
-    {
-        $time_zone_id   = $this->TimeZone;
-        if(empty($time_zone_id)) return $value;
-        $time_zone_list = timezone_identifiers_list();
-
-        if(isset($time_zone_list[$time_zone_id]) && !empty($value))
-        {
-            $utc_timezone      = new \DateTimeZone("UTC");
-            $time_zone_name = $time_zone_list[$time_zone_id];
-            $time_zone   = new \DateTimeZone($time_zone_name);
-            $date  = new \DateTime($value, $time_zone);
-            $date->setTimezone($utc_timezone);
-            return $date->format("Y-m-d H:i:s");
-        }
-        return null;
-    }
-
-    /**
-     * @param $value
-     * @return null|string
-     */
-    public function convertDateFromUTC2TimeZone($value)
-    {
-        $time_zone_id   = $this->TimeZone;
-        if(empty($time_zone_id)) return $value;
-        $time_zone_list = timezone_identifiers_list();
-
-        if(isset($time_zone_list[$time_zone_id]) && !empty($value))
-        {
-            $utc_timezone   = new \DateTimeZone("UTC");
-            $time_zone_name = $time_zone_list[$time_zone_id];
-            $time_zone      = new \DateTimeZone($time_zone_name);
-            $date           = new \DateTime($value, $utc_timezone);
-
-            $date->setTimezone($time_zone);
-            return $date->format("Y-m-d H:i:s");
-        }
-        return null;
-    }
-
     /**
      * @param SummitEvent $summit_event
      * @return bool
      */
     public function isEventInsideSummitDuration(SummitEvent $summit_event)
     {
-        $event_start_date  = $summit_event->StartDate;
-        $event_end_date    = $summit_event->EndDate;
-        $summit_start_date = new \DateTime($this->convertDateFromUTC2TimeZone($this->SummitBeginDate));
-        $summit_end_date   = new \DateTime($this->convertDateFromUTC2TimeZone($this->SummitEndDate));
+        $event_start_date  = $summit_event->getLocalBeginDate();
+        $event_end_date    = $summit_event->getLocalEndDate();
+        $summit_start_date = $this->getLocalBeginDate();
+        $summit_end_date   = $this->getLocalEndDate();
 
         return  $event_start_date >= $summit_start_date && $event_start_date <= $summit_end_date &&
         $event_end_date <= $summit_end_date && $event_end_date >= $event_start_date;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getLocalBeginDate()
-    {
-        return new \DateTime($this->convertDateFromUTC2TimeZone($this->SummitBeginDate));
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getLocalEndDate()
-    {
-        return new \DateTime($this->convertDateFromUTC2TimeZone($this->SummitEndDate));
-    }
 
 }

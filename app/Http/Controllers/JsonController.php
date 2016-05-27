@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Exception;
+use models\utils\IEntity;
+use ModelSerializers\SerializerRegistry;
 
 /**
  * Class JsonController
@@ -67,13 +69,29 @@ abstract class JsonController extends Controller
         if (Input::has('callback')) {
             $res->setCallback(Input::get('callback'));
         }
-
         return $res;
     }
 
-
-    protected function ok($data = 'ok')
+    /**
+     * @param mixed $data
+     * @param null|string $expand
+     * @return mixed
+     */
+    protected function ok($data = 'ok', $expand = null)
     {
+        if(is_array($data)){
+            $new_data  = array();
+            foreach($data as $e){
+                if($e instanceof IEntity)
+                    $e = SerializerRegistry::getInstance()->getSerializer($e)->serialize($expand);
+                array_push($new_data, $e);
+            }
+            $data = $new_data;
+        }
+        else if($data instanceof IEntity){
+            $data = SerializerRegistry::getInstance()->getSerializer($data)->serialize($expand);
+        }
+
         $res = Response::json($data, 200);
         //jsonp
         if (Input::has('callback')) {

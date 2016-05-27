@@ -15,8 +15,10 @@
 namespace models\main;
 
 use models\utils\SilverstripeBaseModel;
-
+use Doctrine\ORM\Mapping AS ORM;
 /**
+ * @ORM\Entity
+ * @ORM\Table(name="Tag")
  * Class Tag
  * @package models\main
  */
@@ -24,10 +26,23 @@ class Tag extends SilverstripeBaseModel
 {
     protected $table = 'Tag';
 
-    protected $array_mappings = array
+    protected static $array_mappings = array
     (
         'ID'  => 'id:json_int',
         'Tag' => 'tag:json_string',
     );
+
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(name="ID", type="integer", unique=true, nullable=false)
+     */
+    protected $id;
+
+    /**
+     * @ORM\Column(name="Tag", type="string")
+     * @var string
+     */
+    protected $tag;
 
 }

@@ -1,4 +1,4 @@
-<?php
+<?php namespace models\main;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,37 +12,44 @@
  * limitations under the License.
  **/
 
-namespace models\main;
-
 use models\utils\SilverstripeBaseModel;
+use Doctrine\ORM\Mapping AS ORM;
 
 /**
+ * @ORM\Entity
+ * @ORM\Table(name="File")
  * Class File
  * @package models\main
  */
 class File extends SilverstripeBaseModel
 {
-    protected $table = 'File';
-
-    protected $stiBaseClass = 'models\main\File';
-
-    protected $mtiClassType = 'concrete';
-
-    protected $array_mappings = array
-    (
-        'ID'        => 'id:json_int',
-        'Name'      => 'name:json_string',
-        'Title'     => 'description:json_string',
-        'Filename'  => 'file_name:json_string',
-        'Content'   => 'content:json_string',
-        'ClassName' => 'class_name',
-    );
+    /**
+     * @ORM\Column(name="Name", type="string")
+     */
+    private $name;
 
     /**
-     * @return int
+     * @return string
      */
-    public function getIdentifier()
-    {
-        return (int)$this->ID;
-    }
+    public function getName(){ return $this->name;}
+
+    /**
+     * @ORM\Column(name="Title", type="string")
+     */
+    private $title;
+
+    /**
+     * @return string
+     */
+    public function getTitle(){ return $this->title;}
+
+    /**
+     * @ORM\Column(name="Filename", type="string")
+     */
+    private $filename;
+
+    /**
+     * @return string
+     */
+    public function getFilename(){ return $this->filename;}
 }

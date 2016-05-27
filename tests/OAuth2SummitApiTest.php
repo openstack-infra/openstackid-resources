@@ -702,8 +702,8 @@ class OAuth2SummitApiTest extends ProtectedApiTest
     public function testGetEvent(){
         $params  = array
         (
-            'id'       => 'current',
-            'event_id' => 3874,
+            'id'       => 6,
+            'event_id' => 6838,
         );
 
         $headers = array
@@ -1552,4 +1552,43 @@ class OAuth2SummitApiTest extends ProtectedApiTest
         $events  = json_decode($content);
         $this->assertTrue(!is_null($events));
     }
+
+
+    public function testAddPresentationVideo()
+    {
+        $params  = array
+        (
+            'id'              => 6,
+            'presentation_id' => 6838
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        );
+
+        $video_data = array
+        (
+            'you_tube_id' => 'nrGk0AuFd_9',
+            'name'        => 'Fostering Full Equality, Organized by the Women of OpenStack!',
+        );
+
+        $response = $this->action
+        (
+            "POST",
+            "OAuth2PresentationApiController@addVideo",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers,
+            json_encode($video_data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+    }
+
 }

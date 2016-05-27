@@ -1,4 +1,4 @@
-<?php
+<?php namespace models\summit;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,51 +12,85 @@
  * limitations under the License.
  **/
 
-namespace models\summit;
-
+use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
+ * @ORM\Entity
+ * @ORM\Table(name="SummitTicketType")
  * Class SummitTicketType
  * @package models\summit
  */
 class SummitTicketType extends SilverstripeBaseModel
 {
-    protected $table = 'SummitTicketType';
+    use SummitOwned;
 
-    protected $array_mappings = array
-    (
-        'ID'          => 'id:json_int',
-        'Name'        => 'name:json_string',
-        'Description' => 'description:json_string',
-    );
+    /**
+     * @ORM\Column(name="Name", type="string")
+     */
+    private $name;
 
-    public function allowed_summit_types()
+    /**
+     * @return mixed
+     */
+    public function getName()
     {
-        return $this->belongsToMany
-        (
-            'models\summit\SummitType',
-            'SummitTicketType_AllowedSummitTypes',
-            'SummitTicketTypeID',
-            'SummitTypeID'
-        )->get();
+        return $this->name;
     }
 
-
-    private function getAllowedSummitTypeIds()
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
     {
-        $ids = array();
-        foreach($this->allowed_summit_types() as $type)
-        {
-            array_push($ids, intval($type->ID));
-        }
-        return $ids;
+        $this->name = $name;
     }
 
-    public function toArray()
+    /**
+     * @return mixed
+     */
+    public function getDescription()
     {
-        $values = parent::toArray();
-        $values['allowed_summit_types'] = $this->getAllowedSummitTypeIds();
-        return $values;
+        return $this->description;
     }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @ORM\Column(name="Description", type="string")
+     */
+    private $description;
+
+
+    public function __construct()
+    {
+        $this->allowed_summit_types = new ArrayCollection();
+    }
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\SummitType")
+     * @ORM\JoinTable(name="SummitTicketType_AllowedSummitTypes",
+     *      joinColumns={@ORM\JoinColumn(name="SummitTicketTypeID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitTypeID", referencedColumnName="ID")}
+     *      )
+     */
+    private $allowed_summit_types;
+
+    public function getAllowedSummitTypes()
+    {
+       return $this->allowed_summit_types;
+    }
+
+    public function getAllowedSummitTypeIds()
+    {
+        return $this->getAllowedSummitTypes()->getKeys();
+    }
+
 }

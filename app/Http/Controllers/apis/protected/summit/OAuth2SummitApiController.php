@@ -88,8 +88,7 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            $data = $this->service->getSummitData($summit, $expand);
-            return $this->ok($data);
+            return $this->ok($summit, $expand);
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -1380,8 +1379,6 @@ class OAuth2SummitApiController extends OAuth2ProtectedController
                 'track_id'       => array('=='),
             ));
         }
-
-
 
         list($total, $per_page, $current_page, $last_page, $events) = $location->events
         (

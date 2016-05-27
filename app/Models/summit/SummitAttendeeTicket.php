@@ -24,14 +24,13 @@ final class SummitAttendeeTicket extends SilverstripeBaseModel
 {
     protected $table = 'SummitAttendeeTicket';
 
-    protected $array_mappings = array
+    protected static $array_mappings = array
     (
         'ID'                 => 'id:json_int',
         'ExternalOrderId'    => 'external_order_id:json_int',
         'ExternalAttendeeId' => 'external_attendee_id:json_int',
         'TicketBoughtDate'   => 'bought_date:datetime_epoch',
     );
-
 
     /**
      * @return SummitTicketType

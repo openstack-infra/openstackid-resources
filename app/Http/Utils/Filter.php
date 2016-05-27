@@ -1,5 +1,7 @@
 <?php namespace utils;
 
+use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\QueryBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -121,6 +123,63 @@ final class Filter
         return $this;
     }
 
+    /**
+     * @param QueryBuilder $query
+     * @param array $mappings
+     * @return $this
+     */
+    public function apply2Query(QueryBuilder $query, array $mappings)
+    {
+        foreach($this->filters as $filter)
+        {
+            if($filter instanceof FilterElement)
+            {
+                if(isset($mappings[$filter->getField()]))
+                {
+                    $mapping = $mappings[$filter->getField()];
+
+                    if($mapping instanceof DoctrineJoinFilterMapping)
+                    {
+                        $query = $mapping->apply($query, $filter);
+                    }
+                    else {
+                        $mapping = explode(':', $mapping);
+                        $value = $filter->getValue();
+                        if (count($mapping) > 1) {
+                            $value = $this->convertValue($value, $mapping[1]);
+                        }
+                        $criteria = $query->where($mapping[0], $filter->getOperator(), $value);
+                    }
+                }
+            }
+            else if(is_array($filter))
+            {
+                // OR
+                $criteria->where(function ($query) use($filter, $mappings){
+                    foreach($filter as $e) {
+                        if($e instanceof FilterElement && isset($mappings[$e->getField()]))
+                        {
+                            $mapping = $mappings[$e->getField()];
+                            if($mapping instanceof FilterMapping)
+                            {
+                                $query->orWhereRaw($mapping->toRawSQL($e));
+                            }
+                            else
+                            {
+                                $mapping = explode(':', $mapping);
+                                $value = $filter->getValue();
+                                if (count($mapping) > 1) {
+                                    $value = $this->convertValue($value, $mapping[1]);
+                                }
+                                $query->orWhere($mapping[0], $e->getOperator(), $value);
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        return $this;
+    }
     /**
      * @param string $value
      * @param string $original_format

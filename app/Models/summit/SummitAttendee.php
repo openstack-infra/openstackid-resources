@@ -1,4 +1,4 @@
-<?php
+<?php namespace models\summit;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +12,23 @@
  * limitations under the License.
  **/
 
-namespace models\summit;
 
+use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use libs\utils\JsonUtils;
 use models\exceptions\ValidationException;
 use models\utils\SilverstripeBaseModel;
-use DB;
 use Config;
 /**
+ * @ORM\Entity
+ * @ORM\Table(name="SummitAttendee")
  * Class SummitAttendee
  * @package models\summit
  */
 class SummitAttendee extends SilverstripeBaseModel
 {
-    protected $table = 'SummitAttendee';
 
-    protected $array_mappings = array
+    protected static $array_mappings = array
     (
         'ID'                      => 'id:json_int',
         'SummitHallCheckedIn'     => 'summit_hall_checked_in:json_boolean',

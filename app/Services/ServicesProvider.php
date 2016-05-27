@@ -35,6 +35,7 @@ class ServicesProvider extends ServiceProvider
         App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
         App::singleton('libs\utils\ITransactionService', 'services\utils\EloquentTransactionService');
         App::singleton('services\model\ISummitService', 'services\model\SummitService');
+        App::singleton('services\model\IPresentationService', 'services\model\PresentationService');
         App::singleton('services\apis\IEventbriteAPI',   function(){
             $api = new EventbriteAPI();
             $api->setCredentials(array('token' => Config::get("server.eventbrite_oauth2_personal_token", null)));

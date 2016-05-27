@@ -1,4 +1,4 @@
-<?php
+<?php namespace models\main;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +12,18 @@
  * limitations under the License.
  **/
 
-namespace models\main;
-
 use models\utils\SilverstripeBaseModel;
+use Doctrine\ORM\Mapping AS ORM;
 
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="Member")
+ * Class Member
+ * @package models\main
+ */
 class Member extends SilverstripeBaseModel
 {
-    protected $table = 'Member';
-
-    protected $array_mappings = array
+    protected static $array_mappings = array
     (
         'ID'            => 'id:json_int',
         'FirstName'     => 'first_name:json_string',
@@ -29,10 +32,29 @@ class Member extends SilverstripeBaseModel
     );
 
     /**
-     * @return Image
+     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\JoinColumn(name="PhotoID", referencedColumnName="ID")
+     * @var File
      */
-    public function photo()
+    protected $photo;
+
+    public function __construct()
     {
-        return $this->hasOne('models\main\Image', 'ID', 'PhotoID')->first();
+    }
+
+    /**
+     * @return File
+     */
+    public function getPhoto()
+    {
+        return $this->photo;
+    }
+
+    /**
+     * @param File $photo
+     */
+    public function setPhoto(File $photo)
+    {
+        $this->photo = $photo;
     }
 }

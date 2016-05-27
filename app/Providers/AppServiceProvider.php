@@ -1,17 +1,17 @@
 <?php namespace App\Providers;
 
-use Event;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Validator;
 use Monolog\Handler\NativeMailerHandler;
 use Monolog\Logger;
-use Validator;
+
 
 class AppServiceProvider extends ServiceProvider
 {
-
     /**
      * Bootstrap any application services.
      * @return void
@@ -36,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if(Config::get("server.db_log_enabled", false)) {
+
             Event::listen('illuminate.query', function ($query, $bindings, $time, $name) {
                 $data = compact('bindings', 'time', 'name');
 
@@ -56,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
 
                 Log::info($query, $data);
             });
+
         }
 
         Validator::extend('int_array', function($attribute, $value, $parameters, $validator)
@@ -70,6 +72,17 @@ class AppServiceProvider extends ServiceProvider
             }
             return true;
         });
+
+
+        Validator::extend('text', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('text', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid text", $attribute);
+            });
+
+            return preg_match('/^[^<>\"\']+$/u', $value);
+        });
+
 
         Validator::extend('string_array', function($attribute, $value, $parameters, $validator)
         {
@@ -97,5 +110,4 @@ class AppServiceProvider extends ServiceProvider
         App::singleton('models\\resource_server\\IApiEndpoint', 'models\\resource_server\\ApiEndpoint');
         App::singleton('models\\resource_server\\IApiScope', 'models\\resource_server\\ApiScope');
     }
-
 }

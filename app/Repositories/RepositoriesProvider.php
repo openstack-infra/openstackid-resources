@@ -15,6 +15,7 @@
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
+use LaravelDoctrine\ORM\Facades\EntityManager;
 
 /**
  * Class RepositoriesProvider
@@ -34,6 +35,7 @@ class RepositoriesProvider extends ServiceProvider
             'models\marketplace\IPublicCloudServiceRepository',
             'repositories\marketplace\EloquentPublicCloudServiceRepository'
         );
+
         App::singleton(
             'models\marketplace\IPrivateCloudServiceRepository',
             'repositories\marketplace\EloquentPrivateCloudServiceRepository'
@@ -47,10 +49,16 @@ class RepositoriesProvider extends ServiceProvider
             'repositories\resource_server\EloquentApiEndpointRepository'
         );
 
-        App::singleton(
+        /*App::singleton(
             'models\summit\ISummitRepository',
             'repositories\summit\EloquentSummitRepository'
-        );
+        );*/
+
+        App::singleton(
+            'models\summit\ISummitRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\Summit::class);
+            });
 
         App::singleton(
             'models\summit\ISpeakerRepository',
@@ -60,6 +68,11 @@ class RepositoriesProvider extends ServiceProvider
         App::singleton(
             'models\summit\ISummitEventRepository',
             'repositories\summit\EloquentSummitEventRepository'
+        );
+
+        App::singleton(
+            'models\summit\IPresentationRepository',
+            'repositories\summit\EloquentPresentationRepository'
         );
     }
 }
