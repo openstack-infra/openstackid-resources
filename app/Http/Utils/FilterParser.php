@@ -84,7 +84,7 @@ final class FilterParser
      * @param string $value
      * @return FilterElement|null
      */
-    private static function buildFilter($field, $op, $value)
+    public static function buildFilter($field, $op, $value)
     {
         switch($op)
         {

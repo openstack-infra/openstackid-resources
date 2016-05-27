@@ -1,26 +1,30 @@
-<?php namespace App\Providers;
+<?php
 
-use App\Events\MyScheduleAdd;
-use App\Events\MyScheduleRemove;
+namespace App\Providers;
+
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
-use models\main\Tag;
 use models\summit\SummitEntityEvent;
 use models\summit\SummitEvent;
-
+use App\Events\MyScheduleAdd;
+use App\Events\MyScheduleRemove;
 
 class EventServiceProvider extends ServiceProvider
 {
-     /**
-     * The event handler mappings for the application.
+    /**
+     * The event listener mappings for the application.
+     *
      * @var array
      */
     protected $listen = [
+        'App\Events\SomeEvent' => [
+            'App\Listeners\EventListener',
+        ],
     ];
 
-    /**
+      /**
      * Register any other events for your application.
      * @param  \Illuminate\Contracts\Events\Dispatcher $events
      * @return void
@@ -29,7 +33,7 @@ class EventServiceProvider extends ServiceProvider
     {
         parent::boot($events);
 
-        Event::listen('App\Events\MyScheduleAdd', function($event)
+       /* Event::listen('App\Events\MyScheduleAdd', function($event)
         {
             if(!$event instanceof MyScheduleAdd) return;
 
@@ -113,7 +117,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->SummitID        = $summit_event->getSummit()->ID;
             $entity_event->Metadata = json_encode( array ( 'pub_new' => intval($summit_event->Published)));
             $entity_event->save();
-        });
+        });*/
     }
 
 }

@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Exception;
+use models\utils\IEntity;
+use ModelSerializers\SerializerRegistry;
 
 /**
  * Class JsonController
@@ -67,11 +69,14 @@ abstract class JsonController extends Controller
         if (Input::has('callback')) {
             $res->setCallback(Input::get('callback'));
         }
-
         return $res;
     }
 
-
+    /**
+     * @param mixed $data
+     * @param null|string $expand
+     * @return mixed
+     */
     protected function ok($data = 'ok')
     {
         $res = Response::json($data, 200);
