@@ -14,14 +14,13 @@
  **/
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class ETagsMiddleware
  * @package App\Http\Middleware
  */
-final class ETagsMiddleware implements Middleware
+final class ETagsMiddleware
 {
 
 

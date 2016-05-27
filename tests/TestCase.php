@@ -35,7 +35,6 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 	protected function prepareForTests()
 	{
 		Artisan::call('migrate');
-		Mail::pretend(true);
 		$this->seed('TestSeeder');
 	}
 
