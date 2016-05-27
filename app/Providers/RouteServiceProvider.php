@@ -1,44 +1,57 @@
-<?php namespace App\Providers;
+<?php
 
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+namespace App\Providers;
+
 use Illuminate\Routing\Router;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
-/**
- * Class RouteServiceProvider
- * @package App\Providers
- */
 class RouteServiceProvider extends ServiceProvider
 {
-
     /**
-     * This namespace is applied to the controller routes in your routes file.
+     * This namespace is applied to your controller routes.
+     *
      * In addition, it is set as the URL generator's root namespace.
+     *
      * @var string
      */
     protected $namespace = 'App\Http\Controllers';
 
     /**
      * Define your route model bindings, pattern filters, etc.
-     * @param  \Illuminate\Routing\Router $router
+     *
+     * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
     public function boot(Router $router)
     {
+        //
+
         parent::boot($router);
-        //filter should be registered here
-        // Route::filter('filter.name',function($route, $request){ .... });
     }
 
     /**
      * Define the routes for the application.
-     * @param  \Illuminate\Routing\Router $router
+     *
+     * @param  \Illuminate\Routing\Router  $router
      * @return void
      */
     public function map(Router $router)
     {
-        $router->group(['namespace' => $this->namespace], function ($router) {
-            require app_path('Http/routes.php');
-        });
+        $this->mapWebRoutes($router);
+
+        //
     }
 
+    /**
+     * Define the "web" routes for the application.
+     *
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @param  \Illuminate\Routing\Router  $router
+     * @return void
+     */
+    protected function mapWebRoutes(Router $router)
+    {
+        require app_path('Http/routes.php');
+    }
 }

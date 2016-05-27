@@ -12,6 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\utils\IEntity;
+use ModelSerializers\SerializerRegistry;
+use Request;
+
+/**
+ * Class PagingResponse
+ * @package utils
+ */
 final class PagingResponse
 {
     /**
@@ -89,17 +97,31 @@ final class PagingResponse
     }
 
     /**
+     * @param null $expand
+     * @param array $fields
+     * @param array $relations
+     * @param array $params
      * @return array
      */
-    public function toArray()
+    public function toArray($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
+        $items = [];
+        foreach($this->items as $i)
+        {
+            if($i instanceof IEntity)
+            {
+                $i = SerializerRegistry::getInstance()->getSerializer($i)->serialize($expand, $fields, $relations, $params);
+            }
+            $items[] = $i;
+        }
+
         return array
         (
             'total'        =>  $this->total,
             'per_page'     =>  $this->per_page,
             'current_page' =>  $this->page,
             'last_page'    =>  $this->last_page,
-            'data'         =>  $this->items,
+            'data'         =>  $items,
         );
     }
 }
