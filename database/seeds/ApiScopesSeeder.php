@@ -103,6 +103,16 @@ class ApiScopesSeeder extends Seeder
 
         ApiScope::create(
             array(
+                'name' => sprintf('%s/me/read', $current_realm),
+                'short_description' => 'Get own member data',
+                'description' => 'Grants read only access for our own member data',
+                'api_id' => $summits->id,
+                'system' => false
+            )
+        );
+
+        ApiScope::create(
+            array(
                 'name' => sprintf('%s/summits/write', $current_realm),
                 'short_description' => 'Write Summit Data',
                 'description' => 'Grants write access for Summits Data',
@@ -156,6 +166,16 @@ class ApiScopesSeeder extends Seeder
                 'name' => sprintf('%s/summits/confirm-external-orders', $current_realm),
                 'short_description' => 'Allow to confirm External Orders',
                 'description' => 'Allow to confirm External Orders',
+                'api_id' => $summits->id,
+                'system' => false
+            )
+        );
+
+        ApiScope::create(
+            array(
+                'name' => sprintf('%s/summits/write-videos', $current_realm),
+                'short_description' => 'Allow to write presentation videos',
+                'description' => 'Allow to write presentation videos',
                 'api_id' => $summits->id,
                 'system' => false
             )

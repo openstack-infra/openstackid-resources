@@ -13,7 +13,6 @@
 **/
 
 use Closure;
-use Illuminate\Contracts\Routing\Middleware;
 
 /**
 * Class SecurityHTTPHeadersWriterMiddleware
@@ -21,7 +20,7 @@ use Illuminate\Contracts\Routing\Middleware;
 *
 * @package App\Http\Middleware
 */
-class SecurityHTTPHeadersWriterMiddleware implements Middleware
+class SecurityHTTPHeadersWriterMiddleware
 {
 	/**
 	 * Handle an incoming request.

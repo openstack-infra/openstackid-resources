@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\Http\Middleware;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,18 @@
  * limitations under the License.
  **/
 
-namespace App\Http\Middleware;
-
 use Closure;
-use Config;
-use Illuminate\Contracts\Routing\Middleware;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Http\JsonResponse;
 use libs\utils\ICacheService;
-use Log;
+use Illuminate\Support\Facades\Log;
 use models\oauth2\IResourceServerContext;
 
 /**
  * Class CacheMiddleware
  * @package App\Http\Middleware
  */
-final class CacheMiddleware implements Middleware
+final class CacheMiddleware
 {
     /**
      * @var ICacheService
@@ -53,9 +50,10 @@ final class CacheMiddleware implements Middleware
      */
     public function handle($request, Closure $next)
     {
+        Log::debug('cache middleware invoked ...');
         if ($request->getMethod() !== 'GET')
         {
-            // shortcircuit
+            // short circuit
             return $next($request);
         }
 
