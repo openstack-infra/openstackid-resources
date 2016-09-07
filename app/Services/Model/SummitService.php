@@ -362,7 +362,7 @@ final class SummitService implements ISummitService
                 $event->setTitle($data['title']);
 
             if (isset($data['description']))
-                $event->setDescription($data['description']);
+                $event->setShortDescription($data['description']);
 
             if (isset($data['allow_feedback']))
                 $event->setAllowFeedBack($data['allow_feedback']);
