@@ -21,19 +21,19 @@ class SummitEventSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = array
     (
-        'Title'           => 'title:json_string',
-        'Description'     => 'description:json_string',
-        'StartDate'       => 'start_date:datetime_epoch',
-        'EndDate'         => 'end_date:datetime_epoch',
-        'LocationId'      => 'location_id:json_int',
-        'SummitId'        => 'summit_id:json_int',
-        'TypeId'          => 'type_id:json_int',
-        'ClassName'       => 'class_name',
-        'AllowFeedBack'   => 'allow_feedback:json_boolean',
-        'AvgFeedbackRate' => 'avg_feedback_rate:json_float',
-        'Published'       => 'is_published:json_boolean',
-        'HeadCount'       => 'head_count:json_int',
-        'RSVPLink'        => 'rsvp_link:json_string',
+        'Title'            => 'title:json_string',
+        'ShortDescription' => 'description:json_string',
+        'StartDate'        => 'start_date:datetime_epoch',
+        'EndDate'          => 'end_date:datetime_epoch',
+        'LocationId'       => 'location_id:json_int',
+        'SummitId'         => 'summit_id:json_int',
+        'TypeId'           => 'type_id:json_int',
+        'ClassName'        => 'class_name',
+        'AllowFeedBack'    => 'allow_feedback:json_boolean',
+        'AvgFeedbackRate'  => 'avg_feedback_rate:json_float',
+        'Published'        => 'is_published:json_boolean',
+        'HeadCount'        => 'head_count:json_int',
+        'RSVPLink'         => 'rsvp_link:json_string',
     );
 
     protected static $allowed_fields = array

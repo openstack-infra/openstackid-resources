@@ -154,7 +154,10 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function getShortDescription()
     {
-        return $this->short_description;
+        $res = $this->short_description;
+        if(empty($res))
+            $res = $this->description;
+        return $res;
     }
 
     /**
