@@ -29,6 +29,7 @@ use services\model\ISummitService;
 use utils\Filter;
 use utils\FilterParser;
 use utils\FilterParserException;
+use utils\OrderParser;
 use utils\PagingInfo;
 use utils\PagingResponse;
 
@@ -162,6 +163,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         }
 
         $filter = null;
+
         if (Input::has('filter')) {
             $filter = FilterParser::parse(Input::get('filter'),  array
             (
@@ -176,6 +178,20 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             ));
         }
 
+        $order = null;
+
+        if (Input::has('order'))
+        {
+            $order = OrderParser::parse(Input::get('order'), array
+            (
+                'title',
+                'start_date',
+                'end_date',
+                'id',
+                'created',
+            ));
+        }
+
         if(is_null($filter)) $filter = new Filter();
 
         $filter->addFilterCondition(FilterParser::buildFilter('location_id','==', $location_id));
@@ -185,7 +201,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $filter->addFilterCondition(FilterParser::buildFilter('published','==', 1));
         }
 
-        return $this->event_repository->getAllByPage(new PagingInfo($page, $per_page), $filter);
+        return $this->event_repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
     }
 
     /**

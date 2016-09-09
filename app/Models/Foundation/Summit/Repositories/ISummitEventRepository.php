@@ -14,6 +14,7 @@
 
 use models\utils\IBaseRepository;
 use utils\Filter;
+use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
 
@@ -31,10 +32,11 @@ interface ISummitEventRepository extends IBaseRepository
 
     /**
      * @param PagingInfo $paging_info
-     * @param Filter $filter
+     * @param Filter|null $filter
+     * @param Order|null $order
      * @return PagingResponse
      */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter);
+    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
 
     /**
      * @param int $event_id

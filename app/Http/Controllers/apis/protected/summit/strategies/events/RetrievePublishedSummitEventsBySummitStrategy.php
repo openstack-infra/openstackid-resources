@@ -40,6 +40,4 @@ final class RetrievePublishedSummitEventsBySummitStrategy extends RetrieveAllSum
         $filter->addFilterCondition(FilterParser::buildFilter('published','==','1'));
         return $filter;
     }
-
-
 }

@@ -19,6 +19,7 @@ use models\summit\SummitEvent;
 use repositories\SilverStripeDoctrineRepository;
 use utils\DoctrineJoinFilterMapping;
 use utils\Filter;
+use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
 use Doctrine\ORM\Query\Expr\Join;
@@ -55,10 +56,11 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
 
     /**
      * @param PagingInfo $paging_info
-     * @param Filter $filter
+     * @param Filter|null $filter
+     * @param Order|null $order
      * @return PagingResponse
      */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter)
+    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
         $class  = count($filter->getFilter('speaker')) > 0? \models\summit\Presentation::class : \models\summit\SummitEvent::class;
         $query  = $this->getEntityManager()->createQueryBuilder()
@@ -69,7 +71,7 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
 
             $filter->apply2Query($query, array
             (
-                'title'         => 'e.title',
+                'title'         => 'e.title:json_string',
                 'published'     => 'e.published',
                 'start_date'    => 'e.start_date:datetime_epoch',
                 'end_date'      => 'e.end_date:datetime_epoch',
@@ -118,9 +120,23 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
             ));
         }
 
+        if (!is_null($order)) {
+
+            $order->apply2Query($query, array
+            (
+                'title'       => 'e.title',
+                'id'          => 'e.id',
+                'start_date'  => 'e.start_date',
+                'end_date'    => 'e.end_date',
+                'created'     => 'e.created',
+            ));
+        } else {
+            //default order
+            $query = $query->addOrderBy("e.start_date",'ASC');
+            $query = $query->addOrderBy("e.end_date", 'ASC');
+        }
+
         $query= $query
-            ->addOrderBy("e.start_date",'ASC')
-            ->addOrderBy("e.end_date", 'ASC')
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 

@@ -16,6 +16,7 @@ namespace App\Http\Controllers;
 
 use models\summit\ISummitEventRepository;
 use utils\Filter;
+use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
 
@@ -42,11 +43,12 @@ class RetrieveAllSummitEventsStrategy extends RetrieveSummitEventsStrategy
     /**
      * @param PagingInfo $paging_info
      * @param Filter|null $filter
+     * @param Order|null $order
      * @return PagingResponse
      */
-    public function retrieveEventsFromSource(PagingInfo $paging_info, Filter $filter = null)
+    public function retrieveEventsFromSource(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
-        return $this->event_repository->getAllByPage($paging_info, $filter);
+        return $this->event_repository->getAllByPage($paging_info, $filter, $order);
     }
 
     /**
