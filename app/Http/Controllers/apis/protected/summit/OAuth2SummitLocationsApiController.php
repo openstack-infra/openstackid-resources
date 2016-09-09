@@ -28,6 +28,7 @@ use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
 use utils\Filter;
 use utils\FilterParser;
+use utils\FilterParserException;
 use utils\PagingInfo;
 use utils\PagingResponse;
 
@@ -206,6 +207,10 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             Log::warning($ex2);
             return $this->error412($ex2->getMessages());
         }
+        catch(FilterParserException $ex3){
+            Log::warning($ex3);
+            return $this->error412($ex3->getMessages());
+        }
         catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -230,6 +235,10 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         catch (ValidationException $ex2) {
             Log::warning($ex2);
             return $this->error412($ex2->getMessages());
+        }
+        catch(FilterParserException $ex3){
+            Log::warning($ex3);
+            return $this->error412($ex3->getMessages());
         }
         catch (Exception $ex) {
             Log::error($ex);

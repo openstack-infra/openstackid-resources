@@ -29,6 +29,7 @@ use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
 use utils\FilterParser;
+use utils\FilterParserException;
 use utils\OrderParser;
 use utils\PagingInfo;
 
@@ -590,7 +591,12 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             return $this->ok($response->toArray(Request::input('expand', '')));
 
-        } catch (Exception $ex) {
+        }
+        catch(FilterParserException $ex1){
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

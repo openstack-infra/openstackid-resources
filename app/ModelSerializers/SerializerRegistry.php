@@ -77,10 +77,13 @@ final class SerializerRegistry
         $this->registry['SummitAirport']              = SummitAirportSerializer::class;
         $this->registry['SummitLocationImage']        = SummitLocationImageSerializer::class;
 
-
         // member
         $this->registry['Member']                    = MemberSerializer::class;
 
+        $this->registry['Group']                     = GroupSerializer::class;
+
+        // push notification
+        $this->registry['SummitPushNotification']    = SummitPushNotificationSerializer::class;
     }
 
     /**
