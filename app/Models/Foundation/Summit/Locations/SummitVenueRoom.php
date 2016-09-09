@@ -13,6 +13,8 @@
  * limitations under the License.
  **/
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
@@ -140,4 +142,43 @@ class SummitVenueRoom extends SummitAbstractLocation
      * @var bool
      */
     private $override_blackouts;
+
+    /**
+     * @ORM\OneToMany(targetEntity="RoomMetricType", mappedBy="room", cascade={"persist"})
+     */
+    private $metrics;
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getMetrics()
+    {
+        return $this->metrics;
+    }
+
+    /**
+     * @param ArrayCollection $metrics
+     */
+    public function setMetrics($metrics)
+    {
+        $this->metrics = $metrics;
+    }
+
+    /**
+     * SummitVenueRoom constructor.
+     */
+    public function __construct()
+    {
+        $this->metrics = new ArrayCollection();
+    }
+
+    /**
+     * @param int $type_id
+     * @return RoomMetricType
+     */
+    public function getMetricByType($type_id){
+
+        $criteria = Criteria::create()->where(Criteria::expr()->eq("id", $type_id));
+        return $this->metrics->matching($criteria)->first();
+    }
 }

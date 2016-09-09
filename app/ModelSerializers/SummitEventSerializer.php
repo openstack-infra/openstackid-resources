@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use libs\utils\JsonUtils;
+use models\summit\SummitEvent;
 
 /**
  * Class SummitEventSerializer
@@ -70,8 +71,12 @@ class SummitEventSerializer extends SilverStripeSerializer
      */
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
-        if(!count($relations)) $relations = $this->getAllowedRelations();
         $event  = $this->object;
+        if(!$event instanceof SummitEvent) return [];
+
+        if(!count($relations)) $relations = $this->getAllowedRelations();
+
+
         $values = parent::serialize($expand, $fields, $relations, $params);
 
         //check if description is empty, if so, set short description
@@ -123,6 +128,15 @@ class SummitEventSerializer extends SilverStripeSerializer
                     break;
                 }
             }
+        }
+
+        if(in_array('metrics', $relations)){
+            // show metrics snapshot
+            $metrics = [];
+            foreach($event->getMetricsSnapShots() as $snapshot){
+                $metrics[] = SerializerRegistry::getInstance()->getSerializer($snapshot)->serialize();
+            }
+            $values['metrics'] = $metrics;
         }
 
         return $values;

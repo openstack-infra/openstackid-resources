@@ -717,13 +717,12 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testGetPublishedEventFields(){
 
-
          $params  = array
          (
-             'id'        => 6,
-             'event_id'  => 8900,
-             'fields'    => 'id,avg_feedback_rate,head_count',
-             'relations' => 'none'
+             'id'        => 7,
+             'event_id'  => 15987,
+             'fields'    => 'id, avg_feedback_rate, head_count',
+             'relations' => 'metrics'
          );
 
         $headers = array
@@ -731,7 +730,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             "HTTP_Authorization" => " Bearer " .$this->access_token,
             "CONTENT_TYPE" => "application/json"
         );
-
 
         $response = $this->action
         (

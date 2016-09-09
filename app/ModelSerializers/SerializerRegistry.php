@@ -48,33 +48,35 @@ final class SerializerRegistry
 
     private function __construct()
     {
-        $this->registry['Summit']                    = SummitSerializer::class;
-        $this->registry['SummitType']                = SummitTypeSerializer::class;
-        $this->registry['SummitEventType']           = SummitEventTypeSerializer::class;
-        $this->registry['SummitTicketType']          = SummitTicketTypeSerializer::class;
-        $this->registry['PresentationCategory']      = PresentationCategorySerializer::class;
-        $this->registry['PresentationCategoryGroup'] = PresentationCategoryGroupSerializer::class;
-        $this->registry['Tag']                       = TagSerializer::class;
-        $this->registry['SummitEvent']               = SummitEventSerializer::class;
-        $this->registry['Presentation']              = PresentationSerializer::class;
-        $this->registry['PresentationVideo']         = PresentationVideoSerializer::class;
-        $this->registry['PresentationSlide']         = PresentationSlideSerializer::class;
-        $this->registry['PresentationLink']          = PresentationLinkSerializer::class;
-        $this->registry['Company']                   = CompanySerializer::class;
-        $this->registry['PresentationSpeaker']       = PresentationSpeakerSerializer::class;
-        $this->registry['SummitEventFeedback']       = SummitEventFeedbackSerializer::class;
-        $this->registry['SummitAttendee']            = SummitAttendeeSerializer::class;
-        $this->registry['SummitAttendeeSchedule']    = SummitAttendeeScheduleSerializer::class;
-        $this->registry['SummitEntityEvent']         = SummitEntityEventSerializer::class;
+        $this->registry['Summit']                     = SummitSerializer::class;
+        $this->registry['SummitType']                 = SummitTypeSerializer::class;
+        $this->registry['SummitEventType']            = SummitEventTypeSerializer::class;
+        $this->registry['SummitTicketType']           = SummitTicketTypeSerializer::class;
+        $this->registry['PresentationCategory']       = PresentationCategorySerializer::class;
+        $this->registry['PresentationCategoryGroup']  = PresentationCategoryGroupSerializer::class;
+        $this->registry['Tag']                        = TagSerializer::class;
+        $this->registry['SummitEvent']                = SummitEventSerializer::class;
+        $this->registry['SummitEventMetricsSnapshot'] = SummitEventMetricsSnapshotSerializer::class;
+        $this->registry['Presentation']               = PresentationSerializer::class;
+        $this->registry['PresentationVideo']          = PresentationVideoSerializer::class;
+        $this->registry['PresentationSlide']          = PresentationSlideSerializer::class;
+        $this->registry['PresentationLink']           = PresentationLinkSerializer::class;
+        $this->registry['Company']                    = CompanySerializer::class;
+        $this->registry['PresentationSpeaker']        = PresentationSpeakerSerializer::class;
+        $this->registry['SummitEventFeedback']        = SummitEventFeedbackSerializer::class;
+        $this->registry['SummitAttendee']             = SummitAttendeeSerializer::class;
+        $this->registry['SummitAttendeeSchedule']     = SummitAttendeeScheduleSerializer::class;
+        $this->registry['SummitEntityEvent']          = SummitEntityEventSerializer::class;
 
         // locations
-        $this->registry['SummitVenue']               = SummitVenueSerializer::class;
-        $this->registry['SummitVenueRoom']           = SummitVenueRoomSerializer::class;
-        $this->registry['SummitVenueFloor']          = SummitVenueFloorSerializer::class;
-        $this->registry['SummitExternalLocation']    = SummitExternalLocationSerializer::class;
-        $this->registry['SummitHotel']               = SummitHotelSerializer::class;
-        $this->registry['SummitAirport']             = SummitAirportSerializer::class;
-        $this->registry['SummitLocationImage']       = SummitLocationImageSerializer::class;
+        $this->registry['SummitVenue']                = SummitVenueSerializer::class;
+        $this->registry['SummitVenueRoom']            = SummitVenueRoomSerializer::class;
+        $this->registry['SummitVenueFloor']           = SummitVenueFloorSerializer::class;
+        $this->registry['SummitExternalLocation']     = SummitExternalLocationSerializer::class;
+        $this->registry['SummitHotel']                = SummitHotelSerializer::class;
+        $this->registry['SummitAirport']              = SummitAirportSerializer::class;
+        $this->registry['SummitLocationImage']        = SummitLocationImageSerializer::class;
+
 
         // member
         $this->registry['Member']                    = MemberSerializer::class;

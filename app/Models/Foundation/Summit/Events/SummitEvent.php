@@ -18,6 +18,7 @@ use App\Events\SummitEventUpdated;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use models\exceptions\ValidationException;
+use models\main\Company;
 use models\main\Tag;
 use models\utils\PreRemoveEventArgs;
 use models\utils\SilverstripeBaseModel;
@@ -705,7 +706,6 @@ class SummitEvent extends SilverstripeBaseModel
         $this->pre_update_args = $args;
     }
 
-
     /**
      * @ORM\PostUpdate:
      */
@@ -720,6 +720,64 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function inserted($args){
         Event::fire(new SummitEventCreated($this, $args));
+    }
+
+    public function hasMetricsAvailable(){
+        if(is_null($this->location)) return false;
+        if(!$this->location instanceof SummitVenueRoom) return false;
+        return $this->location->getMetrics()->count() > 0;
+    }
+
+    /**
+     * @return SummitEventMetricsSnapshot[]
+     */
+    public function getMetricsSnapShots(){
+        $snapshots = [];
+        if(is_null($this->location)) return $snapshots;
+        if(!$this->location instanceof SummitVenueRoom) return $snapshots;
+        foreach($this->location->getMetrics() as $metric){
+            $snapshot =  $this->getMetricsValuesByType($metric);
+            if(is_null($snapshot)) continue;
+            $snapshots[] = $snapshot;
+        }
+        return $snapshots;
+    }
+
+    /**
+     * @param int $type_id
+     * @return SummitEventMetricsSnapshot
+     */
+    public function getMetricValuesByTypeId($type_id){
+
+        $metrics = [];
+        if(is_null($this->location)) return $metrics;
+        if(!$this->location instanceof SummitVenueRoom) return $metrics;
+
+        $metric_type = $this->location->getMetricsByType($type_id);
+        if(is_null($metric_type)) return $metrics;
+        if(!$metric_type instanceof RoomMetricType) return $metrics;
+
+        return $this->getMetricsValuesByType($metric_type);
+    }
+
+    /**
+     * @param RoomMetricType $type
+     * @return SummitEventMetricsSnapshot
+     */
+    private function getMetricsValuesByType(RoomMetricType $type){
+
+        $epoch_start_date = $this->getStartDate()->getTimestamp();
+        $epoch_end_date   = $this->getEndDate()->getTimestamp();
+
+        return new SummitEventMetricsSnapshot
+        (
+            $this,
+            $type,
+            $type->getMeanValueByTimeWindow($epoch_start_date, $epoch_end_date),
+            $type->getMaxValueByTimeWindow($epoch_start_date, $epoch_end_date),
+            $type->getMinValueByTimeWindow($epoch_start_date, $epoch_end_date),
+            $type->getCurrentValueByTimeWindow($epoch_start_date, $epoch_end_date)
+        );
     }
 
 }
