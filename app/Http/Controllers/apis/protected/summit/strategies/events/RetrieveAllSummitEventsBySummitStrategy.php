@@ -20,6 +20,7 @@ use models\summit\ISummitRepository;
 use models\summit\Summit;
 use utils\Filter;
 use utils\FilterParser;
+use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
 
@@ -97,11 +98,12 @@ class RetrieveAllSummitEventsBySummitStrategy extends RetrieveSummitEventsStrate
     /**
      * @param PagingInfo $paging_info
      * @param Filter|null $filter
+     * @param Order|null $order
      * @return PagingResponse
      */
-    public function retrieveEventsFromSource(PagingInfo $paging_info, Filter $filter = null)
+    public function retrieveEventsFromSource(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
-        return $this->events_repository->getAllByPage($paging_info, $filter);
+        return $this->events_repository->getAllByPage($paging_info, $filter, $order);
     }
 
 }

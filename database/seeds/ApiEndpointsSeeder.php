@@ -573,6 +573,19 @@ class ApiEndpointsSeeder extends Seeder
             )
         );
 
+        // notifications
+
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-notifications',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/notifications',
+                'http_method' => 'GET'
+            )
+        );
+
         $member_read_scope             = ApiScope::where('name', '=', sprintf('%s/me/read', $current_realm))->first();
         $summit_read_scope             = ApiScope::where('name', '=', sprintf('%s/summits/read', $current_realm))->first();
         $summit_write_scope            = ApiScope::where('name', '=', sprintf('%s/summits/write', $current_realm))->first();
@@ -582,6 +595,7 @@ class ApiEndpointsSeeder extends Seeder
         $summit_external_order_read    = ApiScope::where('name', '=', sprintf('%s/summits/read-external-orders', $current_realm))->first();
         $summit_external_order_confirm = ApiScope::where('name', '=', sprintf('%s/summits/confirm-external-orders', $current_realm))->first();
         $write_videos_scope            = ApiScope::where('name', '=', sprintf('%s/summits/write-videos', $current_realm))->first();
+        $read_notifications            = ApiScope::where('name', '=', sprintf('%s/summits/read-notifications', $current_realm))->first();
 
         // read
         $endpoint = ApiEndpoint::where('name', '=', 'get-summits')->first();
@@ -630,10 +644,15 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-location-events')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
-        //read external orders
+        // read external orders
 
         $endpoint = ApiEndpoint::where('name', '=', 'get-external-order')->first();
         $endpoint->scopes()->attach($summit_external_order_read->id);
+
+        // read notifications
+
+        $endpoint = ApiEndpoint::where('name', '=', 'get-notifications')->first();
+        $endpoint->scopes()->attach($read_notifications->id);
 
         // write
 

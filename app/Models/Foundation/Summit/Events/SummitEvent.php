@@ -293,7 +293,6 @@ class SummitEvent extends SilverstripeBaseModel
      */
     protected $head_count;
 
-
     /**
      * @return bool
      */

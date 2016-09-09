@@ -1,6 +1,6 @@
 <?php namespace models\summit;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,27 +19,17 @@ use utils\PagingInfo;
 use utils\PagingResponse;
 
 /**
- * Interface ISummitEventRepository
+ * Interface ISummitNotificationRepository
  * @package models\summit
  */
-interface ISummitEventRepository extends IBaseRepository
+interface ISummitNotificationRepository extends IBaseRepository
 {
     /**
-     * @param SummitEvent $event
-     * @return SummitEvent[]
-     */
-    public function getPublishedOnSameTimeFrame(SummitEvent $event);
-
-    /**
+     * @param Summit $summit
      * @param PagingInfo $paging_info
      * @param Filter|null $filter
      * @param Order|null $order
      * @return PagingResponse
      */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
-
-    /**
-     * @param int $event_id
-     */
-    public function cleanupAttendeesScheduleForEvent($event_id);
+    public function getAllByPage(Summit $summit, PagingInfo $paging_info, Filter $filter = null, Order $order = null);
 }

@@ -48,6 +48,7 @@ final class Filter
     }
 
     /**
+     * will return an array of filter elements, OR filters are returned on a sub array
      * @param string $field
      * @return null|FilterElement[]
      */
@@ -55,17 +56,44 @@ final class Filter
     {
         $res = array();
         foreach ($this->filters as $filter) {
+
             if ($filter instanceof FilterElement && $filter->getField() === $field) {
                 $res[] = $filter;
-            } else if (is_array($filter)) {
+            }
+            else if (is_array($filter)) {
                 // OR
                 $or_res = array();
                 foreach ($filter as $e) {
                     if ($e instanceof FilterElement && $e->getField() === $field) {
-                        array_push($or_res, $e);
+                        $or_res[] = $e;
                     }
                 }
-                if (count($or_res)) array_push($res, $or_res);
+                if (count($or_res)) $res[] = $or_res;
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * @param string $field
+     * @return null|FilterElement[]
+     */
+    public function getFlatFilter($field)
+    {
+        $res = array();
+        foreach ($this->filters as $filter) {
+
+            if ($filter instanceof FilterElement && $filter->getField() === $field) {
+                $res[] = $filter;
+            }
+            else if (is_array($filter)) {
+                // OR
+                foreach ($filter as $e) {
+                    if ($e instanceof FilterElement && $e->getField() === $field) {
+                        $res[] = $e;
+                    }
+                }
+
             }
         }
         return $res;
@@ -88,7 +116,8 @@ final class Filter
                     }
 
                     $mapping = explode(':', $mapping);
-                    $value = $filter->getValue();
+                    $value   = $filter->getValue();
+
                     if (count($mapping) > 1) {
                         $value = $this->convertValue($value, $mapping[1]);
                     }
@@ -134,11 +163,13 @@ final class Filter
                 }
 
                 $mapping = explode(':', $mapping);
-                $value = $filter->getValue();
+                $value   = $filter->getValue();
+
                 if (count($mapping) > 1) {
                     $value = $this->convertValue($value, $mapping[1]);
                 }
-                $query = $query->where($mapping[0] . ' ' . $filter->getOperator() . ' ' . $value);
+
+                $query = $query->andWhere(sprintf("%s %s %s",$mapping[0], $filter->getOperator(), $value));
             }
             else if (is_array($filter)) {
                 // OR
@@ -151,12 +182,14 @@ final class Filter
                             continue;
                         }
 
-                        $mapping = explode(':', $mapping);
-                        $value = $filter->getValue();
+                        $mapping  = explode(':', $mapping);
+                        $value    = $e->getValue();
+
                         if (count($mapping) > 1) {
                             $value = $this->convertValue($value, $mapping[1]);
                         }
-                        $query->orWhere($mapping[0], $e->getOperator(), $value);
+
+                        $query->orWhere(sprintf("%s %s %s",$mapping[0], $e->getOperator(), $value));
                     }
                 }
             }
@@ -178,6 +211,9 @@ final class Filter
                 break;
             case 'json_int':
                 return intval($value);
+                break;
+            case 'json_string':
+                return sprintf("'%s'",$value);
                 break;
             default:
                 return $value;

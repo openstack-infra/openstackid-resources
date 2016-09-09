@@ -180,6 +180,16 @@ class ApiScopesSeeder extends Seeder
                 'system' => false
             )
         );
+
+        ApiScope::create(
+            array(
+                'name' => sprintf('%s/summits/read-notifications', $current_realm),
+                'short_description' => 'Allow to read summit notifications',
+                'description' => 'Allow to read summit notifications',
+                'api_id' => $summits->id,
+                'system' => false
+            )
+        );
     }
 
 }

@@ -25,6 +25,7 @@ use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
 use utils\FilterParser;
+use utils\FilterParserException;
 use utils\OrderParser;
 use utils\PagingInfo;
 
@@ -142,6 +143,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             (
                 $result->toArray(Request::input('expand', ''),[],[],['summit_id' => $summit_id, 'published' => true])
             );
+        }
+        catch(FilterParserException $ex1){
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
         }
         catch (Exception $ex)
         {

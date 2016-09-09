@@ -17,63 +17,65 @@ final class FilterParser
     /**
      * @param mixed $filters
      * @param array $allowed_fields
+     * @throws FilterParserException
      * @return Filter
      */
     public static function parse($filters, $allowed_fields = array())
     {
-        $res     = array();
+        $res = array();
         $matches = array();
 
-        if(!is_array($filters))
+        if (!is_array($filters))
             $filters = array($filters);
 
-        foreach($filters as $filter) // parse AND filters
+        foreach ($filters as $filter) // parse AND filters
         {
 
             $f = null;
             // parse OR filters
             $or_filters = explode(',', $filter);
-            if(count($or_filters) > 1)
-            {
+
+            if (count($or_filters) > 1) {
                 $f = array();
                 foreach ($or_filters as $of) {
 
                     //single filter
                     preg_match('/[=<>][=>@]{0,1}/', $of, $matches);
-                    if(count($matches) === 1)
-                    {
-                        $op       = $matches[0];
-                        $operands = explode($op, $of);
-                        $field    = $operands[0];
-                        $value    = $operands[1];
-                        if(!isset($allowed_fields[$field])) continue;
-                        if(!in_array($op, $allowed_fields[$field])) continue;
-                        $f_or = self::buildFilter($field, $op, $value);
-                        if(!is_null($f_or))
-                            array_push($f, $f_or);
-                    }
-                }
-            }
-            else
-            {
-                //single filter
-                preg_match('/[=<>][=>@]{0,1}/', $filter, $matches);
-                if(count($matches) === 1)
-                {
+
+                    if (count($matches) != 1)
+                        throw new FilterParserException(sprintf("invalid OR filter format %s (should be [:FIELD_NAME:OPERAND:VALUE])", $of));
+
                     $op       = $matches[0];
-                    $operands = explode($op, $filter);
+                    $operands = explode($op, $of);
                     $field    = $operands[0];
                     $value    = $operands[1];
-                    if(!isset($allowed_fields[$field])) continue;
-                    if(!in_array($op, $allowed_fields[$field])) continue;
-                    $f = self::buildFilter($field, $op, $value);
 
+                    if (!isset($allowed_fields[$field])) continue;
+                    if (!in_array($op, $allowed_fields[$field])) continue;
+                    $f_or = self::buildFilter($field, $op, $value);
+                    if (!is_null($f_or))
+                        array_push($f, $f_or);
                 }
+            } else {
+                //single filter
+                preg_match('/[=<>][=>@]{0,1}/', $filter, $matches);
+
+                if (count($matches) != 1)
+                    throw new FilterParserException(sprintf("invalid filter format %s (should be [:FIELD_NAME:OPERAND:VALUE])", $filter));
+
+                $op       = $matches[0];
+                $operands = explode($op, $filter);
+                $field    = $operands[0];
+                $value    = $operands[1];
+                if (!isset($allowed_fields[$field])) continue;
+                if (!in_array($op, $allowed_fields[$field])) continue;
+                $f = self::buildFilter($field, $op, $value);
             }
-            if(!is_null($f))
+
+            if (!is_null($f))
                 array_push($res, $f);
         }
-       return new Filter($res);
+        return new Filter($res);
     }
 
     /**
@@ -86,8 +88,7 @@ final class FilterParser
      */
     public static function buildFilter($field, $op, $value)
     {
-        switch($op)
-        {
+        switch ($op) {
             case '==':
                 return FilterElement::makeEqual($field, $value);
                 break;

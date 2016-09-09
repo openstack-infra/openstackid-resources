@@ -1624,11 +1624,11 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params  = array
         (
-            'id'            => 6,
-            'location_id'   => 25,
+            'id'            => 7,
+            'location_id'   => 143,
             'filter'      => array
             (
-                'speaker=@Alex',
+                'speaker=@Morgan',
             )
         );
 
@@ -1660,8 +1660,8 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params  = array
         (
-            'id'              => 6,
-            'presentation_id' => 6838
+            'id'              => 7,
+            'presentation_id' => 15404
         );
 
         $headers = array
@@ -1672,8 +1672,10 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $video_data = array
         (
-            'you_tube_id' => 'nrGk0AuFd_9',
-            'name'        => 'Fostering Full Equality, Organized by the Women of OpenStack!',
+            'you_tube_id' => 'cpHa7kSOur0',
+            'name'        => 'test video',
+            'description' => 'test video',
+            'display_on_site' => true,
         );
 
         $response = $this->action
@@ -1716,6 +1718,115 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $member  = json_decode($content);
         $this->assertTrue(!is_null($member));
+    }
+
+    public function testGetSummitNotifications(){
+
+        $params  = array
+        (
+            'id'        => 7,
+            'page'      => 1,
+            'per_page'  => 15,
+            'filter'    => [
+                'channel=='.\models\summit\SummitPushNotificationChannel::Event.',channel=='.\models\summit\SummitPushNotificationChannel::Group,
+            ],
+            'order'     => '+sent_date'
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitNotificationsApiController@getAll",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $notifications  = json_decode($content);
+        $this->assertTrue(!is_null($notifications));
+    }
+
+    public function testGetAllScheduledEvents(){
+
+        $params  = array
+        (
+            'id'     => 7,
+            'page'        => 1,
+            'per_page'    => 10,
+            'filter' => array
+            (
+                'title=@Lightning',
+            ),
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getScheduledEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    public function testGetAllScheduledEventsUsingOrder(){
+
+        $params  = array
+        (
+            'id'       => 7,
+            'page'     => 1,
+            'per_page' => 5,
+            'filter'   => '',
+            'order'    => '+title'
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getScheduledEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events  = json_decode($content);
+        $this->assertTrue(!is_null($events));
     }
 
 }
