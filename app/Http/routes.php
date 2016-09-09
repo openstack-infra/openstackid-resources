@@ -46,10 +46,6 @@ Route::group(array(
     Route::group(array('prefix' => 'summits'), function () {
 
         Route::get('', 'OAuth2SummitApiController@getSummits');
-        Route::group(array('prefix' => 'events'), function () {
-            Route::get('', 'OAuth2SummitApiController@getAllEvents');
-            Route::get('published', 'OAuth2SummitApiController@getAllEvents');
-        });
 
         Route::group(array('prefix' => '{id}'), function () {
 
@@ -77,6 +73,11 @@ Route::group(array(
                         });
                     });
                 });
+            });
+
+            // notifications
+            Route::group(array('prefix' => 'notifications'), function () {
+                Route::get('', 'OAuth2SummitNotificationsApiController@getAll');
             });
 
             // speakers

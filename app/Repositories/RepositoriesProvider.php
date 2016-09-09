@@ -98,5 +98,11 @@ class RepositoriesProvider extends ServiceProvider
             function(){
                 return  EntityManager::getRepository(\models\summit\SummitAttendeeTicket::class);
         });
+
+        App::singleton(
+            'models\summit\ISummitNotificationRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\SummitPushNotification::class);
+            });
     }
 }

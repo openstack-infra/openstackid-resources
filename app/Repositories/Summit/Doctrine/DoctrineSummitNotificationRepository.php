@@ -12,66 +12,68 @@
  * limitations under the License.
  **/
 
-use models\summit\IEventFeedbackRepository;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use models\summit\ISummitNotificationRepository;
+use models\summit\Summit;
 use repositories\SilverStripeDoctrineRepository;
-use models\summit\SummitEvent;
-use utils\PagingInfo;
 use utils\Filter;
 use utils\Order;
+use utils\PagingInfo;
 use utils\PagingResponse;
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\ORM\Query\Expr\Join;
 
 /**
- * Class DoctrineEventFeedbackRepository
+ * Class DoctrineSummitNotificationRepository
+ * @package repositories\summit
  */
-final class DoctrineEventFeedbackRepository extends SilverStripeDoctrineRepository implements IEventFeedbackRepository
+final class DoctrineSummitNotificationRepository
+    extends SilverStripeDoctrineRepository
+    implements ISummitNotificationRepository
 {
 
+
     /**
-     * @param SummitEvent $event
+     * @param Summit $summit
      * @param PagingInfo $paging_info
-     * @param Filter|null $filter
-     * @param Order|null $order
+     * @param Filter $filter
+     * @param Order $order
      * @return PagingResponse
      */
-    public function getByEvent(SummitEvent $event, PagingInfo $paging_info, Filter $filter = null, Order $order = null)
+    public function getAllByPage(Summit $summit, PagingInfo $paging_info, Filter $filter, Order $order)
     {
-        $query  = $this->getEntityManager()->createQueryBuilder()
-            ->select("f")
-            ->from(\models\summit\SummitEventFeedback::class, "f")
-            ->join('f.event', 'e', Join::WITH, " e.id = :event_id")
-            ->join('f.owner', 'o')
-            ->setParameter('event_id', $event->getId());
+        $query = $this->getEntityManager()->createQueryBuilder()
+            ->select("n")
+            ->from(\models\summit\SummitPushNotification::class, "n")
+            ->leftJoin('n.summit_event', 'e')
+            ->join('n.summit', 's', Join::WITH, " s.id = :summit_id")
+            ->setParameter('summit_id', $summit->getId());
 
-
-        if(!is_null($filter)){
+        if (!is_null($filter)) {
 
             $filter->apply2Query($query, array
             (
-                'owner_id'      => 'o.id',
+                'event_id'  => 'e.id:json_int',
+                'channel'   => 'n.channel:json_string',
+                'sent_date' => 'n.sent_date:datetime_epoch',
+                'created'   => 'n.created:datetime_epoch',
+                'is_sent'   => 'n.is_sent:json_int',
             ));
         }
 
-        if(!is_null($order))
-        {
+        if (!is_null($order)) {
 
             $order->apply2Query($query, array
             (
-                'created_date' => 'f.created',
-                'owner_id'     => 'o.id',
-                'rate'         => 'f.rate',
-                'id'           => 'f.id',
+                'sent_date' => 'n.sent_date',
+                'created'   => 'n.created',
+                'id'        => 'n.id',
             ));
-        }
-        else
-        {
+        } else {
             //default order
-            $query = $query->orderBy('f.created' , Criteria::DESC);
+            $query = $query->orderBy('n.id', Criteria::DESC);
         }
 
-        $query= $query
+        $query = $query
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 
@@ -79,7 +81,7 @@ final class DoctrineEventFeedbackRepository extends SilverStripeDoctrineReposito
         $total     = $paginator->count();
         $data      = array();
 
-        foreach($paginator as $entity)
+        foreach ($paginator as $entity)
             array_push($data, $entity);
 
         return new PagingResponse
@@ -91,4 +93,5 @@ final class DoctrineEventFeedbackRepository extends SilverStripeDoctrineReposito
             $data
         );
     }
+
 }

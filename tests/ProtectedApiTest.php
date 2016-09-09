@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use models\oauth2\AccessToken;
@@ -46,6 +47,7 @@ class AccessTokenServiceStub implements IAccessTokenService
             $url . '/summits/confirm-external-orders',
             $url . '/summits/write-videos',
             $url . '/me/read',
+            $url . '/summits/read-notifications',
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','11624', 3600, 'WEB_APPLICATION', '', '');
@@ -80,6 +82,7 @@ class AccessTokenServiceStub2 implements IAccessTokenService
             $url . '/summits/write-videos',
             $url . '/summits/write-videos',
             $url . '/me/read',
+            $url . '/summits/read-notifications',
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, null,null, 3600, 'SERVICE', '', '');

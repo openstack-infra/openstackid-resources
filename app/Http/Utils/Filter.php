@@ -88,7 +88,8 @@ final class Filter
                     }
 
                     $mapping = explode(':', $mapping);
-                    $value = $filter->getValue();
+                    $value   = $filter->getValue();
+
                     if (count($mapping) > 1) {
                         $value = $this->convertValue($value, $mapping[1]);
                     }
@@ -138,7 +139,7 @@ final class Filter
                 if (count($mapping) > 1) {
                     $value = $this->convertValue($value, $mapping[1]);
                 }
-                $query = $query->where($mapping[0] . ' ' . $filter->getOperator() . ' ' . $value);
+                $query = $query->andWhere($mapping[0] . ' ' . $filter->getOperator() . ' ' . $value);
             }
             else if (is_array($filter)) {
                 // OR
@@ -151,12 +152,13 @@ final class Filter
                             continue;
                         }
 
-                        $mapping = explode(':', $mapping);
-                        $value = $filter->getValue();
+                        $mapping  = explode(':', $mapping);
+                        $value    = $e->getValue();
+
                         if (count($mapping) > 1) {
                             $value = $this->convertValue($value, $mapping[1]);
                         }
-                        $query->orWhere($mapping[0], $e->getOperator(), $value);
+                        $query->orWhere($mapping[0] . ' ' .  $e->getOperator() . ' ' . $value);
                     }
                 }
             }
@@ -178,6 +180,9 @@ final class Filter
                 break;
             case 'json_int':
                 return intval($value);
+                break;
+            case 'json_string':
+                return sprintf("'%s'",$value);
                 break;
             default:
                 return $value;

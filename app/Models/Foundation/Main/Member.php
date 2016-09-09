@@ -28,6 +28,37 @@ use Doctrine\ORM\Mapping AS ORM;
 class Member extends SilverstripeBaseModel
 {
     /**
+     * @return mixed
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param mixed $groups
+     */
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+    }
+
+    public function __construct(){
+        parent::__construct();
+        $this->feedback = new ArrayCollection();
+        $this->groups   = new ArrayCollection();
+    }
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\main\Group", inversedBy="members")
+     * @ORM\JoinTable(name="Group_Members",
+     *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="GroupID", referencedColumnName="ID")}
+     *      )
+     */
+    private $groups;
+
+    /**
      * @return string
      */
     public function getBio()
@@ -136,12 +167,6 @@ class Member extends SilverstripeBaseModel
      * @var SummitEventFeedback[]
      */
     private $feedback;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->feedback = new ArrayCollection();
-    }
 
     /**
      * @return File
