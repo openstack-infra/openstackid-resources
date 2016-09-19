@@ -183,6 +183,24 @@ class Presentation extends SummitEvent
     }
 
     /**
+     * @param int $video_id
+     * @return PresentationVideo
+     */
+    public function getVideoBy($video_id){
+        return $this->materials
+            ->filter(function( $element) use($video_id) { return $element instanceof PresentationVideo && $element->getId() == $video_id; })
+            ->first();
+    }
+
+    /**
+     * @param PresentationVideo $video
+     */
+    public function removeVideo(PresentationVideo $video){
+        $this->materials->removeElement($video);
+        $video->unsetPresentation();
+    }
+
+    /**
      * @return PresentationSlide[]
      */
     public function getSlides()
@@ -302,7 +320,7 @@ class Presentation extends SummitEvent
 
 
     public function unsetModerator(){
-        $this->moderator = nul;
+        $this->moderator = null;
     }
 
 }

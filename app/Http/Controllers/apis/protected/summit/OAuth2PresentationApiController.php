@@ -82,6 +82,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
     public function addVideo(LaravelRequest $request, $summit_id, $presentation_id){
         try {
+
             $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
@@ -113,6 +114,85 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             $video = $this->presentation_service->addVideoTo($presentation_id, $data);
 
             return $this->created($video->getId());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function updateVideo(LaravelRequest $request, $summit_id, $presentation_id, $video_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            if (!$request->isJson()) {
+                return $this->error412(array('invalid content type!'));
+            }
+            if(!Request::isJson()) return $this->error403();
+
+            $data = Input::json();
+
+            $rules = array
+            (
+                'you_tube_id'     => 'required|alpha_dash',
+                'name'            => 'sometimes|required|text:512',
+                'description'     => 'sometimes|required|text|max:512',
+                'display_on_site' => 'sometimes|required|boolean',
+            );
+
+            $data = $data->all();
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException;
+                $ex->setMessages($validation->messages()->toArray());
+                throw $ex;
+            }
+
+            $this->presentation_service->updateVideo($presentation_id, $video_id, $data);
+
+            return $this->updated();
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function deleteVideo($summit_id, $presentation_id, $video_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->presentation_service->deleteVideo($presentation_id, $video_id);
+
+            return $this->deleted();
         }
         catch (EntityNotFoundException $ex1)
         {

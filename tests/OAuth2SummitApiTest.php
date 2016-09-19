@@ -1695,6 +1695,76 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     }
 
+    public function testUpdatePresentationVideo()
+    {
+        $params  = array
+        (
+            'id'              => 7,
+            'presentation_id' => 15404,
+            'video_id'        => 32801
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        );
+
+        $video_data = array
+        (
+            'you_tube_id' => 'cpHa7kSOur0',
+            'name'        => 'test video update',
+        );
+
+        $response = $this->action
+        (
+            "PUT",
+            "OAuth2PresentationApiController@updateVideo",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers,
+            json_encode($video_data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+
+    }
+
+    public function testDeletePresentationVideo()
+    {
+        $params  = array
+        (
+            'id'              => 7,
+            'presentation_id' => 15404,
+            'video_id'        => 32800
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "DELETE",
+            "OAuth2PresentationApiController@deleteVideo",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+
+    }
+
     public function testGetMyMemberFromCurrentSummit(){
 
         $params  = array

@@ -58,6 +58,11 @@ abstract class PresentationMaterial extends SilverstripeBaseModel
         $this->presentation = $presentation;
     }
 
+
+    public function unsetPresentation(){
+        $this->presentation = null;
+    }
+
     /**
      * @return int
      */

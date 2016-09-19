@@ -117,6 +117,10 @@ Route::group(array(
                         Route::get('', 'OAuth2PresentationApiController@getPresentationVideos');
                         Route::get('{video_id}', 'OAuth2PresentationApiController@getPresentationVideo');
                         Route::post('', 'OAuth2PresentationApiController@addVideo');
+                        Route::group(array('prefix' => '{video_id}'), function () {
+                            Route::put('', 'OAuth2PresentationApiController@updateVideo');
+                            Route::delete('', 'OAuth2PresentationApiController@deleteVideo');
+                        });
                     });
                 });
             });

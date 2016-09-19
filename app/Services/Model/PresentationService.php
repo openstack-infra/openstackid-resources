@@ -16,6 +16,7 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\factories\IPresentationVideoFactory;
 use models\summit\ISummitEventRepository;
+use models\summit\Presentation;
 use models\summit\PresentationVideo;
 use libs\utils\ITransactionService;
 
@@ -79,5 +80,75 @@ final class PresentationService implements IPresentationService
         });
 
         return $video;
+    }
+
+    /**
+     * @param int $presentation_id
+     * @param int $video_id
+     * @param array $video_data
+     * @return PresentationVideo
+     */
+    public function updateVideo($presentation_id, $video_id, array $video_data)
+    {
+        return $this->tx_service->transaction(function() use($presentation_id, $video_id, $video_data){
+
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if(is_null($presentation))
+                throw new EntityNotFoundException('presentation not found!');
+
+            $video = $presentation->getVideoBy($video_id);
+
+            if(is_null($video))
+                throw new EntityNotFoundException('video not found!');
+
+            if(!$video instanceof PresentationVideo)
+                throw new EntityNotFoundException('video not found!');
+
+            if(isset($video_data['name']))
+                $video->setName(trim($video_data['name']));
+
+            if(isset($video_data['you_tube_id']))
+                $video->setYoutubeId(trim($video_data['you_tube_id']));
+
+            if(isset($video_data['description']))
+                $video->setDescription(trim($video_data['description']));
+
+            if(isset($video_data['display_on_site']))
+                $video->setDisplayOnSite((bool)$video_data['display_on_site']);
+
+            return $video;
+
+        });
+    }
+
+    /**
+     * @param int $presentation_id
+     * @param int $video_id
+     * @return void
+     */
+    public function deleteVideo($presentation_id, $video_id)
+    {
+        $this->tx_service->transaction(function() use($presentation_id, $video_id){
+
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if(is_null($presentation))
+                throw new EntityNotFoundException('presentation not found!');
+
+            if(!$presentation instanceof Presentation)
+                throw new EntityNotFoundException('presentation not found!');
+
+            $video = $presentation->getVideoBy($video_id);
+
+            if(is_null($video))
+                throw new EntityNotFoundException('video not found!');
+
+            if(!$video instanceof PresentationVideo)
+                throw new EntityNotFoundException('video not found!');
+
+            $presentation->removeVideo($video);
+
+        });
     }
 }

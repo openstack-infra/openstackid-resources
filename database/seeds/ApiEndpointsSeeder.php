@@ -561,6 +561,26 @@ class ApiEndpointsSeeder extends Seeder
             )
         );
 
+        ApiEndpoint::create(
+            array(
+                'name' => 'update-presentation-video',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos/{video_id}',
+                'http_method' => 'PUT'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'delete-presentation-video',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos/{video_id}',
+                'http_method' => 'DELETE'
+            )
+        );
+
         //members
 
         ApiEndpoint::create(
@@ -574,7 +594,6 @@ class ApiEndpointsSeeder extends Seeder
         );
 
         // notifications
-
 
         ApiEndpoint::create(
             array(
@@ -689,7 +708,14 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint->scopes()->attach($summit_external_order_confirm->id);
 
         //write videos
+
         $endpoint = ApiEndpoint::where('name', '=', 'create-presentation-video')->first();
+        $endpoint->scopes()->attach($write_videos_scope->id);
+
+        $endpoint = ApiEndpoint::where('name', '=', 'update-presentation-video')->first();
+        $endpoint->scopes()->attach($write_videos_scope->id);
+
+        $endpoint = ApiEndpoint::where('name', '=', 'delete-presentation-video')->first();
         $endpoint->scopes()->attach($write_videos_scope->id);
 
 

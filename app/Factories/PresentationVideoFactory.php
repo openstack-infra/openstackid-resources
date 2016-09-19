@@ -28,6 +28,7 @@ final class PresentationVideoFactory implements IPresentationVideoFactory
     public function build(array $data){
         $video               = new PresentationVideo;
         $utc_now             = new \DateTime();
+
         $video->setYoutubeId(trim($data['you_tube_id']));
         $video->setDateUploaded($utc_now);
 

@@ -27,4 +27,20 @@ interface IPresentationService
      * @return PresentationVideo
      */
     public function addVideoTo($presentation_id, array $video_data);
+
+    /**
+     * @param int $presentation_id
+     * @param int $video_id
+     * @param array $video_data
+     * @return PresentationVideo
+     */
+    public function updateVideo($presentation_id, $video_id, array $video_data);
+
+
+    /**
+     * @param int $presentation_id
+     * @param int $video_id
+     * @return void
+     */
+    public function deleteVideo($presentation_id, $video_id);
 }
