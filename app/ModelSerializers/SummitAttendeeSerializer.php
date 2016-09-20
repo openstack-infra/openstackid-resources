@@ -14,6 +14,7 @@
 
 use libs\utils\JsonUtils;
 use Illuminate\Support\Facades\Config;
+use models\summit\SummitAttendee;
 
 /**
  * Class SummitAttendeeSerializer
@@ -45,10 +46,17 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
     {
         if(!count($relations)) $relations = $this->getAllowedRelations();
         $attendee = $this->object;
+        if(!$attendee instanceof SummitAttendee) return [];
+
         $summit   = $attendee->getSummit();
         $values   = parent::serialize($expand, $fields, $relations, $params);
 
-        $values['schedule'] = $attendee->getScheduledEventsIds();
+        $schedule = [];
+        foreach ($attendee->getScheduledEventsIds() as $event_id){
+            $schedule[] = intval($event_id);
+        }
+
+        $values['schedule'] = $schedule;
 
         $tickets = array();
         foreach($attendee->getTickets() as $t)

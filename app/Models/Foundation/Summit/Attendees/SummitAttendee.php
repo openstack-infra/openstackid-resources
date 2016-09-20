@@ -245,9 +245,16 @@ class SummitAttendee extends SilverstripeBaseModel
      * @return int[]
      */
     public function getScheduledEventsIds(){
-        return $this->schedule->map(function($entity)  {
-            return $entity->getEvent()->getId();
-        })->toArray();
+        $sql = <<<SQL
+SELECT SummitEventID 
+FROM SummitAttendee_Schedule 
+INNER JOIN SummitEvent ON SummitEvent.ID = SummitAttendee_Schedule.SummitEventID
+WHERE SummitAttendeeID = :attendee_id AND SummitEvent.Published = 1
+SQL;
+
+        $stmt = $this->prepareRawSQL($sql);
+        $stmt->execute(['attendee_id' => $this->getId()]);
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 
 }
