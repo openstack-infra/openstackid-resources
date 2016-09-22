@@ -228,7 +228,7 @@ class OAuth2BearerAccessTokenRequestValidator
 
             return $http_response;
         } catch (\Exception $ex) {
-            Log::warning($ex);
+            Log::error($ex);
             $response = new OAuth2WWWAuthenticateErrorResponse(
                 $realm,
                 OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest,

@@ -192,7 +192,11 @@ final class AccessTokenService implements IAccessTokenService
             $body         = ($is_json) ? $response->json(): $response->getBody();
 
             $code = $response->getStatusCode();
-            if ($code === 400 && $is_json && isset($body['error']) && $body['error'] === OAuth2Protocol::OAuth2Protocol_Error_InvalidToken)
+            if ($code === 400 && $is_json && isset($body['error'])
+                && (
+                    $body['error'] === OAuth2Protocol::OAuth2Protocol_Error_InvalidToken ||
+                    $body['error'] === OAuth2Protocol::OAuth2Protocol_Error_InvalidGrant
+                ))
             {
                 $this->cache_service->setSingleValue(md5($token_value).'.revoked', md5($token_value));
                 throw new InvalidGrantTypeException($body['error']);
