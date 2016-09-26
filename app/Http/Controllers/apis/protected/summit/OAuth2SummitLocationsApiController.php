@@ -262,4 +262,104 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         }
     }
 
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getVenues($summit_id)
+    {
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            //locations
+            $locations = array();
+
+            foreach ($summit->getVenues() as $location)
+            {
+                $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
+            }
+
+            return $this->ok($locations);
+
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getExternalLocations($summit_id)
+    {
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            //locations
+            $locations = array();
+            foreach ($summit->getExternalLocations() as $location)
+            {
+                $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
+            }
+
+            return $this->ok($locations);
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getHotels($summit_id)
+    {
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            //locations
+            $locations = array();
+            foreach ($summit->getHotels() as $location)
+            {
+                $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
+            }
+
+            return $this->ok($locations);
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getAirports($summit_id)
+    {
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            //locations
+            $locations = array();
+            foreach ($summit->getAirports() as $location)
+            {
+                $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
+            }
+
+            return $this->ok($locations);
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
 }

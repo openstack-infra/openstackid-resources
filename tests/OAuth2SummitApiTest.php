@@ -1451,6 +1451,133 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($locations));
     }
 
+
+    public function testGetCurrentSummitVenues()
+    {
+        $params  = array
+        (
+            'id'  => 'current',
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getVenues",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $locations  = json_decode($content);
+        $this->assertTrue(!is_null($locations));
+    }
+
+
+    public function testGetCurrentSummitHotels()
+    {
+        $params  = array
+        (
+            'id'        => 'current',
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getHotels",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $locations  = json_decode($content);
+        $this->assertTrue(!is_null($locations));
+    }
+
+    public function testGetCurrentSummitAirports()
+    {
+        $params  = array
+        (
+            'id'        => 'current',
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getAirports",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $locations  = json_decode($content);
+        $this->assertTrue(!is_null($locations));
+    }
+
+
+    public function testGetCurrentSummitExternalLocations()
+    {
+        $params  = array
+        (
+            'id'        => 'current',
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " .$this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getExternalLocations",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $locations  = json_decode($content);
+        $this->assertTrue(!is_null($locations));
+    }
+
     public function testGetCurrentSummitLocation()
     {
         $params  = array

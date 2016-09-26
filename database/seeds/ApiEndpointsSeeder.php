@@ -474,6 +474,46 @@ class ApiEndpointsSeeder extends Seeder
 
         ApiEndpoint::create(
             array(
+                'name' => 'get-venues',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/locations/venues',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-external-locations',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/locations/external-locations',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-hotels',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/locations/hotels',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-airports',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/locations/airports',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
                 'name' => 'get-location',
                 'active' => true,
                 'api_id' => $summit->id,
@@ -653,6 +693,14 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-locations')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-venues')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-hotels')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-airports')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-external-locations')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-location')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-event-types')->first();
@@ -663,6 +711,7 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-location-events')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
+
         // read external orders
 
         $endpoint = ApiEndpoint::where('name', '=', 'get-external-order')->first();

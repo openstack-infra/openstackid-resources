@@ -331,6 +331,33 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
+     * @return SummitHotel[]
+     */
+    public function getHotels(){
+        return $this->locations->filter(function($e){
+            return $e instanceof SummitHotel;
+        });
+    }
+
+    /**
+     * @return SummitAirport[]
+     */
+    public function getAirports(){
+        return $this->locations->filter(function($e){
+            return $e instanceof SummitAirport;
+        });
+    }
+
+    /**
+     * @return SummitExternalLocation[]
+     */
+    public function getExternalLocations(){
+        return $this->locations->filter(function($e){
+            return $e->getClassName() == 'SummitExternalLocation';
+        });
+    }
+
+    /**
      * @return ArrayCollection
      */
     public function getEvents(){

@@ -129,7 +129,10 @@ Route::group(array(
             Route::group(array('prefix' => 'locations'), function () {
 
                 Route::get('', 'OAuth2SummitLocationsApiController@getLocations');
-
+                Route::get('/venues', 'OAuth2SummitLocationsApiController@getVenues');
+                Route::get('/external-locations', 'OAuth2SummitLocationsApiController@getExternalLocations');
+                Route::get('/hotels', 'OAuth2SummitLocationsApiController@getHotels');
+                Route::get('/airports', 'OAuth2SummitLocationsApiController@getAirports');
                 Route::group(array('prefix' => '{location_id}'), function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationEvents');

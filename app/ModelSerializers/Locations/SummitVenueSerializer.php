@@ -37,20 +37,22 @@ final class SummitVenueSerializer extends SummitGeoLocatedLocationSerializer
         $values = parent::serialize($expand, $fields, $relations, $params);
         $venue  = $this->object;
         // rooms
-        $rooms = array();
+        $rooms = [];
         foreach($venue->getRooms() as $room)
         {
             $rooms[] = SerializerRegistry::getInstance()->getSerializer($room)->serialize($expand, $fields, $relations, $params);
         }
+
         if(count($rooms) > 0)
             $values['rooms'] = $rooms;
 
         // floors
-        $floors = array();
+        $floors = [];
         foreach($venue->getFloors() as $floor)
         {
             $floors[] = SerializerRegistry::getInstance()->getSerializer($floor)->serialize($expand, $fields, $relations, $params);
         }
+
         if(count($floors) > 0)
             $values['floors'] = $floors;
 
