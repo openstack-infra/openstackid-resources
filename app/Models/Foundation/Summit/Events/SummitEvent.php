@@ -333,8 +333,8 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function getLocalStartDate()
     {
-        $value = $this->start_date;
-        if(!empty($value)) {
+        if(!empty($this->start_date)) {
+            $value  = clone $this->start_date;
             $summit = $this->getSummit();
             if(!is_null($summit))
             {
@@ -373,8 +373,8 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function getLocalEndDate()
     {
-        $value = $this->end_date;
-        if(!empty($value)) {
+        if(!empty($this->end_date)) {
+            $value  = clone $this->end_date;
             $summit = $this->getSummit();
             if(!is_null($summit))
             {

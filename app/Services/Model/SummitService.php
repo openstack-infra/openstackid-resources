@@ -304,12 +304,14 @@ final class SummitService implements ISummitService
             $end_datetime   = null;
 
             if (isset($data['start_date']) && isset($data['end_date'])) {
-                $start_datetime = intval($data['start_date']);
-                $start_datetime = new \DateTime("@$start_datetime");
-                $end_datetime = intval($data['end_date']);
-                $end_datetime = new \DateTime("@$end_datetime");
+                $start_datetime   = intval($data['start_date']);
+                $start_datetime   = new \DateTime("@$start_datetime");
+
+                $end_datetime     = intval($data['end_date']);
+                $end_datetime     = new \DateTime("@$end_datetime");
+
                 $interval_seconds = $end_datetime->getTimestamp() - $start_datetime->getTimestamp();
-                $minutes = $interval_seconds / 60;
+                $minutes          = $interval_seconds / 60;
                 if ($minutes < self::MIN_EVENT_MINUTES)
                     throw new ValidationException
                     (

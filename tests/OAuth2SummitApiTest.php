@@ -818,7 +818,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testPostEvent($start_date = 1461510000, $end_date = 1461513600 )
+    public function testPostEvent($start_date = 1477645200, $end_date = 1477647600 )
     {
         $params  = array
         (
@@ -833,15 +833,15 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $data = array
         (
-            'title'           => 'test event BCN',
-            'description'     => 'test event BCN',
-            //'location_id'     => 25,
+            'title'           => 'Neutron: tbd',
+            'description'     => 'TBD',
+            'location_id'     => 179,
             'allow_feedback'  => true,
-            //'start_date'      => $start_date,
-            //'end_date'        => $end_date,
-            'type_id'         => 88,//2,
-            'summit_types_id' => [7,8],//[2],
-            'tags'            => ['tag#1','tag#2' ]
+            'start_date'      => $start_date,
+            'end_date'        => $end_date,
+            'type_id'         => 95,
+            'summit_types_id' => [10],
+            'tags'            => ['Neutron' ]
         );
 
         $response = $this->action
