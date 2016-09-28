@@ -172,10 +172,11 @@ class SummitAttendee extends SilverstripeBaseModel
      */
     public function add2Schedule(SummitEvent $event)
     {
-        $schedule = $this->getScheduleByEvent($event);
-
-        if($schedule !== false)
-            throw new ValidationException(sprintf('Event %s already belongs to attendee %s schedule.', $event->getId(), $this->getId()));
+        if($this->isOnSchedule($event))
+            throw new ValidationException
+            (
+                sprintf('Event %s already belongs to attendee %s schedule.', $event->getId(), $this->getId())
+            );
 
         $schedule = new SummitAttendeeSchedule;
 
@@ -192,12 +193,12 @@ class SummitAttendee extends SilverstripeBaseModel
     public function removeFromSchedule(SummitEvent $event)
     {
         $schedule = $this->getScheduleByEvent($event);
-        if($schedule === false)
+
+        if(is_null($schedule))
             throw new ValidationException
             (
                 sprintf('Event %s does not belongs to attendee %s schedule.', $event->getId(), $this->getId())
             );
-
         $this->schedule->removeElement($schedule);
         $schedule->clearAttendee();
     }
@@ -208,17 +209,37 @@ class SummitAttendee extends SilverstripeBaseModel
      */
     public function isOnSchedule(SummitEvent $event)
     {
-        return $this->getScheduleByEvent($event) !== false;
+        $sql = <<<SQL
+SELECT COUNT(SummitEventID) AS QTY 
+FROM SummitAttendee_Schedule 
+INNER JOIN SummitEvent ON SummitEvent.ID = SummitAttendee_Schedule.SummitEventID
+WHERE SummitAttendeeID = :attendee_id AND SummitEvent.Published = 1 AND SummitEvent.ID = :event_id
+SQL;
+
+        $stmt = $this->prepareRawSQL($sql);
+        $stmt->execute([
+            'attendee_id' => $this->getId(),
+            'event_id'    => $event->getId()
+        ]);
+        $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        return count($res) > 0 ? intval($res[0]) > 0 : false;
     }
 
     /**
      * @param SummitEvent $event
-     * @return SummitAttendeeSchedule
+     * @return null| SummitAttendeeSchedule
      */
     public function getScheduleByEvent(SummitEvent $event){
-        return $this->schedule->filter(function($e) use($event){
-            return $e->getEvent()->getId() == $event->getId();
-        })->first();
+
+        $query = $this->createQuery("SELECT s from models\summit\SummitAttendeeSchedule s 
+        JOIN s.attendee a 
+        JOIN s.event e    
+        WHERE a.id = :attendee_id and e.published = 1 and e.id = :event_id
+        ");
+        return $query
+            ->setParameter('attendee_id', $this->getIdentifier())
+            ->setParameter('event_id', $event->getIdentifier())
+            ->getSingleResult();
     }
 
     /**
@@ -229,7 +250,7 @@ class SummitAttendee extends SilverstripeBaseModel
     {
         $schedule = $this->getScheduleByEvent($event);
 
-        if($schedule === false)
+        if(is_null($schedule))
             throw new ValidationException(sprintf('Event %s does not belongs to attendee %s schedule.', $event->ID, $this->ID));
         $schedule->setIsCheckedIn(true);
     }

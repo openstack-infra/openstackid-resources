@@ -218,7 +218,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testCurrentSummitMyAttendeeAddToSchedule($event_id = 7202, $summit_id = 6)
+    public function testCurrentSummitMyAttendeeAddToSchedule($event_id = 16645, $summit_id = 7)
     {
         $params  = array
         (
@@ -266,9 +266,9 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testCurrentSummitMyAttendeeScheduleUnset()
     {
-        $event_id = 7863;
-        $summit_id = 6;
-        $this->testCurrentSummitMyAttendeeAddToSchedule($event_id, $summit_id);
+        $event_id = 16645;
+        $summit_id = 7;
+        //$this->testCurrentSummitMyAttendeeAddToSchedule($event_id, $summit_id);
         $params  = array
         (
             'id'          => $summit_id,
