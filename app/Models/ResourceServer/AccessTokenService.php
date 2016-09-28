@@ -22,7 +22,7 @@ use libs\oauth2\OAuth2Protocol;
 use libs\utils\ConfigurationException;
 use libs\utils\ICacheService;
 use models\oauth2\AccessToken;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class AccessTokenService
@@ -60,8 +60,7 @@ final class AccessTokenService implements IAccessTokenService
             throw new InvalidGrantTypeException(OAuth2Protocol::OAuth2Protocol_Error_InvalidToken);
         }
 
-        $token_info     = $this->cache_service->getHash(md5($token_value), array
-        (
+        $token_info = $this->cache_service->getHash(md5($token_value),[
             'access_token',
             'scope',
             'client_id',
@@ -72,13 +71,11 @@ final class AccessTokenService implements IAccessTokenService
             'application_type',
             'allowed_return_uris',
             'allowed_origins'
-        ));
+        ]);
 
         if (count($token_info) === 0)
         {
-            Log::debug("getting token from remote call ...");
-            $token_info = $this->makeRemoteCall($token_value);
-            $this->cache_service->storeHash(md5($token_value), $token_info, $cache_lifetime );
+            $token_info = $this->doIntrospection($token_value);
         }
         else
         {
@@ -97,6 +94,23 @@ final class AccessTokenService implements IAccessTokenService
             );
         }
 
+        $token = $this->unSerializeToken($token_info);
+
+        if($token->getLifetime() <= 0)
+        {
+            Log::debug("token lifetime is <= 0 ... retrieving from IDP");
+            $this->cache_service->delete(md5($token_value));
+            $token_info = $this->doIntrospection($token_value);
+            $token      = $this->unSerializeToken($token_info);
+        }
+        return $token;
+    }
+
+    /**
+     * @param array $token_info
+     * @return AccessToken
+     */
+    private function unSerializeToken(array $token_info){
         $token = AccessToken::createFromParams
         (
             $token_info['access_token'],
@@ -115,14 +129,21 @@ final class AccessTokenService implements IAccessTokenService
         foreach($token_info as $k => $v){
             $str_token_info  .= sprintf("-%s=%s-", $k, $v);
         }
+
         Log::debug("token info : ". $str_token_info);
-        if($token->getLifetime() <= 0)
-        {
-            Log::debug("token lifetime is < 0 ... retrieving from IDP");
-            $this->cache_service->delete(md5($token_value));
-            $token = $this->get($token_value);
-        }
+
         return $token;
+    }
+    /**
+     * @param string $token_value
+     * @return array
+     */
+    private function doIntrospection($token_value){
+        Log::debug("getting token from remote call ...");
+        $cache_lifetime = intval(Config::get('server.access_token_cache_lifetime', 300));
+        $token_info     = $this->makeRemoteCall($token_value);
+        $this->cache_service->storeHash(md5($token_value), $token_info, $cache_lifetime );
+        return $token_info;
     }
 
     /**
@@ -145,7 +166,7 @@ final class AccessTokenService implements IAccessTokenService
                 ]
             ]);
 
-            $client_id      = Config::get('app.openstackid_client_id', '');
+            $client_id       = Config::get('app.openstackid_client_id', '');
             $client_secret   = Config::get('app.openstackid_client_secret', '');
             $auth_server_url = Config::get('app.openstackid_base_url', '');
 
