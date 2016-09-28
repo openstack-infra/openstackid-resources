@@ -46,8 +46,8 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
             ->from(\models\summit\SummitEvent::class, "e")
             ->join('e.summit', 's', Join::WITH, " s.id = :summit_id")
             ->where('e.published = 1')
-            ->andWhere('e.start_date <= :end_date')
-            ->andWhere('e.end_date >= :start_date')
+            ->andWhere('e.start_date < :end_date')
+            ->andWhere('e.end_date > :start_date')
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('start_date', $start_date)
             ->setParameter('end_date', $end_date)->getQuery()->getResult();
