@@ -502,13 +502,25 @@ final class SummitService implements ISummitService
                 foreach ($conflict_events as $c_event) {
                     // if the published event is BlackoutTime or if there is a BlackoutTime event in this timeframe
                     if (($event->getType()->isBlackoutTimes() || $c_event->getType()->isBlackoutTimes()) && $event->getId() != $c_event->getId()) {
-                        throw new ValidationException(sprintf("You can't publish on this time frame, it conflicts with event id %s",
-                            $c_event->getId()));
+                        throw new ValidationException
+                        (
+                            sprintf
+                            (
+                                "You can't publish on this time frame, it conflicts with event id %s",
+                                $c_event->getId()
+                            )
+                        );
                     }
                     // if trying to publish an event on a slot occupied by another event
-                    if ($current_event_location->getId() == $c_event->getLocation()->getId() && $event->getId() != $c_event->getId()) {
-                        throw new ValidationException(sprintf("You can't publish on this time frame, it conflicts with event id %s",
-                            $c_event->getId()));
+                    if (!is_null($current_event_location) &&  !is_null($c_event->getLocation()) && $current_event_location->getId() == $c_event->getLocation()->getId() && $event->getId() != $c_event->getId()) {
+                        throw new ValidationException
+                        (
+                            sprintf
+                            (
+                                "You can't publish on this time frame, it conflicts with event id %s",
+                                $c_event->getId()
+                            )
+                        );
                     }
 
                     // check speakers collisions
