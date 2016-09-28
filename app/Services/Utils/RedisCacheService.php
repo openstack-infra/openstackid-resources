@@ -32,7 +32,6 @@ class RedisCacheService implements ICacheService
 		$this->redis   = Redis::connection();
 	}
 
-
 	public function boot()
 	{
 		if (is_null($this->redis))
