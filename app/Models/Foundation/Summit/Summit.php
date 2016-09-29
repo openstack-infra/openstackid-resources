@@ -261,7 +261,8 @@ class Summit extends SilverstripeBaseModel
             $utc_timezone      = new DateTimeZone("UTC");
             $time_zone_name    = $time_zone_list[$time_zone_id];
             $summit_time_zone  = new DateTimeZone($time_zone_name);
-            $local_date        = $value->setTimezone($summit_time_zone);
+            $timestamp         = $value->format('Y-m-d H:i:s');
+            $local_date        = new DateTime($timestamp, $summit_time_zone);
             return $local_date->setTimezone($utc_timezone);
         }
         return null;
@@ -282,13 +283,12 @@ class Summit extends SilverstripeBaseModel
             $utc_timezone     = new DateTimeZone("UTC");
             $time_zone_name   = $time_zone_list[$time_zone_id];
             $summit_time_zone = new DateTimeZone($time_zone_name);
-            $utc_date         = $value->setTimezone($utc_timezone);
-
+            $timestamp        = $value->format('Y-m-d H:i:s');
+            $utc_date         = new DateTime($timestamp, $utc_timezone);
             return $utc_date->setTimezone($summit_time_zone);
         }
         return null;
     }
-
     /**
      * @return DateTime
      */
