@@ -15,6 +15,7 @@
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\NoResultException;
 use models\exceptions\ValidationException;
 use models\main\Member;
 use models\utils\SilverstripeBaseModel;
@@ -231,15 +232,20 @@ SQL;
      */
     public function getScheduleByEvent(SummitEvent $event){
 
-        $query = $this->createQuery("SELECT s from models\summit\SummitAttendeeSchedule s 
+        try {
+            $query = $this->createQuery("SELECT s from models\summit\SummitAttendeeSchedule s 
         JOIN s.attendee a 
         JOIN s.event e    
         WHERE a.id = :attendee_id and e.published = 1 and e.id = :event_id
         ");
-        return $query
-            ->setParameter('attendee_id', $this->getIdentifier())
-            ->setParameter('event_id', $event->getIdentifier())
-            ->getSingleResult();
+            return $query
+                ->setParameter('attendee_id', $this->getIdentifier())
+                ->setParameter('event_id', $event->getIdentifier())
+                ->getSingleResult();
+        }
+        catch(NoResultException $ex1){
+            return null;
+        }
     }
 
     /**
