@@ -96,6 +96,18 @@ class SummitLocationImage extends SilverstripeBaseModel
     }
 
     /**
+     * @return int
+     */
+    public function getLocationId(){
+        try{
+            return !is_null($this->location) ? $this->location->getId() : 0;
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
      * @param SummitAbstractLocation $location
      */
     public function setLocation($location)

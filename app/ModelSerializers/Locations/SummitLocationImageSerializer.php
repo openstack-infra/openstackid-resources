@@ -25,6 +25,7 @@ class SummitLocationImageSerializer  extends SilverStripeSerializer
         'Name'         => 'name:json_text',
         'Description'  => 'description:json_text',
         'ClassName'    => 'class_name:json_text',
+        'LocationId'   => 'location_id:json_int',
         'Order'        => 'order:json_int',
     );
 
