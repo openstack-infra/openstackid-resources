@@ -190,7 +190,7 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function getAvgFeedbackRate()
     {
-        return $this->avg_feedback;
+        return !is_null($this->avg_feedback) ? $this->avg_feedback : 0.0;
     }
 
     /**
