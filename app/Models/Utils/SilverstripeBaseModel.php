@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query;
@@ -116,6 +117,13 @@ class SilverstripeBaseModel implements IEntity
     protected function prepareRawSQL($sql){
 
         return Registry::getManager(self::EntityManager)->getConnection()->prepare($sql);
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEM(){
+        return Registry::getManager(self::EntityManager);
     }
 
     const EntityManager = 'ss';
