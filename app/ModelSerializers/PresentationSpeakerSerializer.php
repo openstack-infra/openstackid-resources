@@ -13,6 +13,8 @@
  **/
 
 use Illuminate\Support\Facades\Config;
+use models\summit\Presentation;
+use models\summit\PresentationSpeaker;
 
 /**
  * Class PresentationSpeakerSerializer
@@ -44,13 +46,18 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
      */
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
-        if(!count($relations)) $relations = $this->getAllowedRelations();
-        $values                  = parent::serialize($expand, $fields, $relations, $params);
-        $speaker                 = $this->object;
-        $summit_id               = isset($params['summit_id'])? intval($params['summit_id']):null;
-        $published               = isset($params['published'])? intval($params['published']):true;
-        $values['presentations'] = $speaker->getPresentationIds($summit_id, $published);
-        $values['pic']           = Config::get("server.assets_base_url", 'https://www.openstack.org/') . 'profile_images/speakers/' . $speaker->getId();
+        if(!count($relations)) $relations  = $this->getAllowedRelations();
+
+        $speaker                           = $this->object;
+        if(!$speaker instanceof PresentationSpeaker) return [];
+
+        $values                            = parent::serialize($expand, $fields, $relations, $params);
+
+        $summit_id                         = isset($params['summit_id'])? intval($params['summit_id']):null;
+        $published                         = isset($params['published'])? intval($params['published']):true;
+        $values['presentations']           = $speaker->getPresentationIds($summit_id, $published);
+        $values['moderated_presentations'] = $speaker->getModeratedPresentationIds($summit_id, $published);
+        $values['pic']                     = Config::get("server.assets_base_url", 'https://www.openstack.org/') . 'profile_images/speakers/' . $speaker->getId();
 
         if (in_array('member', $relations) && $speaker->hasMember())
         {
@@ -77,11 +84,17 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {
                     case 'presentations': {
-                        $presentations = array();
-                        foreach ($speaker->getPresentations() as $p) {
+                        $presentations = [];
+                        foreach ($speaker->getPresentations($summit_id, $published) as $p) {
                             $presentations[] = SerializerRegistry::getInstance()->getSerializer($p)->serialize();
                         }
                         $values['presentations'] = $presentations;
+
+                        $moderated_presentations = [];
+                        foreach ($speaker->getModeratedPresentation($summit_id, $published) as $p) {
+                            $moderated_presentations[] = SerializerRegistry::getInstance()->getSerializer($p)->serialize();
+                        }
+                        $values['moderated_presentations'] = $presentations;
                     }
 
                 }

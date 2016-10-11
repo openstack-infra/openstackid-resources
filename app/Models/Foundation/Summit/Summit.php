@@ -673,25 +673,13 @@ class Summit extends SilverstripeBaseModel
      */
     private function buildModeratorsQuery()
     {
-        $query = <<<SQL
-SELECT DISTINCT p0_.FirstName , p0_.LastName, 
-p0_.Title , p0_.Bio , p0_.IRCHandle, 
-p0_.TwitterName ,
-p0_.ID , p0_.Created, p0_.LastEdited, 
-p0_.PhotoID,
-p0_.MemberID 
-FROM PresentationSpeaker p0_ 
-
-WHERE p0_.ID IN ( 
-	SELECT Presentation.ModeratorID FROM Presentation INNER JOIN SummitEvent ON SummitEvent.ID = Presentation.ID
-    WHERE SummitID = {$this->getId()} AND Published = 1
-)
-SQL;
-        $rsm = new ResultSetMappingBuilder($this->getEM());
-        $rsm->addRootEntityFromClassMetadata(\models\summit\PresentationSpeaker::class, 's', []);
-        // build rsm here
-        $native_query = $this->getEM()->createNativeQuery($query, $rsm);
-        return $native_query;
+        return $this->createQueryBuilder()
+            ->select('distinct ps')
+            ->from('models\summit\PresentationSpeaker','ps')
+            ->join('ps.moderated_presentations','p')
+            ->join('p.summit','s')
+            ->where("s.id = :summit_id and p.published = 1")
+            ->setParameter('summit_id', $this->getId());
     }
 
     /**
@@ -712,7 +700,7 @@ SQL;
      */
     public function getSpeakers(){
         // moderators
-        $moderators = $this->buildModeratorsQuery()->getResult();
+        $moderators = $this->buildModeratorsQuery()->getQuery()->getResult();
         // get moderators ids to exclude from speakers
         $moderators_ids = array();
         foreach($moderators as $m){

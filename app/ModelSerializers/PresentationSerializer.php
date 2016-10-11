@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\Presentation;
+
 /**
  * Class PresentationSerializer
  * @package ModelSerializers
@@ -54,9 +56,11 @@ class PresentationSerializer extends SummitEventSerializer
     {
         if(!count($relations)) $relations = $this->getAllowedRelations();
 
-        $values = parent::serialize($expand, $fields, $relations, $params);
-
         $presentation = $this->object;
+
+        if(!$presentation instanceof Presentation) return [];
+
+        $values = parent::serialize($expand, $fields, $relations, $params);
 
         if(in_array('speakers', $relations)) {
             $values['speakers'] = $presentation->getSpeakerIds();
@@ -104,6 +108,9 @@ class PresentationSerializer extends SummitEventSerializer
                             $speakers[] = SerializerRegistry::getInstance()->getSerializer($s)->serialize();
                         }
                         $values['speakers'] = $speakers;
+                        if(isset($values['moderator_speaker_id']) && intval($values['moderator_speaker_id']) > 0 ){
+                            $values['moderator'] = SerializerRegistry::getInstance()->getSerializer($presentation->getModerator())->serialize();
+                        }
                     }
                     break;
                 }

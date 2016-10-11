@@ -168,10 +168,16 @@ class PresentationSpeaker extends SilverstripeBaseModel
      */
     private $presentations;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Presentation", mappedBy="moderator", cascade={"persist"})
+     */
+    private $moderated_presentations;
+
     public function __construct()
     {
         parent::__construct();
-        $this->presentations = new ArrayCollection;
+        $this->presentations           = new ArrayCollection;
+        $this->moderated_presentations = new ArrayCollection;
     }
 
     /**
@@ -198,6 +204,22 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param null|int $summit_id
+     * @param bool|true $published_ones
+     * @return Presentation[]
+     */
+    public function moderated_presentations($summit_id, $published_ones = true)
+    {
+
+        return $this->moderated_presentations
+            ->filter(function($p) use($published_ones, $summit_id){
+                $res = $published_ones? $p->isPublished(): true;
+                $res &= is_null($summit_id)? true : $p->getSummit()->getId() == $summit_id;
+                return $res;
+            });
+    }
+
+    /**
      * @param int $presentation_id
      * @return Presentation
      */
@@ -205,6 +227,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     {
         return $this->presentations->get($presentation_id);
     }
+
     /**
      * @param null $summit_id
      * @param bool|true $published_ones
@@ -214,6 +237,43 @@ class PresentationSpeaker extends SilverstripeBaseModel
     {
         return $this->presentations($summit_id, $published_ones)->map(function($entity)  {
             return $entity->getId();
+        })->toArray();
+    }
+
+    /**
+     * @param null $summit_id
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getPresentations($summit_id, $published_ones = true)
+    {
+        return $this->presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity;
+        })->toArray();
+    }
+
+
+    /**
+     * @param null $summit_id
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getModeratedPresentationIds($summit_id, $published_ones = true)
+    {
+        return $this->moderated_presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity->getId();
+        })->toArray();
+    }
+
+    /**
+     * @param null $summit_id
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getModeratedPresentations($summit_id, $published_ones = true)
+    {
+        return $this->moderated_presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity;
         })->toArray();
     }
 
