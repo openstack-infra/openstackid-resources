@@ -104,5 +104,11 @@ class RepositoriesProvider extends ServiceProvider
             function(){
                 return  EntityManager::getRepository(\models\summit\SummitPushNotification::class);
             });
+
+        App::singleton(
+            'Models\foundation\main\repositories\ITagRepository',
+            function(){
+                return  EntityManager::getRepository(\models\main\Tag::class);
+            });
     }
 }

@@ -587,11 +587,11 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @param string $tag
+     * @param Tag $tag
      */
-    public function addTag($tag)
+    public function addTag(Tag $tag)
     {
-        $this->tags->add(new Tag($tag));
+        $this->tags->add($tag);
     }
 
     public function clearTags()

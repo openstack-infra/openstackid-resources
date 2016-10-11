@@ -1,4 +1,4 @@
-<?php namespace repositories\summit;
+<?php namespace Models\foundation\main\repositories;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +12,17 @@
  * limitations under the License.
  **/
 
-use Models\foundation\main\repositories\IMemberRepository;
-use models\main\Member;
-use repositories\SilverStripeDoctrineRepository;
+use models\utils\IBaseRepository;
 
 /**
- * Class DoctrineMemberRepository
- * @package repositories\summit
+ * Interface ITagRepository
+ * @package Models\foundation\main\repositories
  */
-final class DoctrineMemberRepository extends SilverStripeDoctrineRepository implements IMemberRepository
+interface ITagRepository extends IBaseRepository
 {
-
     /**
-     * @param string $email
-     * @return Member
+     * @param string $tag
+     * @return Tag
      */
-    public function getByEmail($email)
-    {
-        // TODO: Implement getByEmail() method.
-    }
+    public function getByTag($tag);
 }

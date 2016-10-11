@@ -949,23 +949,26 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testUpdateEvent()
     {
-        $event = $this->testPostEvent();
+        /*$event = $this->testPostEvent();
         unset($event->summit_types);
-        unset($event->tags);
+        unset($event->tags);*/
         $params  = array
         (
             'id'       => 6,
-            'event_id' => $event->getId(),
+            'event_id' => 15303,
         );
+
+        $data = array
+        (
+            'tags' => ['keystone'],
+        );
+
 
         $headers = array
         (
             "HTTP_Authorization" => " Bearer " .$this->access_token,
             "CONTENT_TYPE" => "application/json"
         );
-
-        $event->title .= ' update';
-
 
         $response = $this->action
         (
@@ -976,13 +979,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             array(),
             array(),
             $headers,
-            json_encode($event)
+            json_encode($data)
         );
 
         $this->assertResponseStatus(200);
         $content = $response->getContent();
         $event   = json_decode($content);
-        $this->assertTrue($event->getId() > 0);
+        $this->assertTrue($event->id > 0);
         return $event;
 
     }

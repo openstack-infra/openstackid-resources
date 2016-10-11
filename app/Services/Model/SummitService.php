@@ -20,8 +20,10 @@ use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use Models\foundation\main\repositories\IMemberRepository;
+use Models\foundation\main\repositories\ITagRepository;
 use Models\foundation\summit\EntityEvents\EntityEventTypeFactory;
 use Models\foundation\summit\EntityEvents\SummitEntityEventProcessContext;
+use models\main\Tag;
 use models\summit\ConfirmationExternalOrderRequest;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitAttendeeRepository;
@@ -91,6 +93,11 @@ final class SummitService implements ISummitService
      */
     private $attendee_repository;
 
+    /**
+     * @var ITagRepository
+     */
+    private $tag_repository;
+
     public function __construct
     (
         ISummitEventRepository $event_repository,
@@ -99,6 +106,7 @@ final class SummitService implements ISummitService
         ISummitAttendeeTicketRepository $ticket_repository,
         ISummitAttendeeRepository       $attendee_repository,
         IMemberRepository $member_repository,
+        ITagRepository $tag_repository,
         IEventbriteAPI $eventbrite_api,
         ITransactionService $tx_service
     )
@@ -109,6 +117,7 @@ final class SummitService implements ISummitService
         $this->ticket_repository        = $ticket_repository;
         $this->member_repository        = $member_repository;
         $this->attendee_repository      = $attendee_repository;
+        $this->tag_repository           = $tag_repository;
         $this->eventbrite_api           = $eventbrite_api;
         $this->tx_service               = $tx_service;
     }
@@ -415,7 +424,9 @@ final class SummitService implements ISummitService
 
             if (isset($data['tags']) && count($data['tags']) > 0) {
                 $event->clearTags();
-                foreach ($data['tags'] as $tag) {
+                foreach ($data['tags'] as $str_tag) {
+                    $tag = $this->tag_repository->getByTag($str_tag);
+                    if($tag == null) $tag = new Tag($str_tag);
                     $event->addTag($tag);
                 }
             }
