@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Models\foundation\main\repositories\ITagRepository;
+use models\main\ITagRepository;
 use models\main\Tag;
 use repositories\SilverStripeDoctrineRepository;
 
@@ -19,7 +19,7 @@ use repositories\SilverStripeDoctrineRepository;
  * Class DoctrineTagRepository
  * @package repositories\main
  */
-final class DoctrineTagRepository extends SilverStripeDoctrineRepository  implements ITagRepository
+final class DoctrineTagRepository extends SilverStripeDoctrineRepository implements ITagRepository
 {
 
     /**

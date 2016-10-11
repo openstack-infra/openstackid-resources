@@ -1,4 +1,5 @@
-<?php namespace Models\foundation\main\repositories;
+<?php namespace models\main;
+
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,7 @@ use models\utils\IBaseRepository;
 
 /**
  * Interface ITagRepository
- * @package Models\foundation\main\repositories
+ * @package models\main
  */
 interface ITagRepository extends IBaseRepository
 {

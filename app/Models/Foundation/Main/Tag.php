@@ -16,8 +16,9 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
- * @ORM\Entity(repositoryClass="repositories\main\DoctrineTagRepository")
+ * @ORM\Entity
  * @ORM\Table(name="Tag")
+ * @ORM\Entity(repositoryClass="repositories\main\DoctrineTagRepository")
  * Class Tag
  * @package models\main
  */

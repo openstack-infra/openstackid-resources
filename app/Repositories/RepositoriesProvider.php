@@ -82,7 +82,7 @@ class RepositoriesProvider extends ServiceProvider
 
 
         App::singleton(
-            'Models\foundation\main\repositories\IMemberRepository',
+            'models\main\IMemberRepository',
             function(){
                 return  EntityManager::getRepository(\models\main\Member::class);
         });
@@ -106,7 +106,7 @@ class RepositoriesProvider extends ServiceProvider
             });
 
         App::singleton(
-            'Models\foundation\main\repositories\ITagRepository',
+            'models\main\ITagRepository',
             function(){
                 return  EntityManager::getRepository(\models\main\Tag::class);
             });

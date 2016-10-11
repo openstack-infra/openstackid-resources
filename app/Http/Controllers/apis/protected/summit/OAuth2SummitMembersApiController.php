@@ -12,25 +12,11 @@
  * limitations under the License.
  **/
 
-use Exception;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Validator;
-use models\exceptions\EntityNotFoundException;
-use models\exceptions\ValidationException;
-use Models\foundation\main\repositories\IMemberRepository;
+use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
-use models\summit\IEventFeedbackRepository;
-use models\summit\ISpeakerRepository;
-use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
-use services\model\ISummitService;
-use utils\Filter;
-use utils\FilterParser;
-use utils\PagingInfo;
-use utils\PagingResponse;
 
 /**
  * Class OAuth2SummitMembersApiController

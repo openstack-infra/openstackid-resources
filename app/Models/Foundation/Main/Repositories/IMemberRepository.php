@@ -1,4 +1,4 @@
-<?php namespace Models\foundation\main\repositories;
+<?php namespace models\main;
 
 /**
  * Copyright 2016 OpenStack Foundation
@@ -13,12 +13,11 @@
  * limitations under the License.
  **/
 
-use models\main\Member;
 use models\utils\IBaseRepository;
 
 /**
  * Interface IMemberRepository
- * @package Models\foundation\main\repositories
+ * @package models\main
  */
 interface IMemberRepository extends IBaseRepository
 {

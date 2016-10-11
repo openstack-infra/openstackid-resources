@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 
-use Models\foundation\main\repositories\IMemberRepository;
+use models\main\IMemberRepository;
 use models\main\Member;
 use repositories\SilverStripeDoctrineRepository;
 

@@ -81,7 +81,7 @@ class EventServiceProvider extends ServiceProvider
             if(!$event instanceof SummitEventCreated) return;
 
             $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
-            $member_repository               = App::make(\Models\foundation\main\repositories\IMemberRepository::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
 
@@ -108,7 +108,7 @@ class EventServiceProvider extends ServiceProvider
         {
 
             $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
-            $member_repository               = App::make(\Models\foundation\main\repositories\IMemberRepository::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
 
@@ -137,7 +137,7 @@ class EventServiceProvider extends ServiceProvider
             if(!$args instanceof PreUpdateEventArgs) return;
 
             $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
-            $member_repository               = App::make(\Models\foundation\main\repositories\IMemberRepository::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
 
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
@@ -172,7 +172,7 @@ class EventServiceProvider extends ServiceProvider
             if(!$args instanceof PreRemoveEventArgs) return;
 
             $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
-            $member_repository               = App::make(\Models\foundation\main\repositories\IMemberRepository::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
             $params = $args->getParams();

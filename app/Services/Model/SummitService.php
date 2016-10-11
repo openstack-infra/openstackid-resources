@@ -19,8 +19,8 @@ use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
-use Models\foundation\main\repositories\IMemberRepository;
-use Models\foundation\main\repositories\ITagRepository;
+use models\main\IMemberRepository;
+use models\main\ITagRepository;
 use Models\foundation\summit\EntityEvents\EntityEventTypeFactory;
 use Models\foundation\summit\EntityEvents\SummitEntityEventProcessContext;
 use models\main\Tag;
@@ -98,17 +98,29 @@ final class SummitService implements ISummitService
      */
     private $tag_repository;
 
+    /**
+     * SummitService constructor.
+     * @param ISummitEventRepository $event_repository
+     * @param ISpeakerRepository $speaker_repository
+     * @param ISummitEntityEventRepository $entity_events_repository
+     * @param ISummitAttendeeTicketRepository $ticket_repository
+     * @param ISummitAttendeeRepository $attendee_repository
+     * @param IMemberRepository $member_repository
+     * @param ITagRepository $tag_repository
+     * @param IEventbriteAPI $eventbrite_api
+     * @param ITransactionService $tx_service
+     */
     public function __construct
     (
-        ISummitEventRepository $event_repository,
-        ISpeakerRepository $speaker_repository,
-        ISummitEntityEventRepository $entity_events_repository,
+        ISummitEventRepository          $event_repository,
+        ISpeakerRepository              $speaker_repository,
+        ISummitEntityEventRepository    $entity_events_repository,
         ISummitAttendeeTicketRepository $ticket_repository,
         ISummitAttendeeRepository       $attendee_repository,
-        IMemberRepository $member_repository,
-        ITagRepository $tag_repository,
-        IEventbriteAPI $eventbrite_api,
-        ITransactionService $tx_service
+        IMemberRepository               $member_repository,
+        ITagRepository                  $tag_repository,
+        IEventbriteAPI                  $eventbrite_api,
+        ITransactionService             $tx_service
     )
     {
         $this->event_repository         = $event_repository;
