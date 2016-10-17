@@ -44,16 +44,18 @@ class SummitGeoLocatedLocationSerializer extends SummitAbstractLocationSerialize
         $location = $this->object;
 
         $maps   = array();
-        foreach($location->getMaps() as $m)
+        foreach($location->getMaps() as $image)
         {
-            $maps[] = SerializerRegistry::getInstance()->getSerializer($m)->serialize();
+            if(!$image->hasPicture()) continue;
+            $maps[] = SerializerRegistry::getInstance()->getSerializer($image)->serialize();
         }
         $values['maps'] = $maps;
 
         $images   = array();
-        foreach($location->getImages() as $i)
+        foreach($location->getImages() as $image)
         {
-            $images[] = SerializerRegistry::getInstance()->getSerializer($i)->serialize();
+            if(!$image->hasPicture()) continue;
+            $images[] = SerializerRegistry::getInstance()->getSerializer($image)->serialize();
         }
         $values['images'] = $images;
 

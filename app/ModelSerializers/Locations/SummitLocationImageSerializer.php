@@ -38,7 +38,7 @@ class SummitLocationImageSerializer  extends SilverStripeSerializer
      */
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
-        $values   = parent::serialize($expand, $fields, $relations, $params);
+        $values = parent::serialize($expand, $fields, $relations, $params);
 
         if($this->object->hasPicture())
         {

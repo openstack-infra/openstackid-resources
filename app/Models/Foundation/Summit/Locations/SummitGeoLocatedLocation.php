@@ -32,7 +32,6 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
         return 'SummitGeoLocatedLocation';
     }
 
-
     /**
      * @ORM\Column(name="Address1", type="string")
      */
