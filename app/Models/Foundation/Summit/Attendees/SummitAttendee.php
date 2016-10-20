@@ -213,8 +213,7 @@ class SummitAttendee extends SilverstripeBaseModel
         $sql = <<<SQL
 SELECT COUNT(SummitEventID) AS QTY 
 FROM SummitAttendee_Schedule 
-INNER JOIN SummitEvent ON SummitEvent.ID = SummitAttendee_Schedule.SummitEventID
-WHERE SummitAttendeeID = :attendee_id AND SummitEvent.Published = 1 AND SummitEvent.ID = :event_id
+WHERE SummitAttendeeID = :attendee_id AND SummitEventID = :event_id
 SQL;
 
         $stmt = $this->prepareRawSQL($sql);
@@ -236,7 +235,7 @@ SQL;
             $query = $this->createQuery("SELECT s from models\summit\SummitAttendeeSchedule s 
         JOIN s.attendee a 
         JOIN s.event e    
-        WHERE a.id = :attendee_id and e.published = 1 and e.id = :event_id
+        WHERE a.id = :attendee_id and e.id = :event_id
         ");
             return $query
                 ->setParameter('attendee_id', $this->getIdentifier())
@@ -244,6 +243,10 @@ SQL;
                 ->getSingleResult();
         }
         catch(NoResultException $ex1){
+            return null;
+        }
+        catch(NonUniqueResultException $ex2){
+            // should never happen
             return null;
         }
     }
