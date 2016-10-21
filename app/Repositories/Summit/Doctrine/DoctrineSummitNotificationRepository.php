@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use models\summit\ISummitNotificationRepository;
