@@ -46,14 +46,15 @@ final class DoctrineTransactionService implements ITransactionService
      */
     public function transaction(Closure $callback)
     {
-        $em = Registry::getManager($this->manager_name);
+        $em  = Registry::getManager($this->manager_name);
+        $con = $em->getConnection();
         try {
-            $em->getConnection()->beginTransaction(); // suspend auto-commit
+            $con->beginTransaction(); // suspend auto-commit
             $result = $callback($this);
             $em->flush();
-            $em->getConnection()->commit();
+            $con->commit();
         } catch (\Exception $e) {
-            $em->getConnection()->rollBack();
+            $con->rollBack();
             throw $e;
         }
         return $result;

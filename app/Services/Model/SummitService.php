@@ -15,6 +15,7 @@
 
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
+use Doctrine\DBAL\Driver\PDOException;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
@@ -140,17 +141,26 @@ final class SummitService implements ISummitService
      * @param int $event_id
      * @return void
      * @throws EntityNotFoundException
+     * @throws ValidationException
      */
     public function addEventToAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id)
     {
-        $this->tx_service->transaction(function () use ($summit, $attendee, $event_id) {
-            $event = $summit->getScheduleEvent($event_id);
-            if (is_null($event)) {
-                throw new EntityNotFoundException('event not found on summit!');
-            }
-            $attendee->add2Schedule($event);
-        });
-        Event::fire(new MyScheduleAdd($attendee, $event_id));
+        try {
+            $this->tx_service->transaction(function () use ($summit, $attendee, $event_id) {
+                $event = $summit->getScheduleEvent($event_id);
+                if (is_null($event)) {
+                    throw new EntityNotFoundException('event not found on summit!');
+                }
+                $attendee->add2Schedule($event);
+            });
+            Event::fire(new MyScheduleAdd($attendee, $event_id));
+        }
+        catch (PDOException $ex){
+            throw new ValidationException
+            (
+                sprintf('Event %s already belongs to attendee %s schedule.', $event_id, $attendee->getId())
+            );
+        }
     }
 
     /**
