@@ -15,7 +15,7 @@
 
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
-use Doctrine\DBAL\Driver\PDOException;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
@@ -155,7 +155,7 @@ final class SummitService implements ISummitService
             });
             Event::fire(new MyScheduleAdd($attendee, $event_id));
         }
-        catch (PDOException $ex){
+        catch (UniqueConstraintViolationException $ex){
             throw new ValidationException
             (
                 sprintf('Event %s already belongs to attendee %s schedule.', $event_id, $attendee->getId())
