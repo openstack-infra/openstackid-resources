@@ -12,6 +12,9 @@
  * limitations under the License.
  **/
 
+use App\Events\PresentationMaterialDeleted;
+use App\Events\PresentationMaterialUpdated;
+use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\factories\IPresentationVideoFactory;
@@ -90,7 +93,7 @@ final class PresentationService implements IPresentationService
      */
     public function updateVideo($presentation_id, $video_id, array $video_data)
     {
-        return $this->tx_service->transaction(function() use($presentation_id, $video_id, $video_data){
+        $video = $this->tx_service->transaction(function() use($presentation_id, $video_id, $video_data){
 
             $presentation = $this->presentation_repository->getById($presentation_id);
 
@@ -120,6 +123,8 @@ final class PresentationService implements IPresentationService
             return $video;
 
         });
+        Event::fire(new PresentationMaterialUpdated($video));
+        return $video;
     }
 
     /**
@@ -149,6 +154,8 @@ final class PresentationService implements IPresentationService
 
             $presentation->removeVideo($video);
 
+            Event::fire(new PresentationMaterialDeleted($presentation, $video_id, 'PresentationVideo'));
         });
+
     }
 }

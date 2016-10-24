@@ -1787,12 +1787,12 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testAddPresentationVideo()
+    public function testAddPresentationVideo($summit_id = 7, $presentation_id = 15404)
     {
         $params  = array
         (
-            'id'              => 7,
-            'presentation_id' => 15404
+            'id'              => $summit_id,
+            'presentation_id' => $presentation_id
         );
 
         $headers = array
@@ -1821,18 +1821,20 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             json_encode($video_data)
         );
 
-        $content = $response->getContent();
+        $video_id = $response->getContent();
         $this->assertResponseStatus(201);
-
+        return intval($video_id);
     }
 
     public function testUpdatePresentationVideo()
     {
+        $video_id = $this->testAddPresentationVideo(7, 15404);
+
         $params  = array
         (
             'id'              => 7,
             'presentation_id' => 15404,
-            'video_id'        => 32801
+            'video_id'        => $video_id
         );
 
         $headers = array
@@ -1866,11 +1868,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testDeletePresentationVideo()
     {
+        $video_id = $this->testAddPresentationVideo(7, 15404);
+
         $params  = array
         (
             'id'              => 7,
             'presentation_id' => 15404,
-            'video_id'        => 32800
+            'video_id'        => $video_id
         );
 
         $headers = array
