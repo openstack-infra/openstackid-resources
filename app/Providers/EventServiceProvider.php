@@ -123,6 +123,61 @@ class EventServiceProvider extends ServiceProvider
             }
 
             $entity_event->setSummit($event->getMaterial()->getPresentation()->getSummit());
+            $entity_event->setMetadata(json_encode([ 'presentation_id' => intval($event->getMaterial()->getPresentation()->getId())]));
+
+            $em = Registry::getManager('ss');
+            $em->persist($entity_event);
+            $em->flush();
+
+        });
+
+        Event::listen(\App\Events\PresentationMaterialUpdated::class, function($event)
+        {
+
+            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
+            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
+            if(is_null($owner_id)) $owner_id = 0;
+
+            $entity_event                  = new SummitEntityEvent;
+            $entity_event->setEntityClassName($event->getMaterial()->getClassName());
+            $entity_event->setEntityId($event->getMaterial()->getId());
+            $entity_event->setType('UPDATE');
+
+            if($owner_id > 0){
+                $member = $member_repository->getById($owner_id);
+                $entity_event->setOwner($member);
+            }
+
+            $entity_event->setSummit($event->getMaterial()->getPresentation()->getSummit());
+            $entity_event->setMetadata(json_encode([ 'presentation_id' => intval($event->getMaterial()->getPresentation()->getId())]));
+
+            $em = Registry::getManager('ss');
+            $em->persist($entity_event);
+            $em->flush();
+
+        });
+
+        Event::listen(\App\Events\PresentationMaterialDeleted::class, function($event)
+        {
+
+            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
+            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
+            if(is_null($owner_id)) $owner_id = 0;
+
+            $entity_event = new SummitEntityEvent;
+            $entity_event->setEntityClassName($event->getClassName());
+            $entity_event->setEntityId($event->getMaterialId());
+            $entity_event->setType('DELETE');
+
+            if($owner_id > 0){
+                $member = $member_repository->getById($owner_id);
+                $entity_event->setOwner($member);
+            }
+
+            $entity_event->setSummit($event->getPresentation()->getSummit());
+            $entity_event->setMetadata();
 
             $em = Registry::getManager('ss');
             $em->persist($entity_event);
