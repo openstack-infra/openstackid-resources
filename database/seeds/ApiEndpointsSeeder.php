@@ -590,6 +590,25 @@ class ApiEndpointsSeeder extends Seeder
 
         //videos
 
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-presentation-videos',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos',
+                'http_method' => 'GET'
+            )
+        );
+
+        ApiEndpoint::create(
+            array(
+                'name' => 'get-presentation-video',
+                'active' => true,
+                'api_id' => $summit->id,
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/video/{video_id}',
+                'http_method' => 'GET'
+            )
+        );
 
         ApiEndpoint::create(
             array(
@@ -710,6 +729,10 @@ class ApiEndpointsSeeder extends Seeder
         $endpoint = ApiEndpoint::where('name', '=', 'get-location-published-events')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
         $endpoint = ApiEndpoint::where('name', '=', 'get-location-events')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-presentation-videos')->first();
+        $endpoint->scopes()->attach($summit_read_scope->id);
+        $endpoint = ApiEndpoint::where('name', '=', 'get-presentation-video')->first();
         $endpoint->scopes()->attach($summit_read_scope->id);
 
         // read external orders

@@ -15,6 +15,7 @@
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
+use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
@@ -22,6 +23,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request as LaravelRequest;
 use Exception;
+use models\utils\IEntity;
+use ModelSerializers\SerializerRegistry;
 use services\model\IPresentationService;
 
 /**
@@ -40,15 +43,22 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
      */
     private $presentation_service;
 
+    /**
+     * @var ISummitEventRepository
+     */
+    private $presentation_repository;
+
+
     public function __construct
     (
         IPresentationService $presentation_service,
         ISummitRepository $summit_repository,
+        ISummitEventRepository $presentation_repository,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
-
+        $this->presentation_repository = $presentation_repository;
         $this->presentation_service    = $presentation_service;
         $this->summit_repository       = $summit_repository;
     }
@@ -62,6 +72,24 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if (is_null($presentation)) return $this->error404();
+
+            $videos = $presentation->getVideos();
+
+            $items = [];
+            foreach($videos as $i)
+            {
+                if($i instanceof IEntity)
+                {
+                    $i = SerializerRegistry::getInstance()->getSerializer($i)->serialize();
+                }
+                $items[] = $i;
+            }
+
+            return $this->ok($items);
+
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -69,7 +97,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
     }
 
 
-    public function getPresentationVideo($summit_id, $presentation_id,$video_id){
+    public function getPresentationVideo($summit_id, $presentation_id, $video_id){
         try {
             $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
