@@ -193,6 +193,7 @@ final class SummitService implements ISummitService
             if (is_null($event)) throw new EntityNotFoundException('event not found on summit!');
             $attendee->removeFromSchedule($event);
         });
+
         Event::fire(new MyScheduleRemove($attendee, $event_id));
     }
 
@@ -271,7 +272,9 @@ final class SummitService implements ISummitService
                 );
 
                 foreach ($events as $e) {
+
                     if ($ctx->getListSize() === $limit) break;
+
                     $last_event_id               = $e->getId();
                     $last_event_date             = $e->getCreated();
                     try {
