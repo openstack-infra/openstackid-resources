@@ -53,5 +53,6 @@ class Kernel extends HttpKernel
         'etags'            => \App\Http\Middleware\ETagsMiddleware::class,
         'cache'            => \App\Http\Middleware\CacheMiddleware::class,
         'ssl'              => \App\Http\Middleware\SSLMiddleware::class,
+        'auth.user'        => \App\Http\Middleware\UserAuthEndpoint::class,
     ];
 }

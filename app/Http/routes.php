@@ -95,15 +95,15 @@ Route::group(array(
 
                 Route::get('', 'OAuth2SummitEventsApiController@getEvents');
                 Route::get('/published', 'OAuth2SummitEventsApiController@getScheduledEvents');
-                Route::post('', 'OAuth2SummitEventsApiController@addEvent');
+                Route::post('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@addEvent']);
                 Route::group(array('prefix' => '{event_id}'), function () {
 
                     Route::get('', 'OAuth2SummitEventsApiController@getEvent');
                     Route::get('/published', 'OAuth2SummitEventsApiController@getScheduledEvent');
-                    Route::put('', 'OAuth2SummitEventsApiController@updateEvent');
-                    Route::delete('', 'OAuth2SummitEventsApiController@deleteEvent');
-                    Route::put('/publish', 'OAuth2SummitEventsApiController@publishEvent');
-                    Route::delete('/publish', 'OAuth2SummitEventsApiController@unPublishEvent');
+                    Route::put('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@updateEvent' ]);
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@deleteEvent' ]);
+                    Route::put('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@publishEvent']);
+                    Route::delete('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvent']);
                     Route::post('/feedback', 'OAuth2SummitEventsApiController@addEventFeedback');
                     Route::get('/feedback/{attendee_id?}', 'OAuth2SummitEventsApiController@getEventFeedback')->where('attendee_id', 'me|[0-9]+');
                 });
@@ -116,10 +116,10 @@ Route::group(array(
                     Route::group(array('prefix' => 'videos'), function () {
                         Route::get('', 'OAuth2PresentationApiController@getPresentationVideos');
                         Route::get('{video_id}', 'OAuth2PresentationApiController@getPresentationVideo');
-                        Route::post('', 'OAuth2PresentationApiController@addVideo');
+                        Route::post('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@addVideo' ]);
                         Route::group(array('prefix' => '{video_id}'), function () {
-                            Route::put('', 'OAuth2PresentationApiController@updateVideo');
-                            Route::delete('', 'OAuth2PresentationApiController@deleteVideo');
+                            Route::put('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@updateVideo' ]);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@deleteVideo' ]);
                         });
                     });
                 });

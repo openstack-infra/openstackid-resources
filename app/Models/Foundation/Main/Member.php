@@ -28,7 +28,7 @@ use Doctrine\ORM\Mapping AS ORM;
 class Member extends SilverstripeBaseModel
 {
     /**
-     * @return mixed
+     * @return Group[]
      */
     public function getGroups()
     {
@@ -55,6 +55,7 @@ class Member extends SilverstripeBaseModel
      *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="GroupID", referencedColumnName="ID")}
      *      )
+     * @var Group[]
      */
     private $groups;
 
