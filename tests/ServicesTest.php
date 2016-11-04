@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-class ServicesTest  extends TestCase
+class ServicesTest extends TestCase
 {
     public function testAccessTokenService(){
         $cache          = App::make('libs\utils\ICacheService');
@@ -32,7 +32,7 @@ class ServicesTest  extends TestCase
         ];
         $cache->storeHash(md5($token_value), $token_info, $cache_lifetime );
         sleep(10);
-        $service = App::make('models\resource_server\IAccessTokenService');
+        $service = App::make('App\Models\ResourceServer\IAccessTokenService');
         $service->get($token_value);
     }
 }

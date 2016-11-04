@@ -17,7 +17,7 @@ use Closure;
 use Illuminate\Support\Facades\Response;
 use libs\utils\ICacheService;
 use libs\utils\RequestUtils;
-use models\resource_server\IApiEndpointRepository;
+use App\Models\ResourceServer\IApiEndpointRepository;
 
 /**
  * Class RateLimitMiddleware
@@ -63,11 +63,11 @@ final class RateLimitMiddleware
         $url = $request->getRequestUri();
 
         try {
-            $route = RequestUtils::getCurrentRoutePath($request);
-            $method = $request->getMethod();
+            $route    = RequestUtils::getCurrentRoutePath($request);
+            $method   = $request->getMethod();
             $endpoint = $this->endpoint_repository->getApiEndpointByUrlAndMethod($route, $method);
 
-            if (!is_null($endpoint->rate_limit) && ($requestsPerHour = (int)$endpoint->rate_limit) > 0) {
+            if (!is_null($endpoint->getRateLimit()) && ($requestsPerHour = (int)$endpoint->getRateLimit()) > 0) {
                 //do rate limit checking
                 $key = sprintf('rate.limit.%s_%s_%s', $url, $method, $request->getClientIp());
                 // Add if doesn't exist

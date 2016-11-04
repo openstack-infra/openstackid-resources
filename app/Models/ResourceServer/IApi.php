@@ -1,4 +1,4 @@
-<?php namespace models\resource_server;
+<?php namespace App\Models\ResourceServer;
 /**
 * Copyright 2015 OpenStack Foundation
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,11 +14,10 @@
 
 /**
 * Interface IApi
-* @package models\resource_server
+* @package App\Models\ResourceServer
 */
 interface IApi
 {
-
 	/**
 	* @return string
 	*/
@@ -55,16 +54,16 @@ interface IApi
 	* @param bool $active
 	* @return void
 	*/
-	public function setStatus($active);
+	public function setActive($active);
 
 	/**
 	* @return IApiEndpoint[]
 	*/
-	public function endpoints();
+	public function getEndpoints();
 
 	/**
 	* @return IApiScope[]
 	*/
-	public function scopes();
+	public function getScopes();
 
 }

@@ -19,6 +19,7 @@ use models\utils\SilverstripeBaseModel;
 /**
  * @ORM\Entity
  * @ORM\Table(name="Company")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="sponsors_region")
  * Class Company
  * @package models\main
  */

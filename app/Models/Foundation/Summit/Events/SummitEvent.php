@@ -551,6 +551,7 @@ class SummitEvent extends SilverstripeBaseModel
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="event", cascade={"persist"})
+     * @ORM\Cache("NONSTRICT_READ_WRITE")
      * @var SummitEventFeedback[]
      */
     protected $feedback;

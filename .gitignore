@@ -1,7 +1,6 @@
 /vendor
 /node_modules
 composer.phar
-composer.lock
 .DS_Storeapp/storage
 .idea/*
 app/config/dev/*
@@ -23,5 +22,5 @@ doc/build
 *.egg-info
 .env.testing
 .env
-storage/logs/*
+storage/*
 *.log

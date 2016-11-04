@@ -44,10 +44,12 @@ class RepositoriesProvider extends ServiceProvider
             'models\marketplace\IConsultantRepository',
             'repositories\marketplace\EloquentConsultantRepository'
         );
+
         App::singleton(
-            'models\resource_server\IApiEndpointRepository',
-            'repositories\resource_server\EloquentApiEndpointRepository'
-        );
+            'App\Models\ResourceServer\IApiEndpointRepository',
+            function(){
+                return  EntityManager::getRepository(\App\Models\ResourceServer\ApiEndpoint::class);
+        });
 
         App::singleton(
             'models\summit\ISummitRepository',
@@ -78,7 +80,6 @@ class RepositoriesProvider extends ServiceProvider
             function(){
                 return  EntityManager::getRepository(\models\summit\SummitEntityEvent::class);
         });
-
 
 
         App::singleton(

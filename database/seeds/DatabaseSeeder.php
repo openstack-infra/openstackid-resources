@@ -3,7 +3,10 @@
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class DatabaseSeeder extends Seeder
+/**
+ * Class DatabaseSeeder
+ */
+final class DatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,7 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // $this->call(UsersTableSeeder::class);
-	Model::unguard();
+	    Model::unguard();
         $this->call('ApiSeeder');
         $this->call('ApiScopesSeeder');
         $this->call('ApiEndpointsSeeder');

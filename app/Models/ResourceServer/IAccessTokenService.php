@@ -1,4 +1,4 @@
-<?php namespace models\resource_server;
+<?php namespace App\Models\ResourceServer;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -18,7 +18,7 @@ use models\oauth2\AccessToken;
 
 /**
  * Interface IAccessTokenService
- * @package models\resource_server
+ * @package App\Models\ResourceServer
  */
 interface IAccessTokenService
 {

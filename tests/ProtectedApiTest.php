@@ -15,7 +15,7 @@
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use models\oauth2\AccessToken;
-use models\resource_server\IAccessTokenService;
+use App\Models\ResourceServer\IAccessTokenService;
 
 /**
  * Class AccessTokenServiceStub
@@ -102,7 +102,7 @@ abstract class ProtectedApiTest extends TestCase
     public function createApplication()
     {
         $app = parent::createApplication();
-        App::singleton('models\resource_server\IAccessTokenService', 'AccessTokenServiceStub');
+        App::singleton('App\Models\ResourceServer\IAccessTokenService', 'AccessTokenServiceStub');
 
         return $app;
     }

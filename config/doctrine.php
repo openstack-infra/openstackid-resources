@@ -213,7 +213,20 @@ return [
     'cache'                     => [
         'default'                => env('DOCTRINE_CACHE', 'redis'),
         'namespace'              => null,
-        'second_level'           => true,
+        'second_level'           => [
+            'enabled'                => true,
+            'region_lifetime'        => 3600,
+            'region_lock_lifetime'   => 60,
+            'regions'                => [
+                'summit_event_feedback_region' => [
+                    'lifetime'      => 300,
+                    'lock_lifetime' => 60
+                ]
+            ],
+            'log_enabled'  => true,
+            'file_lock_region_directory' => '/tmp'
+        ]
+
     ],
     /*
     |--------------------------------------------------------------------------

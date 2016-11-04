@@ -1,4 +1,4 @@
-<?php namespace models\resource_server;
+<?php namespace App\Models\ResourceServer;
 /**
 * Copyright 2015 OpenStack Foundation
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,50 +12,136 @@
 * limitations under the License.
 **/
 
-use models\utils\BaseModelEloquent;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping AS ORM;
+
 /**
-* Class Api
-* @package models\resource_server
+ * @ORM\Entity
+ * @ORM\Table(name="apis")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="resource_server_region")
+ * Class Api
+ * @package App\Models\ResourceServer
 */
-class Api extends BaseModelEloquent implements IApi
+class Api extends ResourceServerEntity implements IApi
 {
 
-	protected $table = 'apis';
+    /**
+     * @ORM\OneToMany(targetEntity="ApiScope", mappedBy="api", cascade={"persist"})
+     */
+    private $scopes;
 
-	protected $fillable = array('name','description','active');
+    /**
+     * @ORM\OneToMany(targetEntity="ApiEndpoint", mappedBy="api", cascade={"persist"})
+     */
+    private $endpoints;
 
+    /**
+     * @ORM\Column(name="name", type="string")
+     * @var string
+     */
+    private $name;
 
-	/**
-	* @return IApiScope[]
-	*/
-	public function scopes()
-	{
-		return $this->hasMany('models\resource_server\ApiScope', 'api_id');
-	}
+    /**
+     * @ORM\Column(name="description", type="string")
+     * @var string
+     */
+    private $description;
 
-	/**
-	* @return IApiEndpoint[]
-	*/
-	public function endpoints()
-	{
-		return $this->hasMany('models\resource_server\ApiEndpoint', 'api_id');
-	}
+    /**
+     * @ORM\Column(name="active", type="boolean")
+     * @var bool
+     */
+    private $active;
 
-	/**
-	* @return string
-	*/
-	public function getName()
-	{
-		return $this->name;
-	}
+    /**
+     * Api constructor.
+     */
+	public function __construct()
+    {
+        parent::__construct();
+        $this->scopes    = new ArrayCollection();
+        $this->endpoints = new ArrayCollection();
+    }
 
-	/**
-	* @return string
-	*/
-	public function getDescription()
-	{
-		return $this->description;
-	}
+    /**
+     * @return ApiScope[]
+     */
+    public function getScopes()
+    {
+        return $this->scopes;
+    }
+
+    /**
+     * @param mixed $scopes
+     */
+    public function setScopes($scopes)
+    {
+        $this->scopes = $scopes;
+    }
+
+    /**
+     * @return ApiEndpoint[]
+     */
+    public function getEndpoints()
+    {
+        return $this->endpoints;
+    }
+
+    /**
+     * @param mixed $endpoints
+     */
+    public function setEndpoints($endpoints)
+    {
+        $this->endpoints = $endpoints;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param boolean $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    }
 
 	/**
 	* @return string
@@ -63,38 +149,16 @@ class Api extends BaseModelEloquent implements IApi
 	public function getScope()
 	{
 		$scope = '';
-		foreach ($this->scopes()->get() as $s)
+		foreach ($this->getScopes() as $s)
 		{
-			if (!$s->active)
+			if (!$s->isActive())
 			{
 				continue;
 			}
-			$scope = $scope .$s->name.' ';
+			$scope = $scope .$s->getName().' ';
 		}
 		$scope = trim($scope);
 		return $scope;
 	}
 
-	/**
-	* @return bool
-	*/
-	public function isActive()
-	{
-		return $this->active;
-	}
-
-	public function setName($name)
-	{
-		$this->name = $name;
-	}
-
-	public function setDescription($description)
-	{
-		$this->description = $description;
-	}
-
-	public function setStatus($active)
-	{
-		$this->active = $active;
-	}
 }

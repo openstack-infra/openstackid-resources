@@ -13,14 +13,15 @@
  **/
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Config;
-use models\resource_server\Api;
-use models\resource_server\ApiScope;
+use Illuminate\Support\Facades\Config;;
+use App\Models\ResourceServer\ApiScope;
+use LaravelDoctrine\ORM\Facades\EntityManager;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ApiScopesSeeder
  */
-class ApiScopesSeeder extends Seeder
+final class ApiScopesSeeder extends Seeder
 {
 
     public function run()
@@ -38,158 +39,128 @@ class ApiScopesSeeder extends Seeder
     {
 
         $current_realm = Config::get('app.url');
-        $public_clouds = Api::where('name', '=', 'public-clouds')->first();
+        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'public-clouds']);
 
-        ApiScope::create(
-            array(
-                'name' => sprintf('%s/public-clouds/read', $current_realm),
-                'short_description' => 'Get Public Clouds',
-                'description' => 'Grants read only access for Public Clouds',
-                'api_id' => $public_clouds->id,
-                'system' => false
-            )
-        );
+        $scope = new ApiScope();
+        $scope->setName(sprintf('%s/public-clouds/read', $current_realm));
+        $scope->setShortDescription('Read Public Clouds Data');
+        $scope->setDescription('Grants read only access for Public Clouds');
+        $scope->setActive(true);
+        $scope->setDefault(false);
+        $scope->setApi($api);
+
+        EntityManager::persist($scope);
+        EntityManager::flush();
     }
 
     private function seedPrivateCloudScopes()
     {
 
         $current_realm = Config::get('app.url');
-        $private_clouds = Api::where('name', '=', 'private-clouds')->first();
+        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'private-clouds']);
 
-        ApiScope::create(
-            array(
-                'name' => sprintf('%s/private-clouds/read', $current_realm),
-                'short_description' => 'Get Private Clouds',
-                'description' => 'Grants read only access for Private Clouds',
-                'api_id' => $private_clouds->id,
-                'system' => false
-            )
-        );
+        $scope = new ApiScope();
+        $scope->setName(sprintf('%s/private-clouds/read', $current_realm));
+        $scope->setShortDescription('Read Private Clouds Data');
+        $scope->setDescription('Grants read only access for Private Clouds');
+        $scope->setActive(true);
+        $scope->setDefault(false);
+        $scope->setApi($api);
+
+        EntityManager::persist($scope);
+        EntityManager::flush();
     }
 
     private function seedConsultantScopes()
     {
 
         $current_realm = Config::get('app.url');
-        $consultants = Api::where('name', '=', 'consultants')->first();
+        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'consultants']);
 
-        ApiScope::create(
-            array(
-                'name' => sprintf('%s/consultants/read', $current_realm),
-                'short_description' => 'Get Consultants',
-                'description' => 'Grants read only access for Consultants',
-                'api_id' => $consultants->id,
-                'system' => false
-            )
-        );
+        $scope = new ApiScope();
+        $scope->setName(sprintf('%s/consultants/read', $current_realm));
+        $scope->setShortDescription('Read Consultants Data');
+        $scope->setDescription('Grants read only access for Consultants');
+        $scope->setActive(true);
+        $scope->setDefault(false);
+        $scope->setApi($api);
+
+        EntityManager::persist($scope);
+        EntityManager::flush();
     }
 
     private function seedSummitScopes()
     {
 
         $current_realm = Config::get('app.url');
-        $summits = Api::where('name', '=', 'summits')->first();
+        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'summits']);
 
-        ApiScope::create(
+        $scopes = [
             array(
                 'name' => sprintf('%s/summits/read', $current_realm),
                 'short_description' => 'Get Summit Data',
                 'description' => 'Grants read only access for Summits Data',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/me/read', $current_realm),
                 'short_description' => 'Get own member data',
                 'description' => 'Grants read only access for our own member data',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/write', $current_realm),
                 'short_description' => 'Write Summit Data',
                 'description' => 'Grants write access for Summits Data',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/write-event', $current_realm),
                 'short_description' => 'Write Summit Events',
                 'description' => 'Grants write access for Summits Events',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/delete-event', $current_realm),
                 'short_description' => 'Delete Summit Events',
                 'description' => 'Grants delete access for Summits Events',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/publish-event', $current_realm),
                 'short_description' => 'Publish/UnPublish Summit Events',
                 'description' => 'Grants Publish/UnPublish access for Summits Events',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/read-external-orders', $current_realm),
                 'short_description' => 'Allow to read External Orders',
                 'description' => 'Allow to read External Orders',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/confirm-external-orders', $current_realm),
                 'short_description' => 'Allow to confirm External Orders',
                 'description' => 'Allow to confirm External Orders',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/write-videos', $current_realm),
                 'short_description' => 'Allow to write presentation videos',
                 'description' => 'Allow to write presentation videos',
-                'api_id' => $summits->id,
-                'system' => false
-            )
-        );
-
-        ApiScope::create(
+            ),
             array(
                 'name' => sprintf('%s/summits/read-notifications', $current_realm),
                 'short_description' => 'Allow to read summit notifications',
                 'description' => 'Allow to read summit notifications',
-                'api_id' => $summits->id,
-                'system' => false
             )
-        );
+        ];
+
+        foreach ($scopes as $scope_info) {
+            $scope = new ApiScope();
+            $scope->setName($scope_info['name']);
+            $scope->setShortDescription($scope_info['short_description']);
+            $scope->setDescription($scope_info['description']);
+            $scope->setActive(true);
+            $scope->setDefault(false);
+            $scope->setApi($api);
+            EntityManager::persist($scope);
+        }
+
+        EntityManager::flush();
+
     }
 
 }

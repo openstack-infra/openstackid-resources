@@ -140,7 +140,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testCurrentSummitMyAttendeeFail404()
     {
-        App::singleton('models\resource_server\IAccessTokenService', 'AccessTokenServiceStub2');
+        App::singleton('App\Models\ResourceServer\IAccessTokenService', 'AccessTokenServiceStub2');
 
         $params = array
         (
@@ -1095,8 +1095,8 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => 6,
-            'event_id' => 15027,
+            'id' => 7,
+            'event_id' => 17300,
         );
 
         $headers = array
@@ -1111,7 +1111,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             'note' => 'nice presentation, wow!',
             'attendee_id' => 'me'
         );
-
 
         $response = $this->action
         (
@@ -1360,12 +1359,12 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testGetEventFeedback()
     {
-        $this->testAddFeedback2Event();
+        //$this->testAddFeedback2Event();
 
         $params = array
         (
-            'id' => 6,
-            'event_id' => 9454,
+            'id' => 7,
+            'event_id' => 17300,
         );
 
         $headers = array
@@ -1373,6 +1372,23 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             "HTTP_Authorization" => " Bearer " . $this->access_token,
             "CONTENT_TYPE" => "application/json"
         );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getEventFeedback",
+            $params,
+            array('expand' => 'owner'),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $feedback = json_decode($content);
+        $this->assertTrue(!is_null($feedback));
 
         $response = $this->action
         (

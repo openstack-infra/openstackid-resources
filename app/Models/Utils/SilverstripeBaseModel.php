@@ -14,10 +14,10 @@
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping AS ORM;
-use Doctrine\ORM\NativeQuery;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Registry;
+
 /***
  * @ORM\MappedSuperclass
  * Class SilverstripeBaseModel
@@ -26,8 +26,9 @@ use Registry;
 class SilverstripeBaseModel implements IEntity
 {
     const DefaultTimeZone = 'America/Chicago';
+
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getCreated()
     {
@@ -35,7 +36,7 @@ class SilverstripeBaseModel implements IEntity
     }
 
     /**
-     * @param mixed $created
+     * @param \DateTime $created
      */
     public function setCreated($created)
     {
@@ -43,7 +44,7 @@ class SilverstripeBaseModel implements IEntity
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getLastEdited()
     {
@@ -51,7 +52,7 @@ class SilverstripeBaseModel implements IEntity
     }
 
     /**
-     * @param mixed $last_edited
+     * @param \DateTime $last_edited
      */
     public function setLastEdited($last_edited)
     {

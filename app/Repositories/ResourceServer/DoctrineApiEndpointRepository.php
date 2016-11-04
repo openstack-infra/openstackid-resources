@@ -1,7 +1,6 @@
 <?php namespace repositories\resource_server;
-
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,22 +14,15 @@
 
 use App\Models\ResourceServer\IApiEndpoint;
 use App\Models\ResourceServer\IApiEndpointRepository;
-use models\utils\EloquentBaseRepository;
+use repositories\DoctrineRepository;
+use Illuminate\Support\Facades\Log;
 
 /**
- * Class EloquentApiEndpointRepository
+ * Class DoctrineApiEndpointRepository
  * @package repositories\resource_server
  */
-class EloquentApiEndpointRepository extends EloquentBaseRepository implements IApiEndpointRepository
+final class DoctrineApiEndpointRepository extends DoctrineRepository implements IApiEndpointRepository
 {
-
-    /**
-     * @param IApiEndpoint $endpoint
-     */
-    public function __construct(IApiEndpoint $endpoint)
-    {
-        $this->entity = $endpoint;
-    }
 
     /**
      * @param string $url
@@ -39,18 +31,22 @@ class EloquentApiEndpointRepository extends EloquentBaseRepository implements IA
      */
     public function getApiEndpointByUrlAndMethod($url, $http_method)
     {
-        return $this->entity->Filter(array(
-            array(
-                'name' => 'route',
-                'op' => '=',
-                'value' => $url
-            ),
-            array(
-                'name' => 'http_method',
-                'op' => '=',
-                'value' => $http_method
-            )
-        ))->firstOrFail();
+        try {
+            return $this->getEntityManager()->createQueryBuilder()
+                ->select("e")
+                ->from(\App\Models\ResourceServer\ApiEndpoint::class, "e")
+                ->where('e.route = :route')
+                ->andWhere('e.http_method = :http_method')
+                ->setParameter('route', trim($url))
+                ->setParameter('http_method', trim($http_method))
+                ->setCacheable(true)
+                ->setCacheRegion('resource_server_region')
+                ->getQuery()
+                ->getOneOrNullResult();
+        }
+        catch(\Exception $ex){
+            Log::error($ex);
+            return null;
+        }
     }
-
 }

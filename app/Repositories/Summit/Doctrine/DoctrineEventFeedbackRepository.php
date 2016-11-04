@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 
+use Doctrine\ORM\Cache;
 use models\summit\IEventFeedbackRepository;
 use repositories\SilverStripeDoctrineRepository;
 use models\summit\SummitEvent;
@@ -38,13 +39,16 @@ final class DoctrineEventFeedbackRepository extends SilverStripeDoctrineReposito
      */
     public function getByEvent(SummitEvent $event, PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
-        $query  = $this->getEntityManager()->createQueryBuilder()
-            ->select("f")
-            ->from(\models\summit\SummitEventFeedback::class, "f")
-            ->join('f.event', 'e', Join::WITH, " e.id = :event_id")
-            ->join('f.owner', 'o')
-            ->setParameter('event_id', $event->getId());
-
+        $query  = $this->getEntityManager()
+                ->createQueryBuilder()
+                ->select("f")
+                ->from(\models\summit\SummitEventFeedback::class, "f")
+                ->join('f.event', 'e', Join::WITH, " e.id = :event_id")
+                ->join('f.owner', 'o')
+                ->setParameter('event_id', $event->getId())
+                ->setCacheable(true)
+                ->setCacheMode(Cache::MODE_GET)
+                ->setCacheRegion('summit_event_feedback_region');
 
         if(!is_null($filter)){
 

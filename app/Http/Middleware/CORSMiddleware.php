@@ -14,15 +14,14 @@
 
 use Closure;
 use libs\utils\ICacheService;
-use models\resource_server\IApiEndpoint;
-use models\resource_server\IApiEndpointRepository;
+use App\Models\ResourceServer\IApiEndpoint;
+use App\Models\ResourceServer\IApiEndpointRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Config;
 use libs\utils\RequestUtils;
-
 
 /**
 *
@@ -90,6 +89,11 @@ class CORSMiddleware
 	 */
 	private $cache_service;
 
+    /**
+     * CORSMiddleware constructor.
+     * @param IApiEndpointRepository $endpoint_repository
+     * @param ICacheService $cache_service
+     */
 	public function __construct(IApiEndpointRepository $endpoint_repository, ICacheService $cache_service)
 	{
 		$this->endpoint_repository = $endpoint_repository;
@@ -130,6 +134,7 @@ class CORSMiddleware
 	public function preProcess(Request $request)
 	{
 		$actual_request = false;
+
 		if ($this->isValidCORSRequest($request))
 		{
 			if (!$this->testOriginHeaderScrutiny($request))
@@ -159,7 +164,7 @@ class CORSMiddleware
 						return $response;
 					}
 					// ----Step 2b: Store pre-flight request data in the Cache to keep (mark) the request as correctly followed the request pre-flight process
-					$data     = new CORSRequestPreflightData($request, $this->current_endpoint->supportCredentials());
+					$data     = new CORSRequestPreflightData($request, $this->current_endpoint->isAllowCredentials());
 					$cache_id = $this->generatePreflightCacheKey($request);
 					$this->cache_service->storeHash($cache_id, $data->toArray(), CORSRequestPreflightData::$cache_lifetime);
 					// ----Step 2c: Return corresponding response - This part should be customized with application specific constraints.....
@@ -186,7 +191,7 @@ class CORSMiddleware
 						if ($request->getMethod() === $data['expected_method'])
 						{
 							// ------Finish with custom HTTP headers (use an method to avoid manual iteration on collection to increase the speed)...
-							$x_headers = self::getCustomHeaders($request);
+							$x_headers     = self::getCustomHeaders($request);
 							$x_headers_pre = explode(',', $data['expected_custom_headers']);
 							sort($x_headers);
 							sort($x_headers_pre);
@@ -292,7 +297,7 @@ class CORSMiddleware
 		// The Access-Control-Allow-Credentials header indicates whether the response to request
 		// can be exposed when the omit credentials flag is unset. When part of the response to a preflight request
 		// it indicates that the actual request can include user credentials.
-		if ( $this->current_endpoint->supportCredentials())
+		if ( $this->current_endpoint->isAllowCredentials())
 		{
 			$response->headers->set('Access-Control-Allow-Credentials', 'true');
 		}
@@ -433,7 +438,7 @@ class CORSMiddleware
 		{
 			return false;
 		}
-		if (!$this->current_endpoint->supportCORS() || !$this->current_endpoint->isActive())
+		if (!$this->current_endpoint->isAllowCors() || !$this->current_endpoint->isActive())
 		{
 			return false;
 		}

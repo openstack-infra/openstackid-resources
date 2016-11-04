@@ -1,4 +1,4 @@
-<?php namespace models\resource_server;
+<?php namespace App\Models\ResourceServer;
 /**
 * Copyright 2015 OpenStack Foundation
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@ use models\utils\IBaseRepository;
 
 /**
 * Interface IApiEndpointRepository
-* @package models\resource_server
+* @package App\Models\ResourceServer
 */
 interface IApiEndpointRepository extends IBaseRepository
 {

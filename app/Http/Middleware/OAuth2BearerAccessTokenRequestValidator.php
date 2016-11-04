@@ -25,8 +25,8 @@ use libs\oauth2\OAuth2ResourceServerException;
 use libs\oauth2\OAuth2WWWAuthenticateErrorResponse;
 use libs\utils\RequestUtils;
 use models\oauth2\IResourceServerContext;
-use models\resource_server\IAccessTokenService;
-use models\resource_server\IApiEndpointRepository;
+use App\Models\ResourceServer\IAccessTokenService;
+use App\Models\ResourceServer\IApiEndpointRepository;
 use URL\Normalizer;
 
 /**
@@ -67,10 +67,10 @@ class OAuth2BearerAccessTokenRequestValidator
         IApiEndpointRepository $endpoint_repository,
         IAccessTokenService $token_service
     ) {
-        $this->context = $context;
-        $this->headers = $this->getHeaders();
+        $this->context             = $context;
+        $this->headers             = $this->getHeaders();
         $this->endpoint_repository = $endpoint_repository;
-        $this->token_service = $token_service;
+        $this->token_service       = $token_service;
     }
 
     /**
@@ -152,7 +152,7 @@ class OAuth2BearerAccessTokenRequestValidator
                 throw new OAuth2ResourceServerException(
                     403,
                     OAuth2Protocol::OAuth2Protocol_Error_UnauthorizedClient,
-                    sprintf('invalid origin %s - allowed ones (%s)',$origin, $token_info->getAllowedOrigins())
+                    sprintf('invalid origin %s - allowed ones (%s)', $origin, $token_info->getAllowedOrigins())
                 );
             }
             //check scopes

@@ -162,7 +162,7 @@ return [
         \repositories\RepositoriesProvider::class,
         \services\ServicesProvider::class,
         \factories\FactoriesProvider::class,
-        \LaravelDoctrine\ORM\DoctrineServiceProvider::class,
+        \libs\utils\CustomDoctrineServiceProvider::class,
         \LaravelDoctrine\Extensions\BeberleiExtensionsServiceProvider::class,
     ],
 

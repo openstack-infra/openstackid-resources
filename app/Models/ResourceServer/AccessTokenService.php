@@ -1,4 +1,4 @@
-<?php namespace models\resource_server;
+<?php namespace App\Models\ResourceServer;
 
 /**
  * Copyright 2015 OpenStack Foundation
@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * Class AccessTokenService
- * @package models\resource_server
+ * @package App\Models\ResourceServer
  */
 final class AccessTokenService implements IAccessTokenService
 {
@@ -141,7 +141,7 @@ final class AccessTokenService implements IAccessTokenService
     private function doIntrospection($token_value){
         Log::debug("getting token from remote call ...");
         $cache_lifetime = intval(Config::get('server.access_token_cache_lifetime', 300));
-        $token_info     = $this->makeRemoteCall($token_value);
+        $token_info     = $this->doIntrospectionRequest($token_value);
         $this->cache_service->storeHash(md5($token_value), $token_info, $cache_lifetime );
         return $token_info;
     }
@@ -154,7 +154,7 @@ final class AccessTokenService implements IAccessTokenService
      * @throws OAuth2InvalidIntrospectionResponse
      * @throws \Exception
      */
-    private function makeRemoteCall($token_value)
+    private function doIntrospectionRequest($token_value)
     {
 
         try {
@@ -185,7 +185,7 @@ final class AccessTokenService implements IAccessTokenService
             $response = $client->post(
                 $auth_server_url . '/oauth2/token/introspection',
                 [
-                    'query' => ['token' => $token_value],
+                    'body'    => ['token' => $token_value],
                     'headers' => ['Authorization' => " Basic " . base64_encode($client_id . ':' . $client_secret)]
                 ]
             );

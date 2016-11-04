@@ -11,8 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
 use Illuminate\Database\Seeder;
-use models\resource_server\Api;
+use App\Models\ResourceServer\Api;
+use LaravelDoctrine\ORM\Facades\EntityManager;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ApisTableSeeder
@@ -27,37 +30,43 @@ final class ApiSeeder extends Seeder
         DB::table('api_scopes')->delete();
         DB::table('api_endpoints')->delete();
         DB::table('apis')->delete();
+
         // public clouds
-        Api::create(
-            array(
-                'name' => 'public-clouds',
-                'active' => true,
-                'Description' => 'Marketplace Public Clouds'
-            )
-        );
+        $api = new Api();
+        $api->setName('public-clouds');
+        $api->setActive(true);
+        $api->setDescription('Marketplace Public Clouds API');
+
+        EntityManager::persist($api);
+
         // private clouds
-        Api::create(
-            array(
-                'name' => 'private-clouds',
-                'active' => true,
-                'Description' => 'Marketplace Private Clouds'
-            )
-        );
+
+        $api = new Api();
+        $api->setName('private-clouds');
+        $api->setActive(true);
+        $api->setDescription('Marketplace Private Clouds API');
+
+        EntityManager::persist($api);
+
         // consultants
-        Api::create(
-            array(
-                'name' => 'consultants',
-                'active' => true,
-                'Description' => 'Marketplace Consultants'
-            )
-        );
+
+        $api = new Api();
+        $api->setName('consultants');
+        $api->setActive(true);
+        $api->setDescription('Marketplace Consultants API');
+
+        EntityManager::persist($api);
+
         // summit
-        Api::create(
-            array(
-                'name' => 'summits',
-                'active' => true,
-                'Description' => 'Summits'
-            )
-        );
+
+        $api = new Api();
+        $api->setName('summits');
+        $api->setActive(true);
+        $api->setDescription('Summit API');
+
+        EntityManager::persist($api);
+
+        EntityManager::flush();
+
     }
 }

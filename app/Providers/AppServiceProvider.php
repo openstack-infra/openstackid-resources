@@ -105,9 +105,9 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         App::singleton('models\\oauth2\\IResourceServerContext', 'models\\oauth2\\ResourceServerContext');
-        App::singleton('models\resource_server\\IAccessTokenService', 'models\resource_server\\AccessTokenService');
-        App::singleton('models\\resource_server\\IApi', 'models\\resource_server\\Api');
-        App::singleton('models\\resource_server\\IApiEndpoint', 'models\\resource_server\\ApiEndpoint');
-        App::singleton('models\\resource_server\\IApiScope', 'models\\resource_server\\ApiScope');
+        App::singleton('App\Models\ResourceServer\IAccessTokenService', 'App\Models\ResourceServer\AccessTokenService');
+        App::singleton('App\Models\ResourceServer\IApi', 'models\\resource_server\\Api');
+        App::singleton('App\Models\ResourceServer\IApiEndpoint', 'models\\resource_server\\ApiEndpoint');
+        App::singleton('App\Models\ResourceServer\IApiScope', 'models\\resource_server\\ApiScope');
     }
 }

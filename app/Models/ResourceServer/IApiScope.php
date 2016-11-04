@@ -1,4 +1,4 @@
-<?php namespace models\resource_server;
+<?php namespace App\Models\ResourceServer;
 /**
 * Copyright 2015 OpenStack Foundation
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
 /**
 * Interface IApiScope
 * http://tools.ietf.org/html/rfc6749#section-3.3
-* @package oauth2\models
+* @package App\Models\ResourceServer
 */
 interface IApiScope
 {
@@ -39,8 +39,8 @@ interface IApiScope
 	*/
 	public function isActive();
 
-	/**
-	* @return IApi
-	*/
-	public function api();
+    /**
+     * @return IApi
+     */
+    public function getApi();
 }
