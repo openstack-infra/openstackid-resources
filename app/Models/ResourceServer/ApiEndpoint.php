@@ -14,6 +14,8 @@
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping AS ORM;
+use Illuminate\Support\Facades\Cache as CacheFacade;
+use Illuminate\Support\Facades\Config;
 
 /**
  * @ORM\Entity(repositoryClass="repositories\resource_server\DoctrineApiEndpointRepository")
@@ -248,17 +250,22 @@ class ApiEndpoint extends ResourceServerEntity implements IApiEndpoint
 	*/
 	public function getScope()
 	{
-		$scope = '';
-		foreach ($this->scopes as $s)
-		{
-			if (!$s->isActive())
-			{
-				continue;
-			}
-			$scope = $scope .$s->getName().' ';
-		}
-		$scope = trim($scope);
-		return $scope;
+        return CacheFacade::remember
+        (
+            'endpoint_scopes_'.$this->id,
+            Config::get("cache_regions.region_api_scopes_lifetime", 1140),
+            function() {
+                $scope = '';
+                foreach ($this->scopes as $s) {
+                    if (!$s->isActive()) {
+                        continue;
+                    }
+                    $scope = $scope . $s->getName() . ' ';
+                }
+                $scope = trim($scope);
+                return $scope;
+            }
+        );
 	}
 
     /**

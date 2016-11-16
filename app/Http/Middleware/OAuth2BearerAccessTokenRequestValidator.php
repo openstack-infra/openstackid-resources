@@ -133,8 +133,10 @@ class OAuth2BearerAccessTokenRequestValidator
             }
 
             $token_info = $this->token_service->get($access_token_value);
+
             if(!is_null($token_info))
                 Log::debug(sprintf("token lifetime %s", $token_info->getLifetime()));
+
             //check lifetime
             if (is_null($token_info)) {
                 throw new InvalidGrantTypeException(OAuth2Protocol::OAuth2Protocol_Error_InvalidToken);
@@ -157,7 +159,11 @@ class OAuth2BearerAccessTokenRequestValidator
             }
             //check scopes
             Log::debug('checking token scopes ...');
-            $endpoint_scopes = explode(' ', $endpoint->getScope());
+            $endpoint_scopes = $endpoint->getScope();
+            Log::debug(sprintf("endpoint scopes %s", $endpoint_scopes));
+            Log::debug(sprintf("token scopes %s", $token_info->getScope()));
+
+            $endpoint_scopes = explode(' ', $endpoint_scopes);
             $token_scopes    = explode(' ', $token_info->getScope());
 
             //check token available scopes vs. endpoint scopes

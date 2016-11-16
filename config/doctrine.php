@@ -221,7 +221,15 @@ return [
                 'summit_event_feedback_region' => [
                     'lifetime'      => 300,
                     'lock_lifetime' => 60
-                ]
+                ],
+                'current_summit_region' => [
+                    'lifetime'      => 600,
+                    'lock_lifetime' => 60
+                ],
+                'resource_server_region' => [
+                    'lifetime'      => 3600,
+                    'lock_lifetime' => 60
+                ],
             ],
             'log_enabled'  => true,
             'file_lock_region_directory' => '/tmp'

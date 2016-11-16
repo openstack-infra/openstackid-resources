@@ -40,7 +40,10 @@ final class DoctrineSummitRepository extends SilverStripeDoctrineRepository impl
             ->from(\models\summit\Summit::class, "s")
             ->where('s.active = 1')
             ->orderBy('s.begin_date','DESC')
-            ->getQuery()->getResult();
+            ->setCacheable(true)
+            ->setCacheRegion('current_summit_region')
+            ->getQuery()
+            ->getResult();
         if(count($res) == 0) return null;
         return $res[0];
     }
