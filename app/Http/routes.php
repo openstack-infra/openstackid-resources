@@ -11,6 +11,8 @@
 |
 */
 
+use Illuminate\Support\Facades\Config;
+
 //OAuth2 Protected API
 Route::group(array(
     'namespace' => 'App\Http\Controllers',
@@ -49,7 +51,7 @@ Route::group(array(
 
         Route::group(array('prefix' => '{id}'), function () {
 
-            Route::get('', [ 'middleware' => 'cache', 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
+            Route::get('', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summit_response_lifetime', 300), 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
 
             Route::get('entity-events', 'OAuth2SummitApiController@getSummitEntityEvents');
 
@@ -99,13 +101,13 @@ Route::group(array(
                 Route::group(array('prefix' => '{event_id}'), function () {
 
                     Route::get('', 'OAuth2SummitEventsApiController@getEvent');
-                    Route::get('/published', 'OAuth2SummitEventsApiController@getScheduledEvent');
+                    Route::get('/published', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_published_event_response_lifetime', 300), 'uses' => 'OAuth2SummitEventsApiController@getScheduledEvent']);
                     Route::put('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@updateEvent' ]);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@deleteEvent' ]);
                     Route::put('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@publishEvent']);
                     Route::delete('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvent']);
                     Route::post('/feedback', 'OAuth2SummitEventsApiController@addEventFeedback');
-                    Route::get('/feedback/{attendee_id?}', 'OAuth2SummitEventsApiController@getEventFeedback')->where('attendee_id', 'me|[0-9]+');
+                    Route::get('/feedback/{attendee_id?}',  ['middleware' => 'cache:'.Config::get('cache_api_response.get_event_feedback_response_lifetime', 300), 'uses' => 'OAuth2SummitEventsApiController@getEventFeedback'] )->where('attendee_id', 'me|[0-9]+');
                 });
             });
 

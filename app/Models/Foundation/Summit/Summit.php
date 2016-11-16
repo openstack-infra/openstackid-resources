@@ -375,7 +375,7 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="models\main\File")
      * @ORM\JoinColumn(name="LogoID", referencedColumnName="ID")
      * @var File
      */

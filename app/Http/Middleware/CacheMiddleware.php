@@ -43,14 +43,15 @@ final class CacheMiddleware
 
 
     /**
-     * Handle an incoming request.
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
-     * @return mixed
+     * @param $request
+     * @param Closure $next
+     * @param $cache_lifetime
+     * @return JsonResponse
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $cache_lifetime)
     {
         Log::debug('cache middleware invoked ...');
+        $cache_lifetime = intval($cache_lifetime);
         if ($request->getMethod() !== 'GET')
         {
             // short circuit
@@ -71,8 +72,6 @@ final class CacheMiddleware
                 $key .= ".".implode("=",$q);
             }
         }
-
-        $cache_lifetime = intval(Config::get('server.response_cache_lifetime', 300));
 
         if (str_contains($request->getPathInfo(), '/me'))
         {

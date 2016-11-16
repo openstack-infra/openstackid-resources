@@ -1,4 +1,5 @@
 <?php namespace repositories\summit;
+
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +13,9 @@
  * limitations under the License.
  **/
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Doctrine\ORM\Query\Expr\Join;
 use models\summit\ISummitRepository;
 use models\summit\Summit;
 use repositories\SilverStripeDoctrineRepository;
-use utils\DoctrineJoinFilterMapping;
-use utils\Filter;
-use utils\PagingInfo;
-use utils\PagingResponse;
 
 /**
  * Class DoctrineSummitRepository
@@ -35,16 +30,16 @@ final class DoctrineSummitRepository extends SilverStripeDoctrineRepository impl
      */
     public function getCurrent()
     {
-        $res =  $this->getEntityManager()->createQueryBuilder()
+        $res = $this->getEntityManager()->createQueryBuilder()
             ->select("s")
             ->from(\models\summit\Summit::class, "s")
             ->where('s.active = 1')
-            ->orderBy('s.begin_date','DESC')
-            ->setCacheable(true)
-            ->setCacheRegion('current_summit_region')
+            ->orderBy('s.begin_date', 'DESC')
             ->getQuery()
+            ->setCacheable(true)
+            ->setCacheRegion("summit_region")
             ->getResult();
-        if(count($res) == 0) return null;
+        if (count($res) == 0) return null;
         return $res[0];
     }
 }
