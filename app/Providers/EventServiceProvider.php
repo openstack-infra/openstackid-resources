@@ -26,12 +26,13 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'App\Events\SomeEvent' => [
-            'App\Listeners\EventListener',
+        'Illuminate\Database\Events\QueryExecuted' => [
+            'App\Listeners\QueryExecutedListener',
         ],
     ];
 
-      /**
+
+    /**
      * Register any other events for your application.
      * @param  \Illuminate\Contracts\Events\Dispatcher $events
      * @return void

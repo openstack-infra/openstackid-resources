@@ -16,6 +16,7 @@ return array
 (
     'ssl_enabled'                      => env('SSL_ENABLED', false),
     'db_log_enabled'                   => env('DB_LOG_ENABLED', false),
+    'db_log_trace_enabled'             => env('DB_LOG_TRACE_ENABLED', false),
     'access_token_cache_lifetime'      => env('ACCESS_TOKEN_CACHE_LIFETIME', 300),
     'assets_base_url'                  => env('ASSETS_BASE_URL', null),
     'response_cache_lifetime'          => env('API_RESPONSE_CACHE_LIFETIME', 300),

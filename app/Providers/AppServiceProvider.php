@@ -1,15 +1,15 @@
 <?php namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Monolog\Handler\NativeMailerHandler;
-use Monolog\Logger;
 
-
+/**
+ * Class AppServiceProvider
+ * @package App\Providers
+ */
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -35,31 +35,6 @@ class AppServiceProvider extends ServiceProvider
             $mono_log->pushHandler($handler);
         }
 
-        if(Config::get("server.db_log_enabled", false)) {
-
-            Event::listen('illuminate.query', function ($query, $bindings, $time, $name) {
-                $data = compact('bindings', 'time', 'name');
-
-                // Format binding data for sql insertion
-                foreach ($bindings as $i => $binding) {
-                    if ($binding instanceof \DateTime) {
-                        $bindings[$i] = $binding->format('\'Y-m-d H:i:s\'');
-                    } else {
-                        if (is_string($binding)) {
-                            $bindings[$i] = "'$binding'";
-                        }
-                    }
-                }
-
-                // Insert bindings into query
-                $query = str_replace(array('%', '?'), array('%%', '%s'), $query);
-                $query = vsprintf($query, $bindings);
-
-                Log::info($query, $data);
-            });
-
-        }
-
         Validator::extend('int_array', function($attribute, $value, $parameters, $validator)
         {
             $validator->addReplacer('int_array', function($message, $attribute, $rule, $parameters) use ($validator) {
@@ -73,7 +48,6 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
-
         Validator::extend('text', function($attribute, $value, $parameters, $validator)
         {
             $validator->addReplacer('text', function($message, $attribute, $rule, $parameters) use ($validator) {
@@ -82,7 +56,6 @@ class AppServiceProvider extends ServiceProvider
 
             return preg_match('/^[^<>\"\']+$/u', $value);
         });
-
 
         Validator::extend('string_array', function($attribute, $value, $parameters, $validator)
         {
