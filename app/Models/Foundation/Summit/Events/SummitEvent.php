@@ -417,7 +417,7 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="SummitEventType")
+     * @ORM\ManyToOne(targetEntity="SummitEventType", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID")
      * @var SummitEventType
      */
@@ -441,7 +441,7 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="SummitAbstractLocation")
+     * @ORM\ManyToOne(targetEntity="SummitAbstractLocation", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
      */
     private $location = null;
@@ -485,7 +485,7 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\summit\SummitType")
+     * @ORM\ManyToMany(targetEntity="models\summit\SummitType", fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="SummitEvent_AllowedSummitTypes",
      *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="SummitTypeID", referencedColumnName="ID")}
@@ -514,7 +514,7 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\main\Company", inversedBy="sponsorships")
+     * @ORM\ManyToMany(targetEntity="models\main\Company", inversedBy="sponsorships", fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="SummitEvent_Sponsors",
      *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="CompanyID", referencedColumnName="ID")}

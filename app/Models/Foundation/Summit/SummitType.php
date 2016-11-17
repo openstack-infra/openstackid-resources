@@ -18,6 +18,7 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitType")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="summit_type_region")
  * Class SummitType
  * @package models\summit
  */

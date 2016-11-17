@@ -260,7 +260,7 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationCategory")
+     * @ORM\ManyToOne(targetEntity="PresentationCategory", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="CategoryID", referencedColumnName="ID")
      * @var PresentationCategory
      */

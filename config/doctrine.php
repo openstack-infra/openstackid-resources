@@ -230,6 +230,22 @@ return [
                     'lifetime'      => 3600,
                     'lock_lifetime' => 60
                 ],
+                'summit_type_region' => [
+                    'lifetime'      => 1800,
+                    'lock_lifetime' => 60
+                ],
+                'summit_ticket_type_region' => [
+                    'lifetime'      => 1800,
+                    'lock_lifetime' => 60
+                ],
+                'summit_event_type_region' => [
+                    'lifetime'      => 1800,
+                    'lock_lifetime' => 60
+                ],
+                'summit_presentation_category_region' => [
+                    'lifetime'      => 1800,
+                    'lock_lifetime' => 60
+                ],
             ],
             'log_enabled'  => true,
             'file_lock_region_directory' => '/tmp'

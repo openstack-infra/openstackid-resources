@@ -136,6 +136,7 @@ abstract class AbstractSerializer implements IModelSerializer
             $new_values = array();
             foreach ($mappings as $attribute => $mapping) {
                 $mapping = preg_split('/:/',$mapping);
+                if(!in_array($mapping[0], $fields)) continue;
                 $value   = call_user_func( array( $this->object, 'get'.$attribute ) );
                 if(count($mapping) > 1)
                 {
@@ -175,13 +176,7 @@ abstract class AbstractSerializer implements IModelSerializer
             }
             $values = $new_values;
         }
-        //check requested fields
-        if(count($fields) > 0) {
-            foreach ($values as $field => $value) {
-                if (in_array($field, $fields)) continue;
-                unset($values[$field]);
-            }
-        }
+
         return $values;
     }
 }

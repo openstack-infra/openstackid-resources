@@ -19,6 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitTicketType")
+ * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="summit_ticket_type_region")
  * Class SummitTicketType
  * @package models\summit
  */
