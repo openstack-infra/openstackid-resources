@@ -81,12 +81,6 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
                     't',
                     "t.tag :operator ':value'"
                 ),
-                'summit_type_id'=> new DoctrineJoinFilterMapping
-                (
-                    'e.summit_types',
-                    'st',
-                    "st.id :operator :value"
-                ),
                 'location_id'=> new DoctrineJoinFilterMapping
                 (
                     'e.location',
