@@ -86,35 +86,6 @@ class SummitTicketType extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->allowed_summit_types = new ArrayCollection();
-    }
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\summit\SummitType")
-     * @ORM\JoinTable(name="SummitTicketType_AllowedSummitTypes",
-     *      joinColumns={@ORM\JoinColumn(name="SummitTicketTypeID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitTypeID", referencedColumnName="ID")}
-     *      )
-     * @var SummitType[]
-     */
-    private $allowed_summit_types;
-
-    /**
-     * @return SummitType[]
-     */
-    public function getAllowedSummitTypes()
-    {
-       return $this->allowed_summit_types;
-    }
-
-    /**
-     * @return int[]
-     */
-    public function getAllowedSummitTypeIds()
-    {
-        return $this->allowed_summit_types->map(function($entity)  {
-            return $entity->getId();
-        })->toArray();
     }
 
 }

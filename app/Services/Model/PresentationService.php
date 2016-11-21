@@ -67,7 +67,11 @@ final class PresentationService implements IPresentationService
 
             $presentation = $this->presentation_repository->getById($presentation_id);
 
+
             if(is_null($presentation))
+                throw new EntityNotFoundException('presentation not found!');
+
+            if(!$presentation instanceof Presentation)
                 throw new EntityNotFoundException('presentation not found!');
 
             if($presentation->hasVideos())
@@ -98,6 +102,9 @@ final class PresentationService implements IPresentationService
             $presentation = $this->presentation_repository->getById($presentation_id);
 
             if(is_null($presentation))
+                throw new EntityNotFoundException('presentation not found!');
+
+            if(!$presentation instanceof Presentation)
                 throw new EntityNotFoundException('presentation not found!');
 
             $video = $presentation->getVideoBy($video_id);

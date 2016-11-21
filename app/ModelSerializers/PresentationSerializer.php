@@ -22,7 +22,6 @@ class PresentationSerializer extends SummitEventSerializer
     protected static $array_mappings = array
     (
         'Level'                   => 'level',
-        'CategoryId'              => 'track_id:json_int',
         'ModeratorId'             => 'moderator_speaker_id:json_int',
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',

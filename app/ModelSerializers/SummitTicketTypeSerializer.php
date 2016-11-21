@@ -35,7 +35,6 @@ class SummitTicketTypeSerializer extends SilverStripeSerializer
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
         $ticket_type = $this->object;
-        $values['allowed_summit_types'] = $ticket_type->getAllowedSummitTypeIds();
         return $values;
     }
 }

@@ -87,13 +87,48 @@ class SummitEvent extends SilverstripeBaseModel
         $this->avg_feedback   = 0;
         $this->head_count     = 0;
         $this->tags           = new ArrayCollection();
-        $this->summit_types   = new ArrayCollection();
         $this->feedback       = new ArrayCollection();
         $this->attendees      = new ArrayCollection();
         $this->sponsors       = new ArrayCollection();
     }
 
-   /**
+    /**
+     * @ORM\ManyToOne(targetEntity="PresentationCategory", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="CategoryID", referencedColumnName="ID")
+     * @var PresentationCategory
+     */
+    private $category = null;
+
+    /**
+     * @param PresentationCategory $category
+     * @return $this
+     */
+    public function setCategory(PresentationCategory $category)
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    /**
+     * @return PresentationCategory
+     */
+    public function getCategory(){
+        return $this->category;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCategoryId(){
+        try {
+            return !is_null($this->category)? $this->category->getId():0;
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
      * @ORM\Column(name="Title", type="string")
      * @var string
      */
@@ -482,35 +517,6 @@ class SummitEvent extends SilverstripeBaseModel
         return $this->sponsors->map(function($entity)  {
             return $entity->getId();
         })->toArray();
-    }
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\summit\SummitType", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="SummitEvent_AllowedSummitTypes",
-     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitTypeID", referencedColumnName="ID")}
-     *      )
-     */
-    protected $summit_types;
-
-    /**
-     * @return ArrayCollection
-     */
-    public function getSummitTypes(){
-        return $this->summit_types;
-    }
-
-    /**
-     * @param SummitType $summit_type
-     */
-    public function addSummitType(SummitType $summit_type)
-    {
-        $this->summit_types->add($summit_type);
-    }
-
-    public function clearSummitTypes()
-    {
-        $this->summit_types->clear();
     }
 
     /**

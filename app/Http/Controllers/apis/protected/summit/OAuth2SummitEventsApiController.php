@@ -289,7 +289,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'end_date'        => 'sometimes|required_with:start_date|date_format:U|after:start_date',
                 'allow_feedback'  => 'sometimes|required|boolean',
                 'type_id'         => 'required|integer',
-                'summit_types_id' => 'required|int_array',
+                'track_id'        => 'required|integer',
                 'tags'            => 'sometimes|required|string_array',
             );
 
@@ -353,7 +353,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'end_date'        => 'sometimes|required_with:start_date|date_format:U|after:start_date',
                 'allow_feedback'  => 'sometimes|required|boolean',
                 'type_id'         => 'sometimes|required|integer',
-                'summit_types_id' => 'sometimes|required|int_array',
+                'track_id'        => 'sometimes|required|integer',
                 'tags'            => 'sometimes|required|string_array',
             );
 

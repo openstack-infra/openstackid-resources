@@ -24,32 +24,25 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class SummitType extends SilverstripeBaseModel
 {
-    use SummitOwned;
-
     /**
-     * @ORM\Column(name="Title", type="string")
+     * @ORM\Column(name="FriendlyName", type="string")
      */
-    private $title;
-
-    /**
-     * @ORM\Column(name="Color", type="string")
-     */
-    private $color;
+    private $friendly_name;
 
     /**
      * @return mixed
      */
-    public function getTitle()
+    public function getFriendlyName()
     {
-        return $this->title;
+        return $this->friendly_name;
     }
 
     /**
-     * @param mixed $title
+     * @param mixed $friendly_name
      */
-    public function setTitle($title)
+    public function setFriendlyName($friendly_name)
     {
-        $this->title = $title;
+        $this->friendly_name = $friendly_name;
     }
 
     /**
@@ -85,7 +78,54 @@ class SummitType extends SilverstripeBaseModel
     }
 
     /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param mixed $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAudience()
+    {
+        return $this->audience;
+    }
+
+    /**
+     * @param mixed $audience
+     */
+    public function setAudience($audience)
+    {
+        $this->audience = $audience;
+    }
+
+    /**
+     * @ORM\Column(name="Color", type="string")
+     */
+    private $color;
+
+    /**
      * @ORM\Column(name="Type", type="string")
      */
     private $type;
+
+    /**
+     * @ORM\Column(name="Description", type="string")
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(name="Audience", type="string")
+     */
+    private $audience;
 }

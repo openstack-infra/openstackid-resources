@@ -366,22 +366,20 @@ final class SummitService implements ISummitService
                 }
             }
 
+            $track = null;
+
+            if(isset($data['track_id'])){
+                $track = $summit->getPresentationCategory(intval($data['track_id']));
+                if(is_null($track)){
+                    throw new EntityNotFoundException(sprintf("track id %s does not exists!", $data['track_id']));
+                }
+            }
+
             $location = null;
             if (isset($data['location_id'])) {
                 $location = $summit->getLocation(intval($data['location_id']));
                 if (is_null($location)) {
                     throw new EntityNotFoundException(sprintf("location id %s does not exists!", $data['location_id']));
-                }
-            }
-
-            $summit_types = array();
-            if (isset($data['summit_types_id'])) {
-                foreach ($data['summit_types_id'] as $summit_type_id) {
-                    $summit_type = $summit->getSummitType($summit_type_id);
-                    if (is_null($summit_type)) {
-                        throw new ValidationException(sprintf("summit type id %s does not exists!", $summit_type_id));
-                    }
-                    array_push($summit_types, $summit_type);
                 }
             }
 
@@ -411,6 +409,11 @@ final class SummitService implements ISummitService
                 throw new ValidationException('type_id is mandatory!');
             }
 
+            if(!is_null($track))
+            {
+                $event->setCategory($track);
+            }
+
             // is event is new and we dont provide speakers ...
             if(is_null($event_id) && !is_null($event_type) && $event_type->isPresentationType() && !isset($data['speakers']))
                 throw new ValidationException('speakers data is required for presentations!');
@@ -438,13 +441,6 @@ final class SummitService implements ISummitService
                             $summit->getLocalEndDate()->format('Y-m-d H:i:s')
                         )
                     );
-            }
-
-            if (count($summit_types) > 0) {
-                $event->clearSummitTypes();
-                foreach ($summit_types as $summit_type) {
-                    $event->addSummitType($summit_type);
-                }
             }
 
             if (isset($data['tags']) && count($data['tags']) > 0) {

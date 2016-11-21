@@ -182,6 +182,41 @@ class Summit extends SilverstripeBaseModel
     private $schedule_default_start_date;
 
     /**
+     * @return SummitType
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param SummitType $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTypeId(){
+        try {
+            return !is_null($this->type)? $this->type->getId():0;
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SummitType", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID")
+     * @var SummitType
+     */
+    private $type = null;
+
+    /**
      * @return string
      */
     public function getSummitExternalId(){ return $this->external_summit_id; }
@@ -240,7 +275,6 @@ class Summit extends SilverstripeBaseModel
         $this->locations               = new ArrayCollection();
         $this->events                  = new ArrayCollection();
         $this->event_types             = new ArrayCollection();
-        $this->summit_types            = new ArrayCollection();
         $this->ticket_types            = new ArrayCollection();
         $this->presentation_categories = new ArrayCollection();
         $this->category_groups         = new ArrayCollection();
@@ -445,30 +479,6 @@ class Summit extends SilverstripeBaseModel
         return $event_type === false ? null:$event_type;
     }
 
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitType", mappedBy="summit", cascade={"persist"})
-     */
-    private $summit_types;
-
-    /**
-     * @return SummitType[]
-     */
-    public function getSummitTypes()
-    {
-        return $this->summit_types;
-    }
-
-    /**
-     * @param int $summit_type_id
-     * @return SummitType
-     */
-    public function getSummitType($summit_type_id)
-    {
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('id', intval($summit_type_id)));
-        $summit_type = $this->summit_types->matching($criteria)->first();
-        return $summit_type === false ? null:$summit_type;
-    }
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"})

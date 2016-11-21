@@ -29,6 +29,7 @@ final class SummitSerializer extends SilverStripeSerializer
         'StartShowingVenuesDate'   => 'start_showing_venues_date:datetime_epoch',
         'Active'                   => 'active:json_boolean',
         'ScheduleDefaultStartDate' => 'schedule_start_date:datetime_epoch',
+        'TypeId'                   => 'type_id:json_int' ,
     );
 
     /**
@@ -68,12 +69,6 @@ final class SummitSerializer extends SilverStripeSerializer
         $values['schedule_page_url']           = sprintf("%ssummit/%s/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page, $schedule_page);
         $values['schedule_event_detail_url']   = sprintf("%ssummit/%s/%s/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page, $schedule_page, 'events/:event_id/:event_title');
 
-        // summit types
-        $summit_types = array();
-        foreach ($summit->getSummitTypes() as $type) {
-            $summit_types[] = SerializerRegistry::getInstance()->getSerializer($type)->serialize();
-        }
-        $values['summit_types'] = $summit_types;
         // tickets
         $ticket_types = array();
         foreach ($summit->getTicketTypes() as $ticket) {

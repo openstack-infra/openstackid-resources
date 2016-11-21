@@ -35,6 +35,7 @@ class SummitEventSerializer extends SilverStripeSerializer
         'Published'        => 'is_published:json_boolean',
         'HeadCount'        => 'head_count:json_int',
         'RSVPLink'         => 'rsvp_link:json_string',
+        'CategoryId'       => 'track_id:json_int',
     );
 
     protected static $allowed_fields = array
@@ -53,11 +54,11 @@ class SummitEventSerializer extends SilverStripeSerializer
         'is_published',
         'head_count',
         'rsvp_link',
+        'track_id',
     );
 
     protected static $allowed_relations = array
     (
-        'summit_types',
         'sponsors',
         'tags',
     );
@@ -84,9 +85,6 @@ class SummitEventSerializer extends SilverStripeSerializer
         {
             $values['description'] = JsonUtils::toJsonString($event->getShortDescription());
         }
-
-        if(in_array('summit_types', $relations))
-            $values['summit_types'] = $event->getSummitTypesIds();
 
         if(in_array('sponsors', $relations))
             $values['sponsors'] = $event->getSponsorsIds();

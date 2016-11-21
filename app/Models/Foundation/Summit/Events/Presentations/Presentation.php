@@ -114,8 +114,10 @@ class Presentation extends SummitEvent
      * @return string
      */
     public function getClassName(){
-        return "Presentation";
+        return self::ClassNamePresentation;
     }
+
+    const ClassNamePresentation = 'Presentation';
 
     /**
      * @return PresentationSpeaker[]
@@ -250,42 +252,6 @@ class Presentation extends SummitEvent
     /**
      * @return int
      */
-    public function getCategoryId(){
-        try {
-            return !is_null($this->category)? $this->category->getId():0;
-        }
-        catch(\Exception $ex){
-            return 0;
-        }
-    }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="PresentationCategory", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="CategoryID", referencedColumnName="ID")
-     * @var PresentationCategory
-     */
-    private $category = null;
-
-    /**
-     * @param PresentationCategory $category
-     * @return $this
-     */
-    public function setCategory(PresentationCategory $category)
-    {
-        $this->category = $category;
-        return $this;
-    }
-
-    /**
-     * @return PresentationCategory
-     */
-    public function getCategory(){
-        return $this->category;
-    }
-
-    /**
-     * @return int
-     */
     public function getModeratorId(){
         try {
             return !is_null($this->moderator)? $this->moderator->getId():0;
@@ -317,7 +283,6 @@ class Presentation extends SummitEvent
     {
         $this->moderator = $moderator;
     }
-
 
     public function unsetModerator(){
         $this->moderator = null;
