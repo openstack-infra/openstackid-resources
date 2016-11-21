@@ -282,8 +282,9 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             $rules = array
             (
-                'title'           => 'required|string|max:300',
+                'title'           => 'required|string|max:100',
                 'description'     => 'required|string',
+                'social_summary'  => 'sometimes|string|max:100',
                 'location_id'     => 'sometimes|required|integer',
                 'start_date'      => 'sometimes|required|date_format:U',
                 'end_date'        => 'sometimes|required_with:start_date|date_format:U|after:start_date',
@@ -308,7 +309,8 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $fields = array
             (
                 'title',
-                'description'
+                'description',
+                'social_summary',
             );
 
             $event = $this->service->addEvent($summit, HTMLCleaner::cleanData($data->all(), $fields));
@@ -346,8 +348,9 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             $rules = array
             (
-                'title'           => 'sometimes|required|string|max:300',
+                'title'           => 'sometimes|required|string|max:100',
                 'description'     => 'sometimes|required|string',
+                'social_summary'  => 'sometimes|string|max:100',
                 'location_id'     => 'sometimes|required|integer',
                 'start_date'      => 'sometimes|required|date_format:U',
                 'end_date'        => 'sometimes|required_with:start_date|date_format:U|after:start_date',
@@ -372,7 +375,8 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $fields = array
             (
                 'title',
-                'description'
+                'description',
+                'social_summary',
             );
 
             $event = $this->service->updateEvent($summit, $event_id, HTMLCleaner::cleanData($data->all(), $fields));

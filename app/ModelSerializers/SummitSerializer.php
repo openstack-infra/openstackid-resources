@@ -140,6 +140,4 @@ final class SummitSerializer extends SilverStripeSerializer
         $values['timestamp'] = time();
         return $values;
     }
-
-
 }

@@ -51,14 +51,6 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
-    /**
      * @return boolean
      */
     public function isAllowFeedback()
@@ -152,28 +144,50 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\Column(name="Description", type="string")
-     * @var string
+     * @return string
      */
-    protected $description;
-
-    /**
-     * @ORM\Column(name="ShortDescription", type="string")
-     * @var string
-     */
-    protected $short_description;
-
-    /**
-     * @param string $description
-     * @return $this
-     */
-    public function setDescription($description)
+    public function getAbstract()
     {
-        $this->description = $description;
-        return $this;
+        return $this->abstract;
     }
 
     /**
+     * @param string $abstract
+     */
+    public function setAbstract($abstract)
+    {
+        $this->abstract = $abstract;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSocialSummary()
+    {
+        return $this->social_summary;
+    }
+
+    /**
+     * @param string $social_summary
+     */
+    public function setSocialSummary($social_summary)
+    {
+        $this->social_summary = $social_summary;
+    }
+
+    /**
+     * @ORM\Column(name="Abstract", type="string")
+     * @var string
+     */
+    protected $abstract;
+
+    /**
+     * @ORM\Column(name="SocialSummary", type="string")
+     * @var string
+     */
+    protected $social_summary;
+
+   /**
      * @ORM\Column(name="StartDate", type="datetime")
      * @var \DateTime
      */
@@ -185,24 +199,7 @@ class SummitEvent extends SilverstripeBaseModel
      */
     protected $rsvp_template_id;
 
-    /**
-     * @return string
-     */
-    public function getShortDescription()
-    {
-        $res = $this->short_description;
-        if(empty($res))
-            $res = $this->description;
-        return $res;
-    }
 
-    /**
-     * @param string $short_description
-     */
-    public function setShortDescription($short_description)
-    {
-        $this->short_description = $short_description;
-    }
 
     /**
      * @return DateTime

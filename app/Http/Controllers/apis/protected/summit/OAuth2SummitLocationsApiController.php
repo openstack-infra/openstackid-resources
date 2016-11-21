@@ -172,7 +172,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 'end_date'       => array('>', '<', '<=', '>=', '=='),
                 'speaker'        => array('=@', '=='),
                 'tags'           => array('=@', '=='),
-                'summit_type_id' => array('=='),
                 'event_type_id'  => array('=='),
                 'track_id'       => array('=='),
             ));

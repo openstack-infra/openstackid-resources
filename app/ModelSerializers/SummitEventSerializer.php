@@ -23,7 +23,8 @@ class SummitEventSerializer extends SilverStripeSerializer
     protected static $array_mappings = array
     (
         'Title'            => 'title:json_string',
-        'ShortDescription' => 'description:json_string',
+        'Abstract'         => 'description:json_string',
+        'SocialSummary'    => 'social_description:json_string',
         'StartDate'        => 'start_date:datetime_epoch',
         'EndDate'          => 'end_date:datetime_epoch',
         'LocationId'       => 'location_id:json_int',
@@ -43,6 +44,7 @@ class SummitEventSerializer extends SilverStripeSerializer
         'id',
         'title',
         'description',
+        'social_description',
         'start_date',
         'end_date',
         'location_id',
@@ -79,12 +81,6 @@ class SummitEventSerializer extends SilverStripeSerializer
 
 
         $values = parent::serialize($expand, $fields, $relations, $params);
-
-        //check if description is empty, if so, set short description
-        if(array_key_exists('description', $values) && empty($values['description']))
-        {
-            $values['description'] = JsonUtils::toJsonString($event->getShortDescription());
-        }
 
         if(in_array('sponsors', $relations))
             $values['sponsors'] = $event->getSponsorsIds();
