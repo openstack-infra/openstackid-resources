@@ -147,12 +147,7 @@ Route::group(array(
                 Route::get('', 'OAuth2SummitApiController@getEventTypes');
             });
 
-            // summit types
-            /*Route::group(array('prefix' => 'summit-types'), function () {
-                Route::get('', 'OAuth2SummitApiController@getSummitTypes');
-            });*/
-
-            // summit types
+            // external orders
             Route::group(array('prefix' => 'external-orders'), function () {
                 Route::get('{external_order_id}', 'OAuth2SummitApiController@getExternalOrder');
                 Route::post('{external_order_id}/external-attendees/{external_attendee_id}/confirm', 'OAuth2SummitApiController@confirmExternalOrderAttendee');
@@ -164,6 +159,17 @@ Route::group(array(
                     Route::get('', 'OAuth2SummitMembersApiController@getMyMember');
                 });
 
+            });
+
+            // tracks
+            Route::group(array('prefix' => 'tracks'), function () {
+                Route::get('', 'OAuth2SummitApiController@getTracks');
+                Route::get('{track_id}', 'OAuth2SummitApiController@getTrack');
+            });
+            // track groups
+            Route::group(array('prefix' => 'track-groups'), function () {
+                Route::get('', 'OAuth2SummitApiController@getTracksGroups');
+                Route::get('{track_group_id}', 'OAuth2SummitApiController@getTrackGroup');
             });
 
         });

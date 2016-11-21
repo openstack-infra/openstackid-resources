@@ -36,7 +36,58 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $summits = json_decode($content);
         $this->assertTrue(!is_null($summits));
         $this->assertResponseStatus(200);
+    }
 
+    public function testGetTracks()
+    {
+
+        $params = array
+        (
+            'id' => 6,
+            'expand' => 'track_groups',
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitApiController@getTracks",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $tracks = json_decode($content);
+        $this->assertTrue(!is_null($tracks));
+        $this->assertResponseStatus(200);
+    }
+
+    public function testGetTrackGroups()
+    {
+
+        $params = array
+        (
+            'id' => 6,
+            'expand' => 'tracks',
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitApiController@getTracksGroups",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $groups = json_decode($content);
+        $this->assertTrue(!is_null($groups));
+        $this->assertResponseStatus(200);
     }
 
     public function testGetSummit()

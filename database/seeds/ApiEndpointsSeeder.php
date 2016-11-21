@@ -378,10 +378,28 @@ class ApiEndpointsSeeder extends Seeder
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/summits/read', $current_realm)],
             ),
-            //summit types
+            //tracks
             array(
-                'name' => 'get-summit-types',
-                'route' => '/api/v1/summits/{id}/summit-types',
+                'name' => 'get-tracks',
+                'route' => '/api/v1/summits/{id}/tracks',
+                'http_method' => 'GET',
+                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+            ),
+            array(
+                'name' => 'get-track',
+                'route' => '/api/v1/summits/{id}/tracks/{track_id}',
+                'http_method' => 'GET',
+                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+            ),
+            array(
+                'name' => 'get-track-groups',
+                'route' => '/api/v1/summits/{id}/track-groups',
+                'http_method' => 'GET',
+                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+            ),
+            array(
+                'name' => 'get-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}',
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/summits/read', $current_realm)],
             ),
