@@ -502,16 +502,6 @@ class SummitEvent extends SilverstripeBaseModel
     /**
      * @return array
      */
-    public function getSummitTypesIds()
-    {
-        return $this->summit_types->map(function($entity)  {
-            return $entity->getId();
-        })->toArray();
-    }
-
-    /**
-     * @return array
-     */
     public function getSponsorsIds()
     {
         return $this->sponsors->map(function($entity)  {
@@ -615,9 +605,6 @@ class SummitEvent extends SilverstripeBaseModel
     {
         if($this->isPublished())
             throw new ValidationException('Already published Summit Event');
-
-        if($this->getSummitTypes()->count() === 0)
-            throw new EntityValidationException('To publish this event you must associate a valid summit type!');
 
         $start_date = $this->getStartDate();
         $end_date   = $this->getEndDate();

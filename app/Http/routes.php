@@ -148,9 +148,9 @@ Route::group(array(
             });
 
             // summit types
-            Route::group(array('prefix' => 'summit-types'), function () {
+            /*Route::group(array('prefix' => 'summit-types'), function () {
                 Route::get('', 'OAuth2SummitApiController@getSummitTypes');
-            });
+            });*/
 
             // summit types
             Route::group(array('prefix' => 'external-orders'), function () {

@@ -218,16 +218,8 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     public function getSummitTypes($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
 
-            //summit types
-            $summit_types = array();
-            foreach ($summit->getSummitTypes() as $summit_type)
-            {
-                $summit_types[] =SerializerRegistry::getInstance()->getSerializer($summit_type)->serialize();
-            }
-            return $this->ok($summit_types);
+            return $this->ok();
 
         } catch (Exception $ex) {
             Log::error($ex);

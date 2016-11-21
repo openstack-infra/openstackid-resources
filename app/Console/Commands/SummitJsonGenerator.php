@@ -94,7 +94,7 @@ final class SummitJsonGenerator extends Command {
 
 		$this->info(sprintf("processing summit id %s", $summit->getIdentifier()));
         $start = time();
-        $expand = 'locations,sponsors,summit_types,event_types,presentation_categories,schedule';
+        $expand = 'locations,sponsors,event_types,presentation_categories,schedule';
 
         $data  = SerializerRegistry::getInstance()->getSerializer($summit)->serialize($expand);
         if(is_null($data)) return;

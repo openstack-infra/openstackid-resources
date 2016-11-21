@@ -844,7 +844,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             'start_date' => $start_date,
             'end_date' => $end_date,
             'type_id' => 95,
-            'summit_types_id' => [10],
             'tags' => ['Neutron']
         );
 
@@ -886,7 +885,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             'description' => 'test presentation BCN',
             'allow_feedback' => true,
             'type_id' => 86,
-            'summit_types_id' => [7],
             'tags' => ['tag#1', 'tag#2']
         );
 
@@ -924,7 +922,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             'description' => 'test presentation BCN',
             'allow_feedback' => true,
             'type_id' => 86,
-            'summit_types_id' => [7],
             'tags' => ['tag#1', 'tag#2'],
             'speakers' => [1, 2, 3],
         );
@@ -953,7 +950,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     public function testUpdateEvent()
     {
         /*$event = $this->testPostEvent();
-        unset($event->summit_types);
         unset($event->tags);*/
         $params = array
         (
@@ -996,7 +992,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     public function testPublishEvent($start_date = 1461520800, $end_date = 1461526200)
     {
         $event = $this->testPostEvent($start_date, $end_date);
-        unset($event->summit_types);
         unset($event->tags);
 
         $params = array
