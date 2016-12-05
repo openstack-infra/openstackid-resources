@@ -34,6 +34,7 @@ final class DoctrineSummitRepository extends SilverStripeDoctrineRepository impl
             ->select("s")
             ->from(\models\summit\Summit::class, "s")
             ->where('s.active = 1')
+            ->andWhere('s.available_on_api = 1')
             ->orderBy('s.begin_date', 'DESC')
             ->getQuery()
             ->setCacheable(true)
@@ -41,5 +42,21 @@ final class DoctrineSummitRepository extends SilverStripeDoctrineRepository impl
             ->getResult();
         if (count($res) == 0) return null;
         return $res[0];
+    }
+
+    /**
+     * @return Summit[]
+     */
+    public function getAvailables()
+    {
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select("s")
+            ->from(\models\summit\Summit::class, "s")
+            ->where('s.available_on_api = 1')
+            ->orderBy('s.begin_date', 'ASC')
+            ->getQuery()
+            ->setCacheable(true)
+            ->setCacheRegion("summit_region")
+            ->getResult();
     }
 }

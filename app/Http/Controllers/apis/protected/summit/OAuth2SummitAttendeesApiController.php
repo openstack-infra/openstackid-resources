@@ -164,7 +164,8 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
+            $type     = $attendee_id === 'me' ? CheckAttendeeStrategyFactory::Me : CheckAttendeeStrategyFactory::Own;
+            $attendee = CheckAttendeeStrategyFactory::build($type, $this->resource_server_context)->check($attendee_id, $summit);
             if(is_null($attendee)) return $this->error404();
 
             return $this->ok(SerializerRegistry::getInstance()->getSerializer($attendee)->serialize($expand));

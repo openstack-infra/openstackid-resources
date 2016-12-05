@@ -20,4 +20,9 @@ interface ISummitRepository extends IBaseRepository
      * @return Summit
      */
     public function getCurrent();
+
+    /**
+     * @return Summit[]
+     */
+    public function getAvailables();
 }

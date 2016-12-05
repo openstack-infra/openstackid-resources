@@ -170,6 +170,28 @@ class Summit extends SilverstripeBaseModel
     private $active;
 
     /**
+     * @return boolean
+     */
+    public function isAvailableOnApi()
+    {
+        return $this->available_on_api;
+    }
+
+    /**
+     * @param boolean $available_on_api
+     */
+    public function setAvailableOnApi($available_on_api)
+    {
+        $this->available_on_api = $available_on_api;
+    }
+
+    /**
+     * @ORM\Column(name="AvailableOnApi", type="boolean")
+     * @var bool
+     */
+    private $available_on_api;
+
+    /**
      * @ORM\Column(name="ExternalEventId", type="string")
      * @var string
      */
@@ -186,7 +208,12 @@ class Summit extends SilverstripeBaseModel
      */
     public function getType()
     {
-        return $this->type;
+        try {
+            return $this->type;
+        }
+        catch (\Exception $ex){
+            return null;
+        }
     }
 
     /**
@@ -207,6 +234,13 @@ class Summit extends SilverstripeBaseModel
         catch(\Exception $ex){
             return 0;
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasType(){
+        return $this->getTypeId() > 0;
     }
 
     /**

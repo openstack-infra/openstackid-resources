@@ -18,8 +18,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     public function testGetSummits()
     {
 
-        $params = array
-        ();
+        $params = ['expand' => 'type'];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
@@ -96,7 +95,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $params = array
         (
             'expand' => 'schedule,speakers',
-            'id' => 22
+            'id'     => 7
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
@@ -195,13 +194,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $params = array
         (
-            'expand' => 'schedule',
-            'id' => 6,
-            'attendee_id' => 'me',
+            'expand'       => 'schedule',
+            'id'           => 6,
+            'attendee_id'  => 'me',
             'access_token' => $this->access_token
         );
 
-        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $headers  = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
             "OAuth2SummitAttendeesApiController@getAttendee",

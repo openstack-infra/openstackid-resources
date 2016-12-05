@@ -16,6 +16,7 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Input;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
@@ -76,10 +77,11 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     public function getSummits()
     {
         try {
-            $summits = array();
 
-            foreach($this->repository->getAll() as $summit){
-                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize();
+            $summits = [];
+
+            foreach($this->repository->getAvailables() as $summit){
+                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize(Input::get('expand',''));
             }
 
             $response = new PagingResponse
@@ -90,6 +92,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
                 1,
                 $summits
             );
+
             return $this->ok($response->toArray());
         }
         catch (Exception $ex) {
@@ -335,6 +338,11 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $external_order_id
+     * @return mixed
+     */
     public function getExternalOrder($summit_id, $external_order_id){
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
@@ -356,6 +364,12 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $external_order_id
+     * @param $external_attendee_id
+     * @return mixed
+     */
     public function confirmExternalOrderAttendee($summit_id, $external_order_id, $external_attendee_id){
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);

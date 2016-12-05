@@ -134,6 +134,15 @@ final class SummitSerializer extends SilverStripeSerializer
                         $values['speakers'] = $speakers;
                     }
                     break;
+                    case 'type':{
+                        if(isset($values['type_id']))
+                        {
+                            unset($values['type_id']);
+                            $values['type'] = $summit->hasType() ?
+                                SerializerRegistry::getInstance()->getSerializer($summit->getType())->serialize() : null;
+                        }
+                    }
+                    break;
                 }
             }
         }
