@@ -56,7 +56,7 @@ final class DoctrineSummitEntityEventRepository
         {
             $str_date = $from_date->format("Y-m-d H:i:s");
             // CDT TO UTC
-            $filters .= " AND DATE_ADD(SummitEntityEvent.Created,INTERVAL + 5 HOUR) >= '{$str_date}' ";
+            $filters .= " AND CONVERT_TZ(SummitEntityEvent.Created,'America/Chicago', 'GMT') >= '{$str_date}' ";
         }
 
         $query = <<<SQL
