@@ -1,5 +1,4 @@
 <?php namespace models\main;
-
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,29 +12,12 @@
  * limitations under the License.
  **/
 
-use models\utils\IBaseRepository;
-use utils\Filter;
-use utils\Order;
-use utils\PagingInfo;
-use utils\PagingResponse;
-
 /**
- * Interface IMemberRepository
+ * Class PushNotificationMessagePriority
  * @package models\main
  */
-interface IMemberRepository extends IBaseRepository
+final class PushNotificationMessagePriority
 {
-    /**
-     * @param string $email
-     * @return Member
-     */
-    public function getByEmail($email);
-
-    /**
-     * @param PagingInfo $paging_info
-     * @param Filter|null $filter
-     * @param Order|null $order
-     * @return PagingResponse
-     */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+    const Normal = 'NORMAL';
+    const High   = 'HIGH';
 }

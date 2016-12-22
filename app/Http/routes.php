@@ -44,6 +44,47 @@ Route::group(array(
 
     });
 
+    // members
+    Route::group(['prefix'=>'members'], function(){
+        Route::get('', 'OAuth2MembersApiController@getMembers');
+
+        Route::group(['prefix'=>'me'], function(){
+
+            // invitations
+            Route::group(['prefix'=>'team-invitations'], function(){
+                Route::get('', 'OAuth2TeamInvitationsApiController@getMyInvitations');
+                Route::group(['prefix'=>'{invitation_id}'], function() {
+                    Route::patch('', 'OAuth2TeamInvitationsApiController@acceptInvitation');
+                    Route::delete('', 'OAuth2TeamInvitationsApiController@declineInvitation');
+                });
+            });
+        });
+    });
+
+    // teams
+    Route::group(['prefix'=>'teams'], function(){
+        Route::get('', 'OAuth2TeamsApiController@getMyTeams');
+        Route::post('', 'OAuth2TeamsApiController@addTeam');
+
+        Route::group(['prefix' => '{team_id}'], function () {
+            Route::get('', 'OAuth2TeamsApiController@getMyTeam');
+            Route::put('', 'OAuth2TeamsApiController@updateTeam');
+            Route::delete('', 'OAuth2TeamsApiController@deleteTeam');
+
+            Route::group(array('prefix' => 'messages'), function () {
+                Route::get('', 'OAuth2TeamsApiController@getMyTeamMessages');
+                Route::post('', 'OAuth2TeamsApiController@postTeamMessage');
+            });
+
+            Route::group(array('prefix' => 'members'), function () {
+                Route::group(['prefix' => '{member_id}'], function () {
+                    Route::post('', 'OAuth2TeamsApiController@addMember2MyTeam');
+                    Route::delete('', 'OAuth2TeamsApiController@removedMemberFromMyTeam');
+                });
+            });
+        });
+    });
+
     // summits
     Route::group(array('prefix' => 'summits'), function () {
 

@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use models\main\ChatTeamPermission;
+use models\main\PushNotificationMessagePriority;
 use Monolog\Handler\NativeMailerHandler;
 
 /**
@@ -69,6 +71,22 @@ class AppServiceProvider extends ServiceProvider
                 if(!is_string($element)) return false;
             }
             return true;
+        });
+
+        Validator::extend('team_permission', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('team_permission', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid permission value (ADMIN, WRITE, READ)", $attribute);
+            });
+            return in_array($value, [ChatTeamPermission::Read, ChatTeamPermission::Write, ChatTeamPermission::Admin]);
+        });
+
+        Validator::extend('chat_message_priority', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('chat_message_priority', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid message priority value (NORMAL, HIGH)", $attribute);
+            });
+            return in_array($value, [ PushNotificationMessagePriority::Normal, PushNotificationMessagePriority::High]);
         });
     }
 

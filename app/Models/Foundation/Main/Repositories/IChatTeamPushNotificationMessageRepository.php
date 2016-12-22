@@ -1,5 +1,4 @@
 <?php namespace models\main;
-
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,30 +11,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\utils\IBaseRepository;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
- * Interface IMemberRepository
+ * Interface IChatTeamPushNotificationMessageRepository
  * @package models\main
  */
-interface IMemberRepository extends IBaseRepository
+interface IChatTeamPushNotificationMessageRepository extends IBaseRepository
 {
     /**
-     * @param string $email
-     * @return Member
-     */
-    public function getByEmail($email);
-
-    /**
+     * @param int $team_id
      * @param PagingInfo $paging_info
      * @param Filter|null $filter
      * @param Order|null $order
      * @return PagingResponse
      */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+    function getAllSentByTeamPaginated
+    (
+        $team_id,
+        PagingInfo $paging_info,
+        Filter $filter = null,
+        Order $order = null
+    );
+
+    /**
+     * @param int $team_id
+     * @param PagingInfo $paging_info
+     * @return PagingResponse
+     */
+    function getAllNotSentByTeamPaginated
+    (
+        $team_id,
+        PagingInfo $paging_info
+    );
 }

@@ -1,5 +1,12 @@
 <?php namespace ModelSerializers;
 use Libs\ModelSerializers\IModelSerializer;
+use models\main\ChatTeam;
+use models\main\ChatTeamMember;
+use models\main\ChatTeamPushNotificationMessage;
+use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
+use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
+use ModelSerializers\ChatTeams\ChatTeamPushNotificationMessageSerializer;
+use ModelSerializers\ChatTeams\ChatTeamSerializer;
 use ModelSerializers\Locations\SummitAirportSerializer;
 use ModelSerializers\Locations\SummitExternalLocationSerializer;
 use ModelSerializers\Locations\SummitHotelSerializer;
@@ -84,6 +91,12 @@ final class SerializerRegistry
 
         // push notification
         $this->registry['SummitPushNotification']    = SummitPushNotificationSerializer::class;
+
+        // teams
+        $this->registry['ChatTeam']                        = ChatTeamSerializer::class;
+        $this->registry['ChatTeamMember']                  = ChatTeamMemberSerializer::class;
+        $this->registry['ChatTeamInvitation']              = ChatTeamInvitationSerializer::class;
+        $this->registry['ChatTeamPushNotificationMessage'] = ChatTeamPushNotificationMessageSerializer::class;
     }
 
     /**

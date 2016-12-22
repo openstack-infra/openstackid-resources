@@ -1,4 +1,4 @@
-<?php namespace models\main;
+<?php namespace services\apis;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,20 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use Doctrine\ORM\Mapping as ORM;
-use models\utils\SilverstripeBaseModel;
-
+use models\main\PushNotificationMessagePriority;
 /**
- * @ORM\Entity
- * @ORM\Table(name="CustomDataObject")
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="ClassName", type="string")
- * @ORM\DiscriminatorMap({"CustomDataObject" = "CustomDataObject", "SummitPushNotification" = "models\summit\SummitPushNotification"})
- * Class CustomDataObject
- * @package models\main
+ * Interface IPushNotificationApi
+ * @package services\apis
  */
-abstract class CustomDataObject extends SilverstripeBaseModel
+interface IPushNotificationApi
 {
-
+    /**
+     * @param string $to
+     * @param array $data
+     * @param string $priority
+     * @param null|int $ttl
+     * @return bool
+     */
+    function sendPush($to,  array $data, $priority = PushNotificationMessagePriority::Normal, $ttl = null);
 }

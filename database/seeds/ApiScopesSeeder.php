@@ -33,6 +33,8 @@ final class ApiScopesSeeder extends Seeder
         $this->seedPrivateCloudScopes();
         $this->seedConsultantScopes();
         $this->seedSummitScopes();
+        $this->seedMembersScopes();
+        $this->seedTeamsScopes();
     }
 
     private function seedPublicCloudScopes()
@@ -161,6 +163,63 @@ final class ApiScopesSeeder extends Seeder
 
         EntityManager::flush();
 
+    }
+
+    private function seedMembersScopes(){
+        $current_realm = Config::get('app.url');
+        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'members']);
+
+        $scopes = [
+            array(
+                'name' => sprintf('%s/members/read', $current_realm),
+                'short_description' => 'Get Members Data',
+                'description' => 'Grants read only access for Members Data',
+            ),
+        ];
+
+        foreach ($scopes as $scope_info) {
+            $scope = new ApiScope();
+            $scope->setName($scope_info['name']);
+            $scope->setShortDescription($scope_info['short_description']);
+            $scope->setDescription($scope_info['description']);
+            $scope->setActive(true);
+            $scope->setDefault(false);
+            $scope->setApi($api);
+            EntityManager::persist($scope);
+        }
+
+        EntityManager::flush();
+    }
+
+    private function seedTeamsScopes(){
+        $current_realm = Config::get('app.url');
+        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'teams']);
+
+        $scopes = [
+            array(
+                'name' => sprintf('%s/teams/read', $current_realm),
+                'short_description' => 'Get Teams Data',
+                'description' => 'Grants read only access for Teams Data',
+            ),
+            array(
+                'name' => sprintf('%s/teams/write', $current_realm),
+                'short_description' => 'Write Teams Data',
+                'description' => 'Grants write access for Teams Data',
+            ),
+        ];
+
+        foreach ($scopes as $scope_info) {
+            $scope = new ApiScope();
+            $scope->setName($scope_info['name']);
+            $scope->setShortDescription($scope_info['short_description']);
+            $scope->setDescription($scope_info['description']);
+            $scope->setActive(true);
+            $scope->setDefault(false);
+            $scope->setApi($api);
+            EntityManager::persist($scope);
+        }
+
+        EntityManager::flush();
     }
 
 }

@@ -1,5 +1,4 @@
 <?php namespace services;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use App;
-use Config;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use services\apis\EventbriteAPI;
-
+use services\apis\FireBaseGCMApi;
 /***
  * Class ServicesProvider
  * @package services
@@ -38,9 +36,14 @@ class ServicesProvider extends ServiceProvider
         });
         App::singleton('services\model\ISummitService', 'services\model\SummitService');
         App::singleton('services\model\IPresentationService', 'services\model\PresentationService');
+        App::singleton('services\model\IChatTeamService', 'services\model\ChatTeamService');
         App::singleton('services\apis\IEventbriteAPI',   function(){
             $api = new EventbriteAPI();
             $api->setCredentials(array('token' => Config::get("server.eventbrite_oauth2_personal_token", null)));
+            return $api;
+        });
+        App::singleton('services\apis\IPushNotificationApi',   function(){
+            $api = new FireBaseGCMApi(Config::get("server.firebase_gcm_server_key", null));
             return $api;
         });
     }
