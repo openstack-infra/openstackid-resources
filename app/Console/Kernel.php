@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\SummitJsonGenerator::class,
+        \App\Console\Commands\ChatTeamMessagesSender::class,
     ];
 
     /**
@@ -24,9 +25,15 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // current
+        //Current
         $schedule->command('summit:json-generator')->everyTenMinutes()->withoutOverlapping();
-        //austin
+        //Austin
         $schedule->command('summit:json-generator 6')->everyTenMinutes()->withoutOverlapping();
+        //BCN
+        $schedule->command('summit:json-generator 7')->everyTenMinutes()->withoutOverlapping();
+        //Boston
+        $schedule->command('summit:json-generator 22')->everyTenMinutes()->withoutOverlapping();
+        // teams messages
+        $schedule->command('teams:message-sender 100')->everyMinute()->withoutOverlapping();
     }
 }

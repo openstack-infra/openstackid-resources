@@ -27,10 +27,13 @@ class ApiEndpointsSeeder extends Seeder
     {
         DB::table('endpoint_api_scopes')->delete();
         DB::table('api_endpoints')->delete();
+
         $this->seedPublicCloudsEndpoints();
         $this->seedPrivateCloudsEndpoints();
         $this->seedConsultantsEndpoints();
         $this->seedSummitEndpoints();
+        $this->seedMemberEndpoints();
+        $this->seedTeamEndpoints();
     }
 
     /**
@@ -463,6 +466,100 @@ class ApiEndpointsSeeder extends Seeder
             )
         ]);
 
+    }
+
+    private function seedMemberEndpoints(){
+        $current_realm = Config::get('app.url');
+
+        $this->seedApiEndpoints('members', [
+               // members
+                array(
+                    'name' => 'get-members',
+                    'route' => '/api/v1/members',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/members/read', $current_realm)],
+                )
+            ]
+        );
+    }
+
+    private function seedTeamEndpoints(){
+        $current_realm = Config::get('app.url');
+
+        $this->seedApiEndpoints('teams', [
+                array(
+                    'name' => 'add-team',
+                    'route' => '/api/v1/teams',
+                    'http_method' => 'POST',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+                array(
+                    'name' => 'delete-team',
+                    'route' => '/api/v1/teams/{team_id}',
+                    'http_method' => 'DELETE',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+                array(
+                    'name' => 'get-teams',
+                    'route' => '/api/v1/teams',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/teams/read', $current_realm)],
+                ),
+                array(
+                    'name' => 'get-team',
+                    'route' => '/api/v1/teams/{team_id}',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/teams/read', $current_realm)],
+                ),
+                array(
+                    'name' => 'post-message-2-team',
+                    'route' => '/api/v1/teams/{team_id}/messages',
+                    'http_method' => 'POST',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+                array(
+                    'name' => 'get-messages-from-team',
+                    'route' => '/api/v1/teams/{team_id}/messages',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/teams/read', $current_realm)],
+                ),
+
+                array(
+                    'name' => 'add-member-2-team',
+                    'route' => '/api/v1/teams/{team_id}/members/{member_id}',
+                    'http_method' => 'POST',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+                array(
+                    'name' => 'remove-member-from-team',
+                    'route' => '/api/v1/teams/{team_id}/members/{member_id}',
+                    'http_method' => 'DELETE',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+            ]
+        );
+
+        $this->seedApiEndpoints('members', [
+                array(
+                    'name' => 'get-invitations',
+                    'route' => '/api/v1/members/me/team-invitations',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/teams/read', $current_realm)],
+                ),
+                array(
+                    'name' => 'accept-invitation',
+                    'route' => '/api/v1/members/me/team-invitations/{invitation_id}',
+                    'http_method' => 'PATCH',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+                array(
+                    'name' => 'decline-invitation',
+                    'route' => '/api/v1/members/me/team-invitations/{invitation_id}',
+                    'http_method' => 'DELETE',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+            ]
+        );
     }
 
 }

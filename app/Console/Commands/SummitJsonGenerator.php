@@ -17,8 +17,6 @@ use libs\utils\ICacheService;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Support\Facades\Config;
 
 /**
@@ -42,6 +40,12 @@ final class SummitJsonGenerator extends Command {
      */
     private $cache_service;
 
+    /**
+     * SummitJsonGenerator constructor.
+     * @param ISummitRepository $repository
+     * @param ISummitService $service
+     * @param ICacheService $cache_service
+     */
     public function __construct(
         ISummitRepository $repository,
         ISummitService $service,
@@ -102,8 +106,8 @@ final class SummitJsonGenerator extends Command {
         $delta = $end - $start;
         $this->info(sprintf("execution call %s seconds", $delta));
         $current_time = time();
-        $key_current = sprintf('/api/v1/summits/%s.expand=%s','current', urlencode($expand));
-        $key_id      = sprintf('/api/v1/summits/%s.expand=%s',$summit->getIdentifier(), urlencode($expand));
+        $key_current  = sprintf('/api/v1/summits/%s.expand=%s','current', urlencode($expand));
+        $key_id       = sprintf('/api/v1/summits/%s.expand=%s', $summit->getIdentifier(), urlencode($expand));
 
         $cache_lifetime = intval(Config::get('server.response_cache_lifetime', 300));
 

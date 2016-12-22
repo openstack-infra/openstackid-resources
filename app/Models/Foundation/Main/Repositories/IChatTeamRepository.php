@@ -1,5 +1,4 @@
 <?php namespace models\main;
-
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,28 +13,21 @@
  **/
 
 use models\utils\IBaseRepository;
-use utils\Filter;
-use utils\Order;
-use utils\PagingInfo;
-use utils\PagingResponse;
 
 /**
- * Interface IMemberRepository
+ * Interface IChatTeamRepository
  * @package models\main
  */
-interface IMemberRepository extends IBaseRepository
+interface IChatTeamRepository extends IBaseRepository
 {
     /**
-     * @param string $email
-     * @return Member
+     * @param Member $member
+     * @return ChatTeam[]
      */
-    public function getByEmail($email);
+    function getTeamsByMember(Member $member);
 
     /**
-     * @param PagingInfo $paging_info
-     * @param Filter|null $filter
-     * @param Order|null $order
-     * @return PagingResponse
+     * @return int[]
      */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+    function getAllTeamsIdsWithPendingMessages2Sent();
 }

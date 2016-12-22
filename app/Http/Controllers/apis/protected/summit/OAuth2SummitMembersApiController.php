@@ -46,7 +46,6 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
         $this->repository         = $member_repository;
     }
 
-
     public function getMyMember($summit_id){
 
         $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
