@@ -12,19 +12,17 @@
  * limitations under the License.
  **/
 
-use Doctrine\ORM\Mapping as ORM;
-use models\utils\SilverstripeBaseModel;
+use models\utils\IBaseRepository;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="CustomDataObject")
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="ClassName", type="string")
- * @ORM\DiscriminatorMap({"CustomDataObject" = "CustomDataObject", "SummitPushNotification" = "models\summit\SummitPushNotification"})
- * Class CustomDataObject
+ * Interface IChatTeamRepository
  * @package models\main
  */
-abstract class CustomDataObject extends SilverstripeBaseModel
+interface IChatTeamRepository extends IBaseRepository
 {
-
+    /**
+     * @param Member $member
+     * @return ChatTeam[]
+     */
+    function getTeamsByMember(Member $member);
 }

@@ -1,5 +1,4 @@
 <?php namespace repositories;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,16 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
-
 /**
  * Class RepositoriesProvider
  * @package repositories
  */
-class RepositoriesProvider extends ServiceProvider
+final class RepositoriesProvider extends ServiceProvider
 {
     protected $defer = false;
 
@@ -110,6 +107,24 @@ class RepositoriesProvider extends ServiceProvider
             'models\main\ITagRepository',
             function(){
                 return  EntityManager::getRepository(\models\main\Tag::class);
+            });
+
+        App::singleton(
+            'models\main\IChatTeamRepository',
+            function(){
+                return  EntityManager::getRepository(\models\main\ChatTeam::class);
+            });
+
+        App::singleton(
+            'models\main\IChatTeamInvitationRepository',
+            function(){
+                return  EntityManager::getRepository(\models\main\ChatTeamInvitation::class);
+            });
+
+        App::singleton(
+            'models\main\IChatTeamPushNotificationMessageRepository',
+            function(){
+                return  EntityManager::getRepository(\models\main\ChatTeamPushNotificationMessage::class);
             });
     }
 }

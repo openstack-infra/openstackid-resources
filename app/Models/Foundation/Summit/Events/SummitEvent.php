@@ -199,8 +199,6 @@ class SummitEvent extends SilverstripeBaseModel
      */
     protected $rsvp_template_id;
 
-
-
     /**
      * @return DateTime
      */

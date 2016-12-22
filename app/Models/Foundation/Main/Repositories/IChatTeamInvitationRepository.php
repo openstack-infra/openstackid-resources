@@ -1,6 +1,5 @@
 <?php namespace models\main;
-
-/**
+/*
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,30 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\utils\IBaseRepository;
-use utils\Filter;
-use utils\Order;
-use utils\PagingInfo;
-use utils\PagingResponse;
-
 /**
- * Interface IMemberRepository
+ * Interface IChatTeamInvitationRepository
  * @package models\main
  */
-interface IMemberRepository extends IBaseRepository
+interface IChatTeamInvitationRepository extends IBaseRepository
 {
     /**
-     * @param string $email
-     * @return Member
+     * @param int $invitee_id
+     * @return ChatTeamInvitation[]
      */
-    public function getByEmail($email);
-
-    /**
-     * @param PagingInfo $paging_info
-     * @param Filter|null $filter
-     * @param Order|null $order
-     * @return PagingResponse
-     */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+    function getInvitationsByInvitee($invitee_id);
 }

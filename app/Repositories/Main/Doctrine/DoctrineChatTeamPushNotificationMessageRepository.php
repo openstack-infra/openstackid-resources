@@ -1,4 +1,4 @@
-<?php namespace repositories\summit;
+<?php namespace repositories\main;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,52 +11,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use models\main\IMemberRepository;
-use models\main\Member;
+use models\main\IChatTeamPushNotificationMessageRepository;
 use repositories\SilverStripeDoctrineRepository;
+use utils\DoctrineJoinFilterMapping;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
- * Class DoctrineMemberRepository
- * @package repositories\summit
+ * Class DoctrineChatTeamPushNotificationMessageRepository
+ * @package repositories\main
  */
-final class DoctrineMemberRepository extends SilverStripeDoctrineRepository implements IMemberRepository
+final class DoctrineChatTeamPushNotificationMessageRepository
+    extends SilverStripeDoctrineRepository
+    implements IChatTeamPushNotificationMessageRepository
 {
 
     /**
-     * @param string $email
-     * @return Member
-     */
-    public function getByEmail($email)
-    {
-        // TODO: Implement getByEmail() method.
-    }
-
-    /**
+     * @param int $team_id
      * @param PagingInfo $paging_info
      * @param Filter|null $filter
      * @param Order|null $order
      * @return PagingResponse
      */
-    public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
+    function getAllSentByTeamPaginated($team_id, PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
         $query  = $this->getEntityManager()->createQueryBuilder()
             ->select("m")
-            ->from(\models\main\Member::class, "m");
+            ->from(\models\main\ChatTeamPushNotificationMessage::class, "m")
+            ->join('m.team', 't')
+            ->where('m.is_sent = 1')
+            ->andWhere('t.id = :team_id')
+            ->setParameter('team_id', $team_id);
 
         if(!is_null($filter)){
 
             $filter->apply2Query($query, array
             (
-                'irc'        => 'm.irc_handle:json_string',
-                'twitter'    => 'm.twitter_handle:json_string',
-                'first_name' => 'm.first_name:json_string',
-                'last_name'  => 'm.last_name:json_string',
+                'sent_date' => 'm.sent_date:datetime_epoch',
+                'owner_id'  => new DoctrineJoinFilterMapping
+                (
+                    'm.owner',
+                    'mb',
+                    "mb.id  :operator :value"
+                ),
             ));
         }
 
@@ -64,17 +63,17 @@ final class DoctrineMemberRepository extends SilverStripeDoctrineRepository impl
 
             $order->apply2Query($query, array
             (
-                'id'          => 'm.id',
-                'first_name'  => 'm.first_name',
-                'last_name'   => 'm.last_name',
+                'sent_date' => 'm.sent_date',
+                'id'        => 'm.id',
             ));
         } else {
             //default order
-            $query = $query->addOrderBy("m.first_name",'ASC');
-            $query = $query->addOrderBy("m.last_name", 'ASC');
+            $query = $query->addOrderBy("m.sent_date",'ASC');
+            $query = $query->addOrderBy("m.id", 'ASC');
         }
 
-        $query= $query
+        $query =
+            $query
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 

@@ -14,9 +14,8 @@
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use models\main\CustomDataObject;
 use models\main\Group;
-use models\main\Member;
+use models\main\PushNotificationMessage;
 
 /**
  * Class SummitPushNotificationChannel
@@ -47,6 +46,7 @@ final class SummitPushNotificationChannel {
         return in_array($channel, self::getPublicChannels());
     }
 }
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitPushNotification")
@@ -54,7 +54,7 @@ final class SummitPushNotificationChannel {
  * Class SummitPushNotification
  * @package models\summit
  */
-class SummitPushNotification extends CustomDataObject
+class SummitPushNotification extends PushNotificationMessage
 {
     use SummitOwned;
 
@@ -78,78 +78,6 @@ class SummitPushNotification extends CustomDataObject
     public function setChannel($channel)
     {
         $this->channel = $channel;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
-     * @param string $message
-     */
-    public function setMessage($message)
-    {
-        $this->message = $message;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getSentDate()
-    {
-        return $this->sent_date;
-    }
-
-    /**
-     * @param \DateTime $sent_date
-     */
-    public function setSentDate($sent_date)
-    {
-        $this->sent_date = $sent_date;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isSent()
-    {
-        return $this->is_sent;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function getIsSent()
-    {
-        return $this->isSent();
-    }
-
-    /**
-     * @param boolean $is_sent
-     */
-    public function setIsSent($is_sent)
-    {
-        $this->is_sent = $is_sent;
-    }
-
-    /**
-     * @return Member
-     */
-    public function getOwner()
-    {
-        return $this->owner;
-    }
-
-    /**
-     * @param Member $owner
-     */
-    public function setOwner($owner)
-    {
-        $this->owner = $owner;
     }
 
     /**
@@ -199,31 +127,6 @@ class SummitPushNotification extends CustomDataObject
     {
         $this->recipients = $recipients;
     }
-
-    /**
-     * @ORM\Column(name="Message", type="string")
-     * @var string
-     */
-    private $message;
-
-    /**
-     * @ORM\Column(name="SentDate", type="datetime")
-     * @var \DateTime
-     */
-    private $sent_date;
-
-    /**
-     * @ORM\Column(name="IsSent", type="boolean")
-     * @var bool
-     */
-    private $is_sent;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\Member")
-     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
-     * @var Member
-     */
-    private $owner;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent")

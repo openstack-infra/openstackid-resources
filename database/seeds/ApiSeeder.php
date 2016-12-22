@@ -68,5 +68,27 @@ final class ApiSeeder extends Seeder
 
         EntityManager::flush();
 
+        // members
+
+        $api = new Api();
+        $api->setName('members');
+        $api->setActive(true);
+        $api->setDescription('Members API');
+
+        EntityManager::persist($api);
+
+        EntityManager::flush();
+
+        // teams
+
+        $api = new Api();
+        $api->setName('teams');
+        $api->setActive(true);
+        $api->setDescription('Teams API');
+
+        EntityManager::persist($api);
+
+        EntityManager::flush();
+
     }
 }

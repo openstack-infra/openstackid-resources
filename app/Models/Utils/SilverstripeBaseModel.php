@@ -16,7 +16,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Registry;
+use LaravelDoctrine\ORM\Facades\Registry;
 
 /***
  * @ORM\MappedSuperclass
@@ -90,7 +90,6 @@ class SilverstripeBaseModel implements IEntity
 
     public function __construct()
     {
-
         $now               = new \DateTime('now', new \DateTimeZone(self::DefaultTimeZone));
         $this->created     = $now;
         $this->last_edited = $now;
@@ -116,7 +115,6 @@ class SilverstripeBaseModel implements IEntity
      * @return mixed
      */
     protected function prepareRawSQL($sql){
-
         return Registry::getManager(self::EntityManager)->getConnection()->prepare($sql);
     }
 
