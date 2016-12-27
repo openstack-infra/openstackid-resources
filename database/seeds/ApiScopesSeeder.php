@@ -175,6 +175,16 @@ final class ApiScopesSeeder extends Seeder
                 'short_description' => 'Get Members Data',
                 'description' => 'Grants read only access for Members Data',
             ),
+            array(
+                'name' => sprintf('%s/members/invitations/read', $current_realm),
+                'short_description' => 'Allows read only access to invitations',
+                'description' => 'Allows read only access to invitations',
+            ),
+            array(
+                'name' => sprintf('%s/members/invitations/write', $current_realm),
+                'short_description' => 'Allows write only access to invitations',
+                'description' => 'Allows write only access to invitations',
+            ),
         ];
 
         foreach ($scopes as $scope_info) {

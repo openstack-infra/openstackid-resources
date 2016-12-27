@@ -54,7 +54,7 @@ Route::group(array(
             Route::group(['prefix'=>'team-invitations'], function(){
                 Route::get('', 'OAuth2TeamInvitationsApiController@getMyInvitations');
                 Route::group(['prefix'=>'{invitation_id}'], function() {
-                    Route::patch('', 'OAuth2TeamInvitationsApiController@acceptInvitation');
+                    Route::put('', 'OAuth2TeamInvitationsApiController@acceptInvitation');
                     Route::delete('', 'OAuth2TeamInvitationsApiController@declineInvitation');
                 });
             });

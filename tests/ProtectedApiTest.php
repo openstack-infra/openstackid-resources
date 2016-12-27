@@ -49,6 +49,8 @@ class AccessTokenServiceStub implements IAccessTokenService
             $url . '/me/read',
             $url . '/summits/read-notifications',
             $url . '/members/read',
+            $url . '/members/invitations/read',
+            $url . '/members/invitations/write',
             $url . '/teams/read',
             $url . '/teams/write',
         );
@@ -87,6 +89,8 @@ class AccessTokenServiceStub2 implements IAccessTokenService
             $url . '/me/read',
             $url . '/summits/read-notifications',
             $url . '/members/read',
+            $url . '/members/invitations/read',
+            $url . '/members/invitations/write',
             $url . '/teams/read',
             $url . '/teams/write',
         );
