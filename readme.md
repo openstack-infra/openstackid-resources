@@ -22,6 +22,7 @@ run following commands on root folder
    * php artisan doctrine:clear:result:cache
    * php artisan doctrine:ensure:production
    * give proper rights to storage folder (775 and proper users)
+   * chmod 777 vendor/ezyang/htmlpurifier/library/HTMLPurifier/DefinitionCache/Serializer
    
 ## Permissions
 
