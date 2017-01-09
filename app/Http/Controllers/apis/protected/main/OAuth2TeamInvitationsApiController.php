@@ -19,6 +19,7 @@ use models\oauth2\IResourceServerContext;
 use ModelSerializers\SerializerRegistry;
 use services\model\IChatTeamService;
 use utils\PagingResponse;
+use Illuminate\Support\Facades\Input;
 /**
  * Class OAuth2TeamInvitationsApiController
  * @package App\Http\Controllers

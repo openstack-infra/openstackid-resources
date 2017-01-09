@@ -34,8 +34,7 @@ final class DoctrineChatTeamInvitationRepository
             ->createQueryBuilder()
             ->select("i")
             ->from(\models\main\ChatTeamInvitation::class, "i")
-            ->innerJoin('i.invitee', 'iv')
-            ->innerJoin('iv.id', 'm', Join::WITH, "m.id = :member_id")
+            ->innerJoin('i.invitee', 'm', Join::WITH, " m.id = :member_id")
             ->setParameter('member_id', $invitee_id)->getQuery()->getResult();
     }
 }

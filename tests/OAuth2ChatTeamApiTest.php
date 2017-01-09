@@ -300,4 +300,30 @@ final class OAuth2ChatTeamApiTest extends ProtectedApiTest
         // try to get team again, we are not longer members , so will return 404
         $this->testGetMyTeam($team->id, 404);
     }
+
+    public function testGetMyInvitations(){
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+        ];
+
+        $params = [
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2TeamInvitationsApiController@getMyInvitations",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content  = $response->getContent();
+        $messages = json_decode($content);
+        $this->assertTrue(!is_null($messages));
+        $this->assertResponseStatus(200);
+        return $messages;
+    }
 }
