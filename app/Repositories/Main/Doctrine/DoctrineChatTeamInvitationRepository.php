@@ -14,6 +14,7 @@
 use models\main\ChatTeamInvitation;
 use models\main\IChatTeamInvitationRepository;
 use repositories\SilverStripeDoctrineRepository;
+use Doctrine\ORM\Query\Expr\Join;
 /**
  * Class DoctrineChatTeamInvitationRepository
  * @package repositories\main
