@@ -169,7 +169,7 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
             $rules = array
             (
                 'name'            => 'required|string|max:255',
-                'description'     => 'required|sometimes|string',
+                'description'     => 'required|sometimes|string|max:512',
             );
 
             // Creates a Validator instance and validates the data.
@@ -260,7 +260,7 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
             $rules = array
             (
                 'name'            => 'required|string|max:255',
-                'description'     => 'required|sometimes|string',
+                'description'     => 'string|max:512',
             );
 
             // Creates a Validator instance and validates the data.
