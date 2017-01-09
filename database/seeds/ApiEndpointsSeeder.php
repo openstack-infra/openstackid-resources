@@ -494,6 +494,12 @@ class ApiEndpointsSeeder extends Seeder
                     'scopes' => [sprintf('%s/teams/write', $current_realm)],
                 ),
                 array(
+                    'name' => 'update-team',
+                    'route' => '/api/v1/teams/{team_id}',
+                    'http_method' => 'PUT',
+                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
+                ),
+                array(
                     'name' => 'delete-team',
                     'route' => '/api/v1/teams/{team_id}',
                     'http_method' => 'DELETE',

@@ -40,10 +40,36 @@ final class OAuth2ChatTeamApiTest extends ProtectedApiTest
         );
 
         $content = $response->getContent();
-        $team = json_decode($content);
+        $team    = json_decode($content);
         $this->assertTrue(!is_null($team));
         $this->assertResponseStatus(201);
         return $team;
+    }
+
+    public function testUpdateTeam(){
+        $team = $this->testAddTeam();
+
+        $params  = ['team_id' => $team->id];
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $data = [
+            'name' => 'team test #1 update',
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2TeamsApiController@updateTeam",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers,
+            json_encode($data)
+        );
+        $this->assertResponseStatus(204);
     }
 
     public function testDeleteMyTeam(){

@@ -27,6 +27,7 @@ final class ChatTeamSerializer extends SilverStripeSerializer
         'Name'        => 'name:json_string',
         'Description' => 'description:json_string',
         'OwnerId'     => 'owner_id:json_int',
+        'Created'     => 'created_at:datetime_epoch',
     );
 
     /**
