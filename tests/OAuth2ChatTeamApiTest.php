@@ -123,7 +123,7 @@ final class OAuth2ChatTeamApiTest extends ProtectedApiTest
             $team_id = $team->id;
         }
 
-        $params  = ['team_id' => $team_id];
+        $params  = ['team_id' => $team_id, 'expand' =>'owner,members,member'];
         $headers = [
             "HTTP_Authorization" => " Bearer " . $this->access_token,
         ];
