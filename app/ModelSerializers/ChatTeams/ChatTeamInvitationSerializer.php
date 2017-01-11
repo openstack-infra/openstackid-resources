@@ -66,7 +66,7 @@ final class ChatTeamInvitationSerializer extends SilverStripeSerializer
                         if(isset($values['team_id']))
                         {
                             unset($values['team_id']);
-                            $values['team'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getTeam())->serialize();
+                            $values['team'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getTeam())->serialize($expand = 'owner,members,member');
                         }
                     }
                     break;
