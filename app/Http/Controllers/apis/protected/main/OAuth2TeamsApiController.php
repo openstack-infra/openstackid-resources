@@ -99,7 +99,18 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
                 $teams
             );
 
-            return $this->ok($response->toArray($expand = Input::get('expand','')));
+            return $this->ok
+            (
+                $response->toArray
+                (
+                    $expand    = Input::get('expand',''),
+                    $fields    = [],
+                    $relations = [],
+                    $params    = [
+                        'current_member' => $current_member
+                    ]
+                )
+            );
 
         }
         catch (ValidationException $ex1) {
@@ -137,7 +148,20 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
             if(!$team->isMember($current_member))
                 throw new EntityNotFoundException();
 
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($team)->serialize($expand = Input::get('expand','')));
+            return $this->ok
+            (
+                SerializerRegistry::getInstance()
+                    ->getSerializer($team)
+                    ->serialize
+                    (
+                        $expand    = Input::get('expand',''),
+                        $fields    = [],
+                        $relations = [],
+                        $params    = [
+                            'current_member' => $current_member
+                        ]
+                    )
+            );
 
         }
         catch (ValidationException $ex1) {

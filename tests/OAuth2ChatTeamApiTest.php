@@ -142,9 +142,11 @@ final class OAuth2ChatTeamApiTest extends ProtectedApiTest
         $team    = json_decode($content);
         $this->assertTrue(!is_null($team));
         $this->assertResponseStatus($expected_http_response);
+        return $team;
     }
 
     public function testAddMemberToTeam(){
+
         $team = $this->testAddTeam();
 
         $params = [
@@ -177,6 +179,12 @@ final class OAuth2ChatTeamApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($invitation));
         $this->assertResponseStatus(201);
         return $invitation;
+    }
+
+    public function testGetMyTeamWithInvitations(){
+        $invitation = $this->testAddMemberToTeam();
+
+        $team = $this->testGetMyTeam($invitation->team->id);
     }
 
     public function testAcceptInvitation(){

@@ -41,9 +41,15 @@ final class ChatTeamSerializer extends SilverStripeSerializer
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
         $team = $this->object;
-        if(! $team instanceof ChatTeam) return [];
-        $values = parent::serialize($expand, $fields, $relations, $params);
-        $members = [];
+
+        if(!$team instanceof ChatTeam) return [];
+
+        $values         = parent::serialize($expand, $fields, $relations, $params);
+        $members        = [];
+        $current_member = null;
+
+        if(isset($params['current_member']))
+            $current_member = $params['current_member'];
 
         foreach($team->getMembers() as $member){
             $members[] = SerializerRegistry::getInstance()->getSerializer($member)->serialize($expand);
@@ -65,6 +71,15 @@ final class ChatTeamSerializer extends SilverStripeSerializer
                     break;
                 }
             }
+        }
+
+        if(!is_null($current_member) && $team->isAdmin($current_member)){
+            // add pending invitations
+            $invitations = [];
+            foreach($team->getInvitations() as $invitation){
+                $invitations[] = SerializerRegistry::getInstance()->getSerializer($invitation)->serialize('inviter,invitee');
+            }
+            $values['invitations'] = $invitations;
         }
 
         return $values;

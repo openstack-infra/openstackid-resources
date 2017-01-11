@@ -28,6 +28,8 @@ final class ChatTeamInvitationSerializer extends SilverStripeSerializer
         'InviterId'  => 'inviter_id:json_int',
         'Permission' => 'permission:json_string',
         'IsAccepted' => 'is_accepted:json_boolean',
+        'Created'    => 'created_at:datetime_epoch',
+        'LastEdited' => 'updated_at:datetime_epoch',
     );
 
     /**
