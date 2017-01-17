@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 use models\utils\IEntity;
-
+use models\summit\SummitEvent;
 /**
  * Class SummitEventEntityEventType
  * @package Models\foundation\summit\EntityEvents
@@ -23,9 +23,16 @@ abstract class SummitEventEntityEventType extends EntityEventType
      * @return IEntity|null
      */
     protected function registerEntity(){
-        $entity = $this->entity_event->getSummit()->getScheduleEvent($this->entity_event->getEntityId());
+        $entity = $this->getEntity();
         if(!is_null($entity))
-        $this->entity_event->registerEntity($entity);
+            $this->entity_event->registerEntity($entity);
         return $entity;
+    }
+
+    /**
+     * @return SummitEvent|null
+     */
+    protected function getEntity(){
+        return $this->entity_event->getSummit()->getScheduleEvent($this->entity_event->getEntityId());
     }
 }

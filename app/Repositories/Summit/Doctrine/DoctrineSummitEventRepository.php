@@ -31,6 +31,10 @@ use Doctrine\ORM\Query\Expr\Join;
 final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository implements ISummitEventRepository
 {
 
+    private static $forbidded_classes = [
+        'models\\summit\\SummitGroupEvent'
+    ];
+
     /**
      * @param SummitEvent $event
      * @return SummitEvent[]
@@ -47,6 +51,7 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
             ->join('e.summit', 's', Join::WITH, " s.id = :summit_id")
             ->where('e.published = 1')
             ->andWhere('e.start_date < :end_date')
+            ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')")
             ->andWhere('e.end_date > :start_date')
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('start_date', $start_date)
@@ -62,7 +67,10 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
      */
     public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
-        $class  = count($filter->getFilter('speaker')) > 0? \models\summit\Presentation::class : \models\summit\SummitEvent::class;
+        $class  = count($filter->getFilter('speaker')) > 0?
+            \models\summit\Presentation::class :
+            \models\summit\SummitEvent::class;
+
         $query  = $this->getEntityManager()->createQueryBuilder()
             ->select("e")
             ->from($class, "e");
@@ -131,6 +139,7 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
         }
 
         $query= $query
+            ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')")
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 

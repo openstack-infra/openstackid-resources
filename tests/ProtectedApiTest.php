@@ -30,7 +30,7 @@ class AccessTokenServiceStub implements IAccessTokenService
      */
     public function get($token_value)
     {
-        $url = Config::get('app.url');
+        $url   = Config::get('app.url');
         $parts = @parse_url($url);
         $realm = $parts['host'];
 
@@ -55,7 +55,7 @@ class AccessTokenServiceStub implements IAccessTokenService
             $url . '/teams/write',
         );
 
-        return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','13867', 3600, 'WEB_APPLICATION', '', '');
+        return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','11624', 3600, 'WEB_APPLICATION', '', '');
     }
 }
 

@@ -91,7 +91,7 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
                         $values['presentations'] = $presentations;
 
                         $moderated_presentations = [];
-                        foreach ($speaker->getModeratedPresentation($summit_id, $published) as $p) {
+                        foreach ($speaker->getModeratedPresentations($summit_id, $published) as $p) {
                             $moderated_presentations[] = SerializerRegistry::getInstance()->getSerializer($p)->serialize();
                         }
                         $values['moderated_presentations'] = $presentations;

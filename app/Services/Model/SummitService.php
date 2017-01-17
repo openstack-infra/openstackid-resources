@@ -151,6 +151,8 @@ final class SummitService implements ISummitService
                 if (is_null($event)) {
                     throw new EntityNotFoundException('event not found on summit!');
                 }
+                if(!Summit::allowToSee($event, $attendee->getMember()))
+                    throw new EntityNotFoundException('event not found on summit!');
                 $attendee->add2Schedule($event);
             });
             Event::fire(new MyScheduleAdd($attendee, $event_id));
@@ -174,7 +176,10 @@ final class SummitService implements ISummitService
     {
         $this->tx_service->transaction(function () use ($summit, $attendee, $event_id) {
             $event = $summit->getScheduleEvent($event_id);
-            if (is_null($event)) throw new EntityNotFoundException('event not found on summit!');
+            if (is_null($event))
+                throw new EntityNotFoundException('event not found on summit!');
+            if(!Summit::allowToSee($event, $attendee->getMember()))
+                throw new EntityNotFoundException('event not found on summit!');
             $attendee->checkIn($event);
         });
     }
@@ -190,7 +195,8 @@ final class SummitService implements ISummitService
     {
         $this->tx_service->transaction(function () use ($summit, $attendee, $event_id) {
             $event = $summit->getScheduleEvent($event_id);
-            if (is_null($event)) throw new EntityNotFoundException('event not found on summit!');
+            if (is_null($event))
+                throw new EntityNotFoundException('event not found on summit!');
             $attendee->removeFromSchedule($event);
         });
 
@@ -227,7 +233,17 @@ final class SummitService implements ISummitService
                 $member = $this->member_repository->getById($member_id);
             }
 
-            if (is_null($member)) throw new EntityNotFoundException();
+            if (is_null($member))
+                throw new EntityNotFoundException('member not found!.');
+
+            if(!Summit::allowToSee($event, $member))
+                throw new EntityNotFoundException('event not found on summit!.');
+
+            // check older feedback
+            $older_feedback = $member->getFeedbackByEvent($event);
+
+            if(count($older_feedback) > 0 )
+                throw new ValidationException(sprintf("you already sent feedback for event id %s!.", $event->getIdentifier()));
 
             $newFeedback = new SummitEventFeedback();
             $newFeedback->setRate(intval($feedback['rate']));
@@ -253,7 +269,8 @@ final class SummitService implements ISummitService
 
             $global_last_id = $this->entity_events_repository->getLastEntityEventId($summit);
             $from_id        = !is_null($from_id) ? intval($from_id) : null;
-            $ctx            = new SummitEntityEventProcessContext($member_id);
+            $member         = !is_null($member_id) && $member_id > 0 ? $this->member_repository->getById($member_id): null;
+            $ctx            = new SummitEntityEventProcessContext($member);
 
             do {
 

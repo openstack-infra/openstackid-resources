@@ -58,6 +58,14 @@ final class EntityEventTypeFactory
                 return new SummitEventEntityEventDeleteType($e, $ctx);
             }
             break;
+            case 'SummitGroupEvent':
+            {
+                if ($e->getType() === 'UPDATE' || $e->getType() === "INSERT")
+                    return new SummitGroupEventEntityEventInsertOrUpdateType($e, $ctx);
+
+                return new SummitEventEntityEventDeleteType($e, $ctx);;
+            }
+            break;
             case 'MySchedule':
             {
                 return new MyScheduleEntityEventType($e, $ctx);

@@ -119,4 +119,13 @@ class SummitEventType extends SilverstripeBaseModel
         $this->blackout_times = $blackout_times;
     }
 
+    /**
+     * @param string $type
+     * @return bool
+     */
+    static public function isPrivate($type){
+        $private_types = [ISummitEventType::GroupsEvents];
+        return in_array($type, $private_types);
+    }
+
 }

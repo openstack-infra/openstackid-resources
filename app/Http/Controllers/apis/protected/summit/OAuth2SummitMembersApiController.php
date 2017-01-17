@@ -57,13 +57,17 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
         $current_member = $this->repository->getById($current_member_id);
         if (is_null($current_member)) return $this->error404();
 
+        $fields    = Request::input('fields', null);
+        $relations = Request::input('relations', null);
+
+
         return $this->ok
         (
             SerializerRegistry::getInstance()->getSerializer($current_member)->serialize
             (
                 Request::input('expand', ''),
-                [],
-                [],
+                is_null($fields) ? [] : explode(',', $fields),
+                is_null($relations) ? [] : explode(',', $relations),
                 ['summit' => $summit]
             )
         );

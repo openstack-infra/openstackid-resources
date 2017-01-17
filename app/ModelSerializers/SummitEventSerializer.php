@@ -79,7 +79,6 @@ class SummitEventSerializer extends SilverStripeSerializer
 
         if(!count($relations)) $relations = $this->getAllowedRelations();
 
-
         $values = parent::serialize($expand, $fields, $relations, $params);
 
         if(in_array('sponsors', $relations))
@@ -118,6 +117,15 @@ class SummitEventSerializer extends SilverStripeSerializer
                             $sponsors[] = SerializerRegistry::getInstance()->getSerializer($s)->serialize();
                         }
                         $values['sponsors'] = $sponsors;
+                    }
+                    break;
+                    case 'track': {
+                       unset($values['track_id']);
+                       $values['track'] = SerializerRegistry::getInstance()->getSerializer($event->getCategory())->serialize($expand);
+                    }
+                    case 'type': {
+                        unset($values['type_id']);
+                        $values['type'] = SerializerRegistry::getInstance()->getSerializer($event->getType())->serialize($expand);
                     }
                     break;
                 }

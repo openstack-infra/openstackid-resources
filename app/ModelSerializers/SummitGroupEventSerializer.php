@@ -1,6 +1,6 @@
 <?php namespace ModelSerializers;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,19 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\SummitGroupEvent;
 
 /**
- * Class PresentationCategorySerializer
+ * Class SummitGroupEventSerializer
  * @package ModelSerializers
  */
-final class PresentationCategorySerializer extends SilverStripeSerializer
+class SummitGroupEventSerializer extends SummitEventSerializer
 {
-    protected static $array_mappings = array
-    (
-        'Title'       => 'name:json_string',
-        'Description' => 'description:json_string',
-        'Code'        => 'code:json_string',
-    );
 
     /**
      * @param null $expand
@@ -34,26 +29,24 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
      */
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
-        $category = $this->object;
-        $values   = parent::serialize($expand, $fields, $relations, $params);
-        $groups   = array();
+        $values = parent::serialize($expand, $fields, $relations, $params);
 
-        foreach($category->getGroups() as $group){
-            $groups[] = intval($group->getId());
-        }
-        $values['track_groups'] = $groups;
+        $event  = $this->object;
+        if(!$event instanceof SummitGroupEvent) return [];
+
+        $values['groups'] = $event->getGroupsIds();
 
         if (!empty($expand)) {
             $exp_expand = explode(',', $expand);
             foreach ($exp_expand as $relation) {
                 switch (trim($relation)) {
-                    case 'track_groups': {
+                    case 'groups': {
                         $groups = array();
-                        unset($values['track_groups']);
-                        foreach ($category->getGroups() as $g) {
+                        unset($values['groups']);
+                        foreach ($event->getGroups() as $g) {
                             $groups[] = SerializerRegistry::getInstance()->getSerializer($g)->serialize(null, [], ['none']);
                         }
-                        $values['track_groups'] = $groups;
+                        $values['groups'] = $groups;
                     }
                     break;
                 }

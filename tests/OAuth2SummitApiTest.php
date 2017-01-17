@@ -270,9 +270,9 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => $summit_id,
+            'id'       => $summit_id,
             'attendee_id' => 'me',
-            'event_id' => $event_id
+            'event_id'    => $event_id
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
@@ -695,15 +695,15 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testCurrentSummitEventsByEventTypeExpandLocation()
+    public function testCurrentSummitEventsByEventTypeExpandLocation($summit_id = 7)
     {
         $params = array
         (
-            'id' => 'current',
+            'id' => $summit_id,
             'expand' => 'feedback,location',
             'filter' => array
             (
-                'event_type_id==4',
+                'event_type_id==91',
             )
         );
 
@@ -1249,9 +1249,9 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => 6,
+            'id'        => 7,
             'from_date' => 1471565531,
-            'limit' => 100
+            'limit'     => 100
         );
 
         $headers = array
@@ -1278,13 +1278,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testGetEntityEventsFromCurrentSummitGreaterThanGivenID()
+    public function testGetEntityEventsFromCurrentSummitGreaterThanGivenID($summit_id = 7, $last_event_id = 665707)
     {
         $params = array
         (
-            'id' => 6,
-            'last_event_id' => 32500,
-            'limit' => 100
+            'id'            => $summit_id,
+            'last_event_id' => $last_event_id,
+            'limit'         => 100
         );
 
         $headers = array
@@ -1312,7 +1312,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $params = array
         (
-            'id' => 6,
+            'id'            => 6,
             'last_event_id' => 32795
         );
 
@@ -1775,11 +1775,11 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testCurrentSummitLocationEventsWithFilter()
+    public function testCurrentSummitLocationEventsWithFilter($summit_id = 7)
     {
         $params = array
         (
-            'id' => 6,
+            'id' => $summit_id,
             'page' => 1,
             'per_page' => 50,
             'location_id' => 52,
@@ -2000,11 +2000,11 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     public function testGetMyMemberFromCurrentSummit()
     {
 
-        $params = array
-        (
-            'expand' => 'attendee,speaker,feedback',
-            'id' => 6,
-        );
+        $params = [
+
+            'expand'   => 'attendee,speaker,feedback,groups, presentations',
+            'id'        => 7,
+        ];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(

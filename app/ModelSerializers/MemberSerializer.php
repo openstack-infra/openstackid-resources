@@ -13,6 +13,7 @@
  **/
 
 use Illuminate\Support\Facades\Config;
+use models\main\Member;
 
 /**
  * Class MemberSerializer
@@ -20,8 +21,8 @@ use Illuminate\Support\Facades\Config;
  */
 final class MemberSerializer extends SilverStripeSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
+
         'FirstName'       => 'first_name:json_string',
         'LastName'        => 'last_name:json_string',
         'Gender'          => 'gender:json_string',
@@ -29,8 +30,23 @@ final class MemberSerializer extends SilverStripeSerializer
         'LinkedInProfile' => 'linked_in:json_string',
         'IrcHandle'       => 'irc:json_string',
         'TwitterHandle'   => 'twitter:json_string',
-    );
+    ];
 
+    protected static $allowed_relations = [
+
+        'groups',
+        'groups_events',
+        'feedback'
+    ];
+
+    private static $expand_group_events = [
+        'type',
+        'location',
+        'sponsors',
+        'track',
+        'track_groups',
+        'groups',
+    ];
 
     /**
      * @param null $expand
@@ -42,17 +58,36 @@ final class MemberSerializer extends SilverStripeSerializer
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array())
     {
         $member         = $this->object;
-        $values         = parent::serialize($expand, $fields, $relations, $params);
-        $values['pic']  = Config::get("server.assets_base_url", 'https://www.openstack.org/'). 'profile_images/members/'. $member->getId();
-        $summit         = isset($params['summit'])? $params['summit'] :null;
-        $speaker        = !is_null($summit)? $summit->getSpeakerByMember($member): null;
-        $attendee       = !is_null($summit)? $summit->getAttendeeByMember($member): null;
+        if(!$member instanceof Member) return [];
+
+        if(!count($relations)) $relations = $this->getAllowedRelations();
+
+        $values           = parent::serialize($expand, $fields, $relations, $params);
+        $values['pic']    = Config::get("server.assets_base_url", 'https://www.openstack.org/'). 'profile_images/members/'. $member->getId();
+        $summit           = isset($params['summit'])? $params['summit'] :null;
+
+        $speaker          = !is_null($summit)? $summit->getSpeakerByMember($member): null;
+        $attendee         = !is_null($summit)? $summit->getAttendeeByMember($member): null;
+        $groups_events    = !is_null($summit)? $summit->getGroupEventsFor($member): null;
+
+        if(in_array('groups', $relations))
+            $values['groups'] = $member->getGroupsIds();
 
         if(!is_null($speaker))
             $values['speaker_id'] = $speaker->getId();
 
         if(!is_null($attendee))
             $values['attendee_id'] = $attendee->getId();
+
+        if(!is_null($groups_events) && in_array('groups_events', $relations)){
+            $res = [];
+            foreach ($groups_events as $group_event){
+                $res[] = SerializerRegistry::getInstance()
+                    ->getSerializer($group_event)
+                    ->serialize(implode(',', self::$expand_group_events));
+            }
+            $values['groups_events'] = $res;
+        }
 
         if (!empty($expand)) {
             $exp_expand = explode(',', $expand);
@@ -63,7 +98,7 @@ final class MemberSerializer extends SilverStripeSerializer
                         if (!is_null($attendee))
                         {
                             unset($values['attendee_id']);
-                            $values['attendee'] = SerializerRegistry::getInstance()->getSerializer($attendee)->serialize(null,[],['none']);
+                            $values['attendee'] = SerializerRegistry::getInstance()->getSerializer($attendee)->serialize($expand,[],['none']);
                         }
                     }
                     break;
@@ -71,16 +106,27 @@ final class MemberSerializer extends SilverStripeSerializer
                         if (!is_null($speaker))
                         {
                             unset($values['speaker_id']);
-                            $values['speaker'] = SerializerRegistry::getInstance()->getSerializer($speaker)->serialize(null,[],['none']);
+                            $values['speaker'] = SerializerRegistry::getInstance()->getSerializer($speaker)->serialize($expand,[],['none']);
                         }
                     }
                     break;
                     case 'feedback': {
+                        if(!in_array('feedback', $relations)) break;
                         $feedback = array();
                         foreach ($member->getFeedbackBySummit($summit) as $f) {
-                            array_push($feedback,  SerializerRegistry::getInstance()->getSerializer($f)->serialize());
+                            $feedback[] = SerializerRegistry::getInstance()->getSerializer($f)->serialize();
                         }
                         $values['feedback'] = $feedback;
+                    }
+                    break;
+                    case 'groups': {
+                        if(!in_array('groups', $relations)) break;
+                        $groups = [];
+                        unset($values['groups']);
+                        foreach ($member->getGroups() as $g) {
+                            $groups[] = SerializerRegistry::getInstance()->getSerializer($g)->serialize(null, [], ['none']);
+                        }
+                        $values['groups'] = $groups;
                     }
                     break;
                 }

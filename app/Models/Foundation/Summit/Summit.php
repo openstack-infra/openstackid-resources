@@ -890,4 +890,61 @@ SQL;
         return '';
     }
 
+    /**
+     * @param SummitEvent $summit_event
+     * @param Member|null $member
+     * @return bool
+     */
+    static public function allowToSee(SummitEvent $summit_event, Member $member = null)
+    {
+
+        if (SummitEventType::isPrivate($summit_event->getType()->getType())) {
+            if (is_null($member))
+                return false;
+
+            if ($member->isAdmin()) return true;
+
+            // i am logged, check if i have permissions
+            if ($summit_event instanceof SummitGroupEvent) {
+
+                $member_groups_code = [];
+                $event_groups_code  = [];
+
+                foreach ($member->getGroups() as $member_group) {
+                    $member_groups_code[] = $member_group->getCode();
+                }
+
+                foreach ($summit_event->getGroups() as $event_group) {
+                    $event_groups_code[] = $event_group->getCode();
+                }
+
+                return count(array_intersect($event_groups_code, $member_groups_code)) > 0;
+            }
+            return true;
+        }
+        return true;
+    }
+
+    /**
+     * @param Member $member
+     * @return SummitGroupEvent[]
+     */
+    public function getGroupEventsFor(Member $member){
+        $builder =  $this->createQueryBuilder()
+            ->select('distinct eg')
+            ->from('models\summit\SummitGroupEvent','eg')
+            ->join('eg.groups','g')
+            ->join('eg.summit','s')
+            ->where("s.id = :summit_id and eg.published = 1")
+            ->setParameter('summit_id', $this->getId());
+
+        if(!$member->isAdmin()){
+            $groups_ids = $member->getGroupsIds();
+            $groups_ids = implode(",", $groups_ids);
+            $builder->andWhere("g.id in ({$groups_ids})");
+        }
+
+        return $builder->getQuery()->getResult();
+    }
+
 }

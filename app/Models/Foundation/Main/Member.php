@@ -13,7 +13,9 @@
  **/
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use models\summit\Summit;
+use models\summit\SummitEvent;
 use models\summit\SummitEventFeedback;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
@@ -207,5 +209,56 @@ class Member extends SilverstripeBaseModel
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('owner_id', $this->getId())
             ->getQuery()->getResult();
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @return SummitEventFeedback[]
+     */
+    public function getFeedbackByEvent(SummitEvent $event){
+        return $this->createQueryBuilder()
+            ->select('distinct f')
+            ->from('models\summit\SummitEventFeedback','f')
+            ->join('f.event','e')
+            ->join('f.owner','o')
+            ->join('e.summit','s')
+            ->where('e.id = :event_id and o.id = :owner_id')
+            ->setParameter('event_id', $event->getId())
+            ->setParameter('owner_id', $this->getId())
+            ->getQuery()->getResult();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAdmin(){
+
+        $admin_group = $this->groups->filter(function($entity){
+            return $entity->getCode() == Group::AdminGroupCode;
+        });
+
+        return !is_null($admin_group) && $admin_group != false && $admin_group->count() > 0;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getGroupsIds(){
+        $ids = [];
+        foreach ($this->getGroups() as $g){
+            $ids[] = intval($g->getId());
+        }
+        return $ids;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getGroupsCodes(){
+        $codes = [];
+        foreach ($this->getGroups() as $g){
+            $codes[] = $g->getCode();
+        }
+        return $codes;
     }
 }

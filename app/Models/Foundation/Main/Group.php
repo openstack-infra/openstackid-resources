@@ -24,6 +24,10 @@ use models\utils\SilverstripeBaseModel;
  */
 class Group extends SilverstripeBaseModel
 {
+    const AdminGroupCode        = 'administrators';
+    const CommunityMembersCode  = 'community-members';
+    const FoundationMembersCode = 'foundation-members';
+
     public function __construct(){
         parent::__construct();
         $this->members  = new ArrayCollection();

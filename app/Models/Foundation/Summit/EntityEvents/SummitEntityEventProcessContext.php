@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 
+use models\main\Member;
 use models\summit\SummitEntityEvent;
 use ModelSerializers\SerializerRegistry;
 
@@ -26,9 +27,9 @@ final class SummitEntityEventProcessContext
     private $update_operations        = array();
     private $summit_events_operations = array();
     /**
-     * @var int
+     * @var Member
      */
-    private $current_member_id;
+    private $current_member;
     /**
      * @var EntityEventList
      */
@@ -36,17 +37,24 @@ final class SummitEntityEventProcessContext
 
     /**
      * SummitEntityEventProcessContext constructor.
-     * @param int|null $current_member_id
+     * @param Member|null $current_member
      */
-    public function __construct($current_member_id){
-        $this->list              = new EntityEventList();
-        $this->current_member_id = $current_member_id;
+    public function __construct($current_member = null){
+        $this->list           = new EntityEventList();
+        $this->current_member = $current_member;
     }
+
+    /**
+     * @return Member|null
+     */
+    public function getCurrentMember(){ return $this->current_member; }
 
     /**
      * @return int|null
      */
-    public function getCurrentMemberId(){ return $this->current_member_id; }
+    public function getCurrentMemberId(){
+        return !is_null($this->current_member) ? $this->current_member->getId() : null;
+    }
 
     /**
      * @param SummitEntityEvent $entity_event

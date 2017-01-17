@@ -23,6 +23,12 @@ final class GroupSerializer extends SilverStripeSerializer
     (
         'Title'       => 'title:json_string',
         'Description' => 'description:json_string',
+        'Code'        => 'code:json_string',
+    );
+
+    protected static $allowed_relations = array
+    (
+        'members',
     );
 
     /**
@@ -36,13 +42,19 @@ final class GroupSerializer extends SilverStripeSerializer
     {
         $group = $this->object;
         if(! $group instanceof Group) return [];
-        $values = parent::serialize($expand, $fields, $relations, $params);
-        $members = [];
+        $values  = parent::serialize($expand, $fields, $relations, $params);
 
-        foreach($group->getMembers() as $member){
-            $members[] = SerializerRegistry::getInstance()->getSerializer($member)->serialize();
+        if(!count($relations)) $relations = $this->getAllowedRelations();
+
+        if(in_array('members', $relations)) {
+            $members = [];
+
+            foreach ($group->getMembers() as $member) {
+                $members[] = SerializerRegistry::getInstance()->getSerializer($member)->serialize();
+            }
+            $values['members'] = $members;
         }
-        $values['members'] = $members;
+
         return $values;
     }
 }
