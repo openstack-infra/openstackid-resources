@@ -50,8 +50,10 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
 
         $summit   = $attendee->getSummit();
         $values   = parent::serialize($expand, $fields, $relations, $params);
-
+        $member   = null;
+        $speaker  = null;
         $schedule = [];
+
         foreach ($attendee->getScheduledEventsIds() as $event_id){
             $schedule[] = intval($event_id);
         }
@@ -77,9 +79,7 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
             $values['linked_in']  = $member->getLinkedInProfile();
             $values['irc']        = $member->getIRCHandle();
             $values['twitter']    = $member->getTwitterHandle();
-
-
-            $speaker = $summit->getSpeakerByMember($member);
+            $speaker              = $summit->getSpeakerByMember($member);
 
             if (!is_null($speaker)) {
                 $values['speaker_id'] = intval($speaker->getId());
