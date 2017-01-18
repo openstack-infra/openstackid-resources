@@ -164,6 +164,13 @@ class ChatTeamInvitation extends SilverstripeBaseModel
         return $this->getIsAccepted();
     }
 
+    /**
+     * @return bool
+     */
+    public function isPending(){
+        return !$this->getIsAccepted();
+    }
+
     public function accept()
     {
         $this->is_accepted   = true;

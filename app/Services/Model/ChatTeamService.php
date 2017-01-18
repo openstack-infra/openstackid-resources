@@ -1,6 +1,6 @@
 <?php namespace services\model;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -172,6 +172,7 @@ final class ChatTeamService implements IChatTeamService
     function addMember2Team($team_id,  $invitee_id, $permission = ChatTeamPermission::Read)
     {
         return $this->tx_service->transaction(function() use($team_id, $invitee_id, $permission){
+
             $team = $this->repository->getById($team_id);
             if(is_null($team)) throw new EntityNotFoundException();
 
@@ -182,14 +183,15 @@ final class ChatTeamService implements IChatTeamService
             if (is_null($inviter)) throw new EntityNotFoundException();
 
             $invitee  = $this->member_repository->getById($invitee_id);
-            if(is_null($invitee))
-                throw new EntityNotFoundException();
+            if(is_null($invitee)) throw new EntityNotFoundException();
 
-            if(!$team->isAdmin($inviter))
-                throw new EntityNotFoundException();
+            if(!$team->isAdmin($inviter)) throw new EntityNotFoundException();
 
             if($team->isMember($invitee))
                 throw new ValidationException(sprintf('member id %s already is a member of team id %s', $invitee_id, $team_id));
+
+            if($team->isAlreadyInvited($invitee))
+                throw new ValidationException(sprintf('member id %s has a pending invitation on team id %s', $invitee_id, $team_id));
 
             $invitation = $team->createInvitation($inviter, $invitee, $permission);
 
@@ -343,17 +345,21 @@ final class ChatTeamService implements IChatTeamService
     function sendMessages($batch_size = 1000)
     {
         return $this->tx_service->transaction(function() use($batch_size){
+           echo(sprintf('calling ChatTeamService.sendMessages(%s)', $batch_size)).PHP_EOL;
 
            $teams_ids = $this->repository->getAllTeamsIdsWithPendingMessages2Sent();
            $qty       = 0;
+
            foreach($teams_ids as $team_id) {
 
+               echo(sprintf('processing messages for team id %s', $team_id)).PHP_EOL;
                $messages = $this->chat_message_repository->getAllNotSentByTeamPaginated
                (
                    $team_id,
                    new PagingInfo(1, $batch_size)
                );
-
+               echo(sprintf('found %s messages for team id %s, send them...', $team_id, $messages->getTotal())).PHP_EOL;
+               $team_messages_counter = 0;
                foreach ($messages->getItems() as $message){
 
                    $data  = [
@@ -369,7 +375,10 @@ final class ChatTeamService implements IChatTeamService
                    $this->push_sender_service->sendPush([sprintf('team_%s', $team_id)], $data);
                    $message->markSent();
                    ++$qty;
+                   ++$team_messages_counter;
                }
+
+               echo(sprintf('sent %s messages for team id %s', $team_messages_counter, $team_id)).PHP_EOL;
            }
            return $qty;
         });

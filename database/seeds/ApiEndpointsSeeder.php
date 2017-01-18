@@ -553,6 +553,18 @@ class ApiEndpointsSeeder extends Seeder
                     'scopes' => [sprintf('%s/members/invitations/read', $current_realm)],
                 ),
                 array(
+                    'name'        => 'get-pending-invitations',
+                    'route'       => '/api/v1/members/me/team-invitations/pending',
+                    'http_method' => 'GET',
+                    'scopes'      => [sprintf('%s/members/invitations/read', $current_realm)],
+                ),
+                array(
+                    'name' => 'get-accepted-invitations',
+                    'route' => '/api/v1/members/me/team-invitations/accepted',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/members/invitations/read', $current_realm)],
+                ),
+                array(
                     'name' => 'accept-invitation',
                     'route' => '/api/v1/members/me/team-invitations/{invitation_id}',
                     'http_method' => 'PUT',

@@ -262,6 +262,18 @@ class ChatTeam extends SilverstripeBaseModel
      * @param Member $member
      * @return bool
      */
+    public function isAlreadyInvited(Member $member){
+        $res = $this->invitations->filter(function ($i) use($member){
+            return $i->getInvitee()->getId() == $member->getId() && $i->isPending();
+        });
+
+        return $res->count() > 0;
+    }
+
+    /**
+     * @param Member $member
+     * @return bool
+     */
     public function isAdmin(Member $member){
         $res = $this->members->filter(function ($e) use($member){
             return $e->getMember()->getId() == $member->getId() && $e->isAdmin();
@@ -276,10 +288,19 @@ class ChatTeam extends SilverstripeBaseModel
         $res = $this->members->filter(function ($e) use($member){
             return $e->getMember()->getId() == $member->getId();
         });
-        if($res->count() == 0) return;
 
+        if($res->count() == 0) return;
+        // remove member
         $team_member = $res->first();
         $this->members->removeElement($team_member);
+        $res2 = $this->invitations->filter(function ($i) use($member){
+            return $i->getInvitee()->getId() == $member->getId();
+        });
+        // remove invitation
+        if($res2->count() > 0) {
+            $this->invitations->removeElement($res2->first());
+        }
+
         $team_member->setTeam(null);
     }
 }

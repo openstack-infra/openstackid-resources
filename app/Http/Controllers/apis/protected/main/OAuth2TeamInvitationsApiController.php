@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,6 +49,9 @@ final class OAuth2TeamInvitationsApiController extends OAuth2ProtectedController
         $this->service    = $service;
     }
 
+    /**
+     * @return mixed
+     */
     public function getMyInvitations(){
 
         try {
@@ -56,6 +59,80 @@ final class OAuth2TeamInvitationsApiController extends OAuth2ProtectedController
             if (is_null($current_member_id)) return $this->error403();
 
             $invitations = $this->repository->getInvitationsByInvitee($current_member_id);
+
+            $response    = new PagingResponse
+            (
+                count($invitations),
+                count($invitations),
+                1,
+                1,
+                $invitations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMyPendingInvitations(){
+
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $invitations = $this->repository->getPendingInvitationsByInvitee($current_member_id);
+
+            $response    = new PagingResponse
+            (
+                count($invitations),
+                count($invitations),
+                1,
+                1,
+                $invitations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMyAcceptedInvitations(){
+
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $invitations = $this->repository->getAcceptedInvitationsByInvitee($current_member_id);
 
             $response    = new PagingResponse
             (

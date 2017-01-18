@@ -23,4 +23,8 @@ interface IChatTeamInvitationRepository extends IBaseRepository
      * @return ChatTeamInvitation[]
      */
     function getInvitationsByInvitee($invitee_id);
+
+    function getPendingInvitationsByInvitee($invitee_id);
+
+    function getAcceptedInvitationsByInvitee($invitee_id);
 }

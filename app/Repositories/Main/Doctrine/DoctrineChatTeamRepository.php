@@ -45,7 +45,7 @@ final class DoctrineChatTeamRepository extends SilverStripeDoctrineRepository im
     {
         $result = $this
             ->getEntityManager()
-            ->createQuery("select t.id from \models\main\ChatTeam t join t.messages m where exists (select m2.id from \models\main\ChatTeamPushNotificationMessage m2 where m2.id = m.id and m2.is_sent = 0 )")
+            ->createQuery("select distinct t.id from \models\main\ChatTeam t join t.messages m where exists (select m2.id from \models\main\ChatTeamPushNotificationMessage m2 where m2.id = m.id and m2.is_sent = 0 )")
             ->getScalarResult();
         $ids = array_map('current', $result);
         return $ids;

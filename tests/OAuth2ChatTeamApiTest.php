@@ -329,9 +329,61 @@ final class OAuth2ChatTeamApiTest extends ProtectedApiTest
         );
 
         $content  = $response->getContent();
-        $messages = json_decode($content);
-        $this->assertTrue(!is_null($messages));
+        $invitations = json_decode($content);
+        $this->assertTrue(!is_null($invitations));
         $this->assertResponseStatus(200);
-        return $messages;
+        return $invitations;
+    }
+
+    public function testGetMyPendingInvitations(){
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+        ];
+
+        $params = [
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2TeamInvitationsApiController@getMyPendingInvitations",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content  = $response->getContent();
+        $invitations = json_decode($content);
+        $this->assertTrue(!is_null($invitations));
+        $this->assertResponseStatus(200);
+        return $invitations;
+    }
+
+    public function testGetMyAcceptedInvitations(){
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+        ];
+
+        $params = [
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2TeamInvitationsApiController@getMyAcceptedInvitations",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content  = $response->getContent();
+        $invitations = json_decode($content);
+        $this->assertTrue(!is_null($invitations));
+        $this->assertResponseStatus(200);
+        return $invitations;
     }
 }

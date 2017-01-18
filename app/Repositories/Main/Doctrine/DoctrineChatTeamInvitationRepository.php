@@ -37,4 +37,34 @@ final class DoctrineChatTeamInvitationRepository
             ->innerJoin('i.invitee', 'm', Join::WITH, " m.id = :member_id")
             ->setParameter('member_id', $invitee_id)->getQuery()->getResult();
     }
+
+    /**
+     * @param int $invitee_id
+     * @return ChatTeamInvitation[]
+     */
+    function getPendingInvitationsByInvitee($invitee_id)
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("i")
+            ->from(\models\main\ChatTeamInvitation::class, "i")
+            ->innerJoin('i.invitee', 'm', Join::WITH, " m.id = :member_id")
+            ->where('i.is_accepted = false')
+            ->setParameter('member_id', $invitee_id)->getQuery()->getResult();
+    }
+
+    /**
+     * @param int $invitee_id
+     * @return ChatTeamInvitation[]
+     */
+    function getAcceptedInvitationsByInvitee($invitee_id)
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("i")
+            ->from(\models\main\ChatTeamInvitation::class, "i")
+            ->innerJoin('i.invitee', 'm', Join::WITH, " m.id = :member_id")
+            ->where('i.is_accepted = true')
+            ->setParameter('member_id', $invitee_id)->getQuery()->getResult();
+    }
 }
