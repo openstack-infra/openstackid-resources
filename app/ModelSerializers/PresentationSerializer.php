@@ -25,6 +25,7 @@ class PresentationSerializer extends SummitEventSerializer
         'ModeratorId'             => 'moderator_speaker_id:json_int',
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
+        'ToRecord'                => 'to_record:json_boolean',
     );
 
     protected static $allowed_fields = array

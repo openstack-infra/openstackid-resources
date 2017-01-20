@@ -37,11 +37,42 @@ class Presentation extends SummitEvent
      */
     private $speakers;
 
+    /**
+     * @ORM\Column(name="ToRecord", type="boolean")
+     * @var bool
+     */
+    protected $to_record;
+
+    /**
+     * @return bool
+     */
+    public function isToRecord()
+    {
+        return $this->to_record;
+    }
+
+    /**
+     * @param bool $to_record
+     */
+    public function setToRecord($to_record)
+    {
+        $this->to_record = $to_record;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getToRecord()
+    {
+        return $this->to_record;
+    }
+
     public function __construct()
     {
         parent::__construct();
         $this->materials = new ArrayCollection();
         $this->speakers  = new ArrayCollection();
+        $this->to_record = false;
     }
 
     /**
