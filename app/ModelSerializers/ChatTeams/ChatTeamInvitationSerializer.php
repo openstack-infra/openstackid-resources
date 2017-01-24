@@ -23,13 +23,13 @@ final class ChatTeamInvitationSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = array
     (
-        'TeamId'     => 'team_id:json_int',
-        'InviteeId'  => 'invitee_id:json_int',
-        'InviterId'  => 'inviter_id:json_int',
-        'Permission' => 'permission:json_string',
-        'IsAccepted' => 'is_accepted:json_boolean',
-        'Created'    => 'created_at:datetime_epoch',
-        'LastEdited' => 'updated_at:datetime_epoch',
+        'TeamId'        => 'team_id:json_int',
+        'InviteeId'     => 'invitee_id:json_int',
+        'InviterId'     => 'inviter_id:json_int',
+        'Permission'    => 'permission:json_string',
+        'IsAccepted'    => 'is_accepted:json_boolean',
+        'CreatedUTC'    => 'created_at:datetime_epoch',
+        'LastEditedUTC' => 'updated_at:datetime_epoch',
     );
 
     /**

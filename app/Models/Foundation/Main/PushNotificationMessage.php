@@ -126,6 +126,13 @@ class PushNotificationMessage extends SilverstripeBaseModel
     }
 
     /**
+     * @return \DateTime|null
+     */
+    public function getSentDateUTC(){
+        return $this->getDateFromLocalToUTC($this->sent_date);
+    }
+
+    /**
      * @param \DateTime $sent_date
      */
     public function setSentDate($sent_date)

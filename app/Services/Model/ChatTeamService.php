@@ -369,7 +369,8 @@ final class ChatTeamService implements IChatTeamService
                        'from_id'         => intval($message->getOwner()->getId()),
                        'from_first_name' => $message->getOwner()->getFirstName(),
                        'from_last_name'  => $message->getOwner()->getLastName(),
-                       'created_at'      => intval($message->getCreated()->getTimestamp()),
+                       'created_at'      => intval($message->getCreatedUTC()->getTimestamp()),
+                       'team_id'         => intval($message->getTeamId())
                    ];
 
                    $this->push_sender_service->sendPush([sprintf('team_%s', $team_id)], $data);

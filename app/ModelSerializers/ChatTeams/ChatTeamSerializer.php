@@ -24,11 +24,11 @@ final class ChatTeamSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = array
     (
-        'Name'        => 'name:json_string',
-        'Description' => 'description:json_string',
-        'OwnerId'     => 'owner_id:json_int',
-        'Created'     => 'created_at:datetime_epoch',
-        'LastEdited'  => 'updated_at:datetime_epoch',
+        'Name'          => 'name:json_string',
+        'Description'   => 'description:json_string',
+        'OwnerId'       => 'owner_id:json_int',
+        'CreatedUTC'    => 'created_at:datetime_epoch',
+        'LastEditedUTC' => 'updated_at:datetime_epoch',
     );
 
     /**

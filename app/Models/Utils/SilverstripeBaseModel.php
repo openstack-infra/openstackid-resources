@@ -36,6 +36,13 @@ class SilverstripeBaseModel implements IEntity
     }
 
     /**
+     * @return \DateTime|null
+     */
+    public function getCreatedUTC(){
+        return $this->getDateFromLocalToUTC($this->created);
+    }
+
+    /**
      * @param \DateTime $created
      */
     public function setCreated($created)
@@ -49,6 +56,26 @@ class SilverstripeBaseModel implements IEntity
     public function getLastEdited()
     {
         return $this->last_edited;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getLastEditedUTC(){
+        return $this->getDateFromLocalToUTC($this->last_edited);
+    }
+
+    /**
+     * @param \DateTime $value
+     * @return \DateTime|null
+     */
+    protected function getDateFromLocalToUTC(\DateTime $value){
+        if(is_null($value)) return null;
+        $default_timezone = new \DateTimeZone(self::DefaultTimeZone);
+        $utc_timezone     = new \DateTimeZone("UTC");
+        $timestamp        = $value->format('Y-m-d H:i:s');
+        $local_date       = new \DateTime($timestamp, $default_timezone);
+        return $local_date->setTimezone($utc_timezone);
     }
 
     /**
