@@ -118,15 +118,6 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
                         }
                     }
                     break;
-                    case 'feedback': {
-                        $feedback = array();
-                        foreach ($attendee->getEmittedFeedback() as $f) {
-                            if(!$summit->isEventOnSchedule($f->getEvent()->getId())) continue;
-                            array_push($feedback,  SerializerRegistry::getInstance()->getSerializer($f)->serialize());
-                        }
-                        $values['feedback'] = $feedback;
-                    }
-                    break;
                 }
             }
         }

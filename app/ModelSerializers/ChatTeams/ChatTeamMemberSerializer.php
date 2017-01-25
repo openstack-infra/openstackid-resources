@@ -42,14 +42,14 @@ final class ChatTeamMemberSerializer extends SilverStripeSerializer
         $values = parent::serialize($expand, $fields, $relations, $params);
 
         if (!empty($expand)) {
-            $expand = explode(',', $expand);
-            foreach ($expand as $relation) {
+            $expand_to = explode(',', $expand);
+            foreach ($expand_to as $relation) {
                 switch (trim($relation)) {
                     case 'member':{
                         if(isset($values['member_id']))
                         {
                             unset($values['member_id']);
-                            $values['member'] =  SerializerRegistry::getInstance()->getSerializer($team_member->getMember())->serialize();
+                            $values['member'] =  SerializerRegistry::getInstance()->getSerializer($team_member->getMember())->serialize($expand);
                         }
                     }
                     break;
