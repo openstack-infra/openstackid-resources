@@ -37,6 +37,13 @@ class SummitGroupEvent extends SummitEvent
      */
     private $groups;
 
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return "SummitGroupEvent";
+    }
+
     public function __construct()
     {
         $this->groups = new ArrayCollection();
