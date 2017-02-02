@@ -50,6 +50,22 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
+     * @return mixed
+     */
+    public function getWifiConnections()
+    {
+        return $this->wifi_connections;
+    }
+
+    /**
+     * @param mixed $wifi_connections
+     */
+    public function setWifiConnections($wifi_connections)
+    {
+        $this->wifi_connections = $wifi_connections;
+    }
+
+    /**
      * @return string
      */
     public function getExternalSummitId()
@@ -301,6 +317,11 @@ class Summit extends SilverstripeBaseModel
     private $events;
 
     /**
+     * @ORM\OneToMany(targetEntity="SummitWIFIConnection", mappedBy="summit", cascade={"persist"})
+     */
+    private $wifi_connections;
+
+    /**
      * Summit constructor.
      */
     public function __construct()
@@ -314,6 +335,7 @@ class Summit extends SilverstripeBaseModel
         $this->category_groups         = new ArrayCollection();
         $this->attendees               = new ArrayCollection();
         $this->entity_events           = new ArrayCollection();
+        $this->wifi_connections        = new ArrayCollection();
     }
 
     /**
@@ -355,6 +377,7 @@ class Summit extends SilverstripeBaseModel
             $summit_time_zone = new DateTimeZone($time_zone_name);
             $timestamp        = $value->format('Y-m-d H:i:s');
             $utc_date         = new DateTime($timestamp, $utc_timezone);
+
             return $utc_date->setTimezone($summit_time_zone);
         }
         return null;
@@ -503,7 +526,7 @@ class Summit extends SilverstripeBaseModel
 
     /**
      * @param int $event_type_id
-     * @return SummitEventType
+     * @return SummitEventType|null
      */
     public function getEventType($event_type_id)
     {
@@ -513,6 +536,16 @@ class Summit extends SilverstripeBaseModel
         return $event_type === false ? null:$event_type;
     }
 
+    /**
+     * @param int $wifi_connection_id
+     * @return SummitWIFIConnection|null
+     */
+    public function getWifiConnection($wifi_connection_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($wifi_connection_id)));
+        $wifi_conn = $this->wifi_connections->matching($criteria)->first();
+        return $wifi_conn === false ? null:$wifi_conn;
+    }
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"})

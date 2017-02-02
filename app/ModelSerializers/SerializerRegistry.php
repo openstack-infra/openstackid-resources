@@ -56,6 +56,7 @@ final class SerializerRegistry
     private function __construct()
     {
         $this->registry['Summit']                     = SummitSerializer::class;
+        $this->registry['SummitWIFIConnection']       = SummitWIFIConnectionSerializer::class;
         $this->registry['SummitType']                 = SummitTypeSerializer::class;
         $this->registry['SummitEventType']            = SummitEventTypeSerializer::class;
         $this->registry['SummitTicketType']           = SummitTicketTypeSerializer::class;

@@ -14,6 +14,7 @@
  **/
 
 use Illuminate\Support\Facades\Config;
+use models\summit\Summit;
 
 /**
  * Class SummitSerializer
@@ -42,6 +43,7 @@ final class SummitSerializer extends SilverStripeSerializer
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array())
     {
         $summit              = $this->object;
+        if(!$summit instanceof Summit) return [];
         $values              = parent::serialize($expand, $fields, $relations, $params);
         $time_zone_list      = timezone_identifiers_list();
         $time_zone_id        = $summit->getTimeZoneId();
@@ -70,17 +72,25 @@ final class SummitSerializer extends SilverStripeSerializer
         $values['schedule_event_detail_url']   = sprintf("%ssummit/%s/%s/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page, $schedule_page, 'events/:event_id/:event_title');
 
         // tickets
-        $ticket_types = array();
+        $ticket_types = [];
         foreach ($summit->getTicketTypes() as $ticket) {
             $ticket_types[] = SerializerRegistry::getInstance()->getSerializer($ticket)->serialize();
         }
         $values['ticket_types'] = $ticket_types;
+
         //locations
-        $locations = array();
+        $locations = [];
         foreach ($summit->getLocations() as $location) {
             $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
         }
         $values['locations'] = $locations;
+
+        // wifi connections
+        $wifi_connections = [];
+        foreach ($summit->getWifiConnections() as $wifi_connection) {
+            $wifi_connections[] = SerializerRegistry::getInstance()->getSerializer($wifi_connection)->serialize();
+        }
+        $values['wifi_connections'] = $wifi_connections;
 
         if (!empty($expand)) {
             $expand = explode(',', $expand);
