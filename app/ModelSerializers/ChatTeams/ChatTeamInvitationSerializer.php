@@ -52,7 +52,7 @@ final class ChatTeamInvitationSerializer extends SilverStripeSerializer
                         if(isset($values['inviter_id']))
                         {
                             unset($values['inviter_id']);
-                            $values['inviter'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getInviter())->serialize();
+                            $values['inviter'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getInviter())->serialize('groups');
                         }
                     }
                     break;
@@ -60,7 +60,7 @@ final class ChatTeamInvitationSerializer extends SilverStripeSerializer
                         if(isset($values['invitee_id']))
                         {
                             unset($values['invitee_id']);
-                            $values['invitee'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getInvitee())->serialize();
+                            $values['invitee'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getInvitee())->serialize('groups');
                         }
                     }
                     break;
@@ -68,7 +68,7 @@ final class ChatTeamInvitationSerializer extends SilverStripeSerializer
                         if(isset($values['team_id']))
                         {
                             unset($values['team_id']);
-                            $values['team'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getTeam())->serialize($expand = 'owner,members,member');
+                            $values['team'] =  SerializerRegistry::getInstance()->getSerializer($invitation->getTeam())->serialize($expand = 'owner,members,member, groups');
                         }
                     }
                     break;

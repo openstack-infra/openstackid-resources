@@ -94,7 +94,7 @@ final class OAuth2ChatTeamApiTest extends ProtectedApiTest
     }
 
     public function testGetMyTeams(){
-        $params = ['expand' => 'owner, member'];
+        $params = ['expand' => 'owner, member, groups'];
 
         $headers = [
             "HTTP_Authorization" => " Bearer " . $this->access_token,
