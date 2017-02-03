@@ -88,8 +88,9 @@ final class SerializerRegistry
 
         // member
         $this->registry['Member']                    = MemberSerializer::class;
-
         $this->registry['Group']                     = GroupSerializer::class;
+        $this->registry['Affiliation']               = AffiliationSerializer::class;
+        $this->registry['Organization']              = OrganizationSerializer::class;
 
         // push notification
         $this->registry['SummitPushNotification']    = SummitPushNotificationSerializer::class;

@@ -13,12 +13,11 @@
  **/
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Mapping as ORM;
 use models\summit\Summit;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFeedback;
 use models\utils\SilverstripeBaseModel;
-use Doctrine\ORM\Mapping AS ORM;
 
 /**
  * @ORM\Entity
@@ -29,6 +28,20 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class Member extends SilverstripeBaseModel
 {
+    public function __construct(){
+        parent::__construct();
+        $this->feedback     = new ArrayCollection();
+        $this->groups       = new ArrayCollection();
+        $this->affiliations = new ArrayCollection();
+    }
+
+    /**
+     * @return Affiliation[]
+     */
+    public function getAffiliations(){
+        return $this->affiliations;
+    }
+
     /**
      * @return Group[]
      */
@@ -43,12 +56,6 @@ class Member extends SilverstripeBaseModel
     public function setGroups($groups)
     {
         $this->groups = $groups;
-    }
-
-    public function __construct(){
-        parent::__construct();
-        $this->feedback = new ArrayCollection();
-        $this->groups   = new ArrayCollection();
     }
 
     /**
@@ -112,6 +119,106 @@ class Member extends SilverstripeBaseModel
     private $bio;
 
     /**
+     * @ORM\Column(name="Email", type="string")
+     * @var string
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(name="SecondEmail", type="string")
+     * @var string
+     */
+    private $second_email;
+
+    /**
+     * @ORM\Column(name="ThirdEmail", type="string")
+     * @var string
+     */
+    private $third_email;
+
+    /**
+     * @ORM\Column(name="EmailVerified", type="boolean")
+     * @var bool
+     */
+    private $email_verified;
+
+    /**
+     * @ORM\Column(name="EmailVerifiedDate", type="datetime")
+     * @var \DateTime
+     */
+    private $email_verified_date;
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmailVerified()
+    {
+        return $this->email_verified;
+    }
+
+    /**
+     * @param bool $email_verified
+     */
+    public function setEmailVerified($email_verified)
+    {
+        $this->email_verified = $email_verified;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getEmailVerifiedDate()
+    {
+        return $this->email_verified_date;
+    }
+
+    /**
+     * @param \DateTime $email_verified_date
+     */
+    public function setEmailVerifiedDate($email_verified_date)
+    {
+        $this->email_verified_date = $email_verified_date;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     */
+    public function setActive($active)
+    {
+        $this->active = $active;
+    }
+
+    /**
+     * @ORM\Column(name="Active", type="boolean")
+     * @var bool
+     */
+    private $active;
+
+    /**
      * @ORM\Column(name="LinkedInProfile", type="string")
      * @var string
      */
@@ -128,7 +235,6 @@ class Member extends SilverstripeBaseModel
      * @var string
      */
     private $twitter_handle;
-
 
     /**
      * @ORM\Column(name="Gender", type="string")
@@ -170,6 +276,12 @@ class Member extends SilverstripeBaseModel
      * @var SummitEventFeedback[]
      */
     private $feedback;
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="Affiliation", mappedBy="owner", cascade={"persist"})
+     */
+    private $affiliations;
 
     /**
      * @return File

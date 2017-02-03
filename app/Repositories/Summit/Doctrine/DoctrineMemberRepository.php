@@ -45,19 +45,24 @@ final class DoctrineMemberRepository extends SilverStripeDoctrineRepository impl
      */
     public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
-        $query  = $this->getEntityManager()->createQueryBuilder()
-            ->select("m")
-            ->from(\models\main\Member::class, "m");
+        $query  = $this->getEntityManager()
+                ->createQueryBuilder()
+                ->select("m")
+                ->from(\models\main\Member::class, "m")
+                ->where("m.active = 1")
+                ->andWhere("m.first_name is not null")
+                ->andWhere("m.last_name is not null")
+                ->andWhere("m.email_verified = 1");
 
         if(!is_null($filter)){
 
-            $filter->apply2Query($query, array
-            (
+            $filter->apply2Query($query, [
                 'irc'        => 'm.irc_handle:json_string',
                 'twitter'    => 'm.twitter_handle:json_string',
                 'first_name' => 'm.first_name:json_string',
                 'last_name'  => 'm.last_name:json_string',
-            ));
+                'email'      => ['m.email:json_string', 'm.second_email:json_string', 'm.third_email:json_string'],
+            ]);
         }
 
         if (!is_null($order)) {
@@ -74,7 +79,7 @@ final class DoctrineMemberRepository extends SilverStripeDoctrineRepository impl
             $query = $query->addOrderBy("m.last_name", 'ASC');
         }
 
-        $query= $query
+        $query = $query
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 

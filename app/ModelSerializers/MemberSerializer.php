@@ -36,7 +36,8 @@ final class MemberSerializer extends SilverStripeSerializer
 
         'groups',
         'groups_events',
-        'feedback'
+        'feedback',
+        'affiliations',
     ];
 
     private static $expand_group_events = [
@@ -89,6 +90,16 @@ final class MemberSerializer extends SilverStripeSerializer
             $values['groups_events'] = $res;
         }
 
+        if(in_array('affiliations', $relations)){
+            $res = [];
+            foreach ($member->getAffiliations() as $affiliation){
+                $res[] = SerializerRegistry::getInstance()
+                    ->getSerializer($affiliation)
+                    ->serialize('organization');
+            }
+            $values['affiliations'] = $res;
+        }
+
         if (!empty($expand)) {
             $exp_expand = explode(',', $expand);
             foreach ($exp_expand as $relation) {
@@ -112,6 +123,7 @@ final class MemberSerializer extends SilverStripeSerializer
                     break;
                     case 'feedback': {
                         if(!in_array('feedback', $relations)) break;
+                        if(is_null($summit)) break;
                         $feedback = array();
                         foreach ($member->getFeedbackBySummit($summit) as $f) {
                             $feedback[] = SerializerRegistry::getInstance()->getSerializer($f)->serialize();

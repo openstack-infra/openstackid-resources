@@ -157,19 +157,36 @@ final class Filter
         foreach ($this->filters as $filter) {
             if ($filter instanceof FilterElement && isset($mappings[$filter->getField()])) {
                 $mapping = $mappings[$filter->getField()];
+
                 if ($mapping instanceof DoctrineJoinFilterMapping) {
                     $query = $mapping->apply($query, $filter);
                     continue;
                 }
+                else if(is_array($mapping)){
+                    $condition = '';
+                    foreach ($mapping as $mapping_or){
+                        $mapping_or = explode(':', $mapping_or);
+                        $value      = $filter->getValue();
+                        if (count($mapping_or) > 1) {
+                            $value = $this->convertValue($value, $mapping_or[1]);
+                        }
 
-                $mapping = explode(':', $mapping);
-                $value   = $filter->getValue();
+                        if(!empty($condition)) $condition .= ' OR ';
+                        $condition .= sprintf("%s %s %s", $mapping_or[0], $filter->getOperator(), $value);
+                    }
 
-                if (count($mapping) > 1) {
-                    $value = $this->convertValue($value, $mapping[1]);
+                    $query->andWhere($condition);
                 }
+                else {
+                    $mapping = explode(':', $mapping);
+                    $value   = $filter->getValue();
 
-                $query = $query->andWhere(sprintf("%s %s %s",$mapping[0], $filter->getOperator(), $value));
+                    if (count($mapping) > 1) {
+                        $value = $this->convertValue($value, $mapping[1]);
+                    }
+
+                    $query = $query->andWhere(sprintf("%s %s %s", $mapping[0], $filter->getOperator(), $value));
+                }
             }
             else if (is_array($filter)) {
                 // OR

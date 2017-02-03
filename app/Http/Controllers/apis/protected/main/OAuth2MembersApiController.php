@@ -81,6 +81,7 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
                     'twitter'    => ['=@', '=='],
                     'first_name' => ['=@', '=='],
                     'last_name'  => ['=@', '=='],
+                    'email'      => ['=@', '=='],
                 ));
             }
 
