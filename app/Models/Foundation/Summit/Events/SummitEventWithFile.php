@@ -23,6 +23,12 @@ use models\main\File;
  */
 class SummitEventWithFile extends SummitEvent
 {
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return "SummitEventWithFile";
+    }
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\File")
