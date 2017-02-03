@@ -76,6 +76,7 @@ final class SerializerRegistry
         $this->registry['SummitAttendee']             = SummitAttendeeSerializer::class;
         $this->registry['SummitAttendeeSchedule']     = SummitAttendeeScheduleSerializer::class;
         $this->registry['SummitEntityEvent']          = SummitEntityEventSerializer::class;
+        $this->registry['SummitEventWithFile']        = SummitEventWithFileSerializer::class;
 
         // locations
         $this->registry['SummitVenue']                = SummitVenueSerializer::class;

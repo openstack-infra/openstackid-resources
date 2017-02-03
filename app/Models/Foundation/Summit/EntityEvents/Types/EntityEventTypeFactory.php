@@ -52,6 +52,7 @@ final class EntityEventTypeFactory
         {
             case 'Presentation':
             case 'SummitEvent':
+            case 'SummitEventWithFile':
             {
                 if ($e->getType() === 'UPDATE' || $e->getType() === "INSERT")
                     return new SummitEventEntityEventInsertOrUpdateType($e, $ctx);
