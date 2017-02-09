@@ -77,7 +77,7 @@ final class ChatTeamSerializer extends SilverStripeSerializer
             // add pending invitations
             $invitations = [];
             foreach($team->getInvitations() as $invitation){
-                $invitations[] = SerializerRegistry::getInstance()->getSerializer($invitation)->serialize('inviter,invitee,');
+                $invitations[] = SerializerRegistry::getInstance()->getSerializer($invitation)->serialize('inviter,invitee');
             }
             $values['invitations'] = $invitations;
         }

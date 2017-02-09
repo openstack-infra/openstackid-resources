@@ -12,11 +12,17 @@
  * limitations under the License.
  **/
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
+use services\model\ISummitService;
+use utils\PagingResponse;
+use Illuminate\Support\Facades\Input;
 
 /**
  * Class OAuth2SummitMembersApiController
@@ -30,23 +36,31 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
     private $summit_repository;
 
     /**
+     * @var ISummitService
+     */
+    private $summit_service;
+
+    /**
      * OAuth2SummitMembersApiController constructor.
      * @param IMemberRepository $member_repository
      * @param ISummitRepository $summit_repository
+     * @param ISummitService $summit_service
      * @param IResourceServerContext $resource_server_context
      */
     public function __construct
     (
         IMemberRepository $member_repository,
         ISummitRepository $summit_repository,
+        ISummitService    $summit_service,
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
         $this->summit_repository  = $summit_repository;
         $this->repository         = $member_repository;
+        $this->summit_service     = $summit_service;
     }
 
-    public function getMyMember($summit_id){
+    public function getMyMember($summit_id, $member_id){
 
         $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
         if (is_null($summit)) return $this->error404();
@@ -60,10 +74,10 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
         $fields    = Request::input('fields', null);
         $relations = Request::input('relations', null);
 
-
         return $this->ok
         (
-            SerializerRegistry::getInstance()->getSerializer($current_member)->serialize
+            SerializerRegistry::getInstance()->getSerializer($current_member, SerializerRegistry::SerializerType_Private)
+            ->serialize
             (
                 Request::input('expand', ''),
                 is_null($fields) ? [] : explode(',', $fields),
@@ -71,5 +85,135 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
                 ['summit' => $summit]
             )
         );
+    }
+
+    public function getMemberFavoritesSummitEvents($summit_id, $member_id){
+
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $current_member = $this->repository->getById($current_member_id);
+            if (is_null($current_member)) return $this->error404();
+
+            $favorites = array();
+            foreach ($current_member->getFavoritesSummitEvents() as $favorite_event)
+            {
+                if(!$summit->isEventOnSchedule($favorite_event->getId())) continue;
+                $favorites[] = SerializerRegistry::getInstance()->getSerializer($favorite_event)->serialize();
+            }
+
+            $response    = new PagingResponse
+            (
+                count($favorites),
+                count($favorites),
+                1,
+                1,
+                $favorites
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (\Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+
+    }
+
+    public function addEventToMemberFavorites($summit_id, $member_id, $event_id){
+
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $current_member = $this->repository->getById($current_member_id);
+            if (is_null($current_member)) return $this->error404();
+
+            $this->summit_service->addEventToMemberFavorites($summit, $current_member, intval($event_id));
+
+            return $this->created();
+
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (\Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function removeEventFromMemberFavorites($summit_id, $member_id, $event_id){
+
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $current_member = $this->repository->getById($current_member_id);
+            if (is_null($current_member)) return $this->error404();
+
+            $this->summit_service->removeEventFromMemberFavorites($summit, $current_member, intval($event_id));
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+              return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (\Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 }

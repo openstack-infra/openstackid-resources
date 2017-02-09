@@ -43,7 +43,7 @@ final class RateLimitMiddleware
     public function __construct(IApiEndpointRepository $endpoint_repository, ICacheService $cache_service)
     {
         $this->endpoint_repository = $endpoint_repository;
-        $this->cache_service = $cache_service;
+        $this->cache_service       = $cache_service;
     }
 
     /**

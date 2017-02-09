@@ -179,4 +179,24 @@ abstract class AbstractSerializer implements IModelSerializer
 
         return $values;
     }
+
+    /**
+     * @param string $expand_str
+     * @param string $prefix
+     * @return string
+     */
+    protected static function filterExpandByPrefix($expand_str, $prefix ){
+
+        $expand_to    = explode(',', $expand_str);
+        $filtered_expand  = array_filter($expand_to, function($element) use($prefix){
+            return preg_match('/^' . preg_quote($prefix, '/') . '/', strtolower(trim($element))) > 0;
+        });
+        $res = '';
+        foreach($filtered_expand as $filtered_expand_elem){
+            if(strlen($res) > 0) $res .= ',';
+            $res .= explode('.', strtolower(trim($filtered_expand_elem)))[1];
+        }
+
+        return $res;
+    }
 }

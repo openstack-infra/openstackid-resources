@@ -1,9 +1,11 @@
 <?php namespace services\model;
 
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
+use models\main\Member;
 use models\summit\ConfirmationExternalOrderRequest;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
-use models\summit\SummitEntityEvent;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFeedback;
 
@@ -19,6 +21,11 @@ use models\summit\SummitEventFeedback;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
+/**
+ * Interface ISummitService
+ * @package services\model
+ */
 interface ISummitService
 {
     /**
@@ -112,4 +119,23 @@ interface ISummitService
      * @return SummitAttendee
      */
     public function confirmExternalOrderAttendee(ConfirmationExternalOrderRequest $request);
+
+    /**
+     * @param Summit $summit
+     * @param Member $member
+     * @param int $event_id
+     * @throws EntityNotFoundException
+     */
+    public function removeEventFromMemberFavorites(Summit $summit, Member $member, $event_id);
+
+    /**
+     * @param Summit $summit
+     * @param Member $member
+     * @param int $event_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function addEventToMemberFavorites(Summit $summit, Member $member, $event_id);
+
+
 }

@@ -179,6 +179,12 @@ class SummitAttendee extends SilverstripeBaseModel
                 sprintf('Event %s already belongs to attendee %s schedule.', $event->getId(), $this->getId())
             );
 
+        if(!$event->isPublished())
+            throw new ValidationException
+            (
+                sprintf('Event %s is not published', $event->getId())
+            );
+
         $schedule = new SummitAttendeeSchedule;
 
         $schedule->setAttendee($this);

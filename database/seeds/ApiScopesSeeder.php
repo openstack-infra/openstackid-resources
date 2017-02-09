@@ -105,8 +105,18 @@ final class ApiScopesSeeder extends Seeder
             ),
             array(
                 'name' => sprintf('%s/me/read', $current_realm),
-                'short_description' => 'Get own member data',
-                'description' => 'Grants read only access for our own member data',
+                'short_description' => 'Get own summit member data',
+                'description' => 'Grants read only access for our own summit member data',
+            ),
+            array(
+                'name' => sprintf('%s/me/summits/events/favorites/add', $current_realm),
+                'short_description' => 'Allows to add Summit events as favorite',
+                'description' => 'Allows to add Summit events as favorite',
+            ),
+            array(
+                'name' => sprintf('%s/me/summits/events/favorites/delete', $current_realm),
+                'short_description' => 'Allows to remove Summit events as favorite',
+                'description' => 'Allows to remove Summit events as favorite',
             ),
             array(
                 'name' => sprintf('%s/summits/write', $current_realm),

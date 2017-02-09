@@ -14,6 +14,7 @@
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFeedback;
@@ -28,11 +29,16 @@ use models\utils\SilverstripeBaseModel;
  */
 class Member extends SilverstripeBaseModel
 {
+    /**
+     * Member constructor.
+     */
     public function __construct(){
         parent::__construct();
-        $this->feedback     = new ArrayCollection();
-        $this->groups       = new ArrayCollection();
-        $this->affiliations = new ArrayCollection();
+        $this->feedback                = new ArrayCollection();
+        $this->groups                  = new ArrayCollection();
+        $this->affiliations            = new ArrayCollection();
+        $this->team_memberships        = new ArrayCollection();
+        $this->favorites_summit_events = new ArrayCollection();
     }
 
     /**
@@ -48,6 +54,22 @@ class Member extends SilverstripeBaseModel
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * @return ChatTeamMember[]
+     */
+    public function getTeamMemberships()
+    {
+        return $this->team_memberships;
+    }
+
+    /**
+     * @param ChatTeamMember[] $team_memberships
+     */
+    public function setTeamMemberships($team_memberships)
+    {
+        $this->team_memberships = $team_memberships;
     }
 
     /**
@@ -67,6 +89,39 @@ class Member extends SilverstripeBaseModel
      * @var Group[]
      */
     private $groups;
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="ChatTeamMember", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
+     * @var ChatTeamMember[]
+     */
+    private $team_memberships;
+
+    /**
+     * @return SummitEvent[]
+     */
+    public function getFavoritesSummitEvents()
+    {
+        return $this->favorites_summit_events;
+    }
+
+    /**
+     * @param SummitEvent[] $favorites_summit_events
+     */
+    public function setFavoritesSummitEvents($favorites_summit_events)
+    {
+        $this->favorites_summit_events = $favorites_summit_events;
+    }
+
+     /**
+     * @ORM\ManyToMany(targetEntity="models\summit\SummitEvent")
+     * @ORM\JoinTable(name="Member_FavoriteSummitEvents",
+     *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")}
+     *      )
+     * @var SummitEvent[]
+     */
+    private $favorites_summit_events;
 
     /**
      * @return string
@@ -117,6 +172,82 @@ class Member extends SilverstripeBaseModel
      * @var string
      */
     private $bio;
+
+    /**
+     * @ORM\Column(name="State", type="string")
+     * @var string
+     */
+    private $state;
+
+    /**
+     * @return string
+     */
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * @param string $country
+     */
+    public function setCountry($country)
+    {
+        $this->country = $country;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecondEmail()
+    {
+        return $this->second_email;
+    }
+
+    /**
+     * @param string $second_email
+     */
+    public function setSecondEmail($second_email)
+    {
+        $this->second_email = $second_email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getThirdEmail()
+    {
+        return $this->third_email;
+    }
+
+    /**
+     * @param string $third_email
+     */
+    public function setThirdEmail($third_email)
+    {
+        $this->third_email = $third_email;
+    }
+
+    /**
+     * @ORM\Column(name="Country", type="string")
+     * @var string
+     */
+    private $country;
 
     /**
      * @ORM\Column(name="Email", type="string")
@@ -372,5 +503,74 @@ class Member extends SilverstripeBaseModel
             $codes[] = $g->getCode();
         }
         return $codes;
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @throws ValidationException
+     */
+    public function addFavoriteSummitEvent(SummitEvent $event){
+        if($this->isOnFavorite($event))
+            throw new ValidationException
+            (
+                sprintf('Event %s already belongs to member %s favorites.', $event->getId(), $this->getId())
+            );
+        if(!$event->isPublished())
+            throw new ValidationException
+            (
+                sprintf('Event %s is not published', $event->getId())
+            );
+        $this->favorites_summit_events->add($event);
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @return bool
+     */
+    public function isOnFavorite(SummitEvent $event){
+        $sql = <<<SQL
+SELECT COUNT(SummitEventID) AS QTY 
+FROM Member_FavoriteSummitEvents 
+WHERE MemberID = :member_id AND SummitEventID = :event_id
+SQL;
+
+        $stmt = $this->prepareRawSQL($sql);
+        $stmt->execute([
+            'member_id'   => $this->getId(),
+            'event_id'    => $event->getId()
+        ]);
+        $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        return count($res) > 0 ? intval($res[0]) > 0 : false;
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @throws ValidationException
+     */
+    public function removeFavoriteSummitEvent(SummitEvent $event){
+        if(!$this->isOnFavorite($event)){
+            throw new ValidationException
+            (
+                sprintf('Event %s does not belongs to member %s favorites.', $event->getId(), $this->getId())
+            );
+        }
+
+        $this->favorites_summit_events->removeElement($event);
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getFavoritesEventsIds(){
+        $sql = <<<SQL
+SELECT SummitEventID 
+FROM Member_FavoriteSummitEvents 
+INNER JOIN SummitEvent ON SummitEvent.ID = Member_FavoriteSummitEvents.SummitEventID
+WHERE MemberID = :member_id AND SummitEvent.Published = 1
+SQL;
+
+        $stmt = $this->prepareRawSQL($sql);
+        $stmt->execute(['member_id' => $this->getId()]);
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 }

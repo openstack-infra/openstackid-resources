@@ -1,6 +1,6 @@
 <?php namespace ModelSerializers;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,14 +12,14 @@
  * limitations under the License.
  **/
 
-use Illuminate\Support\Facades\Config;
 use models\main\Member;
+use Illuminate\Support\Facades\Config;
 
 /**
- * Class MemberSerializer
+ * Class AbstractMemberSerializer
  * @package ModelSerializers
  */
-final class MemberSerializer extends SilverStripeSerializer
+class AbstractMemberSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
 
@@ -30,23 +30,13 @@ final class MemberSerializer extends SilverStripeSerializer
         'LinkedInProfile' => 'linked_in:json_string',
         'IrcHandle'       => 'irc:json_string',
         'TwitterHandle'   => 'twitter:json_string',
+        'State'           => 'state:json_string',
+        'Country'         => 'country:json_string',
     ];
 
     protected static $allowed_relations = [
-
         'groups',
-        'groups_events',
-        'feedback',
         'affiliations',
-    ];
-
-    private static $expand_group_events = [
-        'type',
-        'location',
-        'sponsors',
-        'track',
-        'track_groups',
-        'groups',
     ];
 
     /**
@@ -58,37 +48,16 @@ final class MemberSerializer extends SilverStripeSerializer
      */
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array())
     {
-        $member         = $this->object;
+        $member  = $this->object;
         if(!$member instanceof Member) return [];
 
         if(!count($relations)) $relations = $this->getAllowedRelations();
 
         $values           = parent::serialize($expand, $fields, $relations, $params);
         $values['pic']    = Config::get("server.assets_base_url", 'https://www.openstack.org/'). 'profile_images/members/'. $member->getId();
-        $summit           = isset($params['summit'])? $params['summit'] :null;
-
-        $speaker          = !is_null($summit)? $summit->getSpeakerByMember($member): null;
-        $attendee         = !is_null($summit)? $summit->getAttendeeByMember($member): null;
-        $groups_events    = !is_null($summit)? $summit->getGroupEventsFor($member): null;
 
         if(in_array('groups', $relations))
             $values['groups'] = $member->getGroupsIds();
-
-        if(!is_null($speaker))
-            $values['speaker_id'] = $speaker->getId();
-
-        if(!is_null($attendee))
-            $values['attendee_id'] = $attendee->getId();
-
-        if(!is_null($groups_events) && in_array('groups_events', $relations)){
-            $res = [];
-            foreach ($groups_events as $group_event){
-                $res[] = SerializerRegistry::getInstance()
-                    ->getSerializer($group_event)
-                    ->serialize(implode(',', self::$expand_group_events));
-            }
-            $values['groups_events'] = $res;
-        }
 
         if(in_array('affiliations', $relations)){
             $res = [];
@@ -104,34 +73,7 @@ final class MemberSerializer extends SilverStripeSerializer
             $exp_expand = explode(',', $expand);
             foreach ($exp_expand as $relation) {
                 switch (trim($relation)) {
-
-                    case 'attendee': {
-                        if (!is_null($attendee))
-                        {
-                            unset($values['attendee_id']);
-                            $values['attendee'] = SerializerRegistry::getInstance()->getSerializer($attendee)->serialize($expand,[],['none']);
-                        }
-                    }
-                    break;
-                    case 'speaker': {
-                        if (!is_null($speaker))
-                        {
-                            unset($values['speaker_id']);
-                            $values['speaker'] = SerializerRegistry::getInstance()->getSerializer($speaker)->serialize($expand,[],['none']);
-                        }
-                    }
-                    break;
-                    case 'feedback': {
-                        if(!in_array('feedback', $relations)) break;
-                        if(is_null($summit)) break;
-                        $feedback = array();
-                        foreach ($member->getFeedbackBySummit($summit) as $f) {
-                            $feedback[] = SerializerRegistry::getInstance()->getSerializer($f)->serialize();
-                        }
-                        $values['feedback'] = $feedback;
-                    }
-                    break;
-                    case 'groups': {
+                   case 'groups': {
                         if(!in_array('groups', $relations)) break;
                         $groups = [];
                         unset($values['groups']);
@@ -144,7 +86,6 @@ final class MemberSerializer extends SilverStripeSerializer
                 }
             }
         }
-
         return $values;
     }
 }

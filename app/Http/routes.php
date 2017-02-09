@@ -14,13 +14,13 @@
 use Illuminate\Support\Facades\Config;
 
 //OAuth2 Protected API
-Route::group(array(
+Route::group([
     'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/v1',
-    'before' => [],
-    'after' => [],
+    'prefix'     => 'api/v1',
+    'before'     => [],
+    'after'      => [],
     'middleware' => ['ssl', 'oauth2.protected', 'rate.limit','etags']
-), function () {
+], function () {
 
     Route::group(array('prefix' => 'marketplace'), function () {
 
@@ -105,11 +105,11 @@ Route::group(array(
 
                 Route::group(array('prefix' => '{attendee_id}'), function () {
 
-                    Route::get('', 'OAuth2SummitAttendeesApiController@getAttendee')->where('attendee_id', 'me|[0-9]+');
+                    Route::get('', 'OAuth2SummitAttendeesApiController@getAttendee')->where('attendee_id', 'me');
 
                     Route::group(array('prefix' => 'schedule'), function ()
                     {
-                        Route::get('', 'OAuth2SummitAttendeesApiController@getAttendeeSchedule')->where('attendee_id', 'me|[0-9]+');
+                        Route::get('', 'OAuth2SummitAttendeesApiController@getAttendeeSchedule')->where('attendee_id', 'me');
 
                         Route::group(array('prefix' => '{event_id}'), function (){
                             Route::post('', 'OAuth2SummitAttendeesApiController@addEventToAttendeeSchedule')->where('attendee_id', 'me|[0-9]+');
@@ -198,8 +198,17 @@ Route::group(array(
 
             // member
             Route::group(array('prefix' => 'members'), function () {
-                Route::group(array('prefix' => 'me'), function () {
-                    Route::get('', 'OAuth2SummitMembersApiController@getMyMember');
+                Route::group(array('prefix' => '{member_id}'), function () {
+                    Route::get('', 'OAuth2SummitMembersApiController@getMyMember')->where('member_id', 'me');
+                    Route::group(array('prefix' => 'favorites'), function ()
+                    {
+                        Route::get('', 'OAuth2SummitMembersApiController@getMemberFavoritesSummitEvents')->where('member_id', 'me');
+
+                        Route::group(array('prefix' => '{event_id}'), function (){
+                            Route::post('', 'OAuth2SummitMembersApiController@addEventToMemberFavorites')->where('member_id', 'me');
+                            Route::delete('', 'OAuth2SummitMembersApiController@removeEventFromMemberFavorites')->where('member_id', 'me');
+                        });
+                    });
                 });
 
             });
@@ -220,13 +229,13 @@ Route::group(array(
 });
 
 //OAuth2 Protected API V2
-Route::group(array(
-    'namespace' => 'App\Http\Controllers',
-    'prefix' => 'api/v2',
-    'before' => [],
-    'after' => [],
+Route::group([
+    'namespace'  => 'App\Http\Controllers',
+    'prefix'     => 'api/v2',
+    'before'     => [],
+    'after'      => [],
     'middleware' => ['ssl', 'oauth2.protected', 'rate.limit','etags']
-), function () {
+], function () {
 
     // summits
     Route::group(array('prefix' => 'summits'), function () {
