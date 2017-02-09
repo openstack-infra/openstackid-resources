@@ -453,9 +453,27 @@ class ApiEndpointsSeeder extends Seeder
             //members
             array(
                 'name' => 'get-own-member',
-                'route' => '/api/v1/summits/{id}/members/me',
+                'route' => '/api/v1/summits/{id}/members/{member_id}',
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/me/read', $current_realm)],
+            ),
+            array(
+                'name' => 'get-own-member-favorites',
+                'route' => '/api/v1/summits/{id}/members/{member_id}/favorites',
+                'http_method' => 'GET',
+                'scopes' => [sprintf('%s/me/read', $current_realm)],
+            ),
+            array(
+                'name' => 'add-2-own-member-favorites',
+                'route' => '/api/v1/summits/{id}/members/{member_id}/favorites/{event_id}',
+                'http_method' => 'POST',
+                'scopes' => [sprintf('%s/me/summits/events/favorites/add', $current_realm)],
+            ),
+            array(
+                'name' => 'remove-from-own-member-favorites',
+                'route' => '/api/v1/summits/{id}/members/{member_id}/favorites/{event_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [sprintf('%s/me/summits/events/favorites/delete', $current_realm)],
             ),
             // notifications
             array(

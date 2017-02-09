@@ -39,11 +39,11 @@ final class DoctrineSummitEntityEventRepository
     public function getEntityEvents
     (
         Summit $summit,
-        $member_id = null,
-        $from_id   = null,
+        $member_id          = null,
+        $from_id            = null,
         DateTime $from_date = null,
-        $limit = 25,
-        $detach = true
+        $limit              = 25,
+        $detach             = true
     )
     {
         $filters = '';
@@ -65,7 +65,7 @@ SELECT * FROM
 	SELECT * FROM SummitEntityEvent
 	WHERE
 	(
-		(EntityClassName <> 'MySchedule' AND EntityClassName <> 'SummitAttendee')
+		(EntityClassName <> 'MySchedule' AND EntityClassName <> 'SummitAttendee' AND EntityClassName <> 'MyFavorite')
 		-- GLOBAL TRUNCATE
 		OR (EntityClassName = 'WipeData' AND EntityID = 0)
 	)
@@ -84,7 +84,7 @@ SELECT * FROM
 	SELECT * FROM SummitEntityEvent
 	WHERE
 	(
-		EntityClassName = 'MySchedule'
+		EntityClassName = 'MySchedule' OR EntityClassName = 'MyFavorite'
 		AND OwnerID = {$member_id}
 	)
 	AND SummitID = {$summit->getId()}

@@ -68,6 +68,7 @@ final class EntityEventTypeFactory
             }
             break;
             case 'MySchedule':
+            case 'MyFavorite':
             {
                 return new MyScheduleEntityEventType($e, $ctx);
             }
@@ -75,11 +76,6 @@ final class EntityEventTypeFactory
             case 'Summit':
             {
                 return new SummitEntityEventType($e, $ctx);
-            }
-            break;
-            case 'SummitType':
-            {
-                return new SummitTypeEntityEventType($e, $ctx);
             }
             break;
             case 'SummitEventType':

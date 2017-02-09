@@ -156,8 +156,9 @@ final class SummitEntityEventProcessContext
             foreach ($ops as $op) {
                 if (!is_null($last_idx))
                     unset($this->list[$last_idx]);
-                $last_op = $op['op'];
-                $last_idx = intval($op['idx']);
+
+                $last_op     = $op['op'];
+                $last_idx    = intval($op['idx']);
                 $must_insert = !$must_insert && $last_op === 'INSERT' ? true : $must_insert;
             }
             $last_op = $must_insert && $last_op !== 'DELETE' ? 'INSERT' : $last_op;

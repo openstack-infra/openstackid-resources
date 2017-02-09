@@ -53,6 +53,14 @@ final class ChatTeamMemberSerializer extends SilverStripeSerializer
                         }
                     }
                     break;
+                    case 'team': {
+                        if (isset($values['team_id'])) {
+                            unset($values['team_id']);
+
+                            $values['team'] = SerializerRegistry::getInstance()->getSerializer($team_member->getTeam())->serialize(self::filterExpandByPrefix($expand, 'team.'));
+                        }
+                    }
+                    break;
                 }
             }
         }

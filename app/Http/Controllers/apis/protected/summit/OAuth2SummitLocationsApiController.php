@@ -90,7 +90,17 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
             }
 
-            return $this->ok($locations);
+            $response    = new PagingResponse
+            (
+                count($locations),
+                count($locations),
+                1,
+                1,
+                $locations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -280,7 +290,17 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
             }
 
-            return $this->ok($locations);
+
+            $response    = new PagingResponse
+            (
+                count($locations),
+                count($locations),
+                1,
+                1,
+                $locations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
 
         } catch (Exception $ex) {
             Log::error($ex);
@@ -305,7 +325,17 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
             }
 
-            return $this->ok($locations);
+            $response    = new PagingResponse
+            (
+                count($locations),
+                count($locations),
+                1,
+                1,
+                $locations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -329,7 +359,17 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
             }
 
-            return $this->ok($locations);
+            $response    = new PagingResponse
+            (
+                count($locations),
+                count($locations),
+                1,
+                1,
+                $locations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
@@ -354,7 +394,17 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
             }
 
-            return $this->ok($locations);
+            $response    = new PagingResponse
+            (
+                count($locations),
+                count($locations),
+                1,
+                1,
+                $locations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);

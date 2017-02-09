@@ -1,5 +1,6 @@
 <?php namespace App\Providers;
 
+use App\Events\MyFavoritesAdd;
 use App\Events\SummitEventCreated;
 use App\Events\SummitEventDeleted;
 use App\Events\SummitEventUpdated;
@@ -43,8 +44,6 @@ class EventServiceProvider extends ServiceProvider
 
         Event::listen(\App\Events\MyScheduleAdd::class, function($event)
         {
-            if(!$event instanceof MyScheduleAdd) return;
-
             $entity_event = new SummitEntityEvent;
             $entity_event->setEntityClassName('MySchedule');
             $entity_event->setEntityId($event->getEventId());
@@ -58,10 +57,23 @@ class EventServiceProvider extends ServiceProvider
             $em->flush();
         });
 
+        Event::listen(\App\Events\MyFavoritesAdd::class, function($event)
+        {
+            $entity_event = new SummitEntityEvent;
+            $entity_event->setEntityClassName('MyFavorite');
+            $entity_event->setEntityId($event->getEventId());
+            $entity_event->setType('INSERT');
+            $entity_event->setOwner($event->getMember());
+            $entity_event->setSummit($event->getSummit());
+            $entity_event->setMetadata('');
+
+            $em = Registry::getManager('ss');
+            $em->persist($entity_event);
+            $em->flush();
+        });
+
         Event::listen(\App\Events\MyScheduleRemove::class, function($event)
         {
-            if(!$event instanceof MyScheduleRemove) return;
-
             $entity_event = new SummitEntityEvent;
             $entity_event->setEntityClassName('MySchedule');
             $entity_event->setEntityId($event->getEventId());
@@ -76,10 +88,25 @@ class EventServiceProvider extends ServiceProvider
 
         });
 
+        Event::listen(\App\Events\MyFavoritesRemove::class, function($event)
+        {
+
+            $entity_event = new SummitEntityEvent;
+            $entity_event->setEntityClassName('MyFavorite');
+            $entity_event->setEntityId($event->getEventId());
+            $entity_event->setType('DELETE');
+            $entity_event->setOwner($event->getMember());
+            $entity_event->setSummit($event->getSummit());
+            $entity_event->setMetadata('');
+
+            $em = Registry::getManager('ss');
+            $em->persist($entity_event);
+            $em->flush();
+
+        });
+
         Event::listen(\App\Events\SummitEventCreated::class, function($event)
         {
-            if(!$event instanceof SummitEventCreated) return;
-
             $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
             $member_repository               = App::make(\models\main\IMemberRepository::class);
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();

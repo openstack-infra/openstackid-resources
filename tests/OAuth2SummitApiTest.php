@@ -109,7 +109,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             array(),
             $headers
         );
-        $end = time();
+        $end   = time();
         $delta = $end - $start;
         echo "execution call " . $delta . " seconds ...";
         $content = $response->getContent();
@@ -1216,7 +1216,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => 'current',
+            'id' => '7',
             'from_date' => 1460148342,
             'limit' => 100
         );
@@ -1278,7 +1278,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testGetEntityEventsFromCurrentSummitGreaterThanGivenID($summit_id = 7, $last_event_id = 665707)
+    public function testGetEntityEventsFromCurrentSummitGreaterThanGivenID($summit_id = 7, $last_event_id = 702471)
     {
         $params = array
         (
@@ -1997,32 +1997,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     }
 
-    public function testGetMyMemberFromCurrentSummit()
-    {
-
-        $params = [
-
-            'expand'   => 'attendee,speaker,feedback,groups, presentations',
-            'id'        => 7,
-        ];
-
-        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
-        $response = $this->action(
-            "GET",
-            "OAuth2SummitMembersApiController@getMyMember",
-            $params,
-            array(),
-            array(),
-            array(),
-            $headers
-        );
-
-        $content = $response->getContent();
-        $this->assertResponseStatus(200);
-        $member = json_decode($content);
-        $this->assertTrue(!is_null($member));
-    }
-
     public function testGetSummitNotifications()
     {
 
@@ -2133,5 +2107,102 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $events = json_decode($content);
         $this->assertTrue(!is_null($events));
+    }
+
+    public function testAdd2Favorite($summit_id = 7, $event_id = 14964){
+        $params = array
+        (
+            'id'          => $summit_id,
+            'member_id'   => 'me',
+            'event_id'    => $event_id
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitMembersApiController@addEventToMemberFavorites",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+    }
+
+    public function testRemoveFromFavorites($summit_id = 7, $event_id = 14964){
+
+         $params = array
+         (
+             'id'          => $summit_id,
+             'member_id'   => 'me',
+             'event_id'    => $event_id
+         );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitMembersApiController@removeEventFromMemberFavorites",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
+
+    public function testGetMyFavorites(){
+
+          $params = [
+
+              'member_id' => 'me',
+              'id'        => 7,
+          ];
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitMembersApiController@getMemberFavoritesSummitEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $favorites = json_decode($content);
+        $this->assertTrue(!is_null($favorites));
+    }
+
+    public function testGetMyMemberFromCurrentSummit()
+    {
+
+        $params = [
+
+            'expand'    => 'attendee,speaker,feedback,groups,presentations',
+            'member_id' => 'me',
+            'id'        => 7,
+        ];
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitMembersApiController@getMyMember",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $member = json_decode($content);
+        $this->assertTrue(!is_null($member));
     }
 }

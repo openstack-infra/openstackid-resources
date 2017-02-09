@@ -13,6 +13,8 @@
  * limitations under the License.
  **/
 
+use App\Events\MyFavoritesAdd;
+use App\Events\MyFavoritesRemove;
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -24,6 +26,7 @@ use models\main\IMemberRepository;
 use models\main\ITagRepository;
 use Models\foundation\summit\EntityEvents\EntityEventTypeFactory;
 use Models\foundation\summit\EntityEvents\SummitEntityEventProcessContext;
+use models\main\Member;
 use models\main\Tag;
 use models\summit\ConfirmationExternalOrderRequest;
 use models\summit\ISpeakerRepository;
@@ -167,6 +170,34 @@ final class SummitService implements ISummitService
 
     /**
      * @param Summit $summit
+     * @param Member $member
+     * @param int $event_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function addEventToMemberFavorites(Summit $summit, Member $member, $event_id){
+        try {
+            $this->tx_service->transaction(function () use ($summit, $member, $event_id) {
+                $event = $summit->getScheduleEvent($event_id);
+                if (is_null($event)) {
+                    throw new EntityNotFoundException('event not found on summit!');
+                }
+                if(!Summit::allowToSee($event, $member))
+                    throw new EntityNotFoundException('event not found on summit!');
+                $member->addFavoriteSummitEvent($event);
+            });
+            Event::fire(new MyFavoritesAdd($member, $summit, $event_id));
+        }
+        catch (UniqueConstraintViolationException $ex){
+            throw new ValidationException
+            (
+                sprintf('Event %s already belongs to member %s favorites.', $event_id, $member->getId())
+            );
+        }
+    }
+
+    /**
+     * @param Summit $summit
      * @param SummitAttendee $attendee
      * @param $event_id
      * @return void
@@ -201,6 +232,24 @@ final class SummitService implements ISummitService
         });
 
         Event::fire(new MyScheduleRemove($attendee, $event_id));
+    }
+
+
+    /**
+     * @param Summit $summit
+     * @param Member $member
+     * @param int $event_id
+     * @throws EntityNotFoundException
+     */
+    public function removeEventFromMemberFavorites(Summit $summit, Member $member, $event_id){
+        $this->tx_service->transaction(function () use ($summit, $member, $event_id) {
+            $event = $summit->getScheduleEvent($event_id);
+            if (is_null($event))
+                throw new EntityNotFoundException('event not found on summit!');
+            $member->removeFavoriteSummitEvent($event);
+        });
+
+        Event::fire(new MyFavoritesRemove($member, $summit, $event_id));
     }
 
     /**

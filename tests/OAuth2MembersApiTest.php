@@ -22,7 +22,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
             //AND FILTER
             'filter' => 'first_name=@Seba',
             'filter' => 'last_name=@Marcet',
-            'order' => '+first_name,-last_name'
+            'order'  => '+first_name,-last_name'
         ];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);

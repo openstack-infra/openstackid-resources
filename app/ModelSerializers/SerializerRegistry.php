@@ -34,6 +34,8 @@ final class SerializerRegistry
      */
     private static $instance;
 
+    const SerializerType_Public  = 'PUBLIC';
+    const SerializerType_Private = 'PRIVATE';
 
     private function __clone()
     {
@@ -47,7 +49,6 @@ final class SerializerRegistry
         if (!is_object(self::$instance)) {
             self::$instance = new SerializerRegistry();
         }
-
         return self::$instance;
     }
 
@@ -88,7 +89,10 @@ final class SerializerRegistry
         $this->registry['SummitLocationImage']        = SummitLocationImageSerializer::class;
 
         // member
-        $this->registry['Member']                    = MemberSerializer::class;
+        $this->registry['Member']                    = [
+            self::SerializerType_Public  => PublicMemberSerializer::class,
+            self::SerializerType_Private => OwnMemberSerializer::class
+        ];
         $this->registry['Group']                     = GroupSerializer::class;
         $this->registry['Affiliation']               = AffiliationSerializer::class;
         $this->registry['Organization']              = OrganizationSerializer::class;
@@ -105,15 +109,24 @@ final class SerializerRegistry
 
     /**
      * @param object $object
+     * @param string $type
      * @return IModelSerializer
      */
-    public function getSerializer($object){
+    public function getSerializer($object, $type = self::SerializerType_Public){
         $reflect = new \ReflectionClass($object);
         $class   = $reflect->getShortName();
         if(!isset($this->registry[$class]))
             throw new \InvalidArgumentException('Serializer not found for '.$class);
 
         $serializer_class = $this->registry[$class];
+
+        if(is_array($serializer_class)){
+            if(!isset($serializer_class[$type]))
+                throw new \InvalidArgumentException(sprintf('Serializer not found for %s , type %s', $class, $type));
+            $serializer_class = $serializer_class[$type];
+        }
+
+
         return new $serializer_class($object);
     }
 }
