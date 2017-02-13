@@ -23,7 +23,8 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
     protected static $allowed_relations = [
         'team_memberships',
         'groups_events',
-        'favorite_summit_events'
+        'favorite_summit_events',
+        'feedback',
     ];
 
     private static $expand_group_events = [
