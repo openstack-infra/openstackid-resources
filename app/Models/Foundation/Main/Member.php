@@ -448,7 +448,7 @@ class Member extends SilverstripeBaseModel
             ->join('f.event','e')
              ->join('f.owner','o')
             ->join('e.summit','s')
-            ->where('s.id = :summit_id and o.id = :owner_id')
+            ->where('s.id = :summit_id and o.id = :owner_id and e.published = 1')
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('owner_id', $this->getId())
             ->getQuery()->getResult();
