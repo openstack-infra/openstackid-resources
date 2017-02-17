@@ -39,33 +39,23 @@ final class SummitEventFeedbackSerializer extends SilverStripeSerializer
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array())
     {
         $feedback = $this->object;
-        $values = parent::serialize($expand, $fields, $relations, $params);
-        $member = $feedback->hasOwner() ? $feedback->getOwner() : null;
+        $values   = parent::serialize($expand, $fields, $relations, $params);
+        $member   = $feedback->hasOwner() ? $feedback->getOwner() : null;
 
         if (is_null($member)) return $values;
 
+        $values['owner_id'] = intval($member->getId());
 
         if (!empty($expand)) {
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {
                     case 'owner': {
-
-                        $owner = array
-                        (
-                            'id' => intval($member->getId()),
-                            'first_name' => JsonUtils::toJsonString($member->getFirstName()),
-                            'last_name' => JsonUtils::toJsonString($member->getLastName())
-                        );
-
-                        $values['owner'] = $owner;
+                        unset($values['owner_id']);
+                        $values['owner'] = SerializerRegistry::getInstance()->getSerializer($member)->serialize('', [], ['none']);
                     }
-                        break;
+                    break;
                 }
             }
-        }
-
-        if (!isset($values['owner'])) {
-            $values['member_id'] = intval($member->getId());
         }
 
         return $values;
