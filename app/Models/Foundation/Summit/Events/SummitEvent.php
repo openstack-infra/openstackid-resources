@@ -237,18 +237,28 @@ class SummitEvent extends SilverstripeBaseModel
     public function getRsvpLink()
     {
         if($this->rsvp_template_id > 0){
+
             $summit         = $this->getSummit();
             $main_page      = $summit->getMainPage();
             $schedule_page  = $summit->getSchedulePage();
-            return sprintf("%ssummit/%s/%s/events/%s/%s/rsvp",
+
+            $url = sprintf("%ssummit/%s/%s/events/%s/%s/rsvp",
                 Config::get("server.assets_base_url", 'https://www.openstack.org/'),
                 $main_page,
                 $schedule_page,
                 $this->getId(),
                 $this->getSlug()
             );
+            return $url;
         }
         return $this->rsvp_link;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIssExternalRSVP(){
+        return !empty($this->rsvp_link) && $this->rsvp_template_id == 0;
     }
 
     public function getSlug(){

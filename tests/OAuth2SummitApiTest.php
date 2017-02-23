@@ -95,7 +95,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $params = array
         (
             'expand' => 'schedule,speakers',
-            'id'     => 22
+            'id'     => 7
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
