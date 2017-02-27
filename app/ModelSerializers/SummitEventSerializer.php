@@ -57,6 +57,7 @@ class SummitEventSerializer extends SilverStripeSerializer
         'is_published',
         'head_count',
         'rsvp_link',
+        'rsvp_external',
         'track_id',
     );
 
