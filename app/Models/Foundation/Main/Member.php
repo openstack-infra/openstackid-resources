@@ -13,6 +13,7 @@
  **/
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping as ORM;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
@@ -46,6 +47,20 @@ class Member extends SilverstripeBaseModel
      */
     public function getAffiliations(){
         return $this->affiliations;
+    }
+
+    /**
+     * @return Affiliation[]
+     */
+    public function getCurrentAffiliations(){
+        $criteria = Criteria::create()
+            ->where(Criteria::expr()->eq("is_current", true))
+            ->andWhere(Criteria::expr()->eq("end_date", null))
+            ->orderBy([
+                "start_date" => Criteria::ASC,
+            ]);
+
+        return $this->affiliations->matching($criteria);
     }
 
     /**
@@ -446,7 +461,7 @@ class Member extends SilverstripeBaseModel
             ->select('distinct f')
             ->from('models\summit\SummitEventFeedback','f')
             ->join('f.event','e')
-             ->join('f.owner','o')
+            ->join('f.owner','o')
             ->join('e.summit','s')
             ->where('s.id = :summit_id and o.id = :owner_id and e.published = 1')
             ->setParameter('summit_id', $summit->getId())

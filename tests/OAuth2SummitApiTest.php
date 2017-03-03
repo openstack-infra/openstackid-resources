@@ -128,7 +128,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         );
 
         $content = $response->getContent();
-        $summit = json_decode($content);
+        $summit  = json_decode($content);
         $this->assertTrue(!is_null($summit));
         $this->assertTrue(count($summit->schedule) > 0);
         $this->assertResponseStatus(200);

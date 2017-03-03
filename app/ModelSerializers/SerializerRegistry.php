@@ -89,16 +89,17 @@ final class SerializerRegistry
         $this->registry['SummitLocationImage']        = SummitLocationImageSerializer::class;
 
         // member
-        $this->registry['Member']                    = [
+        $this->registry['Member']                          = [
             self::SerializerType_Public  => PublicMemberSerializer::class,
             self::SerializerType_Private => OwnMemberSerializer::class
         ];
-        $this->registry['Group']                     = GroupSerializer::class;
-        $this->registry['Affiliation']               = AffiliationSerializer::class;
-        $this->registry['Organization']              = OrganizationSerializer::class;
+
+        $this->registry['Group']                           = GroupSerializer::class;
+        $this->registry['Affiliation']                     = AffiliationSerializer::class;
+        $this->registry['Organization']                    = OrganizationSerializer::class;
 
         // push notification
-        $this->registry['SummitPushNotification']    = SummitPushNotificationSerializer::class;
+        $this->registry['SummitPushNotification']          = SummitPushNotificationSerializer::class;
 
         // teams
         $this->registry['ChatTeam']                        = ChatTeamSerializer::class;

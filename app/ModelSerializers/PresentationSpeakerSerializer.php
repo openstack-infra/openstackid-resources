@@ -80,6 +80,16 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
             $values['last_name']  = $last_name;
         }
 
+
+        $affiliations = [];
+        if($speaker->hasMember()) {
+            $member = $speaker->getMember();
+            foreach ($member->getCurrentAffiliations() as $affiliation) {
+                $affiliations[] = SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize('organization');
+            }
+        }
+        $values['affiliations'] = $affiliations;
+
         if (!empty($expand)) {
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {
