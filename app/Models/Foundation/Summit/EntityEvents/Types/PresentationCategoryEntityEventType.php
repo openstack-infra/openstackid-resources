@@ -24,6 +24,7 @@ final class PresentationCategoryEntityEventType extends GenericSummitEntityEvent
      */
     protected function registerEntity()
     {
+        $this->evictEntity();
         $entity   = $this->entity_event->getSummit()->getPresentationCategory($this->entity_event->getEntityId());
         if(is_null($entity)) return null;
         $this->entity_event->registerEntity($entity);

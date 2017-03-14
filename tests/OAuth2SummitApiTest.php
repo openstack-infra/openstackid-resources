@@ -134,13 +134,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
-    public function testGetCurrentSummit()
+    public function testGetCurrentSummit($summit_id = 22)
     {
 
         $params = array
         (
             'expand' => 'schedule',
-            'id' => 6
+            'id'     => $summit_id
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
@@ -1214,11 +1214,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testGetEntityEventsFromCurrentSummit()
     {
+        //$this->testGetCurrentSummit(22);
+
         $params = array
         (
-            'id' => '7',
+            'id'        => '22',
             'from_date' => 1460148342,
-            'limit' => 100
+            'limit'     => 100
         );
 
         $headers = array

@@ -26,6 +26,7 @@ final class SummitEntityEventType extends GenericSummitEntityEventType
      */
     protected function registerEntity()
     {
+        $this->evictEntity();
         $summit = $this->entity_event->getSummit();
         if(is_null($summit)) return null;
         if($summit->getId() !== $this->entity_event->getEntityId()) return null;

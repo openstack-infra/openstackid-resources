@@ -48,6 +48,10 @@ final class SummitEntityEventSerializer extends SilverStripeSerializer
                 $params
             );
         }
+
+        if($values['class_name'] == 'PresentationType')
+            $values['class_name'] = 'SummitEventType';
+
         return $values;
     }
 }

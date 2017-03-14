@@ -79,6 +79,7 @@ final class EntityEventTypeFactory
             }
             break;
             case 'SummitEventType':
+            case 'PresentationType':
             {
                 return new SummitEventTypeEntityEventType($e, $ctx);
             }
@@ -121,6 +122,7 @@ final class EntityEventTypeFactory
             }
             break;
             case 'PresentationCategoryGroup':
+            case 'PrivatePresentationCategoryGroup':
             {
                 return new PresentationCategoryGroupEntityEventType($e, $ctx);
             }

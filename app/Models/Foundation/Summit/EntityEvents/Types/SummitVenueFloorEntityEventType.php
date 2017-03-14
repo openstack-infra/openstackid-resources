@@ -27,6 +27,7 @@ final class SummitVenueFloorEntityEventType extends GenericSummitEntityEventType
     {
         $metadata = $this->entity_event->getMetadata();
         if(!isset($metadata['venue_id'])) return null;
+        $this->evictEntity();
         $location = $this->entity_event->getSummit()->getLocation(intval($metadata['venue_id']));
         if (is_null($location)) return null;
         $floor = $location->getFloor($this->entity_event->getEntityId());

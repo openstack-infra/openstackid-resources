@@ -33,6 +33,7 @@ abstract class SummitEventEntityEventType extends EntityEventType
      * @return SummitEvent|null
      */
     protected function getEntity(){
+        $this->evictEntity();
         return $this->entity_event->getSummit()->getScheduleEvent($this->entity_event->getEntityId());
     }
 }

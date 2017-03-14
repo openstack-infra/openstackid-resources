@@ -1,4 +1,4 @@
-<?php
+<?php namespace Models\foundation\summit\EntityEvents;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,8 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-namespace Models\foundation\summit\EntityEvents;
 
 /**
  * Class GenericSummitEntityEventType
@@ -33,4 +31,5 @@ abstract class GenericSummitEntityEventType extends EntityEventType
         }
         $this->process_ctx->registerEntityEvent($this->entity_event);
     }
+
 }

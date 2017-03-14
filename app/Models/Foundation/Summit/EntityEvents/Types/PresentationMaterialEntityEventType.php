@@ -29,6 +29,7 @@ final class PresentationMaterialEntityEventType extends GenericSummitEntityEvent
         if(!isset($metadata['presentation_id'])) return null;
         $presentation = $this->entity_event->getSummit()->getScheduleEvent(intval($metadata['presentation_id']));
         if (is_null($presentation)) return null;
+        $this->evictEntity();
         $material = $presentation->getMaterial($this->entity_event->getEntityId());
         if(is_null($material)) return null;
         $this->entity_event->registerEntity($material);

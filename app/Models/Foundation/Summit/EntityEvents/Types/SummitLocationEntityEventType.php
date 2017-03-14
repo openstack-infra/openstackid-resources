@@ -30,6 +30,7 @@ final class SummitLocationEntityEventType extends GenericSummitEntityEventType
         $type   = $this->entity_event->getType();
         // if there is an insert in place, skip it
         if($type === 'UPDATE' && $this->process_ctx->existsInsertOp($this->entity_event)) return null;
+        $this->evictEntity();
         $entity = $this->entity_event->getSummit()->getLocation($this->entity_event->getEntityId());
         if(is_null($entity)) return null;
         return $this->entity_event->registerEntity($entity);
