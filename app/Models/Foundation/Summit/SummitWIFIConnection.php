@@ -18,7 +18,6 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitWIFIConnection")
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="summit_region")
  * Class SummitWIFIConnection
  * @package models\summit\SummitWIFIConnection
  */

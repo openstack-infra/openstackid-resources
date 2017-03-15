@@ -26,8 +26,6 @@ use models\main\Company;
 /**
  * @ORM\Entity
  * @ORM\Table(name="Summit")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitRepository")
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="summit_region")
  * Class Summit
  * @package models\summit
  */

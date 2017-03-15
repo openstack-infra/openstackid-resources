@@ -20,7 +20,6 @@ use Doctrine\Common\Collections\ArrayCollection;
  * Class PresentationCategory
  * @ORM\Entity
  * @ORM\Table(name="PresentationCategory")
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="summit_presentation_category_region")
  * @package models\summit
  */
 class PresentationCategory extends SilverstripeBaseModel

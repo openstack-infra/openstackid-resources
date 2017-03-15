@@ -22,8 +22,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Entity
  * @ORM\Table(name="PresentationSpeaker")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSpeakerRepository")
- * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="speakers_region")
  * Class PresentationSpeaker
  * @package models\summit
  */
@@ -297,7 +295,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member")
      * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
-     * @var Image
+     * @var Member
      */
     private $member;
 
