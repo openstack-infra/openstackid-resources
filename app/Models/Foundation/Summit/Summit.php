@@ -26,6 +26,7 @@ use models\main\Company;
 /**
  * @ORM\Entity
  * @ORM\Table(name="Summit")
+ * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitRepository")
  * Class Summit
  * @package models\summit
  */
@@ -754,9 +755,6 @@ class Summit extends SilverstripeBaseModel
             ->from('models\summit\PresentationSpeaker','ps')
             ->join('ps.moderated_presentations','p')
             ->join('p.summit','s')
-            ->setCacheable(true)
-            ->setCacheRegion('speakers_region')
-            ->setCacheMode(Cache::MODE_NORMAL)
             ->where("s.id = :summit_id and p.published = 1")
             ->setParameter('summit_id', $this->getId());
     }
@@ -770,9 +768,6 @@ class Summit extends SilverstripeBaseModel
             ->from('models\summit\PresentationSpeaker','ps')
             ->join('ps.presentations','p')
             ->join('p.summit','s')
-            ->setCacheable(true)
-            ->setCacheRegion('speakers_region')
-            ->setCacheMode(Cache::MODE_NORMAL)
             ->where("s.id = :summit_id and p.published = 1")
             ->setParameter('summit_id', $this->getId());
     }
@@ -810,7 +805,7 @@ class Summit extends SilverstripeBaseModel
         return $this->getSpeakerByMemberId($member->getId());
     }
 
-    /**
+    /**`
      * @param int $member_id
      * @return PresentationSpeaker|null
      */
@@ -870,9 +865,6 @@ class Summit extends SilverstripeBaseModel
             ->from('models\main\Company','c')
             ->join('c.sponsorships','sp')
             ->join('sp.summit','s')
-            ->setCacheable(true)
-            ->setCacheRegion('sponsors_region')
-            ->setCacheMode(Cache::MODE_NORMAL)
             ->where('s.id = :summit_id and sp.published = 1')
             ->setParameter('summit_id', $this->getId())->getQuery()->getResult();
     }

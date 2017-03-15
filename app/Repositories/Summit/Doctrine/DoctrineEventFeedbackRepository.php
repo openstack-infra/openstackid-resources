@@ -45,10 +45,7 @@ final class DoctrineEventFeedbackRepository extends SilverStripeDoctrineReposito
                 ->from(\models\summit\SummitEventFeedback::class, "f")
                 ->join('f.event', 'e', Join::WITH, " e.id = :event_id")
                 ->join('f.owner', 'o')
-                ->setParameter('event_id', $event->getId())
-                ->setCacheable(true)
-                ->setCacheMode(Cache::MODE_GET)
-                ->setCacheRegion('summit_event_feedback_region');
+                ->setParameter('event_id', $event->getId());
 
         if(!is_null($filter)){
 

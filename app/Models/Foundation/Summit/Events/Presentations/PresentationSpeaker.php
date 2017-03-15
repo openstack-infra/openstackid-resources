@@ -22,6 +22,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Entity
  * @ORM\Table(name="PresentationSpeaker")
+ * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSpeakerRepository")
  * Class PresentationSpeaker
  * @package models\summit
  */

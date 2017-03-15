@@ -36,10 +36,7 @@ final class DoctrineSummitRepository extends SilverStripeDoctrineRepository impl
             ->where('s.active = 1')
             ->andWhere('s.available_on_api = 1')
             ->orderBy('s.begin_date', 'DESC')
-            ->getQuery()
-            ->setCacheable(true)
-            ->setCacheRegion("summit_region")
-            ->getResult();
+            ->getQuery();
         if (count($res) == 0) return null;
         return $res[0];
     }
