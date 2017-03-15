@@ -29,7 +29,6 @@ final class SummitLocationImageEventType extends GenericSummitEntityEventType
         if(!isset($metadata['location_id'])) return null;
         $location   = $this->entity_event->getSummit()->getLocation(intval($metadata['location_id']));
         if(is_null($location)) return null;
-        $this->evictEntity();
         $entity = $location->getImage($this->entity_event->getEntityId());
         if(is_null($entity)) return null;
         $this->entity_event->registerEntity($entity);

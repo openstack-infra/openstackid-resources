@@ -58,28 +58,4 @@ abstract class EntityEventType implements IEntityEventType
     protected function getEM(){
         return Registry::getManager(self::EntityManager);
     }
-
-    protected function getLocalClassName(){
-        $class_name =  $this->entity_event->getEntityClassName();
-        switch ($class_name){
-            case 'MySchedule':
-            case 'MyFavorite':
-                return 'models\summit\SummitEvent';
-            break;
-            case 'PresentationType':
-                return 'models\summit\SummitEventType';
-            break;
-        }
-        return sprintf('models\summit\%s',$class_name);
-    }
-
-    protected function evictEntity(){
-        $cache      = $this->getEM()->getCache();
-        $class_name = $this->getLocalClassName();
-
-        if(!is_null($cache) && !empty($class_name) && $cache->containsEntity($class_name, $this->entity_event->getEntityId())) {
-            $cache->evictEntity($class_name, $this->entity_event->getEntityId());
-            Log::debug(sprintf("class_name % - id %s evicted from 2nd level cache", $class_name, $this->entity_event->getEntityId()));
-        }
-    }
 }
