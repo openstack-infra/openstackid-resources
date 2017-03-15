@@ -35,6 +35,7 @@ class PresentationSerializer extends SummitEventSerializer
         'level',
         'problem_addressed',
         'attendees_expected_learnt',
+        'to_record'
     );
 
     protected static $allowed_relations = array
