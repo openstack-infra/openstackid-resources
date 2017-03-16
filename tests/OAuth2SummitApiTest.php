@@ -89,13 +89,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
-    public function testGetSummit()
+    public function testGetSummit($summit_id = 22)
     {
 
         $params = array
         (
-            'expand' => 'schedule,speakers',
-            'id'     => 7
+            'expand' => 'schedule',
+            'id'     => $summit_id
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);

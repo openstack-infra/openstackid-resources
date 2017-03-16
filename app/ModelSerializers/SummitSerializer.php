@@ -31,6 +31,7 @@ final class SummitSerializer extends SilverStripeSerializer
         'Active'                   => 'active:json_boolean',
         'ScheduleDefaultStartDate' => 'schedule_start_date:datetime_epoch',
         'TypeId'                   => 'type_id:json_int' ,
+        'DatesLabel'               => 'dates_label:json_string' ,
     );
 
     /**

@@ -30,6 +30,32 @@ class Affiliation extends SilverstripeBaseModel
     private $start_date;
 
     /**
+     * @ORM\Column(name="EndDate", type="datetime")
+     * @var \DateTime
+     */
+    private $end_date;
+
+    /**
+     * @ORM\Column(name="Current", type="boolean")
+     * @var bool
+     */
+    private $is_current;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
+     * @var Member
+     */
+    private $owner;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\Organization")
+     * @ORM\JoinColumn(name="OrganizationID", referencedColumnName="ID")
+     * @var Organization
+     */
+    private $organization;
+
+    /**
      * @return \DateTime
      */
     public function getStartDate()
@@ -96,33 +122,6 @@ class Affiliation extends SilverstripeBaseModel
     {
         $this->organization = $organization;
     }
-
-    /**
-     * @ORM\Column(name="EndDate", type="datetime")
-     * @var \DateTime
-     */
-    private $end_date;
-
-    /**
-     * @ORM\Column(name="Current", type="boolean")
-     * @var bool
-     */
-    private $is_current;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\Member")
-     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
-     * @var Member
-     */
-    protected $owner;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\Organization")
-     * @ORM\JoinColumn(name="OrganizationID", referencedColumnName="ID")
-     * @var Organization
-     */
-    protected $organization;
-
 
     /**
      * @return Member

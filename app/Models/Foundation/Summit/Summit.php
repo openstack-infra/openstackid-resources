@@ -33,6 +33,21 @@ use models\main\Company;
 class Summit extends SilverstripeBaseModel
 {
     /**
+     * @return string
+     */
+    public function getDatesLabel()
+    {
+        return $this->dates_label;
+    }
+
+    /**
+     * @param string $dates_label
+     */
+    public function setDatesLabel($dates_label)
+    {
+        $this->dates_label = $dates_label;
+    }
+    /**
      * @return mixed
      */
     public function getName()
@@ -165,6 +180,12 @@ class Summit extends SilverstripeBaseModel
      * @var string
      */
     private $name;
+
+    /**
+     * @ORM\Column(name="DateLabel", type="string")
+     * @var string
+     */
+    private $dates_label;
 
     /**
      * @ORM\Column(name="SummitBeginDate", type="datetime")
