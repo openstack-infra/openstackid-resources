@@ -296,7 +296,8 @@ final class SummitService implements ISummitService
 
             $newFeedback = new SummitEventFeedback();
             $newFeedback->setRate(intval($feedback['rate']));
-            $newFeedback->setNote(trim($feedback['note']));
+            $note        = isset($feedback['note']) ? trim($feedback['note']) : "";
+            $newFeedback->setNote($note);
             $newFeedback->setOwner($member);
             $event->addFeedBack($newFeedback);
 

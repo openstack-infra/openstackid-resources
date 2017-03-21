@@ -715,8 +715,8 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             $rules = array
             (
-                'rate'        => 'required|integer|digits_between:0,10',
-                'note'        => 'required|max:500',
+                'rate'        => 'required|integer|digits_between:0,5',
+                'note'        => 'max:500',
             );
 
             // Creates a Validator instance and validates the data.

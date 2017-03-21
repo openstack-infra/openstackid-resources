@@ -1178,7 +1178,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => 6,
+            'id'       => 6,
             'event_id' => 8970,
         );
 
@@ -1190,8 +1190,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $feedback_data = array
         (
-            'rate' => 10,
-            'note' => 'nice presentation, wow!',
+            'rate' => 5,
         );
 
 
