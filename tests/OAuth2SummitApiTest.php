@@ -1174,12 +1174,12 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     }
 
-    public function testAddFeedback2EventByMember()
+    public function testAddFeedback2EventByMember($summit_id = 22, $event_id = 17683)
     {
         $params = array
         (
-            'id'       => 6,
-            'event_id' => 8970,
+            'id'       => $summit_id,
+            'event_id' => $event_id,
         );
 
         $headers = array
@@ -1193,11 +1193,48 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             'rate' => 5,
         );
 
-
         $response = $this->action
         (
             "POST",
             "OAuth2SummitEventsApiController@addEventFeedbackByMember",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers,
+            json_encode($feedback_data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+
+    }
+
+    public function testUpdateFeedback2EventByMember($summit_id = 22, $event_id = 17683)
+    {
+        //$this->testAddFeedback2EventByMember($summit_id, $event_id);
+        $params = array
+        (
+            'id'       => $summit_id,
+            'event_id' => $event_id,
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $feedback_data = array
+        (
+            'rate' => 3,
+            'note' => 'update',
+        );
+
+        $response = $this->action
+        (
+            "PUT",
+            "OAuth2SummitEventsApiController@updateEventFeedbackByMember",
             $params,
             array(),
             array(),

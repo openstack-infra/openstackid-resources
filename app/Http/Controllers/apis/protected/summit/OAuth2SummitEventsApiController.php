@@ -703,47 +703,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
     {
         try {
 
-            if (!$request->isJson()) {
-                return $this->error412(array('invalid content type!'));
-            }
-
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-            if(!Request::isJson()) return $this->error403();
-
-            $data = Input::json();
-
-            $rules = array
-            (
-                'rate'        => 'required|integer|digits_between:0,5',
-                'note'        => 'max:500',
-            );
-
-            // Creates a Validator instance and validates the data.
-            $validation = Validator::make($data->all(), $rules);
-
-            if ($validation->fails()) {
-                $messages = $validation->messages()->toArray();
-
-                return $this->error412
-                (
-                    $messages
-                );
-            }
-
-            $event = $summit->getScheduleEvent(intval($event_id));
-
-            if (is_null($event)) {
-                return $this->error404();
-            }
-
-            $data         = $data->all();
-
-            $member_id = $this->resource_server_context->getCurrentUserExternalId();
-
-            if (is_null($member_id)) return $this->error403();
-
-            $data['member_id'] = intval($member_id);
+            list($summit, $event, $data) = $this->validateAndGetFeedbackData($request, $summit_id, $event_id);
 
             $res  = $this->service->addEventFeedback
             (
@@ -774,4 +734,91 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $event_id
+     * @return mixed
+     */
+    public function updateEventFeedbackByMember(LaravelRequest $request, $summit_id, $event_id)
+    {
+        try {
+
+            list($summit, $event, $data) = $this->validateAndGetFeedbackData($request, $summit_id, $event_id);
+            $res  = $this->service->updateEventFeedback
+            (
+                $summit,
+                $event,
+                $data
+            );
+
+            return !is_null($res) ? $this->updated($res->getId()) : $this->error400();
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+
+            return $this->error500($ex);
+        }
+    }
+
+    private function validateAndGetFeedbackData(LaravelRequest $request, $summit_id, $event_id){
+        if (!$request->isJson()) {
+            return $this->error412(array('invalid content type!'));
+        }
+
+        $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+        if (is_null($summit)) return $this->error404();
+        if(!Request::isJson()) return $this->error403();
+
+        $data = Input::json();
+
+        $rules = array
+        (
+            'rate'        => 'required|integer|digits_between:0,5',
+            'note'        => 'max:500',
+        );
+
+        // Creates a Validator instance and validates the data.
+        $validation = Validator::make($data->all(), $rules);
+
+        if ($validation->fails()) {
+            $messages = $validation->messages()->toArray();
+
+            return $this->error412
+            (
+                $messages
+            );
+        }
+
+        $event = $summit->getScheduleEvent(intval($event_id));
+
+        if (is_null($event)) {
+            return $this->error404();
+        }
+
+        $data      = $data->all();
+        $member_id = $this->resource_server_context->getCurrentUserExternalId();
+
+        if (is_null($member_id)) return $this->error403();
+
+        $data['member_id'] = intval($member_id);
+
+        return [$summit, $event, $data];
+    }
+
 }

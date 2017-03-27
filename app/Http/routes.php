@@ -247,6 +247,7 @@ Route::group([
 
                 Route::group(array('prefix' => '{event_id}'), function () {
                    Route::post('/feedback', 'OAuth2SummitEventsApiController@addEventFeedbackByMember');
+                   Route::put('/feedback', 'OAuth2SummitEventsApiController@updateEventFeedbackByMember');
                 });
             });
 

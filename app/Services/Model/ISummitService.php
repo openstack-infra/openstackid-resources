@@ -99,6 +99,14 @@ interface ISummitService
 
     /**
      * @param Summit $summit
+     * @param SummitEvent $event
+     * @param array $feedback
+     * @return SummitEventFeedback
+     */
+    public function updateEventFeedback(Summit $summit, SummitEvent $event, array $feedback);
+
+    /**
+     * @param Summit $summit
      * @param null|int $member_id
      * @param null|\DateTime $from_date
      * @param null|int $from_id

@@ -258,10 +258,10 @@ final class SummitService implements ISummitService
      * @param array $feedback
      * @return SummitEventFeedback
      */
-    public function addEventFeedback(Summit $summit, SummitEvent $event, array $feedback)
+    public function addEventFeedback(Summit $summit, SummitEvent $event, array $data)
     {
 
-        return $this->tx_service->transaction(function () use ($summit, $event, $feedback) {
+        return $this->tx_service->transaction(function () use ($summit, $event, $data) {
 
             if (!$event->isAllowFeedback())
                 throw new ValidationException(sprintf("event id %s does not allow feedback", $event->getIdentifier()));
@@ -269,8 +269,8 @@ final class SummitService implements ISummitService
             $member      = null;
 
             // check for attendee
-            $attendee_id = isset($feedback['attendee_id']) ? intval($feedback['attendee_id']) : null;
-            $member_id   = isset($feedback['member_id'])   ? intval($feedback['member_id']) : null;
+            $attendee_id = isset($data['attendee_id']) ? intval($data['attendee_id']) : null;
+            $member_id   = isset($data['member_id'])   ? intval($data['member_id']) : null;
             if(!is_null($attendee_id)) {
                 $attendee = $summit->getAttendeeById($attendee_id);
                 if (!$attendee) throw new EntityNotFoundException();
@@ -295,13 +295,62 @@ final class SummitService implements ISummitService
                 throw new ValidationException(sprintf("you already sent feedback for event id %s!.", $event->getIdentifier()));
 
             $newFeedback = new SummitEventFeedback();
-            $newFeedback->setRate(intval($feedback['rate']));
-            $note        = isset($feedback['note']) ? trim($feedback['note']) : "";
+            $newFeedback->setRate(intval($data['rate']));
+            $note        = isset($data['note']) ? trim($data['note']) : "";
             $newFeedback->setNote($note);
             $newFeedback->setOwner($member);
             $event->addFeedBack($newFeedback);
 
             return $newFeedback;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param SummitEvent $event
+     * @param array $feedback
+     * @return SummitEventFeedback
+     */
+    public function updateEventFeedback(Summit $summit, SummitEvent $event, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $event, $data) {
+
+            if (!$event->isAllowFeedback())
+                throw new ValidationException(sprintf("event id %s does not allow feedback", $event->getIdentifier()));
+
+            $member      = null;
+
+            // check for attendee
+            $attendee_id = isset($data['attendee_id']) ? intval($data['attendee_id']) : null;
+            $member_id   = isset($data['member_id'])   ? intval($data['member_id']) : null;
+            if(!is_null($attendee_id)) {
+                $attendee = $summit->getAttendeeById($attendee_id);
+                if (!$attendee) throw new EntityNotFoundException();
+                $member = $attendee->getMember();
+            }
+
+            // check by member
+            if(!is_null($member_id)) {
+                $member = $this->member_repository->getById($member_id);
+            }
+
+            if (is_null($member))
+                throw new EntityNotFoundException('member not found!.');
+
+            if(!Summit::allowToSee($event, $member))
+                throw new EntityNotFoundException('event not found on summit!.');
+
+            // check older feedback
+            $feedback = $member->getFeedbackByEvent($event);
+
+            if(count($feedback) == 0 )
+                throw new ValidationException(sprintf("you dont have feedback for event id %s!.", $event->getIdentifier()));
+            $feedback = $feedback[0];
+            $feedback->setRate(intval($data['rate']));
+            $note    = isset($data['note']) ? trim($data['note']) : "";
+            $feedback->setNote($note);
+
+            return $feedback;
         });
     }
 

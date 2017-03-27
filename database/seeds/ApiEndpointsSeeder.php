@@ -320,6 +320,12 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf('%s/summits/write', $current_realm)],
             ),
             array(
+                'name' => 'update-event-feedback-v2',
+                'route' => '/api/v2/summits/{id}/events/{event_id}/feedback',
+                'http_method' => 'PUT',
+                'scopes' => [sprintf('%s/summits/write', $current_realm)],
+            ),
+            array(
                 'name' => 'get-event-feedback',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/feedback/{attendee_id?}',
                 'http_method' => 'GET',
