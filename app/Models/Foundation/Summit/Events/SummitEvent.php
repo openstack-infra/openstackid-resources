@@ -82,6 +82,7 @@ class SummitEvent extends SilverstripeBaseModel
         $this->feedback       = new ArrayCollection();
         $this->attendees      = new ArrayCollection();
         $this->sponsors       = new ArrayCollection();
+        $this->rsvp           = new ArrayCollection();
     }
 
     /**
@@ -252,6 +253,13 @@ class SummitEvent extends SilverstripeBaseModel
             return $url;
         }
         return $this->rsvp_link;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRSVP(){
+        return !empty($this->rsvp_link) || $this->rsvp_template_id > 0;
     }
 
     /**
@@ -602,7 +610,6 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @throws EntityValidationException
      * @throws ValidationException
      * @return void
      */
@@ -776,6 +783,28 @@ class SummitEvent extends SilverstripeBaseModel
             $type->getMinValueByTimeWindow($epoch_start_date, $epoch_end_date),
             $type->getCurrentValueByTimeWindow($epoch_start_date, $epoch_end_date)
         );
+    }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="event", cascade={"persist"})
+     * @var RSVP[]
+     */
+    protected $rsvp;
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getRsvp()
+    {
+        return $this->rsvp;
+    }
+
+    /**
+     * @param ArrayCollection $rsvp
+     */
+    public function setRsvp($rsvp)
+    {
+        $this->rsvp = $rsvp;
     }
 
 }

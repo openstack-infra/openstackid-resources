@@ -145,6 +145,22 @@ class SummitAttendee extends SilverstripeBaseModel
         $this->member = $member;
     }
 
+    /**
+     * @return RSVP[]
+     */
+    public function getRsvp()
+    {
+        return $this->rsvp;
+    }
+
+    /**
+     * @param RSVP[] $rsvp
+     */
+    public function setRsvp($rsvp)
+    {
+        $this->rsvp = $rsvp;
+    }
+
     use SummitOwned;
 
     public function __construct()
@@ -154,6 +170,7 @@ class SummitAttendee extends SilverstripeBaseModel
         $this->summit_hall_checked_in = false;
         $this->schedule               = new ArrayCollection();
         $this->tickets                = new ArrayCollection();
+        $this->rsvp                   = new ArrayCollection();
     }
 
     /**
@@ -291,6 +308,31 @@ SQL;
         $stmt = $this->prepareRawSQL($sql);
         $stmt->execute(['attendee_id' => $this->getId()]);
         return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="owner", cascade={"persist"})
+     * @var RSVP[]
+     */
+    protected $rsvp;
+
+    /**
+     * @param int $event_id
+     * @return null|RSVP
+     */
+    public function getRsvpByEvent($event_id){
+        $builder = $this->createQueryBuilder();
+        $rsvp = $builder
+            ->select('r')
+            ->from('models\summit\RSVP','r')
+            ->join('r.owner','o')
+            ->join('r.event','e')
+            ->where('o.id = :owner_id and e.id = :event_id')
+            ->setParameter('owner_id', $this->getId())
+            ->setParameter('event_id',  intval($event_id))
+            ->getQuery()->getResult();
+
+        return count($rsvp) > 0 ? $rsvp[0] : null;
     }
 
 }

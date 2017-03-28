@@ -341,4 +341,46 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         }
     }
 
+    public function deleteEventRSVP($summit_id, $attendee_id, $event_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $event = $summit->getScheduleEvent(intval($event_id));
+
+            if (is_null($event)) {
+                return $this->error404();
+            }
+
+            $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
+            if (is_null($attendee)) return $this->error404();
+
+            $this->service->unRSVPEvent($summit, $attendee, $event_id);
+
+            return $this->deleted();
+
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+
+    }
+
 }

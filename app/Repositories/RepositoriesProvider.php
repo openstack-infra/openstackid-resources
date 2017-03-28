@@ -126,5 +126,11 @@ final class RepositoriesProvider extends ServiceProvider
             function(){
                 return  EntityManager::getRepository(\models\main\ChatTeamPushNotificationMessage::class);
             });
+
+        App::singleton(
+            'models\summit\IRSVPRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\RSVP::class);
+            });
     }
 }

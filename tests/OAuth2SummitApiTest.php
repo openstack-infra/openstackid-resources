@@ -266,11 +266,11 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testCurrentSummitMyAttendeeAddToSchedule($event_id = 16645, $summit_id = 7)
+    public function testCurrentSummitMyAttendeeAddToSchedule($event_id = 16638, $summit_id = 7)
     {
         $params = array
         (
-            'id'       => $summit_id,
+            'id'          => $summit_id,
             'attendee_id' => 'me',
             'event_id'    => $event_id
         );
@@ -312,10 +312,8 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(204);
     }
 
-    public function testCurrentSummitMyAttendeeScheduleUnset()
+    public function testCurrentSummitMyAttendeeScheduleUnset($event_id = 16638, $summit_id = 7)
     {
-        $event_id = 16645;
-        $summit_id = 7;
         //$this->testCurrentSummitMyAttendeeAddToSchedule($event_id, $summit_id);
         $params = array
         (
@@ -328,6 +326,30 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $response = $this->action(
             "DELETE",
             "OAuth2SummitAttendeesApiController@removeEventFromAttendeeSchedule",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
+
+    public function testCurrentSummitMyAttendeeScheduleUnRSVP($event_id = 16638, $summit_id = 7)
+    {
+        //$this->testCurrentSummitMyAttendeeAddToSchedule($event_id, $summit_id);
+        $params = array
+        (
+            'id'          => $summit_id,
+            'attendee_id' => 'me',
+            'event_id'    => $event_id
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitAttendeesApiController@deleteEventRSVP",
             $params,
             array(),
             array(),

@@ -29,6 +29,7 @@ use Models\foundation\summit\EntityEvents\SummitEntityEventProcessContext;
 use models\main\Member;
 use models\main\Tag;
 use models\summit\ConfirmationExternalOrderRequest;
+use models\summit\IRSVPRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitAttendeeRepository;
 use models\summit\ISummitAttendeeTicketRepository;
@@ -103,6 +104,11 @@ final class SummitService implements ISummitService
     private $tag_repository;
 
     /**
+     * @var IRSVPRepository
+     */
+    private $rsvp_repository;
+
+    /**
      * SummitService constructor.
      * @param ISummitEventRepository $event_repository
      * @param ISpeakerRepository $speaker_repository
@@ -111,6 +117,7 @@ final class SummitService implements ISummitService
      * @param ISummitAttendeeRepository $attendee_repository
      * @param IMemberRepository $member_repository
      * @param ITagRepository $tag_repository
+     * @param IRSVPRepository $rsvp_repository,
      * @param IEventbriteAPI $eventbrite_api
      * @param ITransactionService $tx_service
      */
@@ -123,6 +130,7 @@ final class SummitService implements ISummitService
         ISummitAttendeeRepository       $attendee_repository,
         IMemberRepository               $member_repository,
         ITagRepository                  $tag_repository,
+        IRSVPRepository                 $rsvp_repository,
         IEventbriteAPI                  $eventbrite_api,
         ITransactionService             $tx_service
     )
@@ -134,6 +142,7 @@ final class SummitService implements ISummitService
         $this->member_repository        = $member_repository;
         $this->attendee_repository      = $attendee_repository;
         $this->tag_repository           = $tag_repository;
+        $this->rsvp_repository          = $rsvp_repository;
         $this->eventbrite_api           = $eventbrite_api;
         $this->tx_service               = $tx_service;
     }
@@ -142,20 +151,25 @@ final class SummitService implements ISummitService
      * @param Summit $summit
      * @param SummitAttendee $attendee
      * @param int $event_id
+     * @param bool $check_rsvp
      * @return void
      * @throws EntityNotFoundException
      * @throws ValidationException
      */
-    public function addEventToAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id)
+    public function addEventToAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id, $check_rsvp = true)
     {
         try {
-            $this->tx_service->transaction(function () use ($summit, $attendee, $event_id) {
+            $this->tx_service->transaction(function () use ($summit, $attendee, $event_id, $check_rsvp) {
                 $event = $summit->getScheduleEvent($event_id);
                 if (is_null($event)) {
                     throw new EntityNotFoundException('event not found on summit!');
                 }
                 if(!Summit::allowToSee($event, $attendee->getMember()))
                     throw new EntityNotFoundException('event not found on summit!');
+
+                if($check_rsvp && $event->hasRSVP() && !$event->getIssExternalRSVP())
+                    throw new ValidationException("event has rsvp set on it!");
+
                 $attendee->add2Schedule($event);
             });
             Event::fire(new MyScheduleAdd($attendee, $event_id));
@@ -219,15 +233,20 @@ final class SummitService implements ISummitService
      * @param Summit $summit
      * @param SummitAttendee $attendee
      * @param int $event_id
+     * @param boolean $check_rsvp
      * @return void
      * @throws \Exception
      */
-    public function removeEventFromAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id)
+    public function removeEventFromAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id, $check_rsvp = true)
     {
-        $this->tx_service->transaction(function () use ($summit, $attendee, $event_id) {
+        $this->tx_service->transaction(function () use ($summit, $attendee, $event_id, $check_rsvp) {
             $event = $summit->getScheduleEvent($event_id);
             if (is_null($event))
                 throw new EntityNotFoundException('event not found on summit!');
+
+            if($check_rsvp && $event->hasRSVP() && !$event->getIssExternalRSVP())
+                throw new ValidationException("event has rsvp set on it!");
+
             $attendee->removeFromSchedule($event);
         });
 
@@ -255,7 +274,7 @@ final class SummitService implements ISummitService
     /**
      * @param Summit $summit
      * @param SummitEvent $event
-     * @param array $feedback
+     * @param array $data
      * @return SummitEventFeedback
      */
     public function addEventFeedback(Summit $summit, SummitEvent $event, array $data)
@@ -308,8 +327,9 @@ final class SummitService implements ISummitService
     /**
      * @param Summit $summit
      * @param SummitEvent $event
-     * @param array $feedback
+     * @param array $data
      * @return SummitEventFeedback
+     * @internal param array $feedback
      */
     public function updateEventFeedback(Summit $summit, SummitEvent $event, array $data)
     {
@@ -923,4 +943,34 @@ final class SummitService implements ISummitService
         });
     }
 
+    /**
+     * @param Summit $summit
+     * @param SummitAttendee $attendee
+     * @param $event_id
+     * @return bool
+     */
+    public function unRSVPEvent(Summit $summit, SummitAttendee $attendee, $event_id)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $attendee, $event_id) {
+
+            $event = $summit->getScheduleEvent($event_id);
+            if (is_null($event)) {
+                throw new EntityNotFoundException('event not found on summit!');
+            }
+
+            if(!Summit::allowToSee($event, $attendee->getMember()))
+                throw new EntityNotFoundException('event not found on summit!');
+
+            $rsvp = $attendee->getRsvpByEvent($event_id);
+
+            if(is_null($rsvp))
+                throw new ValidationException(sprintf("rsvp for event id %s does not exist for your attendee", $event_id));
+
+            $this->rsvp_repository->delete($rsvp);
+
+            $this->removeEventFromAttendeeSchedule($summit, $attendee, $event_id ,false);
+
+            return true;
+        });
+    }
 }

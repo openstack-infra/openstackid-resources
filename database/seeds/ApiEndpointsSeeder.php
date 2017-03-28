@@ -331,6 +331,12 @@ class ApiEndpointsSeeder extends Seeder
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/summits/read', $current_realm)],
             ),
+            array(
+                'name' => 'delete-rsvp',
+                'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule/{event_id}/rsvp',
+                'http_method' => 'DELETE',
+                'scopes' => [sprintf('%s/summits/write', $current_realm)],
+            ),
             // locations
              array(
                  'name' => 'get-locations',

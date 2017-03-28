@@ -69,17 +69,19 @@ interface ISummitService
      * @param Summit $summit
      * @param SummitAttendee $attendee
      * @param int $event_id
+     * @param bool $check_rsvp
      * @return bool
      */
-    public function addEventToAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id);
+    public function addEventToAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id, $check_rsvp = true);
 
     /**
      * @param Summit $summit
      * @param SummitAttendee $attendee
      * @param int $event_id
+     * @param bool $check_rsvp
      * @return void
      */
-    public function removeEventFromAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id);
+    public function removeEventFromAttendeeSchedule(Summit $summit, SummitAttendee $attendee, $event_id, $check_rsvp = true);
 
     /**
      * @param Summit $summit
@@ -146,4 +148,11 @@ interface ISummitService
     public function addEventToMemberFavorites(Summit $summit, Member $member, $event_id);
 
 
+    /**
+     * @param Summit $summit
+     * @param SummitAttendee $attendee
+     * @param $event_id
+     * @return bool
+     */
+    public function unRSVPEvent(Summit $summit, SummitAttendee $attendee, $event_id);
 }
