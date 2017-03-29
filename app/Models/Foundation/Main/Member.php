@@ -54,10 +54,10 @@ class Member extends SilverstripeBaseModel
      */
     public function getCurrentAffiliations(){
         $criteria = Criteria::create()
-            ->where(Criteria::expr()->eq("isCurrent", true))
-            ->andWhere(Criteria::expr()->eq("endDate", null))
+            ->where(Criteria::expr()->eq("is_current", true))
+            ->andWhere(Criteria::expr()->eq("end_date", null))
             ->orderBy([
-                "startDate" => Criteria::ASC,
+                "start_date" => Criteria::ASC,
             ]);
 
         return $this->affiliations->matching($criteria);

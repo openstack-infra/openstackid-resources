@@ -61,7 +61,7 @@ class AbstractMemberSerializer extends SilverStripeSerializer
 
         if(in_array('affiliations', $relations)){
             $res = [];
-            foreach ($member->getAffiliations() as $affiliation){
+            foreach ($member->getCurrentAffiliations() as $affiliation){
                 $res[] = SerializerRegistry::getInstance()
                     ->getSerializer($affiliation)
                     ->serialize('organization');
