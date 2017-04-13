@@ -818,21 +818,20 @@ final class SummitService implements ISummitService
 
                     if (!is_null($old_ticket)) continue;
 
-                    array_push($attendees, array(
+                    $attendees[] = [
                         'external_id' => intval($a['id']),
-                        'first_name' => $a['profile']['first_name'],
-                        'last_name' => $a['profile']['last_name'],
-                        'company' => $a['profile']['company'],
-                        'email' => $a['profile']['email'],
-                        'job_title' => $a['profile']['job_title'],
-                        'status' => $a['status'],
-                        'ticket_type' => array
-                        (
-                            'id' => intval($ticket_type->getId()),
-                            'name' => $ticket_type->getName(),
+                        'first_name'  => $a['profile']['first_name'],
+                        'last_name'   => $a['profile']['last_name'],
+                        'email'       => $a['profile']['email'],
+                        'company'     => isset($a['profile']['company']) ? $a['profile']['company'] : null,
+                        'job_title'   => isset($a['profile']['job_title']) ? $a['profile']['job_title'] : null,
+                        'status'      => $a['status'],
+                        'ticket_type' => [
+                            'id'          => intval($ticket_type->getId()),
+                            'name'        => $ticket_type->getName(),
                             'external_id' => $ticket_external_id,
-                        )
-                    ));
+                        ]
+                    ];
                 }
                 if (count($attendees) === 0)
                     throw new ValidationException(sprintf('order %s already redeem!', $external_order_id));
