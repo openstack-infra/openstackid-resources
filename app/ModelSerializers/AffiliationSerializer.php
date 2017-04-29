@@ -41,8 +41,10 @@ final class AffiliationSerializer extends SilverStripeSerializer
                 switch (trim($relation)) {
                     case 'organization':
                     {
-                        unset($values['organization_id']);
-                        $values['organization'] = SerializerRegistry::getInstance()->getSerializer($affiliation->getOrganization())->serialize($expand,[],['none']);
+                        if($affiliation->hasOrganization()) {
+                            unset($values['organization_id']);
+                            $values['organization'] = SerializerRegistry::getInstance()->getSerializer($affiliation->getOrganization())->serialize($expand, [], ['none']);
+                        }
                     }
                     break;
                 }

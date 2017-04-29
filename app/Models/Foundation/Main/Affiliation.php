@@ -163,4 +163,11 @@ class Affiliation extends SilverstripeBaseModel
         }
     }
 
+    /**
+     * @return bool
+     */
+    public function hasOrganization(){
+        return $this->getOrganizationId() > 0;
+    }
+
 }
