@@ -97,8 +97,9 @@ final class CacheMiddleware
         }
         else
         {
+            $ttl = $this->cache_service->ttl($key);
             // cache hit ...
-            Log::debug(sprintf("cache hit for %s ...", $key));
+            Log::debug(sprintf("cache hit for %s - ttl %s ...", $key, $ttl));
             $response = new JsonResponse(json_decode(gzinflate($data), true), 200, array
                 (
                     'content-type'       => 'application/json',
