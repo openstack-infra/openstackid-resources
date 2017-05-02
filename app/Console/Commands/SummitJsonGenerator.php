@@ -113,11 +113,11 @@ final class SummitJsonGenerator extends Command {
 
         if($summit->isActive())
         {
-            $this->cache_service->setSingleValue($key_current, json_encode($data), $cache_lifetime);
+            $this->cache_service->setSingleValue($key_current, gzdeflate(json_encode($data), 9), $cache_lifetime);
             $this->cache_service->setSingleValue($key_current . ".generated", $current_time, $cache_lifetime);
         }
 
-        $this->cache_service->setSingleValue($key_id, json_encode($data), $cache_lifetime);
+        $this->cache_service->setSingleValue($key_id, gzdeflate(json_encode($data), 9), $cache_lifetime);
         $this->cache_service->setSingleValue($key_id.".generated", $current_time, $cache_lifetime);
 
         $this->info(sprintf("regenerated cache for summit id %s", $summit->getIdentifier()));
