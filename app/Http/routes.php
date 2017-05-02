@@ -90,7 +90,7 @@ Route::group([
     // summits
     Route::group(array('prefix' => 'summits'), function () {
 
-        Route::get('', 'OAuth2SummitApiController@getSummits');
+        Route::get('',  [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summits_response_lifetime', 600), 'uses' => 'OAuth2SummitApiController@getSummits']);
 
         Route::group(array('prefix' => '{id}'), function () {
 

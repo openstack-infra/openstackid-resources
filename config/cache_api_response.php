@@ -16,4 +16,5 @@ return [
     'get_summit_response_lifetime'          => env('CACHE_API_RESPONSE_GET_SUMMIT_LIFETIME', 300),
     'get_event_feedback_response_lifetime'  => env('CACHE_API_RESPONSE_GET_EVENT_FEEDBACK_LIFETIME', 300),
     'get_published_event_response_lifetime' => env('CACHE_API_RESPONSE_GET_PUBLISHED_EVENT_LIFETIME', 300),
+    'get_summits_response_lifetime'         => env('CACHE_API_RESPONSE_GET_SUMMITS_LIFETIME', 600),
 ];
