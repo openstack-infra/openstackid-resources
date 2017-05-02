@@ -23,18 +23,18 @@ class AppServiceProvider extends ServiceProvider
     {
         $monolog = Log::getMonolog();
         foreach($monolog->getHandlers() as $handler) {
-            $handler->setLevel(Config::get('log.level', 'error'));
+            $handler->setLevel(Config::get('log.level', 'debug'));
         }
 
         //set email log
-        $to   = Config::get('log.to_email');
-        $from = Config::get('log.from_email');
+        $to   = Config::get('log.to_email', '');
+        $from = Config::get('log.from_email', '');
 
         if (!empty($to) && !empty($from)) {
             $subject = 'openstackid-resource-server error';
             $mono_log = Log::getMonolog();
             $handler = new NativeMailerHandler($to, $subject, $from);
-            $handler->setLevel(Config::get('log.level', 'error'));
+            $handler->setLevel(Config::get('log.email_level', 'error'));
             $mono_log->pushHandler($handler);
         }
 
