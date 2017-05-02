@@ -91,7 +91,7 @@ final class CacheMiddleware
             {
                 // and if its json, store it on cache ...
                 $data = $response->getData(true);
-                $this->cache_service->setSingleValue($key, json_encode($data), $cache_lifetime);
+                $this->cache_service->setSingleValue($key, gzdeflate(json_encode($data), 9), $cache_lifetime);
                 $this->cache_service->setSingleValue($key.".generated", $time, $cache_lifetime);
             }
         }
@@ -99,7 +99,7 @@ final class CacheMiddleware
         {
             // cache hit ...
             Log::debug(sprintf("cache hit for %s ...", $key));
-            $response = new JsonResponse(json_decode($data, true), 200, array
+            $response = new JsonResponse(json_decode(gzinflate($data), true), 200, array
                 (
                     'content-type'       => 'application/json',
                 )
