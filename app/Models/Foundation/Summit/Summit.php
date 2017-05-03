@@ -984,6 +984,7 @@ SQL;
 
         if(!$member->isAdmin()){
             $groups_ids = $member->getGroupsIds();
+            if(count($groups_ids) == 0 ) return [];
             $groups_ids = implode(",", $groups_ids);
             $builder->andWhere("g.id in ({$groups_ids})");
         }
