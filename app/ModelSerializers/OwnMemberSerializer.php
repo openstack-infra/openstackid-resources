@@ -62,7 +62,7 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
         if(!is_null($attendee))
             $values['attendee_id'] = $attendee->getId();
 
-        if(!is_null($groups_events) && in_array('groups_events', $relations) && count($groups_events) > 0){
+        if(!is_null($groups_events) && in_array('groups_events', $relations)){
             $res = [];
             foreach ($groups_events as $group_event){
                 $res[] = SerializerRegistry::getInstance()
