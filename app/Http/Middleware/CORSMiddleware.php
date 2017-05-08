@@ -236,7 +236,7 @@ class CORSMiddleware
 			// ----Step 2a: Check if the current request has an entry into the preflighted requests Cache
 			$data = $this->cache_service->getHash($cache_id, CORSRequestPreflightData::$cache_attributes);
 			$this->headers['Access-Control-Allow-Origin']      =  $request->headers->get('Origin');
-			if ((bool)$data['allows_credentials'])
+			if (isset($data['allows_credentials']) && $data['allows_credentials'] == true)
 			{
 				$this->headers['Access-Control-Allow-Credentials'] = 'true';
 			}
