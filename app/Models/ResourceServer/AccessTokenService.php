@@ -222,6 +222,11 @@ final class AccessTokenService implements IAccessTokenService
                 $this->cache_service->setSingleValue(md5($token_value).'.revoked', md5($token_value));
                 throw new InvalidGrantTypeException($body['error']);
             }
+            if($code == 503 ){
+                // service went online temporally ... revoke token
+                $this->cache_service->setSingleValue(md5($token_value).'.revoked', md5($token_value));
+                throw new InvalidGrantTypeException(OAuth2Protocol::OAuth2Protocol_Error_InvalidToken);
+            }
             throw new OAuth2InvalidIntrospectionResponse(sprintf('http code %s - body %s', $ex->getCode(), $response->getBody()));
         }
     }
