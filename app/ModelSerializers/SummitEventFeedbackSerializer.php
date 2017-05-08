@@ -23,10 +23,10 @@ final class SummitEventFeedbackSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = array
     (
-        'Rate' => 'rate:json_int',
-        'Note' => 'note:json_string',
-        'Created' => 'created_date:datetime_epoch',
-        'EventId' => 'event_id:json_int',
+        'Rate'       => 'rate:json_int',
+        'Note'       => 'note:json_string',
+        'CreatedUTC' => 'created_date:datetime_epoch',
+        'EventId'    => 'event_id:json_int',
     );
 
     /**
@@ -45,7 +45,6 @@ final class SummitEventFeedbackSerializer extends SilverStripeSerializer
         if (is_null($member)) return $values;
 
         $values['owner_id'] = intval($member->getId());
-
         if (!empty($expand)) {
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {

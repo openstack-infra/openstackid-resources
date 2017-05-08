@@ -46,10 +46,11 @@ final class UserAuthEndpoint
 
     public function handle($request, Closure $next, $required_groups)
     {
-        $user_id = $this->context->getCurrentUserId();
-        if (is_null($user_id)) return $next($request);
+        $member_id = $this->context->getCurrentUserExternalId();
+        if (is_null($member_id)) return $next($request);
 
-        $member = $this->member_repository->getById($user_id);
+        $member = $this->member_repository->getById($member_id);
+
         if (is_null($member)){
             $http_response = Response::json(['error' => 'member not found'], 403);
             return $http_response;
@@ -61,7 +62,7 @@ final class UserAuthEndpoint
 
         foreach ($required_groups as $required_group) {
             foreach ($groups as $member_group){
-                if ($required_group == $member_group->getCode()) {
+                if (strtolower($required_group) == strtolower($member_group->getCode())) {
                     return $next($request);
                 }
             }
