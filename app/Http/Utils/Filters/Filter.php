@@ -190,25 +190,46 @@ final class Filter
             }
             else if (is_array($filter)) {
                 // OR
+                $sub_or_query = '';
                 foreach ($filter as $e) {
                     if ($e instanceof FilterElement && isset($mappings[$e->getField()])) {
-                        $mapping = $mappings[$e->getField()];
 
+                        $mapping = $mappings[$e->getField()];
                         if ($mapping instanceof DoctrineJoinFilterMapping) {
-                            $query = $mapping->applyOr($query, $e);
+                            $condition = $mapping->applyOr($query, $e);
+                            if(!empty($condition)) $condition .= ' OR ';
+                            $sub_or_query .= $condition;
                             continue;
                         }
+                        else if(is_array($mapping)){
+                            $condition = '';
+                            foreach ($mapping as $mapping_or){
+                                $mapping_or = explode(':', $mapping_or);
+                                $value      = $e->getValue();
+                                if (count($mapping_or) > 1) {
+                                    $value = $this->convertValue($value, $mapping_or[1]);
+                                }
 
-                        $mapping  = explode(':', $mapping);
-                        $value    = $e->getValue();
-
-                        if (count($mapping) > 1) {
-                            $value = $this->convertValue($value, $mapping[1]);
+                                if(!empty($condition)) $condition .= ' OR ';
+                                $condition .= sprintf(" %s %s %s ", $mapping_or[0], $e->getOperator(), $value);
+                            }
+                            if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
+                            $sub_or_query .= ' ( '.$condition.' ) ';
                         }
+                        else {
+                            $mapping = explode(':', $mapping);
+                            $value = $e->getValue();
 
-                        $query->orWhere(sprintf("%s %s %s",$mapping[0], $e->getOperator(), $value));
+                            if (count($mapping) > 1) {
+                                $value = $this->convertValue($value, $mapping[1]);
+                            }
+
+                            if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
+                            $sub_or_query .= sprintf(" %s %s %s ", $mapping[0], $e->getOperator(), $value);
+                        }
                     }
                 }
+                $query->andWhere($sub_or_query);
             }
         }
         return $this;

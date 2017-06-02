@@ -1,5 +1,4 @@
 <?php namespace utils;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +21,8 @@ final class FilterParser
      */
     public static function parse($filters, $allowed_fields = array())
     {
-        $res = array();
-        $matches = array();
+        $res     = [];
+        $matches = [];
 
         if (!is_array($filters))
             $filters = array($filters);
@@ -36,7 +35,7 @@ final class FilterParser
             $or_filters = explode(',', $filter);
 
             if (count($or_filters) > 1) {
-                $f = array();
+                $f = [];
                 foreach ($or_filters as $of) {
 
                     //single filter
@@ -54,7 +53,7 @@ final class FilterParser
                     if (!in_array($op, $allowed_fields[$field])) continue;
                     $f_or = self::buildFilter($field, $op, $value);
                     if (!is_null($f_or))
-                        array_push($f, $f_or);
+                        $f[] = $f_or;
                 }
             } else {
                 //single filter
@@ -67,13 +66,14 @@ final class FilterParser
                 $operands = explode($op, $filter);
                 $field    = $operands[0];
                 $value    = $operands[1];
+
                 if (!isset($allowed_fields[$field])) continue;
                 if (!in_array($op, $allowed_fields[$field])) continue;
                 $f = self::buildFilter($field, $op, $value);
             }
 
             if (!is_null($f))
-                array_push($res, $f);
+                $res[] = $f;
         }
         return new Filter($res);
     }

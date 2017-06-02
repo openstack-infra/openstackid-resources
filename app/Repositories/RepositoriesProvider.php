@@ -49,6 +49,12 @@ final class RepositoriesProvider extends ServiceProvider
         });
 
         App::singleton(
+            'App\Models\ResourceServer\IEndpointRateLimitByIPRepository',
+            function(){
+                return  EntityManager::getRepository(\App\Models\ResourceServer\EndPointRateLimitByIP::class);
+            });
+
+        App::singleton(
             'models\summit\ISummitRepository',
             function(){
                 return  EntityManager::getRepository(\models\summit\Summit::class);
@@ -132,5 +138,6 @@ final class RepositoriesProvider extends ServiceProvider
             function(){
                 return  EntityManager::getRepository(\models\summit\RSVP::class);
             });
+
     }
 }

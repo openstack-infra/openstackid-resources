@@ -13,6 +13,24 @@
 
 use Illuminate\Support\Facades\Config;
 
+// public api ( without AUTHZ [OAUTH2.0])
+Route::group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix'     => 'api/public/v1',
+    'before'     => [],
+    'after'      => [],
+    'middleware' => [
+        'ssl',
+        'rate.limit:100,1', // 100 request per minute
+        'etags'
+    ]
+], function(){
+    // members
+    Route::group(['prefix'=>'members'], function() {
+        Route::get('', 'OAuth2MembersApiController@getMembers');
+    });
+});
+
 //OAuth2 Protected API
 Route::group([
     'namespace' => 'App\Http\Controllers',

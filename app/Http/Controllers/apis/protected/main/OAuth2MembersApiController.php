@@ -40,7 +40,8 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
     (
         IMemberRepository $member_repository,
         IResourceServerContext $resource_server_context
-    ) {
+    )
+    {
         parent::__construct($resource_server_context);
         $this->repository = $member_repository;
     }

@@ -1,5 +1,4 @@
 <?php namespace App\Http\Middleware;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use Closure;
-use Illuminate\Support\Facades\Response;
-use libs\utils\ICacheService;
-use libs\utils\RequestUtils;
 use App\Models\ResourceServer\IApiEndpointRepository;
+use App\Models\ResourceServer\IEndpointRateLimitByIPRepository;
+use Closure;
+use Illuminate\Cache\RateLimiter;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use libs\utils\RequestUtils;
 
 /**
  * Class RateLimitMiddleware
  * @package App\Http\Middleware
  */
-final class RateLimitMiddleware
+final class RateLimitMiddleware extends ThrottleRequests
 {
 
     /**
@@ -32,69 +31,79 @@ final class RateLimitMiddleware
     private $endpoint_repository;
 
     /**
-     * @var ICacheService
+     * @var IEndpointRateLimitByIPRepository
      */
-    private $cache_service;
+    private $endpoint_rate_limit_by_ip_repository;
 
     /**
+     * RateLimitMiddleware constructor.
      * @param IApiEndpointRepository $endpoint_repository
-     * @param ICacheService $cache_service
+     * @param IEndpointRateLimitByIPRepository $endpoint_rate_limit_by_ip_repository
+     * @param RateLimiter $limiter
      */
-    public function __construct(IApiEndpointRepository $endpoint_repository, ICacheService $cache_service)
+    public function __construct
+    (
+        IApiEndpointRepository $endpoint_repository,
+        IEndpointRateLimitByIPRepository $endpoint_rate_limit_by_ip_repository,
+        RateLimiter $limiter
+    )
     {
-        $this->endpoint_repository = $endpoint_repository;
-        $this->cache_service       = $cache_service;
+        parent::__construct($limiter);
+        $this->endpoint_repository                  = $endpoint_repository;
+        $this->endpoint_rate_limit_by_ip_repository = $endpoint_rate_limit_by_ip_repository;
     }
 
     /**
-     * Handle an incoming request.
-     * @param  \Illuminate\Http\Request $request
-     * @param  \Closure $next
-     * @return mixed
+     * @param \Illuminate\Http\Request $request
+     * @param Closure $next
+     * @param int $max_attempts
+     * @param int $decay_minutes
+     * @return \Illuminate\Http\Response|mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, Closure $next, $max_attempts = 0, $decay_minutes = 0)
     {
+        $route     = RequestUtils::getCurrentRoutePath($request);
+        $method    = $request->getMethod();
+        $endpoint  = $this->endpoint_repository->getApiEndpointByUrlAndMethod($route, $method);
+        $key       = $this->resolveRequestSignature($request);
+        $client_ip = $request->getClientIp();
+
+        if (!is_null($endpoint) && $endpoint->getRateLimit() > 0) {
+            $max_attempts = $endpoint->getRateLimit();
+        }
+
+        if (!is_null($endpoint) && $endpoint->getRateLimitDecay() > 0) {
+            $decay_minutes = $endpoint->getRateLimitDecay();
+        }
+
+        $endpoint_rate_limit_by_ip = $this->endpoint_rate_limit_by_ip_repository->getByIPRouteMethod
+        (
+            $client_ip,
+            $route,
+            $method
+        );
+
+        if(!is_null($endpoint_rate_limit_by_ip)){
+            $max_attempts  = $endpoint_rate_limit_by_ip->getRateLimit();
+            $decay_minutes = $endpoint_rate_limit_by_ip->getRateLimitDecay();
+        }
+
+        if ($max_attempts == 0 || $decay_minutes == 0) {
+            // short circuit (infinite)
+            return $next($request);
+        }
+
+        if ($this->limiter->tooManyAttempts($key, $max_attempts, $decay_minutes)) {
+            return $this->buildResponse($key, $max_attempts);
+        }
+
+        $this->limiter->hit($key, $decay_minutes);
+
         $response = $next($request);
-        // if response was not changed then short circuit ...
-        if ($response->getStatusCode() === 304) {
-            return $response;
-        }
 
-        $url = $request->getRequestUri();
-
-        try {
-            $route    = RequestUtils::getCurrentRoutePath($request);
-            $method   = $request->getMethod();
-            $endpoint = $this->endpoint_repository->getApiEndpointByUrlAndMethod($route, $method);
-
-            if (!is_null($endpoint->getRateLimit()) && ($requestsPerHour = (int)$endpoint->getRateLimit()) > 0) {
-                //do rate limit checking
-                $key = sprintf('rate.limit.%s_%s_%s', $url, $method, $request->getClientIp());
-                // Add if doesn't exist
-                // Remember for 1 hour
-                $this->cache_service->addSingleValue($key, 0, 3600);
-                // Add to count
-                $count = $this->cache_service->incCounter($key);
-                if ($count > $requestsPerHour) {
-                    // Short-circuit response - we're ignoring
-                    $response = Response::json(array(
-                        'message' => "You have triggered an abuse detection mechanism and have been temporarily blocked.
-                         Please retry your request again later."
-                    ), 403);
-                    $ttl = (int)$this->cache_service->ttl($key);
-                    $response->headers->set('X-RateLimit-Reset', $ttl, false);
-                }
-                $response->headers->set('X-Ratelimit-Limit', $requestsPerHour, false);
-                $remaining = $requestsPerHour - (int)$count;
-                if ($remaining < 0) {
-                    $remaining = 0;
-                }
-                $response->headers->set('X-Ratelimit-Remaining', $remaining, false);
-            }
-        } catch (Exception $ex) {
-            Log::error($ex);
-        }
-
-        return $response;
+        return $this->addHeaders(
+            $response, $max_attempts,
+            $this->calculateRemainingAttempts($key, $max_attempts)
+        );
     }
 }

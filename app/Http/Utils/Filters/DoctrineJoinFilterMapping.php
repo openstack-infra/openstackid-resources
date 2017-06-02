@@ -63,13 +63,13 @@ class DoctrineJoinFilterMapping extends FilterMapping
     /**
      * @param QueryBuilder $query
      * @param FilterElement $filter
-     * @return QueryBuilder
+     * @return string
      */
     public function applyOr(QueryBuilder $query, FilterElement $filter){
         $where = str_replace(":value", $filter->getValue(), $this->where);
         $where = str_replace(":operator", $filter->getOperator(), $where);
         if(!in_array($this->alias, $query->getAllAliases()))
             $query->innerJoin($this->table, $this->alias, Join::WITH);
-        return $query->orWhere($where);
+        return $where;
     }
 }

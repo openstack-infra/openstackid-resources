@@ -12,10 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Closure;
 use Illuminate\Support\Facades\Log;
-
 /**
  * Class ETagsMiddleware
  * @package App\Http\Middleware
@@ -34,13 +32,12 @@ final class ETagsMiddleware
         $response = $next($request);
         if ($response->getStatusCode() === 200 && $request->getMethod() === 'GET')
         {
-            $etag = md5($response->getContent());
+            $etag        = md5($response->getContent());
             $requestETag = str_replace('"', '', $request->getETags());
             $requestETag = str_replace('-gzip', '', $requestETag);
 
             if ($requestETag && $requestETag[0] == $etag)
             {
-                Log::debug('ETAG 304');
                 $response->setNotModified();
             }
             $response->setEtag($etag);

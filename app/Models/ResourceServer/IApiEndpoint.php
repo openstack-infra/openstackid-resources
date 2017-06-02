@@ -100,4 +100,9 @@ interface IApiEndpoint extends IEntity
      */
     public function getRateLimit();
 
+    /**
+     * @return int
+     */
+    public function getRateLimitDecay();
+
 }

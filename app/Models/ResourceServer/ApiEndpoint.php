@@ -236,6 +236,12 @@ class ApiEndpoint extends ResourceServerEntity implements IApiEndpoint
     private $rate_limit;
 
     /**
+     * @ORM\Column(name="rate_limit_decay", type="integer")
+     * @var int
+     */
+    private $rate_limit_decay;
+
+    /**
      * ApiEndpoint constructor.
      */
     public function __construct()
@@ -289,6 +295,22 @@ class ApiEndpoint extends ResourceServerEntity implements IApiEndpoint
     public function setRateLimit($rate_limit)
     {
         $this->rate_limit = $rate_limit;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRateLimitDecay()
+    {
+        return $this->rate_limit_decay;
+    }
+
+    /**
+     * @param int $rate_limit_decay
+     */
+    public function setRateLimitDecay($rate_limit_decay)
+    {
+        $this->rate_limit_decay = $rate_limit_decay;
     }
 
 }
