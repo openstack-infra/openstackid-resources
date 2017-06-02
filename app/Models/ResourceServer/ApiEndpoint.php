@@ -247,8 +247,9 @@ class ApiEndpoint extends ResourceServerEntity implements IApiEndpoint
     public function __construct()
     {
         parent::__construct();
-        $this->rate_limit = 0;
-        $this->scopes     = new ArrayCollection();
+        $this->rate_limit       = 0;
+        $this->rate_limit_decay = 0;
+        $this->scopes           = new ArrayCollection();
     }
 
     /**

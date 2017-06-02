@@ -20,8 +20,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
 
         $params = [
             //AND FILTER
-            'filter' => 'first_name=@Seba',
-            'filter' => 'last_name=@Marcet',
+            'filter' => ['first_name=@Seba', 'last_name=@Marcet'],
             'order'  => '+first_name,-last_name'
         ];
 
