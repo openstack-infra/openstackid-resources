@@ -20,6 +20,7 @@ use models\summit\Summit;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFeedback;
 use models\utils\SilverstripeBaseModel;
+use Doctrine\ORM\Mapping AS ORM;
 
 /**
  * @ORM\Entity
