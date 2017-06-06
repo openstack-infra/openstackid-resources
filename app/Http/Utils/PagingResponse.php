@@ -103,7 +103,7 @@ final class PagingResponse
      * @param array $params
      * @return array
      */
-    public function toArray($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
+    public function toArray($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $items = [];
         foreach($this->items as $i)

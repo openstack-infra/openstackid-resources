@@ -102,8 +102,21 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
 
             if(is_null($filter)) $filter = new Filter();
 
-            $data = $this->repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
-            return $this->ok($data->toArray(Request::input('expand', '')));
+            $data      = $this->repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
+            $fields    = Request::input('fields', '');
+            $fields    = !empty($fields) ? explode(',', $fields) : [];
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+
+            return $this->ok
+            (
+                $data->toArray
+                (
+                    Request::input('expand', ''),
+                    $fields,
+                    $relations
+                )
+            );
         }
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);

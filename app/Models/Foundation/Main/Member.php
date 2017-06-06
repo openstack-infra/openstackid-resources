@@ -1,4 +1,5 @@
 <?php namespace models\main;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +15,6 @@
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Mapping as ORM;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitEvent;
@@ -33,26 +33,29 @@ class Member extends SilverstripeBaseModel
     /**
      * Member constructor.
      */
-    public function __construct(){
+    public function __construct()
+    {
         parent::__construct();
-        $this->feedback                = new ArrayCollection();
-        $this->groups                  = new ArrayCollection();
-        $this->affiliations            = new ArrayCollection();
-        $this->team_memberships        = new ArrayCollection();
+        $this->feedback = new ArrayCollection();
+        $this->groups = new ArrayCollection();
+        $this->affiliations = new ArrayCollection();
+        $this->team_memberships = new ArrayCollection();
         $this->favorites_summit_events = new ArrayCollection();
     }
 
     /**
      * @return Affiliation[]
      */
-    public function getAffiliations(){
+    public function getAffiliations()
+    {
         return $this->affiliations;
     }
 
     /**
      * @return Affiliation[]
      */
-    public function getCurrentAffiliations(){
+    public function getCurrentAffiliations()
+    {
         $criteria = Criteria::create()
             ->where(Criteria::expr()->eq("is_current", true))
             ->andWhere(Criteria::expr()->eq("end_date", null))
@@ -60,6 +63,19 @@ class Member extends SilverstripeBaseModel
                 "start_date" => Criteria::ASC,
             ]);
 
+        return $this->affiliations->matching($criteria);
+    }
+
+    /**
+     * @return Affiliation[]
+     */
+    public function getAllAffiliations()
+    {
+        $criteria = Criteria::create()
+            ->orderBy([
+                "start_date" => Criteria::ASC,
+                "end_date"   => Criteria::ASC,
+            ]);
         return $this->affiliations->matching($criteria);
     }
 
@@ -128,7 +144,7 @@ class Member extends SilverstripeBaseModel
         $this->favorites_summit_events = $favorites_summit_events;
     }
 
-     /**
+    /**
      * @ORM\ManyToMany(targetEntity="models\summit\SummitEvent")
      * @ORM\JoinTable(name="Member_FavoriteSummitEvents",
      *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
@@ -169,6 +185,7 @@ class Member extends SilverstripeBaseModel
     {
         return $this->twitter_handle;
     }
+
     /**
      * @ORM\ManyToOne(targetEntity="models\main\File")
      * @ORM\JoinColumn(name="PhotoID", referencedColumnName="ID")
@@ -391,7 +408,8 @@ class Member extends SilverstripeBaseModel
     /**
      * @return string
      */
-    public function getGender(){
+    public function getGender()
+    {
         return $this->gender;
     }
 
@@ -448,7 +466,8 @@ class Member extends SilverstripeBaseModel
     /**
      * @return SummitEventFeedback[]
      */
-    public function getFeedback(){
+    public function getFeedback()
+    {
         return $this->feedback;
     }
 
@@ -456,13 +475,14 @@ class Member extends SilverstripeBaseModel
      * @param Summit $summit
      * @return SummitEventFeedback[]
      */
-    public function getFeedbackBySummit(Summit $summit){
-         return $this->createQueryBuilder()
+    public function getFeedbackBySummit(Summit $summit)
+    {
+        return $this->createQueryBuilder()
             ->select('distinct f')
-            ->from('models\summit\SummitEventFeedback','f')
-            ->join('f.event','e')
-            ->join('f.owner','o')
-            ->join('e.summit','s')
+            ->from('models\summit\SummitEventFeedback', 'f')
+            ->join('f.event', 'e')
+            ->join('f.owner', 'o')
+            ->join('e.summit', 's')
             ->where('s.id = :summit_id and o.id = :owner_id and e.published = 1')
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('owner_id', $this->getId())
@@ -473,13 +493,14 @@ class Member extends SilverstripeBaseModel
      * @param SummitEvent $event
      * @return SummitEventFeedback[]
      */
-    public function getFeedbackByEvent(SummitEvent $event){
+    public function getFeedbackByEvent(SummitEvent $event)
+    {
         return $this->createQueryBuilder()
             ->select('distinct f')
-            ->from('models\summit\SummitEventFeedback','f')
-            ->join('f.event','e')
-            ->join('f.owner','o')
-            ->join('e.summit','s')
+            ->from('models\summit\SummitEventFeedback', 'f')
+            ->join('f.event', 'e')
+            ->join('f.owner', 'o')
+            ->join('e.summit', 's')
             ->where('e.id = :event_id and o.id = :owner_id')
             ->setParameter('event_id', $event->getId())
             ->setParameter('owner_id', $this->getId())
@@ -489,9 +510,10 @@ class Member extends SilverstripeBaseModel
     /**
      * @return bool
      */
-    public function isAdmin(){
+    public function isAdmin()
+    {
 
-        $admin_group = $this->groups->filter(function($entity){
+        $admin_group = $this->groups->filter(function ($entity) {
             return $entity->getCode() == Group::AdminGroupCode;
         });
 
@@ -501,9 +523,10 @@ class Member extends SilverstripeBaseModel
     /**
      * @return int[]
      */
-    public function getGroupsIds(){
+    public function getGroupsIds()
+    {
         $ids = [];
-        foreach ($this->getGroups() as $g){
+        foreach ($this->getGroups() as $g) {
             $ids[] = intval($g->getId());
         }
         return $ids;
@@ -512,9 +535,10 @@ class Member extends SilverstripeBaseModel
     /**
      * @return string[]
      */
-    public function getGroupsCodes(){
+    public function getGroupsCodes()
+    {
         $codes = [];
-        foreach ($this->getGroups() as $g){
+        foreach ($this->getGroups() as $g) {
             $codes[] = $g->getCode();
         }
         return $codes;
@@ -524,13 +548,14 @@ class Member extends SilverstripeBaseModel
      * @param SummitEvent $event
      * @throws ValidationException
      */
-    public function addFavoriteSummitEvent(SummitEvent $event){
-        if($this->isOnFavorite($event))
+    public function addFavoriteSummitEvent(SummitEvent $event)
+    {
+        if ($this->isOnFavorite($event))
             throw new ValidationException
             (
                 sprintf('Event %s already belongs to member %s favorites.', $event->getId(), $this->getId())
             );
-        if(!$event->isPublished())
+        if (!$event->isPublished())
             throw new ValidationException
             (
                 sprintf('Event %s is not published', $event->getId())
@@ -542,7 +567,8 @@ class Member extends SilverstripeBaseModel
      * @param SummitEvent $event
      * @return bool
      */
-    public function isOnFavorite(SummitEvent $event){
+    public function isOnFavorite(SummitEvent $event)
+    {
         $sql = <<<SQL
 SELECT COUNT(SummitEventID) AS QTY 
 FROM Member_FavoriteSummitEvents 
@@ -551,8 +577,8 @@ SQL;
 
         $stmt = $this->prepareRawSQL($sql);
         $stmt->execute([
-            'member_id'   => $this->getId(),
-            'event_id'    => $event->getId()
+            'member_id' => $this->getId(),
+            'event_id' => $event->getId()
         ]);
         $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
         return count($res) > 0 ? intval($res[0]) > 0 : false;
@@ -562,8 +588,9 @@ SQL;
      * @param SummitEvent $event
      * @throws ValidationException
      */
-    public function removeFavoriteSummitEvent(SummitEvent $event){
-        if(!$this->isOnFavorite($event)){
+    public function removeFavoriteSummitEvent(SummitEvent $event)
+    {
+        if (!$this->isOnFavorite($event)) {
             throw new ValidationException
             (
                 sprintf('Event %s does not belongs to member %s favorites.', $event->getId(), $this->getId())
@@ -576,7 +603,8 @@ SQL;
     /**
      * @return int[]
      */
-    public function getFavoritesEventsIds(){
+    public function getFavoritesEventsIds()
+    {
         $sql = <<<SQL
 SELECT SummitEventID 
 FROM Member_FavoriteSummitEvents 
