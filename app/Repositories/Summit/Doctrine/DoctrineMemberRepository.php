@@ -16,6 +16,7 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use models\main\IMemberRepository;
 use models\main\Member;
 use repositories\SilverStripeDoctrineRepository;
+use utils\DoctrineJoinFilterMapping;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
@@ -62,6 +63,18 @@ final class DoctrineMemberRepository extends SilverStripeDoctrineRepository impl
                 'first_name' => 'm.first_name:json_string',
                 'last_name'  => 'm.last_name:json_string',
                 'email'      => ['m.email:json_string', 'm.second_email:json_string', 'm.third_email:json_string'],
+                'group_slug' => new DoctrineJoinFilterMapping
+                (
+                    'm.groups',
+                    'g',
+                    "g.code :operator ':value'"
+                ),
+                'group_id' => new DoctrineJoinFilterMapping
+                (
+                    'm.groups',
+                    'g',
+                    "g.id :operator :value"
+                ),
             ]);
         }
 
