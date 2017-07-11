@@ -13,6 +13,7 @@
  * limitations under the License.
  **/
 
+use models\main\Member;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -33,9 +34,9 @@ class RSVP extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitAttendee", inversedBy="rsvp", fetch="LAZY")
+     * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="rsvp", fetch="LAZY")
      * @ORM\JoinColumn(name="SubmittedByID", referencedColumnName="ID")
-     * @var SummitAttendee
+     * @var Member
      */
     private $owner;
 
@@ -56,7 +57,7 @@ class RSVP extends SilverstripeBaseModel
     }
 
     /**
-     * @return SummitAttendee
+     * @return Member
      */
     public function getOwner()
     {
@@ -64,9 +65,9 @@ class RSVP extends SilverstripeBaseModel
     }
 
     /**
-     * @param SummitAttendee $owner
+     * @param Member $owner
      */
-    public function setOwner(SummitAttendee $owner){
+    public function setOwner(Member $owner){
         $this->owner = $owner;
     }
 

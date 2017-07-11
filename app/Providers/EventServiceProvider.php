@@ -48,8 +48,8 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setEntityClassName('MySchedule');
             $entity_event->setEntityId($event->getEventId());
             $entity_event->setType('INSERT');
-            $entity_event->setOwner($event->getAttendee()->getMember());
-            $entity_event->setSummit($event->getAttendee()->getSummit());
+            $entity_event->setOwner($event->getMember());
+            $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
             $em = Registry::getManager('ss');
@@ -78,8 +78,8 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setEntityClassName('MySchedule');
             $entity_event->setEntityId($event->getEventId());
             $entity_event->setType('DELETE');
-            $entity_event->setOwner($event->getAttendee()->getMember());
-            $entity_event->setSummit($event->getAttendee()->getSummit());
+            $entity_event->setOwner($event->getMember());
+            $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
             $em = Registry::getManager('ss');

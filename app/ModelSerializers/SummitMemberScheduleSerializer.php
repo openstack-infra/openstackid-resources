@@ -1,6 +1,6 @@
 <?php namespace ModelSerializers;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,13 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use libs\utils\JsonUtils;
 
 /**
- * Class SummitAttendeeScheduleSerializer
+ * Class SummitMemberScheduleSerializer
  * @package ModelSerializers
  */
-class SummitAttendeeScheduleSerializer extends SilverStripeSerializer
+final class SummitMemberScheduleSerializer extends SilverStripeSerializer
 {
 
     protected static $array_mappings = array
@@ -37,7 +36,6 @@ class SummitAttendeeScheduleSerializer extends SilverStripeSerializer
             $params
         );
 
-        $values['is_checked_in'] = JsonUtils::toJsonBoolean($schedule->isIsCheckedIn());
         return $values;
     }
 }

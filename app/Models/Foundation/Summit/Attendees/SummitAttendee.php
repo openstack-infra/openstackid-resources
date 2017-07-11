@@ -18,6 +18,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\NoResultException;
 use models\exceptions\ValidationException;
 use models\main\Member;
+use models\main\SummitMemberSchedule;
 use models\utils\SilverstripeBaseModel;
 
 /**
@@ -77,12 +78,6 @@ class SummitAttendee extends SilverstripeBaseModel
     {
         $this->share_contact_info = $share_contact_info;
     }
-
-    /**
-     * @ORM\OneToMany(targetEntity="SummitAttendeeSchedule", mappedBy="attendee", cascade={"persist"}, orphanRemoval=true)
-     * @var SummitAttendeeSchedule[]
-     */
-    private $schedule;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member")
@@ -145,22 +140,6 @@ class SummitAttendee extends SilverstripeBaseModel
         $this->member = $member;
     }
 
-    /**
-     * @return RSVP[]
-     */
-    public function getRsvp()
-    {
-        return $this->rsvp;
-    }
-
-    /**
-     * @param RSVP[] $rsvp
-     */
-    public function setRsvp($rsvp)
-    {
-        $this->rsvp = $rsvp;
-    }
-
     use SummitOwned;
 
     public function __construct()
@@ -168,9 +147,7 @@ class SummitAttendee extends SilverstripeBaseModel
         parent::__construct();
         $this->share_contact_info     = false;
         $this->summit_hall_checked_in = false;
-        $this->schedule               = new ArrayCollection();
         $this->tickets                = new ArrayCollection();
-        $this->rsvp                   = new ArrayCollection();
     }
 
     /**
@@ -187,152 +164,65 @@ class SummitAttendee extends SilverstripeBaseModel
     /**
      * @param SummitEvent $event
      * @throws ValidationException
+     * @deprecated use Member::add2Schedule instead
      */
     public function add2Schedule(SummitEvent $event)
     {
-        if($this->isOnSchedule($event))
-            throw new ValidationException
-            (
-                sprintf('Event %s already belongs to attendee %s schedule.', $event->getId(), $this->getId())
-            );
-
-        if(!$event->isPublished())
-            throw new ValidationException
-            (
-                sprintf('Event %s is not published', $event->getId())
-            );
-
-        $schedule = new SummitAttendeeSchedule;
-
-        $schedule->setAttendee($this);
-        $schedule->setEvent($event);
-        $schedule->setIsCheckedIn(false);
-        $this->schedule->add($schedule);
+        $this->member->add2Schedule($event);
     }
 
     /**
      * @param SummitEvent $event
      * @throws ValidationException
+     * @deprecated use Member::removeFromSchedule instead
      */
     public function removeFromSchedule(SummitEvent $event)
     {
-        $schedule = $this->getScheduleByEvent($event);
-
-        if(is_null($schedule))
-            throw new ValidationException
-            (
-                sprintf('Event %s does not belongs to attendee %s schedule.', $event->getId(), $this->getId())
-            );
-        $this->schedule->removeElement($schedule);
-        $schedule->clearAttendee();
+       $this->member->removeFromSchedule($event);
     }
 
     /**
      * @param SummitEvent $event
      * @return bool
+     * @deprecated use Member::isOnSchedule instead
      */
     public function isOnSchedule(SummitEvent $event)
     {
-        $sql = <<<SQL
-SELECT COUNT(SummitEventID) AS QTY 
-FROM SummitAttendee_Schedule 
-WHERE SummitAttendeeID = :attendee_id AND SummitEventID = :event_id
-SQL;
-
-        $stmt = $this->prepareRawSQL($sql);
-        $stmt->execute([
-            'attendee_id' => $this->getId(),
-            'event_id'    => $event->getId()
-        ]);
-        $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        return count($res) > 0 ? intval($res[0]) > 0 : false;
+        return $this->member->isOnSchedule($event);
     }
 
     /**
      * @param SummitEvent $event
-     * @return null| SummitAttendeeSchedule
+     * @return null| SummitMemberSchedule
+     * @deprecated use Member::getScheduleByEvent instead
      */
     public function getScheduleByEvent(SummitEvent $event){
-
-        try {
-            $query = $this->createQuery("SELECT s from models\summit\SummitAttendeeSchedule s 
-        JOIN s.attendee a 
-        JOIN s.event e    
-        WHERE a.id = :attendee_id and e.id = :event_id
-        ");
-            return $query
-                ->setParameter('attendee_id', $this->getIdentifier())
-                ->setParameter('event_id', $event->getIdentifier())
-                ->getSingleResult();
-        }
-        catch(NoResultException $ex1){
-            return null;
-        }
-        catch(NonUniqueResultException $ex2){
-            // should never happen
-            return null;
-        }
+        return $this->member->getScheduleByEvent($event);
     }
 
     /**
-     * @param SummitEvent $event
-     * @throws ValidationException
-     */
-    public function checkIn(SummitEvent $event)
-    {
-        $schedule = $this->getScheduleByEvent($event);
-
-        if(is_null($schedule))
-            throw new ValidationException(sprintf('Event %s does not belongs to attendee %s schedule.', $event->ID, $this->ID));
-        $schedule->setIsCheckedIn(true);
-    }
-
-    /**
-     * @return SummitAttendeeSchedule[]
+     * @return SummitMemberSchedule[]
+     * @deprecated use Member::getScheduleBySummit instead
      */
     public function getSchedule(){
-        return $this->schedule;
+        return $this->member->getScheduleBySummit($this->summit);
     }
 
     /**
      * @return int[]
+     * @deprecated use Member::getScheduledEventsIds instead
      */
     public function getScheduledEventsIds(){
-        $sql = <<<SQL
-SELECT SummitEventID 
-FROM SummitAttendee_Schedule 
-INNER JOIN SummitEvent ON SummitEvent.ID = SummitAttendee_Schedule.SummitEventID
-WHERE SummitAttendeeID = :attendee_id AND SummitEvent.Published = 1
-SQL;
-
-        $stmt = $this->prepareRawSQL($sql);
-        $stmt->execute(['attendee_id' => $this->getId()]);
-        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        return $this->member->getScheduledEventsIds($this->summit);
     }
-
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="owner", cascade={"persist"})
-     * @var RSVP[]
-     */
-    protected $rsvp;
 
     /**
      * @param int $event_id
      * @return null|RSVP
+     * @deprecated use Member::getRsvpByEvent instead
      */
     public function getRsvpByEvent($event_id){
-        $builder = $this->createQueryBuilder();
-        $rsvp = $builder
-            ->select('r')
-            ->from('models\summit\RSVP','r')
-            ->join('r.owner','o')
-            ->join('r.event','e')
-            ->where('o.id = :owner_id and e.id = :event_id')
-            ->setParameter('owner_id', $this->getId())
-            ->setParameter('event_id',  intval($event_id))
-            ->getQuery()->getResult();
-
-        return count($rsvp) > 0 ? $rsvp[0] : null;
+       return $this->member->getRsvpByEvent($event_id);
     }
 
 }

@@ -245,7 +245,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => 6,
+            'id' => 22,
             'attendee_id' => 'me'
         );
 
@@ -266,7 +266,8 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testCurrentSummitMyAttendeeAddToSchedule($event_id = 16638, $summit_id = 7)
+
+    public function testCurrentSummitMyAttendeeAddToSchedule($event_id = 18845, $summit_id = 22)
     {
         $params = array
         (
@@ -289,30 +290,8 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
     }
 
-    public function testCurrentSummitMyAttendeeScheduleCheckIn()
-    {
-        $params = array
-        (
-            'id' => 6,
-            'attendee_id' => 'me',
-            'event_id' => 7202
-        );
 
-        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
-        $response = $this->action(
-            "PUT",
-            "OAuth2SummitAttendeesApiController@checkingAttendeeOnEvent",
-            $params,
-            array(),
-            array(),
-            array(),
-            $headers
-        );
-        $content = $response->getContent();
-        $this->assertResponseStatus(204);
-    }
-
-    public function testCurrentSummitMyAttendeeScheduleUnset($event_id = 16638, $summit_id = 7)
+    public function testCurrentSummitMyAttendeeScheduleUnset($event_id = 18845, $summit_id = 22)
     {
         //$this->testCurrentSummitMyAttendeeAddToSchedule($event_id, $summit_id);
         $params = array
@@ -336,7 +315,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(204);
     }
 
-    public function testCurrentSummitMyAttendeeScheduleUnRSVP($event_id = 16638, $summit_id = 7)
+    public function testCurrentSummitMyAttendeeScheduleUnRSVP($event_id = 18639, $summit_id = 22)
     {
         //$this->testCurrentSummitMyAttendeeAddToSchedule($event_id, $summit_id);
         $params = array
@@ -2246,7 +2225,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
             'expand'    => 'attendee,speaker,feedback,groups,presentations',
             'member_id' => 'me',
-            'id'        => 7,
+            'id'        => 22,
         ];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
@@ -2264,5 +2243,55 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $member = json_decode($content);
         $this->assertTrue(!is_null($member));
+    }
+
+    public function testCurrentSummitMyMemberFavorites()
+    {
+        $params = array
+        (
+            'id' => 22,
+            'member_id' => 'me',
+            'expand' => 'speakers',
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitMembersApiController@getMemberFavoritesSummitEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $favorites = json_decode($content);
+        $this->assertTrue(!is_null($favorites));
+    }
+
+    public function testCurrentSummitMyMemberScheduleUnRSVP($event_id = 18639, $summit_id = 22)
+    {
+        //$this->testCurrentSummitMyAttendeeAddToSchedule($event_id, $summit_id);
+        $params = array
+        (
+            'id'          => $summit_id,
+            'member_id' => 'me',
+            'event_id'    => $event_id
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitMembersApiController@deleteEventRSVP",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
     }
 }

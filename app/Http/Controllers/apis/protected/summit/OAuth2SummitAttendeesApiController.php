@@ -72,85 +72,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
     /**
      *  Attendees endpoints
      */
-
-    /**
-     * @param $summit_id
-     * @return mixed
-     */
-    /*public function getAttendees($summit_id)
-    {
-        try {
-
-            $values = Input::all();
-
-            $rules = array
-            (
-                'page'     => 'integer|min:1',
-                'per_page' => 'required_with:page|integer|min:5|max:100',
-            );
-
-            $validation = Validator::make($values, $rules);
-
-            if ($validation->fails()) {
-                $messages = $validation->messages()->toArray();
-                return $this->error412($messages);
-            }
-
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            // default values
-            $page     = 1;
-            $per_page = 5;
-
-            if (Input::has('page')) {
-                $page     = intval(Input::get('page'));
-                $per_page = intval(Input::get('per_page'));
-            }
-
-            $filter = null;
-            if (Input::has('filter')) {
-                $filter = FilterParser::parse(Input::get('filter'), array
-                (
-                    'first_name' => array('=@', '=='),
-                    'last_name'  => array('=@', '=='),
-                    'email'      => array('=@', '=='),
-                ));
-            }
-
-            $order = null;
-            if (Input::has('order'))
-            {
-                $order = OrderParser::parse(Input::get('order'), array
-                (
-                    'first_name',
-                    'last_name',
-                ));
-            }
-
-            list($total, $per_page, $current_page, $last_page, $items) = $summit->attendees($page, $per_page, $filter, $order);
-
-            return $this->ok
-            (
-                array
-                (
-                    'total'        => $total,
-                    'per_page'     => $per_page,
-                    'current_page' => $current_page,
-                    'last_page'    => $last_page,
-                    'data'         => $items,
-                )
-            );
-
-        }
-        catch (Exception $ex)
-        {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }*/
-
-    /**
+ /**
      * @param $summit_id
      * @param $attendee_id
      * @return mixed
@@ -231,7 +153,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $this->service->addEventToAttendeeSchedule($summit, $attendee, intval($event_id));
+            $this->service->addEventToMemberSchedule($summit, $attendee->getMember(), intval($event_id));
 
             return $this->created();
         }
@@ -273,7 +195,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $this->service->removeEventFromAttendeeSchedule($summit, $attendee, intval($event_id));
+            $this->service->removeEventFromMemberSchedule($summit, $attendee->getMember(), intval($event_id));
 
             return $this->deleted();
 
@@ -306,41 +228,6 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
      * @param $event_id
      * @return mixed
      */
-    public function checkingAttendeeOnEvent($summit_id, $attendee_id, $event_id)
-    {
-        try {
-
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
-            if (is_null($attendee)) return $this->error404();
-
-            $this->service->checkInAttendeeOnEvent($summit, $attendee, intval($event_id));
-
-            return $this->updated();
-        }
-        catch (ValidationException $ex1)
-        {
-            Log::warning($ex1);
-            return $this->error412(array( $ex1->getMessage()));
-        }
-        catch (EntityNotFoundException $ex2)
-        {
-            Log::warning($ex2);
-            return $this->error404(array('message' => $ex2->getMessage()));
-        }
-        catch(\HTTP401UnauthorizedException $ex3)
-        {
-            Log::warning($ex3);
-            return $this->error401();
-        }
-        catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
     public function deleteEventRSVP($summit_id, $attendee_id, $event_id){
         try {
 
@@ -356,7 +243,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $this->service->unRSVPEvent($summit, $attendee, $event_id);
+            $this->service->unRSVPEvent($summit, $attendee->getMember(), $event_id);
 
             return $this->deleted();
 

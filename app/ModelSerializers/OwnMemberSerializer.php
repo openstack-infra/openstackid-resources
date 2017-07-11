@@ -25,6 +25,7 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
         'groups_events',
         'favorite_summit_events',
         'feedback',
+        'schedule_summit_events',
     ];
 
     private static $expand_group_events = [
@@ -90,6 +91,17 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
             $values['favorite_summit_events'] = $res;
         }
 
+
+        if(in_array('schedule_summit_events', $relations) && !is_null($summit)){
+            $schedule = [];
+
+            foreach ($member->getScheduledEventsIds($summit) as $event_id){
+                $schedule[] = intval($event_id);
+            }
+
+            $values['schedule_summit_events'] = $schedule;
+        }
+
         if (!empty($expand)) {
             $exp_expand = explode(',', $expand);
             foreach ($exp_expand as $relation) {
@@ -125,12 +137,23 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
                         if(!in_array('favorite_summit_events', $relations)) break;
                         if(is_null($summit)) break;
                         $favorites = [];
-                        foreach ($member->getFavoritesSummitEvents($summit) as $events){
+                        foreach ($member->getFavoritesSummitEventsBySummit($summit) as $events){
                             $favorites[] = SerializerRegistry::getInstance()
                                 ->getSerializer($events)
                                 ->serialize($expand);
                         }
                         $values['favorite_summit_events'] = $favorites;
+                    }
+                    case 'schedule_summit_events':{
+                        if(!in_array('schedule_summit_events', $relations)) break;
+                        if(is_null($summit)) break;
+                        $schedule = [];
+                        foreach ($member->getScheduleBySummit($summit) as $events){
+                            $schedule[] = SerializerRegistry::getInstance()
+                                ->getSerializer($events)
+                                ->serialize($expand);
+                        }
+                        $values['schedule_summit_events'] = $schedule;
                     }
                     break;
                 }
