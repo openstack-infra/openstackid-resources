@@ -482,10 +482,34 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf('%s/me/summits/events/favorites/add', $current_realm)],
             ),
             array(
+                'name' => 'delete-rsvp-member',
+                'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}/rsvp',
+                'http_method' => 'DELETE',
+                'scopes' => [sprintf('%s/summits/write', $current_realm)],
+            ),
+            array(
                 'name' => 'remove-from-own-member-favorites',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/favorites/{event_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf('%s/me/summits/events/favorites/delete', $current_realm)],
+            ),
+            array(
+                'name' => 'get-own-member-schedule',
+                'route' => '/api/v1/summits/{id}/members/{member_id}/schedule',
+                'http_method' => 'GET',
+                'scopes' => [sprintf('%s/me/read', $current_realm)],
+            ),
+            array(
+                'name' => 'add-2-own-member-schedule',
+                'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}',
+                'http_method' => 'POST',
+                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+            ),
+            array(
+                'name' => 'remove-from-own-member-schedule',
+                'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [sprintf('%s/summits/read', $current_realm)],
             ),
             // notifications
             array(

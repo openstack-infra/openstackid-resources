@@ -100,10 +100,10 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
             if (is_null($current_member)) return $this->error404();
 
             $favorites = array();
-            foreach ($current_member->getFavoritesSummitEvents() as $favorite_event)
+            foreach ($current_member->getFavoritesSummitEventsBySummit($summit) as $favorite_event)
             {
-                if(!$summit->isEventOnSchedule($favorite_event->getId())) continue;
-                $favorites[] = SerializerRegistry::getInstance()->getSerializer($favorite_event)->serialize();
+                if(!$summit->isEventOnSchedule($favorite_event->getEvent()->getId())) continue;
+                $favorites[] = SerializerRegistry::getInstance()->getSerializer($favorite_event)->serialize(Request::input('expand', ''));
             }
 
             $response    = new PagingResponse
@@ -137,9 +137,14 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
             Log::error($ex);
             return $this->error500($ex);
         }
-
     }
 
+    /**
+     * @param $summit_id
+     * @param $member_id
+     * @param $event_id
+     * @return mixed
+     */
     public function addEventToMemberFavorites($summit_id, $member_id, $event_id){
 
         try {
@@ -179,6 +184,12 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $member_id
+     * @param $event_id
+     * @return mixed
+     */
     public function removeEventFromMemberFavorites($summit_id, $member_id, $event_id){
 
         try {
@@ -215,5 +226,202 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
             Log::error($ex);
             return $this->error500($ex);
         }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $member_id
+     * @return mixed
+     */
+    public function getMemberScheduleSummitEvents($summit_id, $member_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $current_member = $this->repository->getById($current_member_id);
+            if (is_null($current_member)) return $this->error404();
+
+            $schedule = array();
+            foreach ($current_member->getScheduleBySummit($summit) as $schedule_event)
+            {
+                if(!$summit->isEventOnSchedule($schedule_event->getEvent()->getId())) continue;
+                $schedule[] = SerializerRegistry::getInstance()->getSerializer($schedule_event)->serialize(Request::input('expand', ''));
+            }
+
+            $response    = new PagingResponse
+            (
+                count($schedule),
+                count($schedule),
+                1,
+                1,
+                $schedule
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (\Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $member_id
+     * @param $event_id
+     * @return mixed
+     */
+    public function addEventToMemberSchedule($summit_id, $member_id, $event_id)
+    {
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $current_member = $this->repository->getById($current_member_id);
+            if (is_null($current_member)) return $this->error404();
+
+            $this->summit_service->addEventToMemberSchedule($summit, $current_member, intval($event_id));
+
+            return $this->created();
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (\Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $member_id
+     * @param $event_id
+     * @return mixed
+     */
+    public function removeEventFromMemberSchedule($summit_id, $member_id, $event_id)
+    {
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $current_member = $this->repository->getById($current_member_id);
+            if (is_null($current_member)) return $this->error404();
+
+            $this->summit_service->removeEventFromMemberSchedule($summit, $current_member, intval($event_id));
+
+            return $this->deleted();
+
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (\Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $member_id
+     * @param $event_id
+     * @return mixed
+     */
+    public function deleteEventRSVP($summit_id, $member_id, $event_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id)) return $this->error403();
+
+            $current_member = $this->repository->getById($current_member_id);
+            if (is_null($current_member)) return $this->error404();
+
+            $event = $summit->getScheduleEvent(intval($event_id));
+
+            if (is_null($event)) {
+                return $this->error404();
+            }
+
+            $this->summit_service->unRSVPEvent($summit, $current_member, $event_id);
+
+            return $this->deleted();
+
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+
     }
 }
