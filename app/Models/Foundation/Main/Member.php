@@ -15,7 +15,11 @@
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use models\exceptions\ValidationException;
+use models\summit\RSVP;
 use models\summit\Summit;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFeedback;
@@ -37,12 +41,26 @@ class Member extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->feedback = new ArrayCollection();
-        $this->groups = new ArrayCollection();
-        $this->affiliations = new ArrayCollection();
-        $this->team_memberships = new ArrayCollection();
-        $this->favorites_summit_events = new ArrayCollection();
+        $this->feedback                = new ArrayCollection();
+        $this->groups                  = new ArrayCollection();
+        $this->affiliations            = new ArrayCollection();
+        $this->team_memberships        = new ArrayCollection();
+        $this->favorites               = new ArrayCollection();
+        $this->schedule                = new ArrayCollection();
+        $this->rsvp                    = new ArrayCollection();
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="SummitMemberSchedule", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitMemberSchedule[]
+     */
+    private $schedule;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="owner", cascade={"persist"})
+     * @var RSVP[]
+     */
+    protected $rsvp;
 
     /**
      * @return Affiliation[]
@@ -134,26 +152,23 @@ class Member extends SilverstripeBaseModel
      */
     public function getFavoritesSummitEvents()
     {
-        return $this->favorites_summit_events;
+        return $this->favorites;
     }
 
+
     /**
-     * @param SummitEvent[] $favorites_summit_events
+     * @param SummitMemberFavorite[] $favorites
      */
-    public function setFavoritesSummitEvents($favorites_summit_events)
+    public function setFavoritesSummitEvents($favorites)
     {
-        $this->favorites_summit_events = $favorites_summit_events;
+        $this->favorites = $favorites;
     }
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\summit\SummitEvent")
-     * @ORM\JoinTable(name="Member_FavoriteSummitEvents",
-     *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")}
-     *      )
-     * @var SummitEvent[]
+     * @ORM\OneToMany(targetEntity="SummitMemberFavorite", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitMemberFavorite[]
      */
-    private $favorites_summit_events;
+    private $favorites;
 
     /**
      * @return string
@@ -561,7 +576,12 @@ class Member extends SilverstripeBaseModel
             (
                 sprintf('Event %s is not published', $event->getId())
             );
-        $this->favorites_summit_events->add($event);
+
+        $favorite = new SummitMemberFavorite();
+
+        $favorite->setMember($this);
+        $favorite->setEvent($event);
+        $this->favorites->add($favorite);
     }
 
     /**
@@ -591,30 +611,228 @@ SQL;
      */
     public function removeFavoriteSummitEvent(SummitEvent $event)
     {
-        if (!$this->isOnFavorite($event)) {
+        $favorite = $this->getFavoriteByEvent($event);
+
+        if(is_null($favorite))
             throw new ValidationException
             (
-                sprintf('Event %s does not belongs to member %s favorites.', $event->getId(), $this->getId())
+                sprintf('Event %s does not belongs to member %s favorite.', $event->getId(), $this->getId())
             );
-        }
-
-        $this->favorites_summit_events->removeElement($event);
+        $this->schedule->removeElement($favorite);
+        $favorite->clearOwner();
     }
 
     /**
+     * @param  Summit $summit
      * @return int[]
      */
-    public function getFavoritesEventsIds()
+    public function getFavoritesEventsIds(Summit $summit)
     {
         $sql = <<<SQL
 SELECT SummitEventID 
 FROM Member_FavoriteSummitEvents 
 INNER JOIN SummitEvent ON SummitEvent.ID = Member_FavoriteSummitEvents.SummitEventID
-WHERE MemberID = :member_id AND SummitEvent.Published = 1
+WHERE MemberID = :member_id AND SummitEvent.Published = 1 AND SummitEvent.SummitID = :summit_id
 SQL;
 
         $stmt = $this->prepareRawSQL($sql);
-        $stmt->execute(['member_id' => $this->getId()]);
+        $stmt->execute(
+            [
+                'member_id' => $this->getId(),
+                'summit_id' => $summit->getId(),
+            ]
+        );
         return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @throws ValidationException
+     */
+    public function add2Schedule(SummitEvent $event)
+    {
+        if($this->isOnSchedule($event))
+            throw new ValidationException
+            (
+                sprintf('Event %s already belongs to member %s schedule.', $event->getId(), $this->getId())
+            );
+
+        if(!$event->isPublished())
+            throw new ValidationException
+            (
+                sprintf('Event %s is not published', $event->getId())
+            );
+
+        $schedule = new SummitMemberSchedule();
+
+        $schedule->setMember($this);
+        $schedule->setEvent($event);
+        $this->schedule->add($schedule);
+    }
+
+    public function removeFromSchedule(SummitEvent $event)
+    {
+        $schedule = $this->getScheduleByEvent($event);
+
+        if(is_null($schedule))
+            throw new ValidationException
+            (
+                sprintf('Event %s does not belongs to member %s schedule.', $event->getId(), $this->getId())
+            );
+        $this->schedule->removeElement($schedule);
+        $schedule->clearOwner();
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @return bool
+     */
+    public function isOnSchedule(SummitEvent $event)
+    {
+        $sql = <<<SQL
+SELECT COUNT(SummitEventID) AS QTY 
+FROM Member_Schedule 
+WHERE MemberID = :member_id AND SummitEventID = :event_id
+SQL;
+
+        $stmt = $this->prepareRawSQL($sql);
+        $stmt->execute([
+            'member_id' => $this->getId(),
+            'event_id'    => $event->getId()
+        ]);
+        $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        return count($res) > 0 ? intval($res[0]) > 0 : false;
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @return null| SummitMemberSchedule
+     */
+    public function getScheduleByEvent(SummitEvent $event){
+
+        try {
+            $query = $this->createQuery("SELECT s from models\main\SummitMemberSchedule s 
+        JOIN s.member a 
+        JOIN s.event e    
+        WHERE a.id = :member_id and e.id = :event_id
+        ");
+            return $query
+                ->setParameter('member_id', $this->getIdentifier())
+                ->setParameter('event_id', $event->getIdentifier())
+                ->getSingleResult();
+        }
+        catch(NoResultException $ex1){
+            return null;
+        }
+        catch(NonUniqueResultException $ex2){
+            // should never happen
+            return null;
+        }
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @return SummitMemberFavorite|null
+     */
+    public function getFavoriteByEvent(SummitEvent $event){
+        try {
+            $query = $this->createQuery("SELECT f from models\main\SummitMemberFavorite f 
+        JOIN f.member a 
+        JOIN f.event e    
+        WHERE a.id = :member_id and e.id = :event_id
+        ");
+            return $query
+                ->setParameter('member_id', $this->getIdentifier())
+                ->setParameter('event_id', $event->getIdentifier())
+                ->getSingleResult();
+        }
+        catch(NoResultException $ex1){
+            return null;
+        }
+        catch(NonUniqueResultException $ex2){
+            // should never happen
+            return null;
+        }
+    }
+
+    /**
+     * @return SummitMemberSchedule[]
+     */
+    public function getSchedule(){
+        return $this->schedule;
+    }
+    /**
+     * @param  Summit $summit
+     * @return int[]
+     */
+    public function getScheduledEventsIds(Summit $summit){
+        $sql = <<<SQL
+SELECT SummitEventID 
+FROM Member_Schedule 
+INNER JOIN SummitEvent ON SummitEvent.ID = Member_Schedule.SummitEventID
+WHERE MemberID = :member_id AND SummitEvent.Published = 1 AND SummitEvent.SummitID = :summit_id
+SQL;
+
+        $stmt = $this->prepareRawSQL($sql);
+        $stmt->execute(
+            [
+                'member_id' => $this->getId(),
+                'summit_id' => $summit->getId(),
+            ]
+        );
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * @param int $event_id
+     * @return null|RSVP
+     */
+    public function getRsvpByEvent($event_id){
+        $builder = $this->createQueryBuilder();
+        $rsvp = $builder
+            ->select('r')
+            ->from('models\summit\RSVP','r')
+            ->join('r.owner','o')
+            ->join('r.event','e')
+            ->where('o.id = :owner_id and e.id = :event_id')
+            ->setParameter('owner_id', $this->getId())
+            ->setParameter('event_id',  intval($event_id))
+            ->getQuery()->getResult();
+
+        return count($rsvp) > 0 ? $rsvp[0] : null;
+    }
+
+    /**
+     * @param Summit $summit
+     * @return SummitMemberSchedule[]
+     */
+    public function getScheduleBySummit(Summit $summit){
+
+        $query = $this->createQuery("SELECT s from models\main\SummitMemberSchedule s
+        JOIN s.member m
+        JOIN s.event e 
+        JOIN e.summit su WHERE su.id = :summit_id and m.id = :member_id ");
+
+        return $query
+            ->setParameter('member_id', $this->getId())
+            ->setParameter('summit_id', $summit->getId())
+            ->getResult();
+    }
+
+    /**
+     * @param Summit $summit
+     * @return SummitMemberFavorite[]
+     */
+    public function getFavoritesSummitEventsBySummit(Summit $summit)
+    {
+        $query = $this->createQuery("SELECT f from models\main\SummitMemberFavorite f
+        JOIN f.member m
+        JOIN f.event e 
+        JOIN e.summit su WHERE su.id = :summit_id and m.id = :member_id ");
+
+        return $query
+            ->setParameter('member_id', $this->getId())
+            ->setParameter('summit_id', $summit->getId())
+            ->getResult();
     }
 }

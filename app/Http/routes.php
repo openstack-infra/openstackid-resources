@@ -219,6 +219,7 @@ Route::group([
             Route::group(array('prefix' => 'members'), function () {
                 Route::group(array('prefix' => '{member_id}'), function () {
                     Route::get('', 'OAuth2SummitMembersApiController@getMyMember')->where('member_id', 'me');
+                    // favorites
                     Route::group(array('prefix' => 'favorites'), function ()
                     {
                         Route::get('', 'OAuth2SummitMembersApiController@getMemberFavoritesSummitEvents')->where('member_id', 'me');
@@ -226,6 +227,18 @@ Route::group([
                         Route::group(array('prefix' => '{event_id}'), function (){
                             Route::post('', 'OAuth2SummitMembersApiController@addEventToMemberFavorites')->where('member_id', 'me');
                             Route::delete('', 'OAuth2SummitMembersApiController@removeEventFromMemberFavorites')->where('member_id', 'me');
+                        });
+                    });
+
+                    // schedule
+                    Route::group(array('prefix' => 'schedule'), function ()
+                    {
+                        Route::get('', 'OAuth2SummitMembersApiController@getMemberScheduleSummitEvents')->where('member_id', 'me');
+
+                        Route::group(array('prefix' => '{event_id}'), function (){
+                            Route::delete('/rsvp', 'OAuth2SummitMembersApiController@deleteEventRSVP')->where('member_id', 'me');
+                            Route::post('', 'OAuth2SummitMembersApiController@addEventToMemberSchedule')->where('member_id', 'me');
+                            Route::delete('', 'OAuth2SummitMembersApiController@removeEventFromMemberSchedule')->where('member_id', 'me');
                         });
                     });
                 });

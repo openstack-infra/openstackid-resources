@@ -1,6 +1,7 @@
 <?php namespace App\Events;
 
-use models\summit\SummitAttendee;
+use models\main\Member;
+use models\summit\Summit;
 
 /**
  * Class MyScheduleAdd
@@ -10,23 +11,30 @@ class MyScheduleAdd extends SummitEventAction
 {
 
     /**
-     * @var SummitAttendee
+     * @var Member
      */
-    protected $attendee;
+    protected $member;
+
+    /**
+     * @var Summit
+     */
+    protected $summit;
+
 
     /**
      * MyScheduleAdd constructor.
-     * @param SummitAttendee $attendee
+     * @param Member $member
+     * @param Summit $summit
      * @param int $event_id
      */
-    function __construct(SummitAttendee $attendee, $event_id)
-    {
-        $this->attendee = $attendee;
+    public function __construct($member, $summit, $event_id){
+
+        $this->member = $member;
+        $this->summit = $summit;
         parent::__construct($event_id);
     }
 
-    /**
-     * @return SummitAttendee
-     */
-    public function getAttendee(){ return $this->attendee;}
+    public function getMember(){ return $this->member; }
+
+    public function getSummit(){ return $this->summit;}
 }

@@ -75,7 +75,8 @@ final class SerializerRegistry
         $this->registry['PresentationSpeaker']        = PresentationSpeakerSerializer::class;
         $this->registry['SummitEventFeedback']        = SummitEventFeedbackSerializer::class;
         $this->registry['SummitAttendee']             = SummitAttendeeSerializer::class;
-        $this->registry['SummitAttendeeSchedule']     = SummitAttendeeScheduleSerializer::class;
+        $this->registry['SummitMemberSchedule']       = SummitMemberScheduleSerializer::class;
+        $this->registry['SummitMemberFavorite']       = SummitMemberFavoriteSerializer::class;
         $this->registry['SummitEntityEvent']          = SummitEntityEventSerializer::class;
         $this->registry['SummitEventWithFile']        = SummitEventWithFileSerializer::class;
 
