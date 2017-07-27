@@ -22,7 +22,7 @@ use models\utils\IEntity;
  * Class SummitMemberSchedule
  * @package models\main
  */
-class SummitMemberFavorite
+final class SummitMemberFavorite
 {
     /**
      * @ORM\Id
@@ -86,7 +86,7 @@ class SummitMemberFavorite
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="Member", inversedBy="schedule")
+     * @ORM\ManyToOne(targetEntity="Member", inversedBy="favorites")
      * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID", nullable=true )
      * @var Member
      */
