@@ -26,7 +26,7 @@ class Presentation extends SummitEvent
 {
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationMaterial", mappedBy="presentation", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationMaterial", mappedBy="presentation", cascade={"persist"}, orphanRemoval=true)
      * @var PresentationMaterial[]
      */
     private $materials;
@@ -293,7 +293,7 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker")
+     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="moderated_presentations")
      * @ORM\JoinColumn(name="ModeratorID", referencedColumnName="ID")
      * @var PresentationSpeaker
      */

@@ -22,14 +22,40 @@ use models\utils\IEntity;
  * Class SummitMemberSchedule
  * @package models\main
  */
-class SummitMemberSchedule implements IEntity
+final class SummitMemberSchedule implements IEntity
 {
+    public function __construct()
+    {
+    }
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(name="ID", type="integer", unique=true, nullable=false)
      */
     private $id;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Member", inversedBy="schedule")
+     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID", nullable=true )
+     * @var Member
+     */
+    private $member;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent")
+     * @ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")
+     * @var SummitEvent
+     */
+    private $event;
+
+    /**
+     * @return int
+     */
+    public function getIdentifier()
+    {
+        return $this->id;
+    }
 
     /**
      * @return int
@@ -76,27 +102,4 @@ class SummitMemberSchedule implements IEntity
     {
         $this->event = $event;
     }
-
-    /**
-     * @return int
-     */
-    public function getIdentifier()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Member", inversedBy="schedule")
-     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID", nullable=true )
-     * @var Member
-     */
-    private $member;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent")
-     * @ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")
-     * @var SummitEvent
-     */
-    private $event;
-
 }
