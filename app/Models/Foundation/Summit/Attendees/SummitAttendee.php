@@ -50,6 +50,13 @@ class SummitAttendee extends SilverstripeBaseModel
     private $summit_hall_checked_in_date;
 
     /**
+     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
+     * @var Member
+     */
+    private $member;
+
+    /**
      * @return \DateTime
      */
     public function getSummitHallCheckedInDate(){
@@ -80,13 +87,6 @@ class SummitAttendee extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\Member")
-     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
-     * @var Member
-     */
-    private $member;
-
-    /**
      * @return int
      */
     public function getMemberId(){
@@ -106,7 +106,7 @@ class SummitAttendee extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitAttendeeTicket", mappedBy="owner", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SummitAttendeeTicket", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
      * @var SummitAttendeeTicket[]
      */
     private $tickets;
