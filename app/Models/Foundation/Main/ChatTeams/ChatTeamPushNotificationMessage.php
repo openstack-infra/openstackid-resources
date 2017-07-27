@@ -51,7 +51,7 @@ class ChatTeamPushNotificationMessage extends PushNotificationMessage
         $this->team = $team;
     }
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\ChatTeam")
+     * @ORM\ManyToOne(targetEntity="models\main\ChatTeam", inversedBy="messages")
      * @ORM\JoinColumn(name="ChatTeamID", referencedColumnName="ID")
      * @var ChatTeam
      */

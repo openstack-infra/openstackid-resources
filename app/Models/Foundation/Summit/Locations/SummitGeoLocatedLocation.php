@@ -38,6 +38,87 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
     protected $address1;
 
     /**
+     * @ORM\Column(name="Address2", type="string")
+     */
+    protected $address2;
+
+    /**
+     * @ORM\Column(name="ZipCode", type="string")
+     */
+    protected $zip_code;
+
+    /**
+     * @ORM\Column(name="City", type="string")
+     */
+    protected $city;
+
+    /**
+     * @ORM\Column(name="State", type="string")
+     */
+    protected $state;
+
+    /**
+     * @ORM\Column(name="Country", type="string")
+     */
+    protected $country;
+
+    /**
+     * @ORM\Column(name="WebSiteUrl", type="string")
+     */
+    protected $website_url;
+
+    /**
+     * @ORM\Column(name="Lng", type="string")
+     */
+    protected $lng;
+
+    /**
+     * @ORM\Column(name="Lat", type="string")
+     */
+    protected $lat;
+
+    /**
+     * @ORM\Column(name="DisplayOnSite", type="boolean")
+     */
+    protected $display_on_site;
+
+    /**
+     * @ORM\Column(name="DetailsPage", type="boolean")
+     */
+    protected $details_page;
+
+    /**
+     * @ORM\Column(name="LocationMessage", type="string")
+     */
+    protected $location_message;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitLocationImage", mappedBy="location", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitLocationImage[]
+     */
+    protected $images;
+
+
+    /**
+     * @return string
+     */
+    public function getFullAddress(){
+        $full_location  = '';
+        if(!empty($this->address1))
+            $full_location .= $this->address1.', ';
+        if(!empty($this->address2))
+            $full_location .= $this->address2.', ';
+        if(!empty($this->city))
+            $full_location .= $this->city.', ';
+        if(!empty($this->state))
+            $full_location .= $this->state.', ';
+        if(!empty($this->zip_code))
+            $full_location .= $this->zip_code.', ';
+        if(!empty($this->country))
+            $full_location .= $this->country.', ';
+        return rtrim($full_location, ', ');
+    }
+    /**
      * @return mixed
      */
     public function getAddress1()
@@ -229,66 +310,6 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
         $this->location_message = $location_message;
     }
 
-    /**
-     * @ORM\Column(name="Address2", type="string")
-     */
-    protected $address2;
-
-    /**
-     * @ORM\Column(name="ZipCode", type="string")
-     */
-    protected $zip_code;
-
-    /**
-     * @ORM\Column(name="City", type="string")
-     */
-    protected $city;
-
-    /**
-     * @ORM\Column(name="State", type="string")
-     */
-    protected $state;
-
-    /**
-     * @ORM\Column(name="Country", type="string")
-     */
-    protected $country;
-
-    /**
-     * @ORM\Column(name="WebSiteUrl", type="string")
-     */
-    protected $website_url;
-
-    /**
-     * @ORM\Column(name="Lng", type="string")
-     */
-    protected $lng;
-
-    /**
-     * @ORM\Column(name="Lat", type="string")
-     */
-    protected $lat;
-
-    /**
-     * @ORM\Column(name="DisplayOnSite", type="boolean")
-     */
-    protected $display_on_site;
-
-    /**
-     * @ORM\Column(name="DetailsPage", type="boolean")
-     */
-    protected $details_page;
-
-    /**
-     * @ORM\Column(name="LocationMessage", type="string")
-     */
-    protected $location_message;
-
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitLocationImage", mappedBy="location", cascade={"persist"})
-     * @var SummitLocationImage[]
-     */
-    protected $images;
 
     public function __construct()
     {
