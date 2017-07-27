@@ -91,7 +91,6 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
             $values['favorite_summit_events'] = $res;
         }
 
-
         if(in_array('schedule_summit_events', $relations) && !is_null($summit)){
             $schedule = [];
 

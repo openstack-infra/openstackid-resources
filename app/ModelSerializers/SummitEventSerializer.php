@@ -36,7 +36,7 @@ class SummitEventSerializer extends SilverStripeSerializer
         'Published'        => 'is_published:json_boolean',
         'HeadCount'        => 'head_count:json_int',
         'RSVPLink'         => 'rsvp_link:json_string',
-        'IssExternalRSVP'  => 'rsvp_external:json_boolean',
+        'IsExternalRSVP'   => 'rsvp_external:json_boolean',
         'CategoryId'       => 'track_id:json_int',
     );
 
