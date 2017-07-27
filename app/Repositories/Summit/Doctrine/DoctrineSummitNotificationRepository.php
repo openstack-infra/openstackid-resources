@@ -17,6 +17,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use models\summit\ISummitNotificationRepository;
 use models\summit\Summit;
+use models\summit\SummitPushNotification;
 use repositories\SilverStripeDoctrineRepository;
 use utils\Filter;
 use utils\Order;
@@ -44,7 +45,7 @@ final class DoctrineSummitNotificationRepository
     {
         $query = $this->getEntityManager()->createQueryBuilder()
             ->select("n")
-            ->from(\models\summit\SummitPushNotification::class, "n")
+            ->from(SummitPushNotification::class, "n")
             ->leftJoin('n.summit_event', 'e')
             ->join('n.summit', 's', Join::WITH, " s.id = :summit_id")
             ->setParameter('summit_id', $summit->getId());

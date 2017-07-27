@@ -159,9 +159,9 @@ class SummitLocationImage extends SilverstripeBaseModel
     protected $picture;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitAbstractLocation")
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitGeoLocatedLocation", inversedBy="images")
      * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
-     * @var SummitAbstractLocation
+     * @var SummitGeoLocatedLocation
      */
     protected $location;
 

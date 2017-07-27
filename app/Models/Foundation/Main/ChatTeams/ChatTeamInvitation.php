@@ -195,7 +195,7 @@ class ChatTeamInvitation extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\ChatTeam")
+     * @ORM\ManyToOne(targetEntity="models\main\ChatTeam", inversedBy="invitations")
      * @ORM\JoinColumn(name="TeamID", referencedColumnName="ID")
      * @var ChatTeam
      */
