@@ -38,7 +38,7 @@ abstract class PresentationMaterial extends SilverstripeBaseModel
     }
 
     /**
-    * @ORM\ManyToOne(targetEntity="models\summit\Presentation", inversedBy="materil")
+    * @ORM\ManyToOne(targetEntity="models\summit\Presentation", inversedBy="materials")
     * @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID")
     * @var Presentation
     */

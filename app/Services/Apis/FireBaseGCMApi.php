@@ -12,8 +12,11 @@
  * limitations under the License.
  **/
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use models\main\PushNotificationMessagePriority;
 use Illuminate\Support\Facades\Log;
+use Exception;
+
 /**
  * Class FireBaseGCMApi
  * @package services\apis
@@ -56,20 +59,19 @@ final class FireBaseGCMApi implements IPushNotificationApi
                 $response = $client->post($endpoint, [
                     'headers' => [
                         'Authorization' => sprintf('key=%s', $this->api_server_key),
-                        'Content-Type'  => 'application/json'
                     ],
-                    'body' => json_encode($message)
+                    'json' => $message
                 ]);
 
                 if ($response->getStatusCode() !== 200) $res = $res && false;
             }
             return $res;
         }
-        catch (\GuzzleHttp\Exception\ClientException $ex1){
+        catch (ClientException $ex1){
             Log::error($ex1->getMessage());
             return false;
         }
-        catch(\Exception $ex){
+        catch(Exception $ex){
             Log::error($ex->getMessage());
             return false;
         }
