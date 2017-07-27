@@ -139,5 +139,22 @@ final class RepositoriesProvider extends ServiceProvider
                 return  EntityManager::getRepository(\models\summit\RSVP::class);
             });
 
+        App::singleton(
+            'models\summit\IAbstractCalendarSyncWorkRequestRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest::class);
+            });
+
+        App::singleton(
+            'models\summit\ICalendarSyncInfoRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\CalendarSync\CalendarSyncInfo::class);
+            });
+
+        App::singleton(
+            'models\summit\IScheduleCalendarSyncInfoRepository',
+            function(){
+                return  EntityManager::getRepository(\models\summit\CalendarSync\ScheduleCalendarSyncInfo::class);
+            });
     }
 }
