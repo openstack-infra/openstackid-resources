@@ -31,20 +31,53 @@ class ServicesProvider extends ServiceProvider
     public function register()
     {
         App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
+
         App::singleton(\libs\utils\ITransactionService::class, function(){
             return new \services\utils\DoctrineTransactionService('ss');
         });
+
+        App::singleton(\libs\utils\IEncryptionService::class, function(){
+            return new \services\utils\EncryptionService(
+                Config::get("server.ss_encrypt_key", ''),
+                Config::get("server.ss_encrypt_cypher", '')
+            );
+        });
+
+        // setting facade
+        $this->app['encryption'] = App::share(function ($app) {
+            return new \services\utils\EncryptionService(
+                Config::get("server.ss_encrypt_key", ''),
+                Config::get("server.ss_encrypt_cypher", '')
+            );
+        });
+
         App::singleton('services\model\ISummitService', 'services\model\SummitService');
+
         App::singleton('services\model\IPresentationService', 'services\model\PresentationService');
+
         App::singleton('services\model\IChatTeamService', 'services\model\ChatTeamService');
+
         App::singleton('services\apis\IEventbriteAPI',   function(){
             $api = new EventbriteAPI();
             $api->setCredentials(array('token' => Config::get("server.eventbrite_oauth2_personal_token", null)));
             return $api;
         });
+
         App::singleton('services\apis\IPushNotificationApi',   function(){
             $api = new FireBaseGCMApi(Config::get("server.firebase_gcm_server_key", null));
             return $api;
         });
+
+        App::singleton
+        (
+            'services\model\IMemberActionsCalendarSyncProcessingService',
+            'services\model\MemberActionsCalendarSyncProcessingService'
+        );
+
+        App::singleton
+        (
+            'services\model\IAdminActionsCalendarSyncProcessingService',
+            'services\model\AdminActionsCalendarSyncProcessingService'
+        );
     }
 }
