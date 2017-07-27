@@ -364,15 +364,11 @@ class Summit extends SilverstripeBaseModel
      */
     public function convertDateFromTimeZone2UTC(DateTime $value)
     {
-        $time_zone_id   = $this->time_zone_id;
-        if(empty($time_zone_id)) return $value;
-        $time_zone_list = timezone_identifiers_list();
+        $summit_time_zone = $this->getTimeZone();
 
-        if(isset($time_zone_list[$time_zone_id]) && !empty($value))
+        if(!is_null($summit_time_zone) && !empty($value))
         {
             $utc_timezone      = new DateTimeZone("UTC");
-            $time_zone_name    = $time_zone_list[$time_zone_id];
-            $summit_time_zone  = new DateTimeZone($time_zone_name);
             $timestamp         = $value->format('Y-m-d H:i:s');
             $local_date        = new DateTime($timestamp, $summit_time_zone);
             return $local_date->setTimezone($utc_timezone);
@@ -380,6 +376,19 @@ class Summit extends SilverstripeBaseModel
         return null;
     }
 
+    /**
+     * @return DateTimeZone|null
+     */
+    public function getTimeZone(){
+        $time_zone_id   = $this->time_zone_id;
+        if(empty($time_zone_id)) return null;
+        $time_zone_list = timezone_identifiers_list();
+        if(isset($time_zone_list[$time_zone_id])){
+            $time_zone_name    = $time_zone_list[$time_zone_id];
+            return new DateTimeZone($time_zone_name);
+        }
+        return null;
+    }
     /**
      * @param DateTime $value
      * @return null|DateTime
@@ -992,4 +1001,13 @@ SQL;
         return $builder->getQuery()->getResult();
     }
 
+    /**
+     * @return string
+     */
+    public function getSlug(){
+        $res  = "openstack-".$this->name.'-';
+        $res .= $this->begin_date->format('Y').'-summit';
+        $res  = strtolower(  preg_replace('/[^a-zA-Z0-9\-]/', '',$res));
+        return $res;
+    }
 }

@@ -22,7 +22,7 @@ use models\utils\IEntity;
  * Class SummitMemberSchedule
  * @package models\main
  */
-class SummitMemberFavorite
+final class SummitMemberFavorite
 {
     /**
      * @ORM\Id

@@ -57,7 +57,7 @@ class AccessTokenServiceStub implements IAccessTokenService
             $url . '/me/summits/events/favorites/delete',
         );
 
-        return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','13867', 3600, 'WEB_APPLICATION', '', '');
+        return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','11624', 3600, 'WEB_APPLICATION', '', '');
     }
 }
 
