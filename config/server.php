@@ -22,4 +22,6 @@ return array
     'response_cache_lifetime'          => env('API_RESPONSE_CACHE_LIFETIME', 300),
     'eventbrite_oauth2_personal_token' => env('EVENTBRITE_OAUTH2_PERSONAL_TOKEN', ''),
     'firebase_gcm_server_key'          => env('FIREBASE_GCM_SERVER_KEY', ''),
+    'ss_encrypt_key'                   => env('SS_ENCRYPT_KEY', ''),
+    'ss_encrypt_cypher'                => env('SS_ENCRYPT_CYPHER', ''),
 );
