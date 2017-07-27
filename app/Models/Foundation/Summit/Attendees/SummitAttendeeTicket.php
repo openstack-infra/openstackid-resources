@@ -170,7 +170,7 @@ class SummitAttendeeTicket extends SilverstripeBaseModel
     private $ticket_type;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SummitAttendee")
+     * @ORM\ManyToOne(targetEntity="SummitAttendee", inversedBy="tickets")
      * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
      * @var SummitAttendee
      */
