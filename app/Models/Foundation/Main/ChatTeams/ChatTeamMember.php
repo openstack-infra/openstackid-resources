@@ -123,14 +123,14 @@ class ChatTeamMember
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="team_memberships")
      * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
      * @var Member
      */
     private $member;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\ChatTeam")
+     * @ORM\ManyToOne(targetEntity="models\main\ChatTeam", inversedBy="members")
      * @ORM\JoinColumn(name="ChatTeamID", referencedColumnName="ID")
      * @var ChatTeam
      */
