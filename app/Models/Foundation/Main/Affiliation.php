@@ -42,7 +42,7 @@ class Affiliation extends SilverstripeBaseModel
     private $is_current;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="affiliations")
      * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
      * @var Member
      */
