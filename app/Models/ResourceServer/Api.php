@@ -26,7 +26,7 @@ class Api extends ResourceServerEntity implements IApi
 {
 
     /**
-     * @ORM\OneToMany(targetEntity="ApiScope", mappedBy="api", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="ApiScope", mappedBy="api", cascade={"persist"}, orphanRemoval=true)
      */
     private $scopes;
 
