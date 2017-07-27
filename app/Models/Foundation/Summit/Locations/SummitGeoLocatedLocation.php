@@ -285,7 +285,7 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
     protected $location_message;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitLocationImage", mappedBy="location", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitLocationImage", mappedBy="location", cascade={"persist"}, orphanRemoval=true)
      * @var SummitLocationImage[]
      */
     protected $images;
