@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\SummitJsonGenerator::class,
+        \App\Console\Commands\MemberActionsCalendarSyncProcessingCommand::class,
+        \App\Console\Commands\AdminActionsCalendarSyncProcessingCommand::class,
         \App\Console\Commands\ChatTeamMessagesSender::class,
     ];
 
@@ -33,7 +35,15 @@ class Kernel extends ConsoleKernel
         $schedule->command('summit:json-generator 7')->everyTenMinutes()->withoutOverlapping();
         //Boston
         $schedule->command('summit:json-generator 22')->everyTenMinutes()->withoutOverlapping();
+
+        // Calendar Sync Jobs
+
+        // Admin Actions
+        $schedule->command('summit:admin-schedule-action-process')->everyMinute()->withoutOverlapping();
+        // Member Actions
+        $schedule->command('summit:member-schedule-action-process 1000')->everyMinute()->withoutOverlapping();
+
         // teams messages
-        $schedule->command('teams:message-sender 100')->everyMinute()->withoutOverlapping();
+        // $schedule->command('teams:message-sender 100')->everyMinute()->withoutOverlapping();
     }
 }
