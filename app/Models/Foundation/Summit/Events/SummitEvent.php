@@ -265,8 +265,15 @@ class SummitEvent extends SilverstripeBaseModel
     /**
      * @return bool
      */
-    public function getIssExternalRSVP(){
+    public function isExternalRSVP(){
         return !empty($this->rsvp_link) && $this->rsvp_template_id == 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsExternalRSVP(){
+        return $this->isExternalRSVP();
     }
 
     public function getSlug(){
