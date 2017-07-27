@@ -19,6 +19,8 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use models\exceptions\ValidationException;
+use models\summit\CalendarSync\CalendarSyncInfo;
+use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
 use models\summit\RSVP;
 use models\summit\Summit;
 use models\summit\SummitEvent;
@@ -35,19 +37,22 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class Member extends SilverstripeBaseModel
 {
+
     /**
      * Member constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $this->feedback                = new ArrayCollection();
-        $this->groups                  = new ArrayCollection();
-        $this->affiliations            = new ArrayCollection();
-        $this->team_memberships        = new ArrayCollection();
-        $this->favorites               = new ArrayCollection();
-        $this->schedule                = new ArrayCollection();
-        $this->rsvp                    = new ArrayCollection();
+        $this->feedback           = new ArrayCollection();
+        $this->groups             = new ArrayCollection();
+        $this->affiliations       = new ArrayCollection();
+        $this->team_memberships   = new ArrayCollection();
+        $this->favorites          = new ArrayCollection();
+        $this->schedule           = new ArrayCollection();
+        $this->rsvp               = new ArrayCollection();
+        $this->calendars_sync     = new ArrayCollection();
+        $this->schedule_sync_info = new ArrayCollection();
     }
 
     /**
@@ -55,6 +60,18 @@ class Member extends SilverstripeBaseModel
      * @var SummitMemberSchedule[]
      */
     private $schedule;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\CalendarSync\ScheduleCalendarSyncInfo", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
+     * @var ScheduleCalendarSyncInfo[]
+     */
+    private $schedule_sync_info;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\CalendarSync\CalendarSyncInfo", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
+     * @var CalendarSyncInfo[]
+     */
+    private $calendars_sync;
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="owner", cascade={"persist"})
@@ -670,6 +687,14 @@ SQL;
         $this->schedule->add($schedule);
     }
 
+    /**
+     * @param ScheduleCalendarSyncInfo $sync_info
+     */
+    public function add2ScheduleSyncInfo(ScheduleCalendarSyncInfo $sync_info){
+        $sync_info->setMember($this);
+        $this->schedule_sync_info->add($sync_info);
+    }
+
     public function removeFromSchedule(SummitEvent $event)
     {
         $schedule = $this->getScheduleByEvent($event);
@@ -683,6 +708,34 @@ SQL;
         $schedule->clearOwner();
     }
 
+    public function removeFromScheduleSyncInfo(ScheduleCalendarSyncInfo $sync_info){
+        $this->schedule_sync_info->removeElement($sync_info);
+        $sync_info->clearOwner();
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @return bool
+     */
+    public function isEventSynchronized(SummitEvent $event){
+        $sql = <<<SQL
+SELECT COUNT(SummitEventID) AS QTY 
+FROM ScheduleCalendarSyncInfo
+INNER JOIN SummitEvent ON SummitEvent.ID = ScheduleCalendarSyncInfo.SummitEventID
+WHERE 
+OwnerID = :member_id 
+AND SummitEventID = :event_id      
+SQL;
+
+        $stmt = $this->prepareRawSQL($sql);
+        $stmt->execute([
+            'member_id' => $this->getId(),
+            'event_id'  => $event->getId()
+        ]);
+        $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+        return count($res) > 0 ? intval($res[0]) > 0 : false;
+    }
+
     /**
      * @param SummitEvent $event
      * @return bool
@@ -691,8 +744,11 @@ SQL;
     {
         $sql = <<<SQL
 SELECT COUNT(SummitEventID) AS QTY 
-FROM Member_Schedule 
-WHERE MemberID = :member_id AND SummitEventID = :event_id
+FROM Member_Schedule
+INNER JOIN SummitEvent ON SummitEvent.ID = Member_Schedule.SummitEventID
+WHERE 
+MemberID = :member_id 
+AND SummitEventID = :event_id      
 SQL;
 
         $stmt = $this->prepareRawSQL($sql);
@@ -719,6 +775,34 @@ SQL;
             return $query
                 ->setParameter('member_id', $this->getIdentifier())
                 ->setParameter('event_id', $event->getIdentifier())
+                ->getSingleResult();
+        }
+        catch(NoResultException $ex1){
+            return null;
+        }
+        catch(NonUniqueResultException $ex2){
+            // should never happen
+            return null;
+        }
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @param CalendarSyncInfo $calendar_sync_info
+     * @return ScheduleCalendarSyncInfo|null
+     */
+    public function getScheduleSyncInfoByEvent(SummitEvent $event, CalendarSyncInfo $calendar_sync_info){
+        try {
+            $query = $this->createQuery("SELECT s from models\summit\CalendarSync\ScheduleCalendarSyncInfo s 
+        JOIN s.member m
+        JOIN s.event e    
+        JOIN s.calendar_sync_info si
+        WHERE m.id = :member_id and e.id = :event_id and si.id = :calendar_sync_info_id
+        ");
+            return $query
+                ->setParameter('member_id', $this->getIdentifier())
+                ->setParameter('event_id', $event->getIdentifier())
+                ->setParameter('calendar_sync_info_id', $calendar_sync_info->getIdentifier())
                 ->getSingleResult();
         }
         catch(NoResultException $ex1){
@@ -761,6 +845,7 @@ SQL;
     public function getSchedule(){
         return $this->schedule;
     }
+
     /**
      * @param  Summit $summit
      * @return int[]
@@ -834,5 +919,31 @@ SQL;
             ->setParameter('member_id', $this->getId())
             ->setParameter('summit_id', $summit->getId())
             ->getResult();
+    }
+
+    /**
+     * @param Summit $summit
+     * @return CalendarSyncInfo[]
+     */
+    public function getSyncInfoBy(Summit $summit){
+        return $this->calendars_sync->filter(function($entity) use($summit){
+            return $entity->getSummit()->getIdentifier() == $summit->getIdentifier() && !$entity->isRevoked();
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @return bool
+     */
+    public function hasSyncInfoFor(Summit $summit){
+        return count($this->getSyncInfoBy($summit)) > 0;
+    }
+
+    /**
+     * @param CalendarSyncInfo $calendar_sync_info
+     */
+    public function removeFromCalendarSyncInfo(CalendarSyncInfo $calendar_sync_info){
+        $this->calendars_sync->removeElement($calendar_sync_info);
+        $calendar_sync_info->clearOwner();
     }
 }
