@@ -181,38 +181,42 @@ final class AccessTokenService implements IAccessTokenService
             if (empty($auth_server_url)) {
                 throw new ConfigurationException('app.openstackid_base_url param is missing!');
             }
-
-            $response = $client->post(
-                $auth_server_url . '/oauth2/token/introspection',
+            // http://docs.guzzlephp.org/en/stable/request-options.html
+            $response = $client->request('POST',
+                  "{$auth_server_url}/oauth2/token/introspection",
                 [
-                    'body'    => ['token' => $token_value],
-                    'headers' => ['Authorization' => " Basic " . base64_encode($client_id . ':' . $client_secret)]
+                    'form_params'  => ['token' => $token_value],
+                    'auth'         => [$client_id, $client_secret],
+                    'timeout'      => 120,
+                    'http_errors' => true
                 ]
             );
 
-            $content_type = $response->getHeader('content-type');
+            $content_type = $response->getHeaderLine('content-type');
             if(!str_contains($content_type, 'application/json'))
             {
                 // invalid content type
                 throw new \Exception($response->getBody());
             }
-            $token_info   = $response->json();
+            $token_info   = json_decode($response->getBody()->getContents(), true);
 
             return $token_info;
 
         }
-        catch (RequestException $ex)
-        {
+        catch (RequestException $ex) {
+
             Log::warning($ex->getMessage());
-            $response     = $ex->getResponse();
+            $response  = $ex->getResponse();
+
             if(is_null($response))
                 throw new OAuth2InvalidIntrospectionResponse(sprintf('http code %s', $ex->getCode()));
 
-            $content_type = $response->getHeader('content-type');
+            $content_type = $response->getHeaderLine('content-type');
             $is_json      = str_contains($content_type, 'application/json');
-            $body         = ($is_json) ? $response->json(): $response->getBody();
+            $body         = $response->getBody()->getContents();
+            $body         = $is_json ? json_decode($body, true): $body;
+            $code         = $response->getStatusCode();
 
-            $code = $response->getStatusCode();
             if ($code === 400 && $is_json && isset($body['error'])
                 && (
                     $body['error'] === OAuth2Protocol::OAuth2Protocol_Error_InvalidToken ||
@@ -227,7 +231,7 @@ final class AccessTokenService implements IAccessTokenService
                 $this->cache_service->setSingleValue(md5($token_value).'.revoked', md5($token_value));
                 throw new InvalidGrantTypeException(OAuth2Protocol::OAuth2Protocol_Error_InvalidToken);
             }
-            throw new OAuth2InvalidIntrospectionResponse(sprintf('http code %s - body %s', $ex->getCode(), $response->getBody()));
+            throw new OAuth2InvalidIntrospectionResponse(sprintf('http code %s - body %s', $ex->getCode(), $body));
         }
     }
 }

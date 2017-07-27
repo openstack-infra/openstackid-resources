@@ -40,7 +40,7 @@ class ApiScope extends ResourceServerEntity implements IApiScope
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="Api", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Api", inversedBy="scopes")
      * @ORM\JoinColumn(name="api_id", referencedColumnName="id")
      * @var Api
      */
