@@ -31,20 +31,80 @@ class ServicesProvider extends ServiceProvider
     public function register()
     {
         App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
+
         App::singleton(\libs\utils\ITransactionService::class, function(){
             return new \services\utils\DoctrineTransactionService('ss');
         });
+
+        App::singleton(\libs\utils\IEncryptionService::class, function(){
+            return new \services\utils\EncryptionService(
+                Config::get("server.ss_encrypt_key", ''),
+                Config::get("server.ss_encrypt_cypher", '')
+            );
+        });
+
+        // setting facade
+        $this->app['encryption'] = App::share(function ($app) {
+            return new \services\utils\EncryptionService(
+                Config::get("server.ss_encrypt_key", ''),
+                Config::get("server.ss_encrypt_cypher", '')
+            );
+        });
+
         App::singleton('services\model\ISummitService', 'services\model\SummitService');
+
         App::singleton('services\model\IPresentationService', 'services\model\PresentationService');
+
         App::singleton('services\model\IChatTeamService', 'services\model\ChatTeamService');
+
         App::singleton('services\apis\IEventbriteAPI',   function(){
             $api = new EventbriteAPI();
             $api->setCredentials(array('token' => Config::get("server.eventbrite_oauth2_personal_token", null)));
             return $api;
         });
+
         App::singleton('services\apis\IPushNotificationApi',   function(){
             $api = new FireBaseGCMApi(Config::get("server.firebase_gcm_server_key", null));
             return $api;
         });
+
+        // work request pre processors
+
+        App::singleton
+        (
+            'App\Services\Model\Strategies\ICalendarSyncWorkRequestPreProcessorStrategyFactory',
+            'App\Services\Model\Strategies\CalendarSyncWorkRequestPreProcessorStrategyFactory'
+        );
+
+        App::when('App\Services\Model\MemberActionsCalendarSyncPreProcessor')
+            ->needs('App\Services\Model\ICalendarSyncWorkRequestQueueManager')
+            ->give('App\Services\Model\MemberScheduleWorkQueueManager');
+
+        App::when('App\Services\Model\AdminActionsCalendarSyncPreProcessor')
+            ->needs('App\Services\Model\ICalendarSyncWorkRequestQueueManager')
+            ->give('App\Services\Model\AdminScheduleWorkQueueManager');
+
+
+        // work request process services
+
+        App::when('App\Services\Model\MemberActionsCalendarSyncProcessingService')
+            ->needs('App\Services\Model\ICalendarSyncWorkRequestPreProcessor')
+            ->give('App\Services\Model\MemberActionsCalendarSyncPreProcessor');
+
+        App::singleton
+        (
+            'App\Services\Model\IMemberActionsCalendarSyncProcessingService',
+            'App\Services\Model\MemberActionsCalendarSyncProcessingService'
+        );
+
+        App::when('App\Services\Model\AdminActionsCalendarSyncProcessingService')
+            ->needs('App\Services\Model\ICalendarSyncWorkRequestPreProcessor')
+            ->give('App\Services\Model\AdminActionsCalendarSyncPreProcessor');
+
+        App::singleton
+        (
+            'App\Services\Model\IAdminActionsCalendarSyncProcessingService',
+            'App\Services\Model\AdminActionsCalendarSyncProcessingService'
+        );
     }
 }
