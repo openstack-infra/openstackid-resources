@@ -26,6 +26,9 @@ use models\utils\SilverstripeBaseModel;
  */
 class PushNotificationMessage extends SilverstripeBaseModel
 {
+    const PlatformMobile = 'MOBILE';
+    const PlatformWeb    = 'WEB';
+
     public function __construct()
     {
         parent::__construct();
@@ -37,22 +40,6 @@ class PushNotificationMessage extends SilverstripeBaseModel
      * @var string
      */
     protected $message;
-
-    /**
-     * @return string
-     */
-    public function getPriority()
-    {
-        return $this->priority;
-    }
-
-    /**
-     * @param string $priority
-     */
-    public function setPriority($priority)
-    {
-        $this->priority = $priority;
-    }
 
     /**
      * @ORM\Column(name="Priority", type="string")
@@ -73,11 +60,30 @@ class PushNotificationMessage extends SilverstripeBaseModel
     protected $is_sent;
 
     /**
+     * @ORM\Column(name="Approved", type="boolean")
+     * @var bool
+     */
+    protected $approved;
+
+    /**
+     * @ORM\Column(name="Platform", type="string")
+     * @var bool
+     */
+    protected $platform;
+
+    /**
      * @ORM\ManyToOne(targetEntity="models\main\Member")
      * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
      * @var Member
      */
     protected $owner;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\JoinColumn(name="ApprovedByID", referencedColumnName="ID")
+     * @var Member
+     */
+    protected $approved_by;
 
     /**
      * @return int
@@ -178,6 +184,70 @@ class PushNotificationMessage extends SilverstripeBaseModel
     public function setOwner($owner)
     {
         $this->owner = $owner;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param string $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isApproved()
+    {
+        return $this->approved;
+    }
+
+    /**
+     * @param bool $approved
+     */
+    public function setApproved($approved)
+    {
+        $this->approved = $approved;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPlatform()
+    {
+        return $this->platform;
+    }
+
+    /**
+     * @param bool $platform
+     */
+    public function setPlatform($platform)
+    {
+        $this->platform = $platform;
+    }
+
+    /**
+     * @return Member
+     */
+    public function getApprovedBy()
+    {
+        return $this->approved_by;
+    }
+
+    /**
+     * @param Member $approved_by
+     */
+    public function setApprovedBy($approved_by)
+    {
+        $this->approved_by = $approved_by;
     }
 
 }
