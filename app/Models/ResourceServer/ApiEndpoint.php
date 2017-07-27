@@ -171,7 +171,7 @@ class ApiEndpoint extends ResourceServerEntity implements IApiEndpoint
         $this->http_method = $http_method;
     }
     /**
-     * @ORM\ManyToOne(targetEntity="Api", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="Api", cascade={"persist"}, inversedBy="endpoints")
      * @ORM\JoinColumn(name="api_id", referencedColumnName="id")
      * @var Api
      */
