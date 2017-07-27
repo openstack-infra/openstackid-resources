@@ -170,6 +170,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
 
     /**
      * @ORM\OneToMany(targetEntity="Presentation", mappedBy="moderator", cascade={"persist"})
+     * @var Presentation[]
      */
     private $moderated_presentations;
 
