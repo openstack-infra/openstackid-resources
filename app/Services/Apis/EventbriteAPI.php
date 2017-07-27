@@ -1,7 +1,4 @@
-<?php
-namespace services\apis;
-use GuzzleHttp\Client;
-
+<?php namespace services\apis;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +11,15 @@ use GuzzleHttp\Client;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use GuzzleHttp\Client;
+use Exception;
+use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * Class EventbriteAPI
+ * @package services\apis
+ */
 final class EventbriteAPI implements IEventbriteAPI
 {
 
@@ -37,33 +43,42 @@ final class EventbriteAPI implements IEventbriteAPI
      */
     public function getEntity($api_url, array $params)
     {
-        if(strstr($api_url, self::BaseUrl) === false) throw new Exception('invalid base url!');
-        $client   = new Client();
+        try {
+            if (strstr($api_url, self::BaseUrl) === false)
+                throw new Exception('invalid base url!');
 
-        $query = array
-        (
-            'token' => $this->auth_info['token']
-        );
+            $client = new Client();
 
-        foreach($params as $param => $value)
-        {
-            $query[$param] = $value;
-        }
-
-        $response = $client->get($api_url, array
+            $query = array
             (
-                'query' => $query
-            )
-        );
+                'token' => $this->auth_info['token']
+            );
 
-        if($response->getStatusCode() !== 200) throw new Exception('invalid status code!');
-        $content_type = $response->getHeader('content-type');
-        if(empty($content_type)) throw new Exception('invalid content type!');
-        if($content_type !== 'application/json') throw new Exception('invalid content type!');
+            foreach ($params as $param => $value) {
+                $query[$param] = $value;
+            }
 
-        $json = $response->getBody()->getContents();
-        return json_decode($json, true);
+            $response = $client->get($api_url, array
+                (
+                    'query' => $query
+                )
+            );
 
+            if ($response->getStatusCode() !== 200)
+                throw new Exception('invalid status code!');
+            $content_type = $response->getHeaderLine('content-type');
+            if (empty($content_type))
+                throw new Exception('invalid content type!');
+            if ($content_type !== 'application/json')
+                throw new Exception('invalid content type!');
+
+            $json = $response->getBody()->getContents();
+            return json_decode($json, true);
+        }
+        catch(RequestException $ex){
+            Log::warning($ex->getMessage());
+            throw $ex;
+        }
     }
 
     /**
@@ -73,7 +88,7 @@ final class EventbriteAPI implements IEventbriteAPI
     public function getOrder($order_id)
     {
         $order_id = intval($order_id);
-        $url = sprintf('%s/orders/%s', self::BaseUrl, $order_id);
+        $url      = sprintf('%s/orders/%s', self::BaseUrl, $order_id);
         return $this->getEntity($url, array('expand' => 'attendees'));
     }
 }
