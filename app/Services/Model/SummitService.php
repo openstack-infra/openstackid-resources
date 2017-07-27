@@ -28,7 +28,10 @@ use Models\foundation\summit\EntityEvents\EntityEventTypeFactory;
 use Models\foundation\summit\EntityEvents\SummitEntityEventProcessContext;
 use models\main\Member;
 use models\main\Tag;
+use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
+use models\summit\CalendarSync\WorkQueue\MemberScheduleSummitEventCalendarSyncWorkRequest;
 use models\summit\ConfirmationExternalOrderRequest;
+use models\summit\IAbstractCalendarSyncWorkRequestRepository;
 use models\summit\IRSVPRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitAttendeeRepository;
@@ -109,6 +112,11 @@ final class SummitService implements ISummitService
     private $rsvp_repository;
 
     /**
+     * @var IAbstractCalendarSyncWorkRequestRepository
+     */
+    private $calendar_sync_work_request_repository;
+
+    /**
      * SummitService constructor.
      * @param ISummitEventRepository $event_repository
      * @param ISpeakerRepository $speaker_repository
@@ -118,6 +126,7 @@ final class SummitService implements ISummitService
      * @param IMemberRepository $member_repository
      * @param ITagRepository $tag_repository
      * @param IRSVPRepository $rsvp_repository,
+     * @param IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository
      * @param IEventbriteAPI $eventbrite_api
      * @param ITransactionService $tx_service
      */
@@ -131,20 +140,22 @@ final class SummitService implements ISummitService
         IMemberRepository               $member_repository,
         ITagRepository                  $tag_repository,
         IRSVPRepository                 $rsvp_repository,
+        IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository,
         IEventbriteAPI                  $eventbrite_api,
         ITransactionService             $tx_service
     )
     {
-        $this->event_repository         = $event_repository;
-        $this->speaker_repository       = $speaker_repository;
-        $this->entity_events_repository = $entity_events_repository;
-        $this->ticket_repository        = $ticket_repository;
-        $this->member_repository        = $member_repository;
-        $this->attendee_repository      = $attendee_repository;
-        $this->tag_repository           = $tag_repository;
-        $this->rsvp_repository          = $rsvp_repository;
-        $this->eventbrite_api           = $eventbrite_api;
-        $this->tx_service               = $tx_service;
+        $this->event_repository                      = $event_repository;
+        $this->speaker_repository                    = $speaker_repository;
+        $this->entity_events_repository              = $entity_events_repository;
+        $this->ticket_repository                     = $ticket_repository;
+        $this->member_repository                     = $member_repository;
+        $this->attendee_repository                   = $attendee_repository;
+        $this->tag_repository                        = $tag_repository;
+        $this->rsvp_repository                       = $rsvp_repository;
+        $this->calendar_sync_work_request_repository = $calendar_sync_work_request_repository;
+        $this->eventbrite_api                        = $eventbrite_api;
+        $this->tx_service                            = $tx_service;
     }
 
     /**
@@ -167,10 +178,31 @@ final class SummitService implements ISummitService
                 if(!Summit::allowToSee($event, $member))
                     throw new EntityNotFoundException('event not found on summit!');
 
-                if($check_rsvp && $event->hasRSVP() && !$event->getIssExternalRSVP())
+                if($check_rsvp && $event->hasRSVP() && !$event->isExternalRSVP())
                     throw new ValidationException("event has rsvp set on it!");
 
                 $member->add2Schedule($event);
+
+                if($member->hasSyncInfoFor($summit)) {
+                    $sync_info               = $member->getSyncInfoBy($summit);
+                    $old_unprocessed_request = $this->calendar_sync_work_request_repository->getUnprocessedMemberScheduleWorkRequest
+                    (
+                        $member,
+                        $event,
+                        AbstractCalendarSyncWorkRequest::TypeAdd
+                    );
+
+                    if(is_null($old_unprocessed_request)){
+                        $request                 = new MemberScheduleSummitEventCalendarSyncWorkRequest();
+                        $request->setType(AbstractCalendarSyncWorkRequest::TypeAdd);
+                        $request->setCreatedBy($member);
+                        $request->setEvent($event);
+                        $request->setOwner($member);
+                        $request->setCalendar($sync_info[0]);
+                        $this->calendar_sync_work_request_repository->add($request);
+                    }
+                }
+
             });
             Event::fire(new MyScheduleAdd($member ,$summit, $event_id));
         }
@@ -200,6 +232,7 @@ final class SummitService implements ISummitService
                     throw new EntityNotFoundException('event not found on summit!');
                 $member->addFavoriteSummitEvent($event);
             });
+
             Event::fire(new MyFavoritesAdd($member, $summit, $event_id));
         }
         catch (UniqueConstraintViolationException $ex){
@@ -226,10 +259,21 @@ final class SummitService implements ISummitService
             if (is_null($event))
                 throw new EntityNotFoundException('event not found on summit!');
 
-            if($check_rsvp && $event->hasRSVP() && !$event->getIssExternalRSVP())
+            if($check_rsvp && $event->hasRSVP() && !$event->isExternalRSVP())
                 throw new ValidationException("event has rsvp set on it!");
 
             $member->removeFromSchedule($event);
+
+            if($member->hasSyncInfoFor($summit) && $member->isEventSynchronized($event)) {
+                $sync_info = $member->getSyncInfoBy($summit);
+                $request   = new MemberScheduleSummitEventCalendarSyncWorkRequest();
+                $request->setType(AbstractCalendarSyncWorkRequest::TypeRemove);
+                $request->setCreatedBy($member);
+                $request->setEvent($event);
+                $request->setOwner($member);
+                $request->setCalendar($sync_info[0]);
+                $this->calendar_sync_work_request_repository->add($request);
+            }
         });
 
         Event::fire(new MyScheduleRemove($member,$summit, $event_id));
@@ -948,7 +992,7 @@ final class SummitService implements ISummitService
 
             $this->rsvp_repository->delete($rsvp);
 
-            $this->removeEventFromAttendeeSchedule($summit, $member, $event_id ,false);
+            $this->removeEventFromMemberSchedule($summit, $member, $event_id ,false);
 
             return true;
         });

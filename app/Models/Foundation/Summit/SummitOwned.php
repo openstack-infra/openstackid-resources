@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping AS ORM;
 trait SummitOwned
 {
     /**
-     * @ORM\ManyToOne(targetEntity="Summit", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="models\summit\Summit", cascade={"persist"})
      * @ORM\JoinColumn(name="SummitID", referencedColumnName="ID")
      * @var Summit
      */
