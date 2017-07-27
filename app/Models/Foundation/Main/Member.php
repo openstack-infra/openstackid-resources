@@ -19,6 +19,8 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use models\exceptions\ValidationException;
+use models\summit\CalendarSync\CalendarSyncInfo;
+use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
 use models\summit\RSVP;
 use models\summit\Summit;
 use models\summit\SummitEvent;
@@ -35,20 +37,114 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class Member extends SilverstripeBaseModel
 {
+
     /**
-     * Member constructor.
+     * @ORM\Column(name="FirstName", type="string")
+     * @var string
      */
-    public function __construct()
-    {
-        parent::__construct();
-        $this->feedback                = new ArrayCollection();
-        $this->groups                  = new ArrayCollection();
-        $this->affiliations            = new ArrayCollection();
-        $this->team_memberships        = new ArrayCollection();
-        $this->favorites               = new ArrayCollection();
-        $this->schedule                = new ArrayCollection();
-        $this->rsvp                    = new ArrayCollection();
-    }
+    private $first_name;
+
+    /**
+     * @ORM\Column(name="Bio", type="string")
+     * @var string
+     */
+    private $bio;
+
+    /**
+     * @ORM\Column(name="Surname", type="string")
+     * @var string
+     */
+    private $last_name;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="owner", cascade={"persist"})
+     * @var SummitEventFeedback[]
+     */
+    private $feedback;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Affiliation", mappedBy="owner", cascade={"persist"})
+     */
+    private $affiliations;
+
+    /**
+     * @ORM\Column(name="Active", type="boolean")
+     * @var bool
+     */
+    private $active;
+
+    /**
+     * @ORM\Column(name="LinkedInProfile", type="string")
+     * @var string
+     */
+    private $linked_in_profile;
+
+    /**
+     * @ORM\Column(name="IRCHandle", type="string")
+     * @var string
+     */
+    private $irc_handle;
+
+    /**
+     * @ORM\Column(name="TwitterName", type="string")
+     * @var string
+     */
+    private $twitter_handle;
+
+    /**
+     * @ORM\Column(name="Gender", type="string")
+     * @var string
+     */
+    private $gender;
+
+    /**
+     * @ORM\Column(name="Country", type="string")
+     * @var string
+     */
+    private $country;
+
+    /**
+     * @ORM\Column(name="Email", type="string")
+     * @var string
+     */
+    private $email;
+
+    /**
+     * @ORM\Column(name="SecondEmail", type="string")
+     * @var string
+     */
+    private $second_email;
+
+    /**
+     * @ORM\Column(name="ThirdEmail", type="string")
+     * @var string
+     */
+    private $third_email;
+
+    /**
+     * @ORM\Column(name="EmailVerified", type="boolean")
+     * @var bool
+     */
+    private $email_verified;
+
+    /**
+     * @ORM\Column(name="EmailVerifiedDate", type="datetime")
+     * @var \DateTime
+     */
+    private $email_verified_date;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\JoinColumn(name="PhotoID", referencedColumnName="ID")
+     * @var File
+     */
+    private $photo;
+
+    /**
+     * @ORM\Column(name="State", type="string")
+     * @var string
+     */
+    private $state;
 
     /**
      * @ORM\OneToMany(targetEntity="SummitMemberSchedule", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
@@ -57,10 +153,61 @@ class Member extends SilverstripeBaseModel
     private $schedule;
 
     /**
+     * @ORM\OneToMany(targetEntity="models\summit\CalendarSync\ScheduleCalendarSyncInfo", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
+     * @var ScheduleCalendarSyncInfo[]
+     */
+    private $schedule_sync_info;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\CalendarSync\CalendarSyncInfo", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
+     * @var CalendarSyncInfo[]
+     */
+    private $calendars_sync;
+
+    /**
      * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="owner", cascade={"persist"})
      * @var RSVP[]
      */
-    protected $rsvp;
+    private $rsvp;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\main\Group", inversedBy="members")
+     * @ORM\JoinTable(name="Group_Members",
+     *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="GroupID", referencedColumnName="ID")}
+     *      )
+     * @var Group[]
+     */
+    private $groups;
+
+    /**
+     * @ORM\OneToMany(targetEntity="ChatTeamMember", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
+     * @var ChatTeamMember[]
+     */
+    private $team_memberships;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SummitMemberFavorite", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitMemberFavorite[]
+     */
+    private $favorites;
+
+    /**
+     * Member constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->feedback           = new ArrayCollection();
+        $this->groups             = new ArrayCollection();
+        $this->affiliations       = new ArrayCollection();
+        $this->team_memberships   = new ArrayCollection();
+        $this->favorites          = new ArrayCollection();
+        $this->schedule           = new ArrayCollection();
+        $this->rsvp               = new ArrayCollection();
+        $this->calendars_sync     = new ArrayCollection();
+        $this->schedule_sync_info = new ArrayCollection();
+    }
 
     /**
      * @return Affiliation[]
@@ -131,30 +278,12 @@ class Member extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\main\Group", inversedBy="members")
-     * @ORM\JoinTable(name="Group_Members",
-     *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="GroupID", referencedColumnName="ID")}
-     *      )
-     * @var Group[]
-     */
-    private $groups;
-
-
-    /**
-     * @ORM\OneToMany(targetEntity="ChatTeamMember", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
-     * @var ChatTeamMember[]
-     */
-    private $team_memberships;
-
-    /**
      * @return SummitEvent[]
      */
     public function getFavoritesSummitEvents()
     {
         return $this->favorites;
     }
-
 
     /**
      * @param SummitMemberFavorite[] $favorites
@@ -163,12 +292,6 @@ class Member extends SilverstripeBaseModel
     {
         $this->favorites = $favorites;
     }
-
-    /**
-     * @ORM\OneToMany(targetEntity="SummitMemberFavorite", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
-     * @var SummitMemberFavorite[]
-     */
-    private $favorites;
 
     /**
      * @return string
@@ -201,31 +324,6 @@ class Member extends SilverstripeBaseModel
     {
         return $this->twitter_handle;
     }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\File")
-     * @ORM\JoinColumn(name="PhotoID", referencedColumnName="ID")
-     * @var File
-     */
-    private $photo;
-
-    /**
-     * @ORM\Column(name="FirstName", type="string")
-     * @var string
-     */
-    private $first_name;
-
-    /**
-     * @ORM\Column(name="Bio", type="string")
-     * @var string
-     */
-    private $bio;
-
-    /**
-     * @ORM\Column(name="State", type="string")
-     * @var string
-     */
-    private $state;
 
     /**
      * @return string
@@ -290,42 +388,6 @@ class Member extends SilverstripeBaseModel
     {
         $this->third_email = $third_email;
     }
-
-    /**
-     * @ORM\Column(name="Country", type="string")
-     * @var string
-     */
-    private $country;
-
-    /**
-     * @ORM\Column(name="Email", type="string")
-     * @var string
-     */
-    private $email;
-
-    /**
-     * @ORM\Column(name="SecondEmail", type="string")
-     * @var string
-     */
-    private $second_email;
-
-    /**
-     * @ORM\Column(name="ThirdEmail", type="string")
-     * @var string
-     */
-    private $third_email;
-
-    /**
-     * @ORM\Column(name="EmailVerified", type="boolean")
-     * @var bool
-     */
-    private $email_verified;
-
-    /**
-     * @ORM\Column(name="EmailVerifiedDate", type="datetime")
-     * @var \DateTime
-     */
-    private $email_verified_date;
 
     /**
      * @return string
@@ -408,36 +470,6 @@ class Member extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\Column(name="Active", type="boolean")
-     * @var bool
-     */
-    private $active;
-
-    /**
-     * @ORM\Column(name="LinkedInProfile", type="string")
-     * @var string
-     */
-    private $linked_in_profile;
-
-    /**
-     * @ORM\Column(name="IRCHandle", type="string")
-     * @var string
-     */
-    private $irc_handle;
-
-    /**
-     * @ORM\Column(name="TwitterName", type="string")
-     * @var string
-     */
-    private $twitter_handle;
-
-    /**
-     * @ORM\Column(name="Gender", type="string")
-     * @var string
-     */
-    private $gender;
-
-    /**
      * @return string
      */
     public function getGender()
@@ -460,24 +492,6 @@ class Member extends SilverstripeBaseModel
     {
         return $this->first_name;
     }
-
-    /**
-     * @ORM\Column(name="Surname", type="string")
-     * @var string
-     */
-    private $last_name;
-
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="owner", cascade={"persist"})
-     * @var SummitEventFeedback[]
-     */
-    private $feedback;
-
-
-    /**
-     * @ORM\OneToMany(targetEntity="Affiliation", mappedBy="owner", cascade={"persist"})
-     */
-    private $affiliations;
 
     /**
      * @return File
@@ -606,19 +620,9 @@ class Member extends SilverstripeBaseModel
      */
     public function isOnFavorite(SummitEvent $event)
     {
-        $sql = <<<SQL
-SELECT COUNT(SummitEventID) AS QTY 
-FROM Member_FavoriteSummitEvents 
-WHERE MemberID = :member_id AND SummitEventID = :event_id
-SQL;
-
-        $stmt = $this->prepareRawSQL($sql);
-        $stmt->execute([
-            'member_id' => $this->getId(),
-            'event_id' => $event->getId()
-        ]);
-        $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        return count($res) > 0 ? intval($res[0]) > 0 : false;
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('event', $event));
+        return $this->favorites->matching($criteria)->count() > 0;
     }
 
     /**
@@ -634,7 +638,7 @@ SQL;
             (
                 sprintf('Event %s does not belongs to member %s favorite.', $event->getId(), $this->getId())
             );
-        $this->schedule->removeElement($favorite);
+        $this->favorites->removeElement($favorite);
         $favorite->clearOwner();
     }
 
@@ -686,6 +690,14 @@ SQL;
         $this->schedule->add($schedule);
     }
 
+    /**
+     * @param ScheduleCalendarSyncInfo $sync_info
+     */
+    public function add2ScheduleSyncInfo(ScheduleCalendarSyncInfo $sync_info){
+        $sync_info->setMember($this);
+        $this->schedule_sync_info->add($sync_info);
+    }
+
     public function removeFromSchedule(SummitEvent $event)
     {
         $schedule = $this->getScheduleByEvent($event);
@@ -699,25 +711,33 @@ SQL;
         $schedule->clearOwner();
     }
 
+    public function removeFromScheduleSyncInfo(ScheduleCalendarSyncInfo $sync_info){
+        $this->schedule_sync_info->removeElement($sync_info);
+        $sync_info->clearOwner();
+    }
+
+    /**
+     * @param CalendarSyncInfo $calendar_sync_info
+     * @param SummitEvent $event
+     * @return bool
+     */
+    public function isEventSynchronized(CalendarSyncInfo $calendar_sync_info, SummitEvent $event){
+
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('summit_event', $event));
+        $criteria->andWhere(Criteria::expr()->eq('calendar_sync_info', $calendar_sync_info));
+        return $this->schedule_sync_info->matching($criteria)->count() > 0;
+    }
+
     /**
      * @param SummitEvent $event
      * @return bool
      */
     public function isOnSchedule(SummitEvent $event)
     {
-        $sql = <<<SQL
-SELECT COUNT(SummitEventID) AS QTY 
-FROM Member_Schedule 
-WHERE MemberID = :member_id AND SummitEventID = :event_id
-SQL;
-
-        $stmt = $this->prepareRawSQL($sql);
-        $stmt->execute([
-            'member_id' => $this->getId(),
-            'event_id'    => $event->getId()
-        ]);
-        $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-        return count($res) > 0 ? intval($res[0]) > 0 : false;
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('event', $event));
+        return $this->schedule->matching($criteria)->count() > 0;
     }
 
     /**
@@ -736,6 +756,27 @@ SQL;
                 ->setParameter('member_id', $this->getIdentifier())
                 ->setParameter('event_id', $event->getIdentifier())
                 ->getSingleResult();
+        }
+        catch(NoResultException $ex1){
+            return null;
+        }
+        catch(NonUniqueResultException $ex2){
+            // should never happen
+            return null;
+        }
+    }
+
+    /**
+     * @param SummitEvent $event
+     * @param CalendarSyncInfo $calendar_sync_info
+     * @return ScheduleCalendarSyncInfo|null
+     */
+    public function getScheduleSyncInfoByEvent(SummitEvent $event, CalendarSyncInfo $calendar_sync_info){
+        try {
+            $criteria = Criteria::create();
+            $criteria->where(Criteria::expr()->eq('summit_event', $event));
+            $criteria->andWhere(Criteria::expr()->eq('calendar_sync_info', $calendar_sync_info));
+            return $this->schedule_sync_info->matching($criteria)->first();
         }
         catch(NoResultException $ex1){
             return null;
@@ -771,12 +812,6 @@ SQL;
         }
     }
 
-    /**
-     * @return SummitMemberSchedule[]
-     */
-    public function getSchedule(){
-        return $this->schedule;
-    }
     /**
      * @param  Summit $summit
      * @return int[]
@@ -850,5 +885,32 @@ SQL;
             ->setParameter('member_id', $this->getId())
             ->setParameter('summit_id', $summit->getId())
             ->getResult();
+    }
+
+    /**
+     * @param Summit $summit
+     * @return CalendarSyncInfo[]
+     */
+    public function getSyncInfoBy(Summit $summit){
+        $res = $this->calendars_sync->filter(function($entity) use($summit){
+            return $entity->getSummit()->getIdentifier() == $summit->getIdentifier() && !$entity->isRevoked();
+        });
+        return count($res) > 0 ? $res[0] : null;
+    }
+
+    /**
+     * @param Summit $summit
+     * @return bool
+     */
+    public function hasSyncInfoFor(Summit $summit){
+        return !is_null($this->getSyncInfoBy($summit));
+    }
+
+    /**
+     * @param CalendarSyncInfo $calendar_sync_info
+     */
+    public function removeFromCalendarSyncInfo(CalendarSyncInfo $calendar_sync_info){
+        $this->calendars_sync->removeElement($calendar_sync_info);
+        $calendar_sync_info->clearOwner();
     }
 }

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use models\summit\CalendarSync\CalendarSyncInfo;
 
 class Kernel extends ConsoleKernel
 {
@@ -14,6 +15,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\SummitJsonGenerator::class,
+        \App\Console\Commands\MemberActionsCalendarSyncProcessingCommand::class,
+        \App\Console\Commands\AdminActionsCalendarSyncProcessingCommand::class,
         \App\Console\Commands\ChatTeamMessagesSender::class,
     ];
 
@@ -28,12 +31,23 @@ class Kernel extends ConsoleKernel
         //Current
         $schedule->command('summit:json-generator')->everyTenMinutes()->withoutOverlapping();
         //Austin
-        $schedule->command('summit:json-generator 6')->everyTenMinutes()->withoutOverlapping();
+        $schedule->command('summit:json-generator',[6])->everyTenMinutes()->withoutOverlapping();
         //BCN
-        $schedule->command('summit:json-generator 7')->everyTenMinutes()->withoutOverlapping();
+        $schedule->command('summit:json-generator', [7])->everyTenMinutes()->withoutOverlapping();
         //Boston
-        $schedule->command('summit:json-generator 22')->everyTenMinutes()->withoutOverlapping();
-        // teams messages
-        $schedule->command('teams:message-sender 100')->everyMinute()->withoutOverlapping();
+        $schedule->command('summit:json-generator', [22])->everyTenMinutes()->withoutOverlapping();
+
+        // Calendar Sync Jobs
+
+        // Admin Actions
+        $schedule->command('summit:admin-schedule-action-process')->withoutOverlapping();
+        // Member Actions
+        // Google Calendar
+        $schedule->command('summit:member-schedule-action-process', [CalendarSyncInfo::ProviderGoogle, 1000])->withoutOverlapping();
+        // Outlook
+        $schedule->command('summit:member-schedule-action-process', [CalendarSyncInfo::ProviderOutlook, 1000])->withoutOverlapping();
+        // iCloud
+        $schedule->command('summit:member-schedule-action-process', [CalendarSyncInfo::ProvideriCloud, 1000])->withoutOverlapping();
+
     }
 }

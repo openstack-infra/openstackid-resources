@@ -266,7 +266,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-
     public function testCurrentSummitMyAttendeeAddToSchedule($event_id = 18845, $summit_id = 22)
     {
         $params = array
@@ -289,7 +288,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $this->assertResponseStatus(201);
     }
-
 
     public function testCurrentSummitMyAttendeeScheduleUnset($event_id = 18845, $summit_id = 22)
     {
@@ -2148,7 +2146,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testAdd2Favorite($summit_id = 7, $event_id = 14964){
+    public function testAdd2Favorite($summit_id = 22, $event_id = 18719){
         $params = array
         (
             'id'          => $summit_id,
@@ -2170,7 +2168,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
     }
 
-    public function testRemoveFromFavorites($summit_id = 7, $event_id = 14964){
+    public function testRemoveFromFavorites($summit_id = 22, $event_id = 18719){
 
          $params = array
          (
@@ -2269,6 +2267,53 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $favorites = json_decode($content);
         $this->assertTrue(!is_null($favorites));
+    }
+
+    public function testCurrentSummitMemberAddToSchedule($event_id = 18845, $summit_id = 22)
+    {
+        $params = array
+        (
+            'id'        => $summit_id,
+            'member_id' => 'me',
+            'event_id'  => $event_id
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitMembersApiController@addEventToMemberSchedule",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+    }
+
+    public function testCurrentSummitMemberScheduleUnset($event_id = 18845, $summit_id = 22)
+    {
+        $this->testCurrentSummitMemberAddToSchedule($event_id, $summit_id);
+        $params = array
+        (
+            'id'        => $summit_id,
+            'member_id' => 'me',
+            'event_id'  => $event_id
+        );
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitMembersApiController@removeEventFromMemberSchedule",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
     }
 
     public function testCurrentSummitMyMemberScheduleUnRSVP($event_id = 18639, $summit_id = 22)
