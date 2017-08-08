@@ -948,7 +948,7 @@ final class SummitService implements ISummitService
 
             $this->rsvp_repository->delete($rsvp);
 
-            $this->removeEventFromAttendeeSchedule($summit, $member, $event_id ,false);
+            $this->removeEventFromMemberSchedule($summit, $member, $event_id ,false);
 
             return true;
         });
