@@ -352,6 +352,14 @@ class Member extends SilverstripeBaseModel
     }
 
     /**
+     * @return bool
+     */
+    public function getEmailVerified()
+    {
+        return $this->email_verified;
+    }
+
+    /**
      * @param bool $email_verified
      */
     public function setEmailVerified($email_verified)
@@ -379,6 +387,14 @@ class Member extends SilverstripeBaseModel
      * @return bool
      */
     public function isActive()
+    {
+        return $this->active;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getActive()
     {
         return $this->active;
     }

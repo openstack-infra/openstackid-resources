@@ -32,6 +32,8 @@ class AbstractMemberSerializer extends SilverStripeSerializer
         'TwitterHandle'   => 'twitter:json_string',
         'State'           => 'state:json_string',
         'Country'         => 'country:json_string',
+        'Active'          => 'active:json_boolean',
+        'EmailVerified'   => 'email_verified:json_boolean',
     ];
 
     protected static $allowed_relations = [

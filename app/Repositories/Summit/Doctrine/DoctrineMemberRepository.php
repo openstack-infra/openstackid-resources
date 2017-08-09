@@ -50,10 +50,8 @@ final class DoctrineMemberRepository extends SilverStripeDoctrineRepository impl
                 ->createQueryBuilder()
                 ->select("m")
                 ->from(\models\main\Member::class, "m")
-                ->where("m.active = 1")
                 ->andWhere("m.first_name is not null")
-                ->andWhere("m.last_name is not null")
-                ->andWhere("m.email_verified = 1");
+                ->andWhere("m.last_name is not null");
 
         if(!is_null($filter)){
 
@@ -75,6 +73,8 @@ final class DoctrineMemberRepository extends SilverStripeDoctrineRepository impl
                     'g',
                     "g.id :operator :value"
                 ),
+                'email_verified' => 'm.email_verified:json_int',
+                'active'         => 'm.active:json_int',
             ]);
         }
 

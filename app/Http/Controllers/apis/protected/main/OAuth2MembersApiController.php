@@ -78,13 +78,15 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'),  array
                 (
-                    'irc'        => ['=@', '=='],
-                    'twitter'    => ['=@', '=='],
-                    'first_name' => ['=@', '=='],
-                    'last_name'  => ['=@', '=='],
-                    'email'      => ['=@', '=='],
-                    'group_slug' => ['=@', '=='],
-                    'group_id'   => ['=='],
+                    'irc'            => ['=@', '=='],
+                    'twitter'        => ['=@', '=='],
+                    'first_name'     => ['=@', '=='],
+                    'last_name'      => ['=@', '=='],
+                    'email'          => ['=@', '=='],
+                    'group_slug'     => ['=@', '=='],
+                    'group_id'       => ['=='],
+                    'email_verified' => ['=='],
+                    'active'         => ['=='],
                 ));
             }
 
