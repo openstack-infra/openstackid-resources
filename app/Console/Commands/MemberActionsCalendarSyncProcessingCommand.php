@@ -15,7 +15,7 @@
 use Illuminate\Console\Command;
 use App\Services\Model\IMemberActionsCalendarSyncProcessingService;
 use models\summit\CalendarSync\CalendarSyncInfo;
-
+use Illuminate\Support\Facades\Log;
 /**
  * Class MemberActionsCalendarSyncProcessingCommand
  * @package App\Console\Commands
@@ -64,6 +64,7 @@ final class MemberActionsCalendarSyncProcessingCommand extends Command
         $provider   = $this->argument('provider');
         if(!CalendarSyncInfo::isValidProvider($provider)){
             $this->error("provider param is not valid , valid values are [Google, Outlook, iCloud]");
+            log::error("provider param is not valid , valid values are [Google, Outlook, iCloud]");
             return false;
         }
         if(empty($batch_size))
@@ -72,12 +73,13 @@ final class MemberActionsCalendarSyncProcessingCommand extends Command
         $start  = time();
 
         $this->info(sprintf("processing provider %s - batch size of %s", $provider, $batch_size));
-
+        log::info(sprintf("processing provider %s - batch size of %s", $provider, $batch_size));
 
         $res = $this->service->processActions($provider, $batch_size);
 
         $end   = time();
         $delta = $end - $start;
         $this->info(sprintf("execution call %s seconds - processed entries %s", $delta, $res));
+        log::info(sprintf("execution call %s seconds - processed entries %s", $delta, $res));
     }
 }

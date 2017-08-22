@@ -30,7 +30,6 @@ use OutlookRestClient\Facade\Responses\ErrorResponse;
 use OutlookRestClient\IOutlookRestClient;
 use Exception;
 use LogicException;
-use RuntimeException;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -46,6 +45,7 @@ final class OutlookCalendarSyncRemoteFacade
      */
     private $client;
 
+    const MaxRetriesAttempt = 5;
 
     /**
      * OutlookCalendarSyncRemoteFacade constructor.
@@ -267,19 +267,33 @@ final class OutlookCalendarSyncRemoteFacade
     )
     {
         try {
+            $calendar_id = $calendar_sync_info->getExternalId();
+            $counter     = 1;
             do {
-                $res     = $this->client->deleteCalendar($calendar_sync_info->getExternalId());
+                $res     = $this->client->deleteCalendar($calendar_id);
                 $deleted = is_bool($res) ? $res : false;
                 if ($res instanceof ErrorResponse) {
-                    if($res->getErrorCode() == "ErrorItemNotFound"){$delete = true; break;}
+                    log::warning(sprintf("OutlookCalendarSyncRemoteFacade::deleteCalendar: error deleting calendar id %s", $calendar_id));
+                    if($res->getErrorCode() == "ErrorItemNotFound"){
+                        log::info("OutlookCalendarSyncRemoteFacade::deleteCalendar: ErrorItemNotFound");
+                        break;
+                    }
                     // @see https://stackoverflow.com/questions/31923669/office-365-unified-api-error-when-deleting-a-calendar
                     // @see https://stackoverflow.com/questions/44597230/office365-calendar-rest-api-cannot-delete-calendars
                     // change name ...
-                    $this->client->updateCalendar($calendar_sync_info->getExternalId(), new CalendarVO(
+                    log::info(sprintf("OutlookCalendarSyncRemoteFacade::deleteCalendar: renaming calendar id %s", $calendar_id));
+                    $this->client->updateCalendar($calendar_id, new CalendarVO(
                         md5(uniqid(mt_rand(), true))
                     ));
+                    $exp = $this->getSleepInterval() * (pow(2, $counter) - 1);
+                    log::info(sprintf("OutlookCalendarSyncRemoteFacade::deleteCalendar: retrying calendar id %s on %s ms", $calendar_id, $exp));
+                    usleep($exp);
                 }
-
+                ++$counter;
+                if($counter == self::MaxRetriesAttempt){
+                    log::warning(sprintf("OutlookCalendarSyncRemoteFacade::deleteCalendar: error deleting calendar id %s (MaxRetriesAttempt reached !)", $calendar_id));
+                    break;
+                }
             } while (!$deleted);
             return $deleted;
         }
