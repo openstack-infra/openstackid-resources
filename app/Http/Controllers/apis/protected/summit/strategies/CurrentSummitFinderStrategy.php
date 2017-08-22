@@ -41,6 +41,7 @@ class CurrentSummitFinderStrategy implements ISummitFinderStrategy
     public function find($summit_id)
     {
         $summit = $summit_id === 'current' ? $this->repository->getCurrent() : $this->repository->getById(intval($summit_id));
+        if(!$summit->isAvailableOnApi()) return null;
         return $summit;
     }
 }
