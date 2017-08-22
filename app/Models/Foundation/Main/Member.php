@@ -892,10 +892,19 @@ SQL;
      * @return CalendarSyncInfo[]
      */
     public function getSyncInfoBy(Summit $summit){
-        $res = $this->calendars_sync->filter(function($entity) use($summit){
-            return $entity->getSummit()->getIdentifier() == $summit->getIdentifier() && !$entity->isRevoked();
-        });
-        return count($res) > 0 ? $res[0] : null;
+        try {
+            $criteria = Criteria::create();
+            $criteria->where(Criteria::expr()->eq('summit', $summit));
+            $criteria->andWhere(Criteria::expr()->eq('revoked', 0));
+            return $this->calendars_sync->matching($criteria)->first();
+        }
+        catch(NoResultException $ex1){
+            return null;
+        }
+        catch(NonUniqueResultException $ex2){
+            // should never happen
+            return null;
+        }
     }
 
     /**

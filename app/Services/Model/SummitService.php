@@ -186,6 +186,7 @@ final class SummitService implements ISummitService
                 $member->add2Schedule($event);
 
                 if($member->hasSyncInfoFor($summit)) {
+                    Log::info(sprintf("synching externally event id %s", $event_id));
                     $sync_info = $member->getSyncInfoBy($summit);
                     $request   = new MemberEventScheduleSummitActionSyncWorkRequest();
                     $request->setType(AbstractCalendarSyncWorkRequest::TypeAdd);
@@ -227,6 +228,7 @@ final class SummitService implements ISummitService
             $member->removeFromSchedule($event);
 
             if($member->hasSyncInfoFor($summit)) {
+                Log::info(sprintf("unsynching externally event id %s", $event_id));
                 $sync_info = $member->getSyncInfoBy($summit);
                 $request   = new MemberEventScheduleSummitActionSyncWorkRequest();
                 $request->setType(AbstractCalendarSyncWorkRequest::TypeRemove);
