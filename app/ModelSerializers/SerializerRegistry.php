@@ -1,8 +1,17 @@
 <?php namespace ModelSerializers;
+use App\ModelSerializers\Marketplace\ConsultantSerializer;
+use App\ModelSerializers\Marketplace\DistributionSerializer;
+use App\ModelSerializers\Marketplace\GuestOSTypeSerializer;
+use App\ModelSerializers\Marketplace\HyperVisorTypeSerializer;
+use App\ModelSerializers\Marketplace\MarketPlaceReviewSerializer;
+use App\ModelSerializers\Marketplace\OfficeSerializer;
+use App\ModelSerializers\Marketplace\OpenStackImplementationApiCoverageSerializer;
+use App\ModelSerializers\Marketplace\RegionalSupportSerializer;
+use App\ModelSerializers\Marketplace\RegionSerializer;
+use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
+use App\ModelSerializers\Software\OpenStackComponentSerializer;
+use App\ModelSerializers\Software\OpenStackReleaseSerializer;
 use Libs\ModelSerializers\IModelSerializer;
-use models\main\ChatTeam;
-use models\main\ChatTeamMember;
-use models\main\ChatTeamPushNotificationMessage;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
 use ModelSerializers\ChatTeams\ChatTeamPushNotificationMessageSerializer;
@@ -14,6 +23,7 @@ use ModelSerializers\Locations\SummitLocationImageSerializer;
 use ModelSerializers\Locations\SummitVenueFloorSerializer;
 use ModelSerializers\Locations\SummitVenueRoomSerializer;
 use ModelSerializers\Locations\SummitVenueSerializer;
+use App\ModelSerializers\Marketplace\ApplianceSerializer;
 
 /**
  * Copyright 2016 OpenStack Foundation
@@ -37,9 +47,7 @@ final class SerializerRegistry
     const SerializerType_Public  = 'PUBLIC';
     const SerializerType_Private = 'PRIVATE';
 
-    private function __clone()
-    {
-    }
+    private function __clone(){}
 
     /**
      * @return SerializerRegistry
@@ -107,6 +115,24 @@ final class SerializerRegistry
         $this->registry['ChatTeamMember']                  = ChatTeamMemberSerializer::class;
         $this->registry['ChatTeamInvitation']              = ChatTeamInvitationSerializer::class;
         $this->registry['ChatTeamPushNotificationMessage'] = ChatTeamPushNotificationMessageSerializer::class;
+
+        // marketplace
+
+        $this->registry['Appliance']                          = ApplianceSerializer::class;
+        $this->registry["Distribution"]                       = DistributionSerializer::class;
+        $this->registry['MarketPlaceReview']                  = MarketPlaceReviewSerializer::class;
+        $this->registry['OpenStackImplementationApiCoverage'] = OpenStackImplementationApiCoverageSerializer::class;
+        $this->registry['GuestOSType']                        = GuestOSTypeSerializer::class;
+        $this->registry['HyperVisorType']                     = HyperVisorTypeSerializer::class;
+        $this->registry['Region']                             = RegionSerializer::class;
+        $this->registry['RegionalSupport']                    = RegionalSupportSerializer::class;
+        $this->registry['SupportChannelType']                 = SupportChannelTypeSerializer::class;
+        $this->registry['Office']                             = OfficeSerializer::class;
+        $this->registry['Consultant']                         = ConsultantSerializer::class;
+        // software
+
+        $this->registry['OpenStackComponent'] = OpenStackComponentSerializer::class;
+        $this->registry['OpenStackRelease']   = OpenStackReleaseSerializer::class;
     }
 
     /**
@@ -115,6 +141,7 @@ final class SerializerRegistry
      * @return IModelSerializer
      */
     public function getSerializer($object, $type = self::SerializerType_Public){
+        if(is_null($object)) return null;
         $reflect = new \ReflectionClass($object);
         $class   = $reflect->getShortName();
         if(!isset($this->registry[$class]))

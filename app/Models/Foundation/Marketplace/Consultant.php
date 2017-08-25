@@ -1,7 +1,6 @@
-<?php namespace models\marketplace;
-
+<?php namespace App\Models\Foundation\Marketplace;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,18 +11,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-class Consultant extends CompanyService implements IConsultant
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping AS ORM;
+/**
+ * @ORM\Entity(repositoryClass="App\Repositories\Marketplace\DoctrineConsultantRepository")
+ * @ORM\Table(name="Consultant")
+ * Class Consultant
+ * @package App\Models\Foundation\Marketplace
+ */
+class Consultant extends RegionalSupportedCompanyService
 {
 
+    /**
+     * @ORM\OneToMany(targetEntity="Office", mappedBy="consultant", cascade={"persist"}, orphanRemoval=true)
+     * @var Office[]
+     */
+    private $offices;
 
-    protected $connection = 'ss';
+    /**
+     * Consultant constructor.
+     */
+    public function __construct()
+    {
+        $this->offices = new ArrayCollection();
+    }
 
     /**
      * @return Office[]
      */
-    public function offices()
+    public function getOffices()
     {
-        return $this->hasMany('models\marketplace\Office', 'ConsultantID', 'ID')->get();
+        return $this->offices->toArray();
     }
 }
