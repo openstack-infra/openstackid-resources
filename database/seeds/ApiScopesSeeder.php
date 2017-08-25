@@ -29,66 +29,9 @@ final class ApiScopesSeeder extends Seeder
         DB::table('endpoint_api_scopes')->delete();
         DB::table('api_scopes')->delete();
 
-        $this->seedPublicCloudScopes();
-        $this->seedPrivateCloudScopes();
-        $this->seedConsultantScopes();
         $this->seedSummitScopes();
         $this->seedMembersScopes();
         $this->seedTeamsScopes();
-    }
-
-    private function seedPublicCloudScopes()
-    {
-
-        $current_realm = Config::get('app.url');
-        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'public-clouds']);
-
-        $scope = new ApiScope();
-        $scope->setName(sprintf('%s/public-clouds/read', $current_realm));
-        $scope->setShortDescription('Read Public Clouds Data');
-        $scope->setDescription('Grants read only access for Public Clouds');
-        $scope->setActive(true);
-        $scope->setDefault(false);
-        $scope->setApi($api);
-
-        EntityManager::persist($scope);
-        EntityManager::flush();
-    }
-
-    private function seedPrivateCloudScopes()
-    {
-
-        $current_realm = Config::get('app.url');
-        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'private-clouds']);
-
-        $scope = new ApiScope();
-        $scope->setName(sprintf('%s/private-clouds/read', $current_realm));
-        $scope->setShortDescription('Read Private Clouds Data');
-        $scope->setDescription('Grants read only access for Private Clouds');
-        $scope->setActive(true);
-        $scope->setDefault(false);
-        $scope->setApi($api);
-
-        EntityManager::persist($scope);
-        EntityManager::flush();
-    }
-
-    private function seedConsultantScopes()
-    {
-
-        $current_realm = Config::get('app.url');
-        $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'consultants']);
-
-        $scope = new ApiScope();
-        $scope->setName(sprintf('%s/consultants/read', $current_realm));
-        $scope->setShortDescription('Read Consultants Data');
-        $scope->setDescription('Grants read only access for Consultants');
-        $scope->setActive(true);
-        $scope->setDefault(false);
-        $scope->setApi($api);
-
-        EntityManager::persist($scope);
-        EntityManager::flush();
     }
 
     private function seedSummitScopes()

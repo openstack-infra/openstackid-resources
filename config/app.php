@@ -159,11 +159,11 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        \repositories\RepositoriesProvider::class,
-        \services\ServicesProvider::class,
-        \factories\FactoriesProvider::class,
-        \libs\utils\CustomDoctrineServiceProvider::class,
-        \LaravelDoctrine\Extensions\BeberleiExtensionsServiceProvider::class,
+        App\Repositories\RepositoriesProvider::class,
+        services\ServicesProvider::class,
+        factories\FactoriesProvider::class,
+        libs\utils\CustomDoctrineServiceProvider::class,
+        LaravelDoctrine\Extensions\BeberleiExtensionsServiceProvider::class,
     ],
 
     /*
