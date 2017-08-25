@@ -30,18 +30,149 @@ use Illuminate\Support\Facades\Config;
 use Cocur\Slugify\Slugify;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEventRepository")
  * @ORM\Table(name="SummitEvent")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
  * @ORM\DiscriminatorMap({"SummitEvent" = "SummitEvent", "Presentation" = "Presentation", "SummitGroupEvent" = "SummitGroupEvent", "SummitEventWithFile" = "SummitEventWithFile"})
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitEventRepository")
  * @ORM\HasLifecycleCallbacks
  * Class SummitEvent
  * @package models\summit
  */
 class SummitEvent extends SilverstripeBaseModel
 {
+    /**
+     * @ORM\Column(name="Title", type="string")
+     * @var string
+     */
+    protected $title;
+
+    /**
+     * @ORM\Column(name="Abstract", type="string")
+     * @var string
+     */
+    protected $abstract;
+
+    /**
+     * @ORM\Column(name="SocialSummary", type="string")
+     * @var string
+     */
+    protected $social_summary;
+
+    /**
+     * @ORM\Column(name="StartDate", type="datetime")
+     * @var \DateTime
+     */
+    protected $start_date;
+
+    /**
+     * @ORM\Column(name="EndDate", type="datetime")
+     * @var \DateTime
+     */
+    protected $end_date;
+
+    /**
+     * @ORM\Column(name="Published", type="boolean")
+     * @var bool
+     */
+    protected $published;
+
+    /**
+     * @ORM\Column(name="PublishedDate", type="datetime")
+     * @var \DateTime
+     */
+    protected $published_date;
+
+    /**
+     * @ORM\Column(name="AllowFeedBack", type="boolean")
+     * @var bool
+     */
+    protected $allow_feedback;
+
+    /**
+     * @ORM\Column(name="AvgFeedbackRate", type="float")
+     * @var float
+     */
+    protected $avg_feedback;
+
+    /**
+     * @ORM\Column(name="RSVPLink", type="string")
+     * @var string
+     */
+    protected $rsvp_link;
+
+    /**
+     * @ORM\Column(name="HeadCount", type="integer")
+     * @var int
+     */
+    protected $head_count;
+
+    /**
+     * @ORM\Column(name="RSVPTemplateID", type="integer")
+     * @var int
+     */
+    protected $rsvp_template_id;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="event", cascade={"persist"})
+     * @var RSVP[]
+     */
+    protected $rsvp;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="PresentationCategory", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="CategoryID", referencedColumnName="ID")
+     * @var PresentationCategory
+     */
+    protected $category = null;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SummitEventType", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID")
+     * @var SummitEventType
+     */
+    protected $type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SummitAbstractLocation", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
+     */
+    protected $location = null;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\main\Company", inversedBy="sponsorships", fetch="EXTRA_LAZY")
+     * @ORM\JoinTable(name="SummitEvent_Sponsors",
+     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="CompanyID", referencedColumnName="ID")}
+     *      )
+     */
+    protected $sponsors;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\SummitAttendee")
+     * @ORM\JoinTable(name="SummitAttendee_Schedule",
+     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitAttendeeID", referencedColumnName="ID")}
+     *      )
+     */
+    protected $attendees;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="event", cascade={"persist"})
+     * @ORM\Cache("NONSTRICT_READ_WRITE")
+     * @var SummitEventFeedback[]
+     */
+    protected $feedback;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\main\Tag", cascade={"persist"})
+     * @ORM\JoinTable(name="SummitEvent_Tags",
+     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="TagID", referencedColumnName="ID")}
+     *      )
+     */
+    protected $tags;
+
     /**
      * @return string
      */
@@ -86,13 +217,6 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationCategory", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="CategoryID", referencedColumnName="ID")
-     * @var PresentationCategory
-     */
-    private $category = null;
-
-    /**
      * @param PresentationCategory $category
      * @return $this
      */
@@ -120,12 +244,6 @@ class SummitEvent extends SilverstripeBaseModel
             return 0;
         }
     }
-
-    /**
-     * @ORM\Column(name="Title", type="string")
-     * @var string
-     */
-    protected $title;
 
     /**
      * @param string $title
@@ -175,30 +293,6 @@ class SummitEvent extends SilverstripeBaseModel
     {
         $this->social_summary = $social_summary;
     }
-
-    /**
-     * @ORM\Column(name="Abstract", type="string")
-     * @var string
-     */
-    protected $abstract;
-
-    /**
-     * @ORM\Column(name="SocialSummary", type="string")
-     * @var string
-     */
-    protected $social_summary;
-
-   /**
-     * @ORM\Column(name="StartDate", type="datetime")
-     * @var \DateTime
-     */
-    protected $start_date;
-
-    /**
-     * @ORM\Column(name="RSVPTemplateID", type="integer")
-     * @var int
-     */
-    protected $rsvp_template_id;
 
     /**
      * @return DateTime
@@ -304,49 +398,6 @@ class SummitEvent extends SilverstripeBaseModel
     {
         $this->head_count = $head_count;
     }
-
-    /**
-     * @ORM\Column(name="EndDate", type="datetime")
-     * @var \DateTime
-     */
-    protected $end_date;
-
-    /**
-     * @ORM\Column(name="Published", type="boolean")
-     * @var bool
-     */
-    protected $published;
-
-    /**
-     * @ORM\Column(name="PublishedDate", type="datetime")
-     * @var \DateTime
-     */
-    protected $published_date;
-
-    /**
-     * @ORM\Column(name="AllowFeedBack", type="boolean")
-     * @var bool
-     */
-    protected $allow_feedback;
-
-    /**
-     * @ORM\Column(name="AvgFeedbackRate", type="float")
-     * @var float
-     */
-    protected $avg_feedback;
-
-    /**
-     * @ORM\Column(name="RSVPLink", type="string")
-     * @var string
-     */
-    protected $rsvp_link;
-
-
-    /**
-     * @ORM\Column(name="HeadCount", type="integer")
-     * @var int
-     */
-    protected $head_count;
 
     /**
      * @return bool
@@ -472,13 +523,6 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="SummitEventType", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID")
-     * @var SummitEventType
-     */
-    private $type;
-
-    /**
      * @param SummitEventType $type
      * @return $this
      */
@@ -494,12 +538,6 @@ class SummitEvent extends SilverstripeBaseModel
     public function getType(){
         return $this->type;
     }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="SummitAbstractLocation", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
-     */
-    private $location = null;
 
     /**
      * @param SummitAbstractLocation $location
@@ -530,30 +568,12 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\main\Company", inversedBy="sponsorships", fetch="EXTRA_LAZY")
-     * @ORM\JoinTable(name="SummitEvent_Sponsors",
-     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="CompanyID", referencedColumnName="ID")}
-     *      )
-     */
-    protected $sponsors;
-
-    /**
      * @return Company[]
      */
     public function getSponsors()
     {
         return $this->sponsors;
     }
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\summit\SummitAttendee")
-     * @ORM\JoinTable(name="SummitAttendee_Schedule",
-     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitAttendeeID", referencedColumnName="ID")}
-     *      )
-     */
-    protected $attendees;
 
     /**
      * @return SummitAttendee[]
@@ -564,13 +584,6 @@ class SummitEvent extends SilverstripeBaseModel
         $criteria->where(Criteria::expr()->eq('IsCheckedIn', 1));
         return $this->attendees->matching($criteria);
     }
-
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="event", cascade={"persist"})
-     * @ORM\Cache("NONSTRICT_READ_WRITE")
-     * @var SummitEventFeedback[]
-     */
-    protected $feedback;
 
     public function addFeedBack(SummitEventFeedback $feedback)
     {
@@ -586,15 +599,6 @@ class SummitEvent extends SilverstripeBaseModel
         $criteria = $criteria->orderBy(['created' => Criteria::DESC]);
         return $this->feedback->matching($criteria);
     }
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\main\Tag", cascade={"persist"})
-     * @ORM\JoinTable(name="SummitEvent_Tags",
-     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="TagID", referencedColumnName="ID")}
-     *      )
-     */
-    protected $tags;
 
     /**
      * @return ArrayCollection
@@ -791,12 +795,6 @@ class SummitEvent extends SilverstripeBaseModel
             $type->getCurrentValueByTimeWindow($epoch_start_date, $epoch_end_date)
         );
     }
-
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="event", cascade={"persist"})
-     * @var RSVP[]
-     */
-    protected $rsvp;
 
     /**
      * @return ArrayCollection
