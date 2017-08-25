@@ -20,7 +20,7 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitEntityEvent")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitEntityEventRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEntityEventRepository")
  * Class SummitEntityEvent
  * @package models\summit
  */

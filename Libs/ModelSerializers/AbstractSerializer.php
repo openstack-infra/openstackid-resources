@@ -128,16 +128,23 @@ abstract class AbstractSerializer implements IModelSerializer
      */
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
-        $values   = array();
+        $values          = [];
+        $method_prefix   = ['get', 'is'];
         if(!count($fields)) $fields       = $this->getAllowedFields();
         $mappings                         = $this->getAttributeMappings();
-
         if (count($mappings)) {
-            $new_values = array();
+            $new_values = [];
             foreach ($mappings as $attribute => $mapping) {
-                $mapping = preg_split('/:/',$mapping);
+                $mapping = preg_split('/:/', $mapping);
                 if(count($fields) > 0 && !in_array($mapping[0], $fields)) continue;
-                $value   = call_user_func( array( $this->object, 'get'.$attribute ) );
+
+                foreach($method_prefix as $prefix){
+                    if(method_exists($this->object, $prefix.$attribute)){
+                        $value   = call_user_func([$this->object, $prefix.$attribute ]);
+                        break;
+                    }
+                }
+
                 if(count($mapping) > 1)
                 {
                     //we have a formatter ...
