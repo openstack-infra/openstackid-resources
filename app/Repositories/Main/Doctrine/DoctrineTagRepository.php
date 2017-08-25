@@ -13,7 +13,7 @@
  **/
 use models\main\ITagRepository;
 use models\main\Tag;
-use repositories\SilverStripeDoctrineRepository;
+use App\Repositories\SilverStripeDoctrineRepository;
 
 /**
  * Class DoctrineTagRepository
@@ -39,5 +39,13 @@ final class DoctrineTagRepository extends SilverStripeDoctrineRepository impleme
         catch(\Exception $ex){
             return null;
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+        return Tag::class;
     }
 }

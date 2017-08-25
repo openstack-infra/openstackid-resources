@@ -14,7 +14,7 @@
 use models\main\ChatTeam;
 use models\main\IChatTeamRepository;
 use models\main\Member;
-use repositories\SilverStripeDoctrineRepository;
+use App\Repositories\SilverStripeDoctrineRepository;
 use Doctrine\ORM\Query\Expr\Join;
 /**
  * Class DoctrineChatTeamRepository
@@ -49,5 +49,13 @@ final class DoctrineChatTeamRepository extends SilverStripeDoctrineRepository im
             ->getScalarResult();
         $ids = array_map('current', $result);
         return $ids;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+       return ChatTeam::class;
     }
 }

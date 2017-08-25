@@ -13,7 +13,7 @@
  **/
 use models\main\ChatTeamInvitation;
 use models\main\IChatTeamInvitationRepository;
-use repositories\SilverStripeDoctrineRepository;
+use App\Repositories\SilverStripeDoctrineRepository;
 use Doctrine\ORM\Query\Expr\Join;
 /**
  * Class DoctrineChatTeamInvitationRepository
@@ -66,5 +66,13 @@ final class DoctrineChatTeamInvitationRepository
             ->innerJoin('i.invitee', 'm', Join::WITH, " m.id = :member_id")
             ->where('i.is_accepted = true')
             ->setParameter('member_id', $invitee_id)->getQuery()->getResult();
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+        return ChatTeamInvitation::class;
     }
 }

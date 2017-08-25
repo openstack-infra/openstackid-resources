@@ -12,8 +12,9 @@
  * limitations under the License.
  **/
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use models\main\ChatTeamPushNotificationMessage;
 use models\main\IChatTeamPushNotificationMessageRepository;
-use repositories\SilverStripeDoctrineRepository;
+use App\Repositories\SilverStripeDoctrineRepository;
 use utils\DoctrineJoinFilterMapping;
 use utils\Filter;
 use utils\Order;
@@ -133,5 +134,13 @@ final class DoctrineChatTeamPushNotificationMessageRepository
             $paging_info->getLastPage($total),
             $data
         );
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+       return ChatTeamPushNotificationMessage::class;
     }
 }

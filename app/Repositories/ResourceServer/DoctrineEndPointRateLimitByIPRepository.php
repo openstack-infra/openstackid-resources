@@ -13,7 +13,8 @@
  **/
 use App\Models\ResourceServer\EndPointRateLimitByIP;
 use App\Models\ResourceServer\IEndpointRateLimitByIPRepository;
-use repositories\DoctrineRepository;
+use App\Repositories\DoctrineRepository;
+use Doctrine\ORM\QueryBuilder;
 use Illuminate\Support\Facades\Log;
 /**
  * Class DoctrineEndPointRateLimitByIPRepository
@@ -49,5 +50,38 @@ final class DoctrineEndPointRateLimitByIPRepository
             Log::error($ex);
             return null;
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+        return EndPointRateLimitByIP::class;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFilterMappings()
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderMappings()
+    {
+        return [];
+    }
+
+    /**
+     * @param QueryBuilder $query
+     * @return QueryBuilder
+     */
+    protected function applyExtraFilters(QueryBuilder $query)
+    {
+       return $query;
     }
 }

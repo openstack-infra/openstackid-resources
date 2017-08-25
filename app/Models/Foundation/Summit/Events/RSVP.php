@@ -21,7 +21,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Entity
  * @ORM\Table(name="RSVP")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineRSVPRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineRSVPRepository")
  * Class RSVP
  * @package models\summit
  */

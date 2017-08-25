@@ -30,12 +30,11 @@ use Illuminate\Support\Facades\Config;
 use Cocur\Slugify\Slugify;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEventRepository")
  * @ORM\Table(name="SummitEvent")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
  * @ORM\DiscriminatorMap({"SummitEvent" = "SummitEvent", "Presentation" = "Presentation", "SummitGroupEvent" = "SummitGroupEvent", "SummitEventWithFile" = "SummitEventWithFile"})
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitEventRepository")
  * @ORM\HasLifecycleCallbacks
  * Class SummitEvent
  * @package models\summit
