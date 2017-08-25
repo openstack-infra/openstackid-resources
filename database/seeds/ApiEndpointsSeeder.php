@@ -28,9 +28,6 @@ class ApiEndpointsSeeder extends Seeder
         DB::table('endpoint_api_scopes')->delete();
         DB::table('api_endpoints')->delete();
 
-        $this->seedPublicCloudsEndpoints();
-        $this->seedPrivateCloudsEndpoints();
-        $this->seedConsultantsEndpoints();
         $this->seedSummitEndpoints();
         $this->seedMemberEndpoints();
         $this->seedTeamEndpoints();
@@ -66,98 +63,6 @@ class ApiEndpointsSeeder extends Seeder
         }
 
         EntityManager::flush();
-    }
-
-    private function seedPublicCloudsEndpoints()
-    {
-
-        $current_realm = Config::get('app.url');
-
-        $this->seedApiEndpoints('public-clouds', [
-            array(
-                'name' => 'get-public-clouds',
-                'active' => true,
-                'route' => '/api/v1/marketplace/public-clouds',
-                'http_method' => 'GET',
-                'scopes' => [
-                    sprintf('%s/public-clouds/read', $current_realm),
-                ],
-            ),
-            array(
-                'name' => 'get-public-cloud',
-                'active' => true,
-                'route' => '/api/v1/marketplace/public-clouds/{id}',
-                'http_method' => 'GET',
-                'scopes' => [
-                    sprintf('%s/public-clouds/read', $current_realm),
-                ],
-            ),
-            array(
-                'name' => 'get-public-cloud-datacenters',
-                'active' => true,
-                'route' => '/api/v1/marketplace/public-clouds/{id}/data-centers',
-                'http_method' => 'GET',
-                'scopes' => [
-                    sprintf('%s/public-clouds/read', $current_realm),
-                ],
-            )
-        ]);
-    }
-
-    private function seedPrivateCloudsEndpoints()
-    {
-
-        $current_realm = Config::get('app.url');
-        // endpoints scopes
-
-        $this->seedApiEndpoints('private-clouds', [
-            array(
-                'name' => 'get-private-clouds',
-                'route' => '/api/v1/marketplace/private-clouds',
-                'http_method' => 'GET',
-                'scopes' => [sprintf('%s/private-clouds/read', $current_realm)],
-            ),
-            array(
-                'name' => 'get-private-cloud',
-                'route' => '/api/v1/marketplace/private-clouds/{id}',
-                'http_method' => 'GET',
-                'scopes' => [sprintf('%s/private-clouds/read', $current_realm)],
-            ),
-            array(
-                'name' => 'get-private-cloud-datacenters',
-                'route' => '/api/v1/marketplace/private-clouds/{id}/data-centers',
-                'http_method' => 'GET',
-                'scopes' => [sprintf('%s/private-clouds/read', $current_realm)],
-            )
-        ]);
-
-    }
-
-    private function seedConsultantsEndpoints()
-    {
-
-        $current_realm = Config::get('app.url');
-
-        $this->seedApiEndpoints('consultants', [
-            array(
-                'name' => 'get-consultants',
-                'route' => '/api/v1/marketplace/consultants',
-                'http_method' => 'GET',
-                'scopes' => [sprintf('%s/consultants/read', $current_realm)],
-            ),
-            array(
-                'name' => 'get-consultant',
-                'route' => '/api/v1/marketplace/consultants/{id}',
-                'http_method' => 'GET',
-                'scopes' => [sprintf('%s/consultants/read', $current_realm)],
-            ),
-            array(
-                'name' => 'get-consultant-offices',
-                'route' => '/api/v1/marketplace/consultants/{id}/offices',
-                'http_method' => 'GET',
-                'scopes' => [sprintf('%s/consultants/read', $current_realm)],
-            )
-        ]);
     }
 
     private function seedSummitEndpoints()
