@@ -12,9 +12,10 @@
  * limitations under the License.
  **/
 
+use App\Models\Utils\BaseEntity;
 use Doctrine\ORM\Mapping AS ORM;
 use models\summit\SummitEvent;
-use models\utils\IEntity;
+
 
 /**
  * @ORM\Entity
@@ -22,22 +23,8 @@ use models\utils\IEntity;
  * Class SummitMemberSchedule
  * @package models\main
  */
-final class SummitMemberFavorite
+final class SummitMemberFavorite extends BaseEntity
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="ID", type="integer", unique=true, nullable=false)
-     */
-    private $id;
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @return Member
@@ -78,16 +65,8 @@ final class SummitMemberFavorite
     }
 
     /**
-     * @return int
-     */
-    public function getIdentifier()
-    {
-        return $this->id;
-    }
-
-    /**
      * @ORM\ManyToOne(targetEntity="Member", inversedBy="favorites")
-     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID", nullable=true )
+     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
      * @var Member
      */
     private $member;

@@ -17,6 +17,16 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
+ * @see https://github.com/doctrine/doctrine2/commit/ff28507b88ffd98830c44762
+ * //@ORM\AssociationOverrides({
+ * //     @ORM\AssociationOverride(
+ * //         name="summit",
+ * //         inversedBy="locations"
+ * //     )
+ * // })
+ */
+
+/**
  * @ORM\Entity
  * @ORM\Table(name="SummitAbstractLocation")
  * @ORM\InheritanceType("JOINED")
