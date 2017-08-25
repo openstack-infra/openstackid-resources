@@ -20,7 +20,7 @@ use models\main\Member;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitEventFeedback")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineEventFeedbackRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineEventFeedbackRepository")
  * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="summit_event_feedback_region")
  * Class SummitEventFeedback
  * @package models\summit

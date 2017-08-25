@@ -11,33 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use App\Models\Utils\BaseEntity;
 use Doctrine\ORM\Mapping AS ORM;
 use models\summit\SummitEvent;
 use models\utils\IEntity;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="Member_Schedule")
  * Class SummitMemberSchedule
  * @package models\main
  */
-final class SummitMemberSchedule implements IEntity
+final class SummitMemberSchedule extends BaseEntity
 {
-    public function __construct()
-    {
-    }
-
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="ID", type="integer", unique=true, nullable=false)
-     */
-    private $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Member", inversedBy="schedule")
-     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID", nullable=true )
+     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
      * @var Member
      */
     private $member;
@@ -48,22 +37,6 @@ final class SummitMemberSchedule implements IEntity
      * @var SummitEvent
      */
     private $event;
-
-    /**
-     * @return int
-     */
-    public function getIdentifier()
-    {
-        return $this->id;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 
     /**
      * @return Member
