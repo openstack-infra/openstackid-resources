@@ -14,7 +14,7 @@
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
 /**
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineAbstractCalendarSyncWorkRequestRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineAbstractCalendarSyncWorkRequestRepository")
  * @ORM\Table(name="AbstractCalendarSyncWorkRequest")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")

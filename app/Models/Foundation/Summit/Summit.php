@@ -11,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\ORM\Cache;
 use models\main\File;
 use models\main\Member;
 use models\utils\SilverstripeBaseModel;
-use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTimeZone;
@@ -24,14 +23,44 @@ use DateTime;
 use models\main\Company;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitRepository")
  * @ORM\Table(name="Summit")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitRepository")
  * Class Summit
  * @package models\summit
  */
 class Summit extends SilverstripeBaseModel
 {
+
+    /**
+     * @ORM\Column(name="Title", type="string")
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(name="DateLabel", type="string")
+     * @var string
+     */
+    private $dates_label;
+
+    /**
+     * @ORM\Column(name="SummitBeginDate", type="datetime")
+     * @var \DateTime
+     */
+    private $begin_date;
+
+    /**
+     * @ORM\Column(name="SummitEndDate", type="datetime")
+     * @var \DateTime
+     */
+    private $end_date;
+
+    /**
+     * @ORM\Column(name="Active", type="boolean")
+     * @var bool
+     */
+    private $active;
+
     /**
      * @return string
      */
@@ -174,36 +203,6 @@ class Summit extends SilverstripeBaseModel
     {
         $this->start_showing_venues_date = $start_showing_venues_date;
     }
-
-    /**
-     * @ORM\Column(name="Title", type="string")
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @ORM\Column(name="DateLabel", type="string")
-     * @var string
-     */
-    private $dates_label;
-
-    /**
-     * @ORM\Column(name="SummitBeginDate", type="datetime")
-     * @var \DateTime
-     */
-    private $begin_date;
-
-    /**
-     * @ORM\Column(name="SummitEndDate", type="datetime")
-     * @var \DateTime
-     */
-    private $end_date;
-
-    /**
-     * @ORM\Column(name="Active", type="boolean")
-     * @var bool
-     */
-    private $active;
 
     /**
      * @return boolean
