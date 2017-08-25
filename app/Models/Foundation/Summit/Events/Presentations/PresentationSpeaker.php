@@ -22,7 +22,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Entity
  * @ORM\Table(name="PresentationSpeaker")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSpeakerRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSpeakerRepository")
  * Class PresentationSpeaker
  * @package models\summit
  */
