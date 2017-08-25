@@ -11,19 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use App\Models\Utils\BaseEntity;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use LaravelDoctrine\ORM\Facades\Registry;
-
 /***
  * @ORM\MappedSuperclass
  * Class SilverstripeBaseModel
  * @package models\utils
  */
-class SilverstripeBaseModel implements IEntity
+class SilverstripeBaseModel extends BaseEntity
 {
     const DefaultTimeZone = 'America/Chicago';
 
@@ -87,13 +86,6 @@ class SilverstripeBaseModel implements IEntity
     }
 
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(name="ID", type="integer", unique=true, nullable=false)
-     */
-    protected $id;
-
-    /**
      * @ORM\Column(name="Created", type="datetime")
      */
     protected $created;
@@ -102,18 +94,6 @@ class SilverstripeBaseModel implements IEntity
      * @ORM\Column(name="LastEdited", type="datetime")
      */
     protected $last_edited;
-
-    /**
-    * @return int
-    */
-    public function getIdentifier()
-    {
-        return (int)$this->id;
-    }
-
-    public function getId(){
-        return $this->getIdentifier();
-    }
 
     public function __construct()
     {
