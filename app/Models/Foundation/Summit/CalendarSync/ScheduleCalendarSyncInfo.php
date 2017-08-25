@@ -19,7 +19,7 @@ use models\summit\SummitEvent;
 use models\utils\SilverstripeBaseModel;
 
 /**
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineScheduleCalendarSyncInfoRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineScheduleCalendarSyncInfoRepository")
  * @ORM\Table(name="ScheduleCalendarSyncInfo")
  * @package models\summit\CalendarSync
  */
