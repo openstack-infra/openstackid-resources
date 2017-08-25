@@ -29,6 +29,7 @@ Route::group([
     Route::group(['prefix'=>'members'], function() {
         Route::get('', 'OAuth2MembersApiController@getMembers');
     });
+
     // summits
     Route::group(['prefix'=>'summits'], function() {
         Route::get('','OAuth2SummitApiController@getSummits');
@@ -40,6 +41,33 @@ Route::group([
         });
     });
 
+    // marketplace
+    Route::group(array('prefix' => 'marketplace'), function () {
+
+        Route::group(array('prefix' => 'appliances'), function () {
+            Route::get('', 'AppliancesApiController@getAll');
+        });
+
+        Route::group(array('prefix' => 'distros'), function () {
+            Route::get('', 'DistributionsApiController@getAll');
+        });
+
+        Route::group(array('prefix' => 'consultants'), function () {
+            Route::get('', 'ConsultantsApiController@getAll');
+        });
+
+        Route::group(array('prefix' => 'hosted-private-clouds'), function () {
+            Route::get('', 'PrivateCloudsApiController@getAll');
+        });
+
+        Route::group(array('prefix' => 'remotely-managed-private-clouds'), function () {
+            Route::get('', 'RemoteCloudsApiController@getAll');
+        });
+
+        Route::group(array('prefix' => 'public-clouds'), function () {
+            Route::get('', 'PublicCloudsApiController@getAll');
+        });
+    });
 });
 
 //OAuth2 Protected API
@@ -50,28 +78,6 @@ Route::group([
     'after'      => [],
     'middleware' => ['ssl', 'oauth2.protected', 'rate.limit','etags']
 ], function () {
-
-    Route::group(array('prefix' => 'marketplace'), function () {
-
-        Route::group(array('prefix' => 'public-clouds'), function () {
-            Route::get('', 'OAuth2PublicCloudApiController@getClouds');
-            Route::get('/{id}', 'OAuth2PublicCloudApiController@getCloud');
-            Route::get('/{id}/data-centers', 'OAuth2PublicCloudApiController@getCloudDataCenters');
-        });
-
-        Route::group(array('prefix' => 'private-clouds'), function () {
-            Route::get('', 'OAuth2PrivateCloudApiController@getClouds');
-            Route::get('/{id}', 'OAuth2PrivateCloudApiController@getCloud');
-            Route::get('/{id}/data-centers', 'OAuth2PrivateCloudApiController@getCloudDataCenters');
-        });
-
-        Route::group(array('prefix' => 'consultants'), function () {
-            Route::get('', 'OAuth2ConsultantsApiController@getConsultants');
-            Route::get('/{id}', 'OAuth2ConsultantsApiController@getConsultant');
-            Route::get('/{id}/offices', 'OAuth2ConsultantsApiController@getOffices');
-        });
-
-    });
 
     // members
     Route::group(['prefix'=>'members'], function(){

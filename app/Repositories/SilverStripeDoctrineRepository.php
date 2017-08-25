@@ -1,4 +1,4 @@
-<?php namespace repositories;
+<?php namespace App\Repositories;
 
 /**
  * Copyright 2016 OpenStack Foundation
@@ -13,11 +13,37 @@
  * limitations under the License.
  **/
 
+use Doctrine\ORM\QueryBuilder;
+
 /**
  * Class SilverStripeDoctrineRepository
- * @package repositories
+ * @package App\Repositories
  */
 abstract class SilverStripeDoctrineRepository extends DoctrineRepository
 {
     protected static $em_name = 'ss';
+
+    /**
+     * @return array
+     */
+    protected function getFilterMappings()
+    {
+        return [];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderMappings()
+    {
+        return [];
+    }
+
+    /**
+     * @param QueryBuilder $query
+     * @return QueryBuilder
+     */
+    protected function applyExtraFilters(QueryBuilder $query){
+        return $query;
+    }
 }
