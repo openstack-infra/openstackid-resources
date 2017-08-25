@@ -31,5 +31,5 @@ interface ISummitNotificationRepository extends IBaseRepository
      * @param Order|null $order
      * @return PagingResponse
      */
-    public function getAllByPage(Summit $summit, PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+    public function getAllByPageBySummit(Summit $summit, PagingInfo $paging_info, Filter $filter = null, Order $order = null);
 }
