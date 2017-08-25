@@ -12,16 +12,20 @@
  * limitations under the License.
  **/
 
+use App\Models\ResourceServer\ApiEndpoint;
 use App\Models\ResourceServer\IApiEndpoint;
 use App\Models\ResourceServer\IApiEndpointRepository;
-use repositories\DoctrineRepository;
+use App\Repositories\DoctrineRepository;
+use Doctrine\ORM\QueryBuilder;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Class DoctrineApiEndpointRepository
  * @package repositories\resource_server
  */
-final class DoctrineApiEndpointRepository extends DoctrineRepository implements IApiEndpointRepository
+final class DoctrineApiEndpointRepository
+    extends DoctrineRepository
+    implements IApiEndpointRepository
 {
 
     /**
@@ -48,5 +52,38 @@ final class DoctrineApiEndpointRepository extends DoctrineRepository implements 
             Log::error($ex);
             return null;
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+        // TODO: Implement getBaseEntity() method.
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFilterMappings()
+    {
+        return ApiEndpoint::class;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderMappings()
+    {
+        return [];
+    }
+
+    /**
+     * @param QueryBuilder $query
+     * @return QueryBuilder
+     */
+    protected function applyExtraFilters(QueryBuilder $query)
+    {
+        return [];
     }
 }

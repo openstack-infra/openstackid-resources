@@ -48,9 +48,8 @@ final class SummitPushNotificationChannel {
 }
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitNotificationRepository")
  * @ORM\Table(name="SummitPushNotification")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitNotificationRepository")
  * Class SummitPushNotification
  * @package models\summit
  */
