@@ -19,7 +19,7 @@ use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
 
 /**
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineCalendarSyncInfoRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineCalendarSyncInfoRepository")
  * @ORM\Table(name="CalendarSyncInfo")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")

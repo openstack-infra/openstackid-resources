@@ -1,8 +1,6 @@
 <?php namespace ModelSerializers;
+use App\ModelSerializers\Marketplace\MarketPlaceReviewSerializer;
 use Libs\ModelSerializers\IModelSerializer;
-use models\main\ChatTeam;
-use models\main\ChatTeamMember;
-use models\main\ChatTeamPushNotificationMessage;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
 use ModelSerializers\ChatTeams\ChatTeamPushNotificationMessageSerializer;
@@ -14,6 +12,7 @@ use ModelSerializers\Locations\SummitLocationImageSerializer;
 use ModelSerializers\Locations\SummitVenueFloorSerializer;
 use ModelSerializers\Locations\SummitVenueRoomSerializer;
 use ModelSerializers\Locations\SummitVenueSerializer;
+use App\ModelSerializers\Marketplace\ApplianceSerializer;
 
 /**
  * Copyright 2016 OpenStack Foundation
@@ -37,9 +36,7 @@ final class SerializerRegistry
     const SerializerType_Public  = 'PUBLIC';
     const SerializerType_Private = 'PRIVATE';
 
-    private function __clone()
-    {
-    }
+    private function __clone(){}
 
     /**
      * @return SerializerRegistry
@@ -107,6 +104,11 @@ final class SerializerRegistry
         $this->registry['ChatTeamMember']                  = ChatTeamMemberSerializer::class;
         $this->registry['ChatTeamInvitation']              = ChatTeamInvitationSerializer::class;
         $this->registry['ChatTeamPushNotificationMessage'] = ChatTeamPushNotificationMessageSerializer::class;
+
+        // marketplace
+
+        $this->registry['Appliance']                       = ApplianceSerializer::class;
+        $this->registry['MarketPlaceReview']               = MarketPlaceReviewSerializer::class;
     }
 
     /**

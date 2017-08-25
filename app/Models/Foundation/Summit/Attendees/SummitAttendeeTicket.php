@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitAttendeeTicket")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitAttendeeTicketRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitAttendeeTicketRepository")
  * Class SummitAttendeeTicket
  * @package models\summit
  */

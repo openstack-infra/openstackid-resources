@@ -1,4 +1,4 @@
-<?php namespace repositories;
+<?php namespace App\Repositories;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,19 +28,6 @@ final class RepositoriesProvider extends ServiceProvider
 
     public function register()
     {
-        App::singleton(
-            'models\marketplace\IPublicCloudServiceRepository',
-            'repositories\marketplace\EloquentPublicCloudServiceRepository'
-        );
-
-        App::singleton(
-            'models\marketplace\IPrivateCloudServiceRepository',
-            'repositories\marketplace\EloquentPrivateCloudServiceRepository'
-        );
-        App::singleton(
-            'models\marketplace\IConsultantRepository',
-            'repositories\marketplace\EloquentConsultantRepository'
-        );
 
         App::singleton(
             'App\Models\ResourceServer\IApiEndpointRepository',
@@ -155,6 +142,20 @@ final class RepositoriesProvider extends ServiceProvider
             'models\summit\IScheduleCalendarSyncInfoRepository',
             function(){
                 return  EntityManager::getRepository(\models\summit\CalendarSync\ScheduleCalendarSyncInfo::class);
+            });
+
+        // Marketplace
+
+        App::singleton(
+            'App\Models\Foundation\Marketplace\IApplianceRepository',
+            function(){
+                return  EntityManager::getRepository(\App\Models\Foundation\Marketplace\Appliance::class);
+            });
+
+        App::singleton(
+            'App\Models\Foundation\Marketplace\IDistributionRepository',
+            function(){
+                return  EntityManager::getRepository(\App\Models\Foundation\Marketplace\Distribution::class);
             });
     }
 }
