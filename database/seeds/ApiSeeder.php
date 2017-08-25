@@ -31,32 +31,6 @@ final class ApiSeeder extends Seeder
         DB::table('api_endpoints')->delete();
         DB::table('apis')->delete();
 
-        // public clouds
-        $api = new Api();
-        $api->setName('public-clouds');
-        $api->setActive(true);
-        $api->setDescription('Marketplace Public Clouds API');
-
-        EntityManager::persist($api);
-
-        // private clouds
-
-        $api = new Api();
-        $api->setName('private-clouds');
-        $api->setActive(true);
-        $api->setDescription('Marketplace Private Clouds API');
-
-        EntityManager::persist($api);
-
-        // consultants
-
-        $api = new Api();
-        $api->setName('consultants');
-        $api->setActive(true);
-        $api->setDescription('Marketplace Consultants API');
-
-        EntityManager::persist($api);
-
         // summit
 
         $api = new Api();

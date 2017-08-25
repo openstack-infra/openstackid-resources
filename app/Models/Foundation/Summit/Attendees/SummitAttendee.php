@@ -24,7 +24,7 @@ use models\utils\SilverstripeBaseModel;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitAttendee")
- * @ORM\Entity(repositoryClass="repositories\summit\DoctrineSummitAttendeeRepository")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitAttendeeRepository")
  * Class SummitAttendee
  * @package models\summit
  */
