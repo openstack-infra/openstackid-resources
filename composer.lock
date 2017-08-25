@@ -687,12 +687,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/doctrine2.git",
-                "reference": "e1b851f2e93a4afd82fb7e7f32c6f114d0ea7b71"
+                "reference": "049470c787467e2c7f5a267b8b86c5a5d28498fc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/e1b851f2e93a4afd82fb7e7f32c6f114d0ea7b71",
-                "reference": "e1b851f2e93a4afd82fb7e7f32c6f114d0ea7b71",
+                "url": "https://api.github.com/repos/doctrine/doctrine2/zipball/049470c787467e2c7f5a267b8b86c5a5d28498fc",
+                "reference": "049470c787467e2c7f5a267b8b86c5a5d28498fc",
                 "shasum": ""
             },
             "require": {
@@ -755,7 +755,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2017-10-23T18:26:03+00:00"
+            "time": "2017-11-12T11:25:46+00:00"
         },
         {
             "name": "eluceo/ical",
@@ -946,12 +946,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client.git",
-                "reference": "b69b8ac4bf6501793c389d4e013a79d09c85c5f2"
+                "reference": "0c4a7b6eaefe8b0a6334c044feab9790095b2ddb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/b69b8ac4bf6501793c389d4e013a79d09c85c5f2",
-                "reference": "b69b8ac4bf6501793c389d4e013a79d09c85c5f2",
+                "url": "https://api.github.com/repos/google/google-api-php-client/zipball/0c4a7b6eaefe8b0a6334c044feab9790095b2ddb",
+                "reference": "0c4a7b6eaefe8b0a6334c044feab9790095b2ddb",
                 "shasum": ""
             },
             "require": {
@@ -966,7 +966,7 @@
             },
             "require-dev": {
                 "cache/filesystem-adapter": "^0.3.2",
-                "phpunit/phpunit": "~4",
+                "phpunit/phpunit": "~4.8.36",
                 "squizlabs/php_codesniffer": "~2.3",
                 "symfony/css-selector": "~2.1",
                 "symfony/dom-crawler": "~2.1"
@@ -997,20 +997,20 @@
             "keywords": [
                 "google"
             ],
-            "time": "2017-11-03T01:19:53+00:00"
+            "time": "2017-11-08T19:28:50+00:00"
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.33",
+            "version": "v0.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/google/google-api-php-client-services.git",
-                "reference": "6399eb82c725aef79124cd6b543e1984cd13d207"
+                "reference": "4d0d438e323929579cabf0b4d420177a96835c6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/6399eb82c725aef79124cd6b543e1984cd13d207",
-                "reference": "6399eb82c725aef79124cd6b543e1984cd13d207",
+                "url": "https://api.github.com/repos/google/google-api-php-client-services/zipball/4d0d438e323929579cabf0b4d420177a96835c6d",
+                "reference": "4d0d438e323929579cabf0b4d420177a96835c6d",
                 "shasum": ""
             },
             "require": {
@@ -1034,7 +1034,7 @@
             "keywords": [
                 "google"
             ],
-            "time": "2017-11-06T00:24:21+00:00"
+            "time": "2017-11-11T00:27:24+00:00"
         },
         {
             "name": "google/auth",
@@ -1720,12 +1720,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "910d698be2274c22509e800dbcdb5cdd73247b0b"
+                "reference": "8f4639a34cabf69c300814258e6eadc13b0f1aed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/910d698be2274c22509e800dbcdb5cdd73247b0b",
-                "reference": "910d698be2274c22509e800dbcdb5cdd73247b0b",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/8f4639a34cabf69c300814258e6eadc13b0f1aed",
+                "reference": "8f4639a34cabf69c300814258e6eadc13b0f1aed",
                 "shasum": ""
             },
             "require": {
@@ -1797,7 +1797,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2017-11-04T05:38:03+00:00"
+            "time": "2017-11-10T20:20:27+00:00"
         },
         {
             "name": "league/oauth2-client",
@@ -2146,12 +2146,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "12090c138e267cc7781729210244ec2444b80cd3"
+                "reference": "6a65ea28ecac752eb58814076f43d93bb161d9e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/12090c138e267cc7781729210244ec2444b80cd3",
-                "reference": "12090c138e267cc7781729210244ec2444b80cd3",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/6a65ea28ecac752eb58814076f43d93bb161d9e7",
+                "reference": "6a65ea28ecac752eb58814076f43d93bb161d9e7",
                 "shasum": ""
             },
             "require": {
@@ -2230,7 +2230,7 @@
                 "x.509",
                 "x509"
             ],
-            "time": "2017-11-05T17:42:33+00:00"
+            "time": "2017-11-12T05:15:00+00:00"
         },
         {
             "name": "predis/predis",
@@ -2885,12 +2885,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "10d9a1b5dbf23dfaa38737b69a09f8882821f666"
+                "reference": "ca20b8f9ef149f40ff656d52965f240d85f7a8e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/10d9a1b5dbf23dfaa38737b69a09f8882821f666",
-                "reference": "10d9a1b5dbf23dfaa38737b69a09f8882821f666",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/ca20b8f9ef149f40ff656d52965f240d85f7a8e4",
+                "reference": "ca20b8f9ef149f40ff656d52965f240d85f7a8e4",
                 "shasum": ""
             },
             "require": {
@@ -2940,7 +2940,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-05T16:10:10+00:00"
+            "time": "2017-11-09T14:14:31+00:00"
         },
         {
             "name": "symfony/finder",
@@ -3722,12 +3722,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "910a79d58e264630477292a3ca06b9966673ac09"
+                "reference": "9cda1a418ca4b2b71c9b921ebaea6c2e61e270b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/910a79d58e264630477292a3ca06b9966673ac09",
-                "reference": "910a79d58e264630477292a3ca06b9966673ac09",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/9cda1a418ca4b2b71c9b921ebaea6c2e61e270b4",
+                "reference": "9cda1a418ca4b2b71c9b921ebaea6c2e61e270b4",
                 "shasum": ""
             },
             "require": {
@@ -3735,7 +3735,7 @@
             },
             "require-dev": {
                 "ext-intl": "*",
-                "phpunit/phpunit": "^4.0 || ^5.0",
+                "phpunit/phpunit": "^4.8.35 || ^5.7",
                 "squizlabs/php_codesniffer": "^1.5"
             },
             "type": "library",
@@ -3764,7 +3764,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2017-11-06T09:42:24+00:00"
+            "time": "2017-11-13T07:51:09+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -3856,7 +3856,7 @@
             ],
             "authors": [
                 {
-                    "name": "Padraic Brady",
+                    "name": "Pádraic Brady",
                     "email": "padraic.brady@gmail.com",
                     "homepage": "http://blog.astrumfutura.com"
                 },
@@ -4954,12 +4954,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "dcf3a9dfac146a0e10757a91de0b541fcd79de4f"
+                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/dcf3a9dfac146a0e10757a91de0b541fcd79de4f",
-                "reference": "dcf3a9dfac146a0e10757a91de0b541fcd79de4f",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/0938408c4faa518d95230deabb5f595bf0de31b9",
+                "reference": "0938408c4faa518d95230deabb5f595bf0de31b9",
                 "shasum": ""
             },
             "require": {
@@ -5001,7 +5001,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-10-06T12:26:09+00:00"
+            "time": "2017-11-10T18:26:04+00:00"
         },
         {
             "name": "webmozart/assert",
