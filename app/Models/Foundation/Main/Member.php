@@ -896,7 +896,8 @@ SQL;
             $criteria = Criteria::create();
             $criteria->where(Criteria::expr()->eq('summit', $summit));
             $criteria->andWhere(Criteria::expr()->eq('revoked', 0));
-            return $this->calendars_sync->matching($criteria)->first();
+            $res = $this->calendars_sync->matching($criteria)->first();
+            return $res == false ? null : $res;
         }
         catch(NoResultException $ex1){
             return null;
