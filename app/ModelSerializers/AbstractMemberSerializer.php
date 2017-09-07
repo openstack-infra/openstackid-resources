@@ -34,6 +34,7 @@ class AbstractMemberSerializer extends SilverStripeSerializer
         'Country'         => 'country:json_string',
         'Active'          => 'active:json_boolean',
         'EmailVerified'   => 'email_verified:json_boolean',
+        'EmailVerifiedDate' => 'email_verified_date:datetime_epoch',
     ];
 
     protected static $allowed_relations = [
