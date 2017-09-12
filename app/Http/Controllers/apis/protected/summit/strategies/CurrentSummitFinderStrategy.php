@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\Http\Controllers;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,12 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-namespace App\Http\Controllers;
-
 use models\summit\ISummitRepository;
 use models\summit\Summit;
-
 /**
  * Class CurrentSummitFinderStrategy
  * @package App\Http\Controllers
@@ -41,6 +37,7 @@ class CurrentSummitFinderStrategy implements ISummitFinderStrategy
     public function find($summit_id)
     {
         $summit = $summit_id === 'current' ? $this->repository->getCurrent() : $this->repository->getById(intval($summit_id));
+        if(is_null($summit)) return null;
         if(!$summit->isAvailableOnApi()) return null;
         return $summit;
     }

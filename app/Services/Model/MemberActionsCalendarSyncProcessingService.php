@@ -17,7 +17,6 @@ use CalDAVClient\Facade\Exceptions\ForbiddenException;
 use CalDAVClient\Facade\Exceptions\NotFoundResourceException;
 use CalDAVClient\Facade\Exceptions\ServerErrorException;
 use CalDAVClient\Facade\Exceptions\UserUnAuthorizedException;
-use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
 use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberCalendarScheduleSummitActionSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberEventScheduleSummitActionSyncWorkRequest;
@@ -28,7 +27,6 @@ use services\apis\CalendarSync\CalendarSyncRemoteFacadeFactory;
 use utils\PagingInfo;
 use libs\utils\ITransactionService;
 use Illuminate\Support\Facades\Log;
-use Doctrine\DBAL\DBALException;
 use Exception;
 
 /**
@@ -205,19 +203,15 @@ implements IMemberActionsCalendarSyncProcessingService
                 }
                 catch(ForbiddenException $ex1){
                     // cant create calendar (CAL DAV)...
-                    echo 'ForbiddenException !!'.PHP_EOL;
                     Log::warning($ex1);
                 }
                 catch(UserUnAuthorizedException $ex2){
-                    echo 'UserUnAuthorizedException !!'.PHP_EOL;
                     Log::warning($ex2);
                 }
                 catch(NotFoundResourceException $ex3){
-                    echo 'NotFoundResourceException !!'.PHP_EOL;
                     Log::error($ex3);
                 }
                 catch(ServerErrorException $ex4){
-                    echo 'ServerErrorException !!'.PHP_EOL;
                     Log::error($ex4);
                 }
                 catch (RateLimitExceededException $ex5){
@@ -225,11 +219,9 @@ implements IMemberActionsCalendarSyncProcessingService
                     break;
                 }
                 catch(Exception $ex6){
-                    echo 'Exception !!'.PHP_EOL;
                     Log::error($ex6);
                 }
             }
-
             return $count;
         });
     }

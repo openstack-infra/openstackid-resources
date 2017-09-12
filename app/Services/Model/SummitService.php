@@ -1,5 +1,4 @@
 <?php namespace services\model;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use App\Events\MyFavoritesAdd;
 use App\Events\MyFavoritesRemove;
 use App\Events\MyScheduleAdd;
@@ -30,7 +28,6 @@ use models\main\Member;
 use models\main\Tag;
 use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberEventScheduleSummitActionSyncWorkRequest;
-use models\summit\CalendarSync\WorkQueue\MemberScheduleSummitEventCalendarSyncWorkRequest;
 use models\summit\ConfirmationExternalOrderRequest;
 use models\summit\IAbstractCalendarSyncWorkRequestRepository;
 use models\summit\IRSVPRepository;
@@ -50,7 +47,6 @@ use libs\utils\ITransactionService;
 use Exception;
 use DateTime;
 use Illuminate\Support\Facades\Log;
-
 /**
  * Class SummitService
  * @package services\model
