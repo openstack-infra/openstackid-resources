@@ -81,7 +81,7 @@ class FilterElement extends AbstractFilterElement
 
     public static function makeGreatherOrEqual($field, $value)
     {
-        return new self($field, $value, '=>');
+        return new self($field, $value, '>=');
     }
 
     public static function makeLower($field, $value)
@@ -91,7 +91,7 @@ class FilterElement extends AbstractFilterElement
 
     public static function makeLowerOrEqual($field, $value)
     {
-        return new self($field, $value, '>=');
+        return new self($field, $value, '<=');
     }
 
     public static function makeNotEqual($field, $value)

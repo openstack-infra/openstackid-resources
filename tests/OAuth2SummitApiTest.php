@@ -1856,12 +1856,12 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => 7,
-            'location_id' => 143,
-            'filter' => array
-            (
-                'speaker=@Morgan',
-            )
+            'id' => 23,
+            'location_id' => 311,
+            'filter' => [
+
+                'start_date>=1451479955'
+            ]
         );
 
         $headers = array

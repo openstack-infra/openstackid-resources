@@ -124,14 +124,14 @@ final class DoctrineSummitEventRepository extends SilverStripeDoctrineRepository
 
         if (!is_null($order)) {
 
-            $order->apply2Query($query, array
-            (
+            $order->apply2Query($query,[
+
                 'title'       => 'e.title',
                 'id'          => 'e.id',
                 'start_date'  => 'e.start_date',
                 'end_date'    => 'e.end_date',
                 'created'     => 'e.created',
-            ));
+            ]);
         } else {
             //default order
             $query = $query->addOrderBy("e.start_date",'ASC');

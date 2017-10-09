@@ -175,30 +175,30 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         $filter = null;
 
         if (Input::has('filter')) {
-            $filter = FilterParser::parse(Input::get('filter'),  array
-            (
-                'title'          => array('=@', '=='),
-                'start_date'     => array('>', '<', '<=', '>=', '=='),
-                'end_date'       => array('>', '<', '<=', '>=', '=='),
-                'speaker'        => array('=@', '=='),
-                'tags'           => array('=@', '=='),
-                'event_type_id'  => array('=='),
-                'track_id'       => array('=='),
-            ));
+            $filter = FilterParser::parse(Input::get('filter'),
+            [
+                'title'          => ['=@', '=='],
+                'start_date'     => ['>', '<', '<=', '>=', '=='],
+                'end_date'       => ['>', '<', '<=', '>=', '=='],
+                'speaker'        => ['=@', '=='],
+                'tags'           => ['=@', '=='],
+                'event_type_id'  => ['=='],
+                'track_id'       => ['==']
+            ]);
         }
 
         $order = null;
 
         if (Input::has('order'))
         {
-            $order = OrderParser::parse(Input::get('order'), array
-            (
+            $order = OrderParser::parse(Input::get('order'),
+            [
                 'title',
                 'start_date',
                 'end_date',
                 'id',
                 'created',
-            ));
+            ]);
         }
 
         if(is_null($filter)) $filter = new Filter();
@@ -221,7 +221,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function getLocationEvents($summit_id, $location_id)
     {
         try {
-
             return $this->ok($this->_getLocationEvents($summit_id, $location_id, false)->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1) {
