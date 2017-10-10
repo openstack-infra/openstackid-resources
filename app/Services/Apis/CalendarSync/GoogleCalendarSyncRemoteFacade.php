@@ -109,10 +109,12 @@ final class GoogleCalendarSyncRemoteFacade
             return $sync_info;
         }
         catch(Google_Service_Exception $ex1){
-            Log::warning($ex1);
-            if($ex1->getCode() == 403)
+            if($ex1->getCode() == 403) {
+                Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
-            throw $ex1;
+            }
+            Log::warning($ex1);
+            return false;
         }
         catch (Exception $ex){
             Log::error($ex);
@@ -187,14 +189,12 @@ final class GoogleCalendarSyncRemoteFacade
             return $res->getStatusCode() == 204;
         }
         catch(Google_Service_Exception $ex1){
-            Log::warning($ex1);
-            // Resource has been deleted ...
-            if($ex1->getCode() == 410) return false;
-            // not found ...
-            if($ex1->getCode() == 404) return false;
-            if($ex1->getCode() == 403)
+            if($ex1->getCode() == 403) {
+                Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
-            throw $ex1;
+            }
+            Log::warning($ex1);
+            return false;
         }
         catch (Exception $ex){
             Log::error($ex);
@@ -231,14 +231,12 @@ final class GoogleCalendarSyncRemoteFacade
             return true;
         }
         catch(Google_Service_Exception $ex1){
-            Log::warning($ex1);
-            // Resource has been deleted ...
-            if($ex1->getCode() == 410) return false;
-            // not found ...
-            if($ex1->getCode() == 404) return false;
-            if($ex1->getCode() == 403)
+            if($ex1->getCode() == 403) {
+                Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
-            throw $ex1;
+            }
+            Log::warning($ex1);
+            return false;
         }
         catch (Exception $ex){
             Log::error($ex);
@@ -274,10 +272,12 @@ final class GoogleCalendarSyncRemoteFacade
             return true;
         }
         catch(Google_Service_Exception $ex1){
-            Log::warning($ex1);
-            if($ex1->getCode() == 403)
+            if($ex1->getCode() == 403) {
+                Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
-            throw $ex1;
+            }
+            Log::warning($ex1);
+            return false;
         }
         catch (Exception $ex){
             Log::error($ex);
@@ -307,14 +307,12 @@ final class GoogleCalendarSyncRemoteFacade
             return $res->getStatusCode() == 204;
         }
         catch(Google_Service_Exception $ex1){
-            Log::warning($ex1);
-            // Resource has been deleted ...
-            if($ex1->getCode() == 410) return false;
-            // not found ...
-            if($ex1->getCode() == 404) return false;
-            if($ex1->getCode() == 403)
+            if($ex1->getCode() == 403) {
+                Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
-            throw $ex1;
+            }
+            Log::warning($ex1);
+            return false;
         }
         catch (Exception $ex){
             Log::error($ex);
