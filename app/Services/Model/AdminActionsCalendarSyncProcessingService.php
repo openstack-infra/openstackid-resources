@@ -140,7 +140,7 @@ final class AdminActionsCalendarSyncProcessingService
                                 $work_request->setType(AbstractCalendarSyncWorkRequest::TypeUpdate);
                                 $work_request->setCalendarSyncInfo($schedule_event->getCalendarSyncInfo());
                                 $work_request->setOwner($schedule_event->getMember());
-                                $work_request->setSummitEvent($summit_event);
+                                $work_request->setSummitEvent($schedule_event->getSummitEvent());
                                 $this->work_request_repository->add($work_request);
                             }
                             $page++;
