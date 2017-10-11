@@ -29,6 +29,17 @@ Route::group([
     Route::group(['prefix'=>'members'], function() {
         Route::get('', 'OAuth2MembersApiController@getMembers');
     });
+    // summits
+    Route::group(['prefix'=>'summits'], function() {
+        Route::get('','OAuth2SummitApiController@getSummits');
+        // locations
+        Route::group(array('prefix' => 'locations'), function () {
+            Route::group(array('prefix' => '{location_id}'), function () {
+                Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationEvents');
+            });
+        });
+    });
+
 });
 
 //OAuth2 Protected API
