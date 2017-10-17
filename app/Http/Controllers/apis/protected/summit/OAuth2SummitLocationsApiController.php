@@ -116,6 +116,9 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     {
         try {
 
+            $expand    = Request::input('expand', '');
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
             $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
@@ -123,7 +126,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             if (is_null($location)) {
                 return $this->error404();
             }
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($location)->serialize());
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($location)->serialize($expand,[], $relations));
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);

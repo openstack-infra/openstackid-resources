@@ -41,7 +41,7 @@ final class SummitSerializer extends SilverStripeSerializer
      * @param array $params
      * @return array
      */
-    public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array())
+    public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [])
     {
         $summit              = $this->object;
         if(!$summit instanceof Summit) return [];
@@ -75,21 +75,21 @@ final class SummitSerializer extends SilverStripeSerializer
         // tickets
         $ticket_types = [];
         foreach ($summit->getTicketTypes() as $ticket) {
-            $ticket_types[] = SerializerRegistry::getInstance()->getSerializer($ticket)->serialize();
+            $ticket_types[] = SerializerRegistry::getInstance()->getSerializer($ticket)->serialize($expand);
         }
         $values['ticket_types'] = $ticket_types;
 
         //locations
         $locations = [];
         foreach ($summit->getLocations() as $location) {
-            $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
+            $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize($expand);
         }
         $values['locations'] = $locations;
 
         // wifi connections
         $wifi_connections = [];
         foreach ($summit->getWifiConnections() as $wifi_connection) {
-            $wifi_connections[] = SerializerRegistry::getInstance()->getSerializer($wifi_connection)->serialize();
+            $wifi_connections[] = SerializerRegistry::getInstance()->getSerializer($wifi_connection)->serialize($expand);
         }
         $values['wifi_connections'] = $wifi_connections;
 
