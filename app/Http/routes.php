@@ -38,7 +38,7 @@ Route::group([
             Route::group(array('prefix' => 'locations'), function () {
                 Route::group(array('prefix' => '{location_id}'), function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
-                    Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationEvents');
+                    Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents');
                 });
             });
         });
@@ -214,8 +214,8 @@ Route::group([
                 Route::get('/airports', 'OAuth2SummitLocationsApiController@getAirports');
                 Route::group(array('prefix' => '{location_id}'), function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
-                    Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationEvents');
-                    Route::get('/events','OAuth2SummitLocationsApiController@getLocationPublishedEvents');
+                    Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents');
+                    Route::get('/events','OAuth2SummitLocationsApiController@getLocationEvents');
                 });
             });
 
