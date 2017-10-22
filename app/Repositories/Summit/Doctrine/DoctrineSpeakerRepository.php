@@ -40,17 +40,20 @@ class DoctrineSpeakerRepository extends SilverStripeDoctrineRepository implement
 
         $extra_filters = '';
         $extra_orders  = '';
-        $bindings      = array();
+        $bindings      = [];
 
         if(!is_null($filter))
         {
-            $extra_filters = ' WHERE '. $filter->toRawSQL(array
-                (
-                    'first_name' => 'FirstName',
-                    'last_name'  => 'LastName',
-                    'email'      => 'Email',
-                ));
-            $bindings = array_merge($bindings, $filter->getSQLBindings());
+            $where_conditions = $filter->toRawSQL([
+
+                'first_name' => 'FirstName',
+                'last_name'  => 'LastName',
+                'email'      => 'Email',
+            ]);
+            if(!empty($where_conditions)) {
+                $extra_filters = " WHERE {$where_conditions}";
+                $bindings = array_merge($bindings, $filter->getSQLBindings());
+            }
         }
 
         if(!is_null($order))

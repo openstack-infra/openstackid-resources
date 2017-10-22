@@ -162,14 +162,14 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testGetCurrentSummitSpeakers()
     {
-        $params = array
-        (
-            'id' => 6,
-            'page' => 1,
+        $params = [
+
+            'id'       => 'current',
+            'page'     => 1,
             'per_page' => 15,
-            'filter' => 'first_name=@John,last_name=@Bryce,email=@sebastian@',
-            'order' => '+first_name,-last_name'
-        );
+            'filter'   => 'first_name=@John,last_name=@Bryce,email=@sebastian@',
+            'order'    => '+first_name,-last_name'
+        ];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
