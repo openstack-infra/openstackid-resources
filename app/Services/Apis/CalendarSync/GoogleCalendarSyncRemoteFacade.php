@@ -114,7 +114,7 @@ final class GoogleCalendarSyncRemoteFacade
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
             }
             Log::warning($ex1);
-            return false;
+            return null;
         }
         catch (Exception $ex){
             Log::error($ex);
