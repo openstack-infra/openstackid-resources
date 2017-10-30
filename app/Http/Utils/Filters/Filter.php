@@ -154,6 +154,10 @@ final class Filter
      */
     public function apply2Query(QueryBuilder $query, array $mappings)
     {
+        $param_prefix = "param_%s";
+        $param_idx    = 1;
+        $bindings     = [];
+
         foreach ($this->filters as $filter) {
             if ($filter instanceof FilterElement && isset($mappings[$filter->getField()])) {
                 $mapping = $mappings[$filter->getField()];
@@ -172,9 +176,10 @@ final class Filter
                         }
 
                         if(!empty($condition)) $condition .= ' OR ';
-                        $condition .= sprintf("%s %s %s", $mapping_or[0], $filter->getOperator(), $value);
+                        $bindings[sprintf($param_prefix, $param_idx)] = $value;
+                        $condition .= sprintf("%s %s :%s", $mapping_or[0], $filter->getOperator(), sprintf($param_prefix, $param_idx));
+                        ++$param_idx;
                     }
-
                     $query->andWhere($condition);
                 }
                 else {
@@ -184,8 +189,9 @@ final class Filter
                     if (count($mapping) > 1) {
                         $value = $this->convertValue($value, $mapping[1]);
                     }
-
-                    $query = $query->andWhere(sprintf("%s %s %s", $mapping[0], $filter->getOperator(), $value));
+                    $bindings[sprintf($param_prefix, $param_idx)] = $value;
+                    $query = $query->andWhere(sprintf("%s %s :%s", $mapping[0], $filter->getOperator(), sprintf($param_prefix, $param_idx)));
+                    ++$param_idx;
                 }
             }
             else if (is_array($filter)) {
@@ -211,7 +217,9 @@ final class Filter
                                 }
 
                                 if(!empty($condition)) $condition .= ' OR ';
-                                $condition .= sprintf(" %s %s %s ", $mapping_or[0], $e->getOperator(), $value);
+                                $bindings[sprintf($param_prefix, $param_idx)] = $value;
+                                $condition .= sprintf(" %s %s :%s ", $mapping_or[0], $e->getOperator(), sprintf($param_prefix, $param_idx));
+                                ++$param_idx;
                             }
                             if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
                             $sub_or_query .= ' ( '.$condition.' ) ';
@@ -225,13 +233,18 @@ final class Filter
                             }
 
                             if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
-                            $sub_or_query .= sprintf(" %s %s %s ", $mapping[0], $e->getOperator(), $value);
+
+                            $bindings[sprintf($param_prefix, $param_idx)] = $value;
+                            $sub_or_query .= sprintf(" %s %s :%s ", $mapping[0], $e->getOperator(), sprintf($param_prefix, $param_idx));
+                            ++$param_idx;
                         }
                     }
                 }
                 $query->andWhere($sub_or_query);
             }
         }
+        foreach($bindings as $param => $value)
+            $query->setParameter($param, $value);
         return $this;
     }
 
@@ -245,13 +258,13 @@ final class Filter
         switch ($original_format) {
             case 'datetime_epoch':
                 $datetime = new \DateTime("@$value");
-                return sprintf("'%s'", $datetime->format("Y-m-d H:i:s"));
+                return sprintf("%s", $datetime->format("Y-m-d H:i:s"));
                 break;
             case 'json_int':
                 return intval($value);
                 break;
             case 'json_string':
-                return sprintf("'%s'",$value);
+                return sprintf("%s",$value);
                 break;
             default:
                 return $value;
@@ -274,7 +287,7 @@ final class Filter
     public function toRawSQL(array $mappings)
     {
         $sql = '';
-        $this->bindings = array();
+        $this->bindings = [];
 
         foreach ($this->filters as $filter) {
             if ($filter instanceof FilterElement) {
