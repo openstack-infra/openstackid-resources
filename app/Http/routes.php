@@ -21,7 +21,7 @@ Route::group([
     'after'      => [],
     'middleware' => [
         'ssl',
-        'rate.limit:100,1', // 100 request per minute
+        'rate.limit:1000,1', // 1000 request per minute
         'etags'
     ]
 ], function(){
