@@ -776,7 +776,8 @@ SQL;
             $criteria = Criteria::create();
             $criteria->where(Criteria::expr()->eq('summit_event', $event));
             $criteria->andWhere(Criteria::expr()->eq('calendar_sync_info', $calendar_sync_info));
-            return $this->schedule_sync_info->matching($criteria)->first();
+            $res = $this->schedule_sync_info->matching($criteria)->first();
+            return $res === false ? null : $res;
         }
         catch(NoResultException $ex1){
             return null;
