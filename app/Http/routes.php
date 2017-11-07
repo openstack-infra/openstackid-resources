@@ -127,7 +127,7 @@ Route::group([
 
         Route::group(array('prefix' => '{id}'), function () {
 
-            Route::get('', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summit_response_lifetime', 300), 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
+            Route::get('', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summit_response_lifetime', 1200), 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
 
             Route::get('entity-events', 'OAuth2SummitApiController@getSummitEntityEvents');
 

@@ -29,13 +29,15 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         //Current
-        $schedule->command('summit:json-generator')->everyTenMinutes()->withoutOverlapping();
+        $schedule->command('summit:json-generator')->everyFiveMinutes()->withoutOverlapping();
         //Austin
-        $schedule->command('summit:json-generator',[6])->everyTenMinutes()->withoutOverlapping();
+        $schedule->command('summit:json-generator',[6])->everyFiveMinutes()->withoutOverlapping();
         //BCN
-        $schedule->command('summit:json-generator', [7])->everyTenMinutes()->withoutOverlapping();
+        $schedule->command('summit:json-generator', [7])->everyFiveMinutes()->withoutOverlapping();
         //Boston
-        $schedule->command('summit:json-generator', [22])->everyTenMinutes()->withoutOverlapping();
+        $schedule->command('summit:json-generator', [22])->everyFiveMinutes()->withoutOverlapping();
+        //Sydney
+        $schedule->command('summit:json-generator', [23])->everyFiveMinutes()->withoutOverlapping();
 
         // Calendar Sync Jobs
 
