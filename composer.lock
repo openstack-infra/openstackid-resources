@@ -2617,12 +2617,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarcet/CalDAVClient.git",
-                "reference": "22d4decdee634776389d03297d59180d909fe522"
+                "reference": "0c2a8357b69ee20115bcf0d00a126908d5dd480f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarcet/CalDAVClient/zipball/22d4decdee634776389d03297d59180d909fe522",
-                "reference": "22d4decdee634776389d03297d59180d909fe522",
+                "url": "https://api.github.com/repos/smarcet/CalDAVClient/zipball/0c2a8357b69ee20115bcf0d00a126908d5dd480f",
+                "reference": "0c2a8357b69ee20115bcf0d00a126908d5dd480f",
                 "shasum": ""
             },
             "require": {
@@ -2658,7 +2658,7 @@
                 "icloud",
                 "synchronization"
             ],
-            "time": "2017-11-06T22:19:44+00:00"
+            "time": "2017-11-07T09:01:30+00:00"
         },
         {
             "name": "smarcet/outlook-rest-client",
@@ -3479,12 +3479,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "c33ba7fb2a918372e50db4e01a14903b90b0f250"
+                "reference": "13362647299108bd7565756bff3f05f7dc1d4ab5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/c33ba7fb2a918372e50db4e01a14903b90b0f250",
-                "reference": "c33ba7fb2a918372e50db4e01a14903b90b0f250",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/13362647299108bd7565756bff3f05f7dc1d4ab5",
+                "reference": "13362647299108bd7565756bff3f05f7dc1d4ab5",
                 "shasum": ""
             },
             "require": {
@@ -3535,7 +3535,7 @@
             ],
             "description": "Symfony Serializer Component",
             "homepage": "https://symfony.com",
-            "time": "2017-11-05T15:25:56+00:00"
+            "time": "2017-11-07T14:08:47+00:00"
         },
         {
             "name": "symfony/translation",
@@ -4034,12 +4034,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpspec/prophecy.git",
-                "reference": "c9b8c6088acd19d769d4cc0ffa60a9fe34344bd6"
+                "reference": "ddd9d7ffff1d7c3acd1a79a8e21d5ee5ea7beace"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/c9b8c6088acd19d769d4cc0ffa60a9fe34344bd6",
-                "reference": "c9b8c6088acd19d769d4cc0ffa60a9fe34344bd6",
+                "url": "https://api.github.com/repos/phpspec/prophecy/zipball/ddd9d7ffff1d7c3acd1a79a8e21d5ee5ea7beace",
+                "reference": "ddd9d7ffff1d7c3acd1a79a8e21d5ee5ea7beace",
                 "shasum": ""
             },
             "require": {
@@ -4051,7 +4051,7 @@
             },
             "require-dev": {
                 "phpspec/phpspec": "^2.5|^3.2",
-                "phpunit/phpunit": "^4.8 || ^5.6.5"
+                "phpunit/phpunit": "^4.8.35 || ^5.7"
             },
             "type": "library",
             "extra": {
@@ -4089,7 +4089,7 @@
                 "spy",
                 "stub"
             ],
-            "time": "2017-09-04T11:05:03+00:00"
+            "time": "2017-11-07T12:00:44+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

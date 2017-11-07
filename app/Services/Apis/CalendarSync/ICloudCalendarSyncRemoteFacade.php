@@ -191,8 +191,7 @@ final class ICloudCalendarSyncRemoteFacade
             $vo->setUID($schedule_sync_info->getExternalId());
             $res = $this->client->updateEvent(
                 $calendar_url,
-                $vo,
-                $schedule_sync_info->getEtag()
+                $vo
             );
 
             $etag = $res->getETag();
@@ -224,15 +223,14 @@ final class ICloudCalendarSyncRemoteFacade
     {
         try{
             if(empty($schedule_sync_info->getEtag())) return false;
+
             $res = $this->client->deleteEvent
             (
                 $this->sync_calendar_info->getCalendarUrl(),
-                $schedule_sync_info->getExternalId(),
-                $schedule_sync_info->getEtag()
+                $schedule_sync_info->getExternalId()
             );
 
             return $res->isSuccessFull();
-            return true;
         }
         catch (Exception $ex){
             Log::error($ex);
