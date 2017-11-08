@@ -68,7 +68,7 @@ final class CacheMiddleware
             foreach($query as $q)
             {
                 $q = explode('=',$q);
-                if(strtolower($q[0]) === 'access_token'|| strtolower($q[0]) === 'token_type' ) continue;
+                if(strtolower($q[0]) === 'q'|| strtolower($q[0]) === 'access_token'|| strtolower($q[0]) === 'token_type' ) continue;
                 $key .= ".".implode("=",$q);
             }
         }
@@ -100,10 +100,9 @@ final class CacheMiddleware
             $ttl = $this->cache_service->ttl($key);
             // cache hit ...
             Log::debug(sprintf("cache hit for %s - ttl %s ...", $key, $ttl));
-            $response = new JsonResponse(json_decode(gzinflate($data), true), 200, array
-                (
+            $response = new JsonResponse(json_decode(gzinflate($data), true), 200, [
                     'content-type'       => 'application/json',
-                )
+                ]
             );
         }
 
