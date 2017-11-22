@@ -1,4 +1,5 @@
 <?php namespace ModelSerializers;
+use App\ModelSerializers\CCLA\TeamSerializer;
 use App\ModelSerializers\Marketplace\CloudServiceOfferedSerializer;
 use App\ModelSerializers\Marketplace\ConfigurationManagementTypeSerializer;
 use App\ModelSerializers\Marketplace\ConsultantClientSerializer;
@@ -157,6 +158,10 @@ final class SerializerRegistry
 
         $this->registry['OpenStackComponent'] = OpenStackComponentSerializer::class;
         $this->registry['OpenStackRelease']   = OpenStackReleaseSerializer::class;
+
+        // ccla
+
+        $this->registry['Team']               = TeamSerializer::class;
     }
 
     /**

@@ -111,4 +111,29 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($member));
         $this->assertResponseStatus(200);
     }
+
+    public function testGetMembersByGitHubUser()
+    {
+        $params = [
+            'filter' => 'github_user=@smarcet',
+            'order'  => '+first_name,-last_name',
+            'expand' => 'groups, ccla_teams'
+        ];
+
+        $headers  = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2MembersApiController@getMembers",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $members = json_decode($content);
+        $this->assertTrue(!is_null($members));
+        $this->assertResponseStatus(200);
+    }
 }

@@ -13,11 +13,11 @@
  * limitations under the License.
  **/
 
+use Models\Foundation\Main\CCLA\Team;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use models\exceptions\ValidationException;
 use models\summit\CalendarSync\CalendarSyncInfo;
 use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
@@ -55,6 +55,12 @@ class Member extends SilverstripeBaseModel
      * @var string
      */
     private $last_name;
+
+    /**
+     * @ORM\Column(name="GitHubUser", type="string")
+     * @var string
+     */
+    private $github_user;
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="owner", cascade={"persist"})
@@ -181,6 +187,16 @@ class Member extends SilverstripeBaseModel
     private $groups;
 
     /**
+     * @ORM\ManyToMany(targetEntity="Models\Foundation\Main\CCLA\Team", inversedBy="members")
+     * @ORM\JoinTable(name="Team_Members",
+     *      joinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="TeamID", referencedColumnName="ID")}
+     *      )
+     * @var Team[]
+     */
+    private $ccla_teams;
+
+    /**
      * @ORM\OneToMany(targetEntity="ChatTeamMember", mappedBy="member", cascade={"persist"}, orphanRemoval=true)
      * @var ChatTeamMember[]
      */
@@ -200,6 +216,7 @@ class Member extends SilverstripeBaseModel
         parent::__construct();
         $this->feedback           = new ArrayCollection();
         $this->groups             = new ArrayCollection();
+        $this->ccla_teams         = new ArrayCollection();
         $this->affiliations       = new ArrayCollection();
         $this->team_memberships   = new ArrayCollection();
         $this->favorites          = new ArrayCollection();
@@ -406,6 +423,13 @@ class Member extends SilverstripeBaseModel
     }
 
     /**
+     * @return string
+     */
+    public function getGitHubUser(){
+        return $this->github_user;
+    }
+
+    /**
      * @return bool
      */
     public function isEmailVerified()
@@ -576,6 +600,21 @@ class Member extends SilverstripeBaseModel
             $ids[] = intval($g->getId());
         }
         return $ids;
+    }
+
+    public function getCCLATeamsIds(){
+          $ids = [];
+        foreach ($this->getCCLATeams() as $t) {
+            $ids[] = intval($t->getId());
+        }
+        return $ids;
+    }
+
+    /**
+     * @return Team[]
+     */
+    public function getCCLATeams(){
+        return $this->ccla_teams->toArray();
     }
 
     /**
@@ -924,4 +963,5 @@ SQL;
         $this->calendars_sync->removeElement($calendar_sync_info);
         $calendar_sync_info->clearOwner();
     }
+
 }
