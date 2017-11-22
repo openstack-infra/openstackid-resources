@@ -56,18 +56,19 @@ final class DoctrineMemberRepository
         if(!is_null($filter)){
 
             $filter->apply2Query($query, [
-                'irc'        => 'm.irc_handle:json_string',
-                'twitter'    => 'm.twitter_handle:json_string',
-                'first_name' => 'm.first_name:json_string',
-                'last_name'  => 'm.last_name:json_string',
-                'email'      => ['m.email:json_string', 'm.second_email:json_string', 'm.third_email:json_string'],
-                'group_slug' => new DoctrineJoinFilterMapping
+                'irc'         => 'm.irc_handle:json_string',
+                'twitter'     => 'm.twitter_handle:json_string',
+                'first_name'  => 'm.first_name:json_string',
+                'last_name'   => 'm.last_name:json_string',
+                'github_user' => 'm.github_user:json_string',
+                'email'       => ['m.email:json_string', 'm.second_email:json_string', 'm.third_email:json_string'],
+                'group_slug'  => new DoctrineJoinFilterMapping
                 (
                     'm.groups',
                     'g',
                     "g.code :operator ':value'"
                 ),
-                'group_id' => new DoctrineJoinFilterMapping
+                'group_id'    => new DoctrineJoinFilterMapping
                 (
                     'm.groups',
                     'g',

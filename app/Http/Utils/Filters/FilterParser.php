@@ -1,4 +1,6 @@
 <?php namespace utils;
+use models\exceptions\ValidationException;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,8 +51,13 @@ final class FilterParser
                     $field    = $operands[0];
                     $value    = $operands[1];
 
-                    if (!isset($allowed_fields[$field])) continue;
-                    if (!in_array($op, $allowed_fields[$field])) continue;
+                    if (!isset($allowed_fields[$field])){
+                        throw new FilterParserException(sprintf("filter by field %s is not allowed", $field));
+                    }
+                    if (!in_array($op, $allowed_fields[$field])){
+                        throw new FilterParserException(sprintf("%s op is not allowed for filter by field %s",$op, $field));
+                    }
+
                     $f_or = self::buildFilter($field, $op, $value);
                     if (!is_null($f_or))
                         $f[] = $f_or;
@@ -67,8 +74,13 @@ final class FilterParser
                 $field    = $operands[0];
                 $value    = $operands[1];
 
-                if (!isset($allowed_fields[$field])) continue;
-                if (!in_array($op, $allowed_fields[$field])) continue;
+                if (!isset($allowed_fields[$field])){
+                    throw new FilterParserException(sprintf("filter by field %s is not allowed", $field));
+                }
+                if (!in_array($op, $allowed_fields[$field])){
+                    throw new FilterParserException(sprintf("%s op is not allowed for filter by field %s",$op, $field));
+                }
+
                 $f = self::buildFilter($field, $op, $value);
             }
 

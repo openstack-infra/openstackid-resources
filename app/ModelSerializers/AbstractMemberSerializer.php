@@ -26,6 +26,7 @@ class AbstractMemberSerializer extends SilverStripeSerializer
         'FirstName'       => 'first_name:json_string',
         'LastName'        => 'last_name:json_string',
         'Gender'          => 'gender:json_string',
+        'GitHubUser'      => 'github_user:json_string',
         'Bio'             => 'bio:json_string',
         'LinkedInProfile' => 'linked_in:json_string',
         'IrcHandle'       => 'irc:json_string',
@@ -39,6 +40,7 @@ class AbstractMemberSerializer extends SilverStripeSerializer
     protected static $allowed_relations = [
         'groups',
         'affiliations',
+        'ccla_teams',
     ];
 
     /**
@@ -60,6 +62,9 @@ class AbstractMemberSerializer extends SilverStripeSerializer
 
         if(in_array('groups', $relations))
             $values['groups'] = $member->getGroupsIds();
+
+        if(in_array('ccla_teams', $relations))
+            $values['ccla_teams'] = $member->getCCLATeamsIds();
 
         if(in_array('affiliations', $relations)){
             $res = [];
@@ -93,6 +98,16 @@ class AbstractMemberSerializer extends SilverStripeSerializer
                             $groups[] = SerializerRegistry::getInstance()->getSerializer($g)->serialize(null, [], ['none']);
                         }
                         $values['groups'] = $groups;
+                    }
+                    break;
+                    case 'ccla_teams': {
+                        if(!in_array('ccla_teams', $relations)) break;
+                        $teams = [];
+                        unset($values['ccla_teams']);
+                        foreach ($member->getCCLATeams() as $t) {
+                            $teams[] = SerializerRegistry::getInstance()->getSerializer($t)->serialize('company', [], ['none']);
+                        }
+                        $values['ccla_teams'] = $teams;
                     }
                     break;
                 }

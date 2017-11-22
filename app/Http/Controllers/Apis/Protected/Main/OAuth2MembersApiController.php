@@ -88,6 +88,7 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
                     'group_id'       => ['=='],
                     'email_verified' => ['=='],
                     'active'         => ['=='],
+                    'github_user'    => ['=@', '=='],
                 ));
             }
 
