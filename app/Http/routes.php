@@ -87,7 +87,8 @@ Route::group([
         Route::get('', 'OAuth2MembersApiController@getMembers');
 
         Route::group(['prefix'=>'me'], function(){
-
+            // get my member info
+            Route::get('', 'OAuth2MembersApiController@getMyMember');
             // invitations
             Route::group(['prefix'=>'team-invitations'], function(){
                 Route::get('', 'OAuth2TeamInvitationsApiController@getMyInvitations');

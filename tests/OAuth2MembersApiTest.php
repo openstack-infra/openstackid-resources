@@ -88,4 +88,27 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($members));
         $this->assertResponseStatus(200);
     }
+
+    public function testGetMyMember()
+    {
+        $params = [
+            'expand' => 'groups'
+        ];
+
+        $headers  = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2MembersApiController@getMyMember",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $member = json_decode($content);
+        $this->assertTrue(!is_null($member));
+        $this->assertResponseStatus(200);
+    }
 }

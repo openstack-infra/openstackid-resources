@@ -440,6 +440,17 @@ class ApiEndpointsSeeder extends Seeder
                 )
             ]
         );
+
+        $this->seedApiEndpoints('members', [
+                // members
+                array(
+                    'name' => 'get-my-member',
+                    'route' => '/api/v1/members/me',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/members/read/me', $current_realm)],
+                )
+            ]
+        );
     }
 
     private function seedTeamEndpoints(){

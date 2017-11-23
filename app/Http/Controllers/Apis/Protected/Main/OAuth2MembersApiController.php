@@ -1,5 +1,4 @@
 <?php namespace App\Http\Controllers;
-
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +17,7 @@ use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
+use ModelSerializers\SerializerRegistry;
 use utils\Filter;
 use utils\FilterParser;
 use utils\FilterParserException;
@@ -138,5 +138,29 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    public function getMyMember(){
+
+        $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+        if (is_null($current_member_id)) return $this->error403();
+
+        $current_member = $this->repository->getById($current_member_id);
+        if (is_null($current_member)) return $this->error404();
+
+        $fields    = Request::input('fields', null);
+        $relations = Request::input('relations', null);
+
+        return $this->ok
+        (
+            SerializerRegistry::getInstance()->getSerializer($current_member, SerializerRegistry::SerializerType_Private)
+                ->serialize
+                (
+                    Request::input('expand', ''),
+                    is_null($fields) ? [] : explode(',', $fields),
+                    is_null($relations) ? [] : explode(',', $relations)
+                )
+        );
+    }
+
 
 }

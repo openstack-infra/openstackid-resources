@@ -129,6 +129,11 @@ final class ApiScopesSeeder extends Seeder
                 'description' => 'Grants read only access for Members Data',
             ),
             array(
+                'name' => sprintf('%s/members/read/me', $current_realm),
+                'short_description' => 'Get My Member Data',
+                'description' => 'Grants read only access for My Member',
+            ),
+            array(
                 'name' => sprintf('%s/members/invitations/read', $current_realm),
                 'short_description' => 'Allows read only access to invitations',
                 'description' => 'Allows read only access to invitations',
