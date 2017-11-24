@@ -211,6 +211,33 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($speakers));
     }
 
+    public function testAllSpeakers()
+    {
+        $params = [
+
+            'page'     => 1,
+            'per_page' => 15,
+            'filter'   => 'first_name=@John,last_name=@Bryce,email=@sebastian@',
+            'order'    => '+first_name,-last_name'
+        ];
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitSpeakersApiController@getAllSpeakers",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $speakers = json_decode($content);
+        $this->assertTrue(!is_null($speakers));
+    }
+
     public function testCurrentSummitMyAttendeeFail404()
     {
         App::singleton('App\Models\ResourceServer\IAccessTokenService', 'AccessTokenServiceStub2');

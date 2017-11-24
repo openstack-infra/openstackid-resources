@@ -155,6 +155,77 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
+
+    public function getAllSpeakers(){
+        try {
+
+            $values = Input::all();
+
+            $rules = array
+            (
+                'page'     => 'integer|min:1',
+                'per_page' => 'required_with:page|integer|min:10|max:100',
+            );
+
+            $validation = Validator::make($values, $rules);
+
+            if ($validation->fails())
+            {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412($messages);
+            }
+
+            // default values
+            $page     = 1;
+            $per_page = 10;
+
+            if (Input::has('page'))
+            {
+                $page = intval(Input::get('page'));
+                $per_page = intval(Input::get('per_page'));
+            }
+
+            $filter = null;
+
+            if (Input::has('filter'))
+            {
+                $filter = FilterParser::parse(Input::get('filter'), array
+                (
+                    'first_name' => array('=@', '=='),
+                    'last_name'  => array('=@', '=='),
+                    'email'      => array('=@', '=='),
+                ));
+            }
+
+            $order = null;
+            if (Input::has('order'))
+            {
+                $order = OrderParser::parse(Input::get('order'), array
+                (
+                    'first_name',
+                    'last_name',
+                ));
+            }
+
+            $result = $this->speaker_repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
+
+            return $this->ok
+            (
+                $result->toArray(Request::input('expand', ''),[],[])
+            );
+        }
+        catch(FilterParserException $ex1){
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * @param $summit_id
      * @param $speaker_id

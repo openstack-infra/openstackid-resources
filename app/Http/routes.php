@@ -283,6 +283,12 @@ Route::group([
 
         });
     });
+
+    // speakers
+
+    Route::group(array('prefix' => 'speakers'), function () {
+        Route::get('', 'OAuth2SummitSpeakersApiController@getAllSpeakers');
+    });
 });
 
 //OAuth2 Protected API V2
