@@ -58,6 +58,19 @@ final class DoctrineSummitRepository
     }
 
     /**
+     * @return Summit[]
+     */
+    public function getAllOrderedByBeginDate()
+    {
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select("s")
+            ->from(\models\summit\Summit::class, "s")
+            ->orderBy('s.begin_date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * @return string
      */
     protected function getBaseEntity()

@@ -100,6 +100,34 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    public function getAllSummits()
+    {
+        try {
+
+            $summits = [];
+
+            foreach($this->repository->getAllOrderedByBeginDate() as $summit){
+                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize();
+            }
+
+            $response = new PagingResponse
+            (
+                count($summits),
+                count($summits),
+                1,
+                1,
+                $summits
+            );
+
+            return $this->ok($response->toArray());
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * @param $summit_id
      * @return mixed

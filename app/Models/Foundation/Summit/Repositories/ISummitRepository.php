@@ -25,4 +25,9 @@ interface ISummitRepository extends IBaseRepository
      * @return Summit[]
      */
     public function getAvailables();
+
+    /**
+     * @return Summit[]
+     */
+    public function getAllOrderedByBeginDate();
 }

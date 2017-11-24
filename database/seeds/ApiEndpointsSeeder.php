@@ -78,6 +78,12 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf('%s/summits/read', $current_realm)],
             ),
             array(
+                'name' => 'get-all-summits',
+                'route' => '/api/v1/summits/all',
+                'http_method' => 'GET',
+                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+            ),
+            array(
                 'name' => 'get-summit',
                 'route' => '/api/v1/summits/{id}',
                 'http_method' => 'GET',
