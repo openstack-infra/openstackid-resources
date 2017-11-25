@@ -84,6 +84,10 @@ class OAuth2BearerAccessTokenRequestValidator
         $method = $request->getMethod();
         $realm  = $request->getHost();
 
+        $response = $next($request);
+
+        return $response;
+
         try {
             $route = RequestUtils::getCurrentRoutePath($request);
             if (!$route) {

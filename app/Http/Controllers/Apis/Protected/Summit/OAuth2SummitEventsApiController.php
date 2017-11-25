@@ -821,4 +821,42 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         return [$summit, $event, $data];
     }
 
+
+    public function addEventAttachment(LaravelRequest $request, $summit_id, $event_id){
+
+        try {
+
+            $file = $request->file('file');
+            if (is_null($file)) {
+                return $this->error412(array('file param not set!'));
+            }
+
+            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $res = $this->service->addEventAttachment($summit, $event_id, $file);
+
+            return $res ? $this->created() : $this->error400();
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+
+            return $this->error500($ex);
+        }
+    }
+
 }

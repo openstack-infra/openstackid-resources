@@ -15,11 +15,16 @@ use App\Events\MyFavoritesAdd;
 use App\Events\MyFavoritesRemove;
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
+use App\Http\Utils\FileUploader;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\File;
+use models\main\IFolderRepository;
 use models\main\IMemberRepository;
 use models\main\ITagRepository;
 use Models\foundation\summit\EntityEvents\EntityEventTypeFactory;
@@ -42,6 +47,7 @@ use models\summit\SummitAttendeeTicket;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFactory;
 use models\summit\SummitEventFeedback;
+use models\summit\SummitEventWithFile;
 use services\apis\IEventbriteAPI;
 use libs\utils\ITransactionService;
 use Exception;
@@ -114,6 +120,11 @@ final class SummitService implements ISummitService
     private $calendar_sync_work_request_repository;
 
     /**
+     * @var IFolderRepository
+     */
+    private $folder_repository;
+
+    /**
      * SummitService constructor.
      * @param ISummitEventRepository $event_repository
      * @param ISpeakerRepository $speaker_repository
@@ -122,9 +133,10 @@ final class SummitService implements ISummitService
      * @param ISummitAttendeeRepository $attendee_repository
      * @param IMemberRepository $member_repository
      * @param ITagRepository $tag_repository
-     * @param IRSVPRepository $rsvp_repository,
+     * @param IRSVPRepository $rsvp_repository
      * @param IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository
      * @param IEventbriteAPI $eventbrite_api
+     * @param IFolderRepository $folder_repository
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -139,6 +151,7 @@ final class SummitService implements ISummitService
         IRSVPRepository                 $rsvp_repository,
         IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository,
         IEventbriteAPI                  $eventbrite_api,
+        IFolderRepository               $folder_repository,
         ITransactionService             $tx_service
     )
     {
@@ -152,6 +165,7 @@ final class SummitService implements ISummitService
         $this->rsvp_repository                       = $rsvp_repository;
         $this->calendar_sync_work_request_repository = $calendar_sync_work_request_repository;
         $this->eventbrite_api                        = $eventbrite_api;
+        $this->folder_repository                     = $folder_repository;
         $this->tx_service                            = $tx_service;
     }
 
@@ -982,6 +996,45 @@ final class SummitService implements ISummitService
 
             $this->removeEventFromMemberSchedule($summit, $member, $event_id ,false);
 
+            return true;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $event_id
+     * @param UploadedFile $file
+     * @param int $max_file_size
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return bool
+     */
+    public function addEventAttachment(Summit $summit, $event_id, UploadedFile $file,  $max_file_size = 10485760)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $event_id, $file, $max_file_size) {
+
+            $allowed_extensions = ['png','jpg','jpeg','gif','pdf'];
+
+            $event = $summit->getEvent($event_id);
+            if (is_null($event)) {
+                throw new EntityNotFoundException('event not found on summit!');
+            }
+
+            if(!$event instanceof SummitEventWithFile){
+                throw new ValidationException(sprintf("event id %s does not allow attachments!", $event_id));
+            }
+
+            if(!in_array($file->extension(), $allowed_extensions)){
+                throw new ValidationException("file does not has a valid extension ('png','jpg','jpeg','gif','pdf').");
+            }
+
+            if($file->getSize() > $max_file_size)
+            {
+                throw new ValidationException(sprintf( "file exceeds max_file_size (%s MB).", ($max_file_size/1024)/1024));
+            }
+            $uploader   = new FileUploader($this->folder_repository);
+            $attachment = $uploader->build($file, 'summit-event-attachments');
+            $event->setAttachment($attachment);
             return true;
         });
     }

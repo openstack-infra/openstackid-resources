@@ -14,6 +14,8 @@
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
+use models\main\File;
+
 /**
  * Class RepositoriesProvider
  * @package repositories
@@ -180,6 +182,12 @@ final class RepositoriesProvider extends ServiceProvider
             'App\Models\Foundation\Marketplace\IRemoteCloudServiceRepository',
             function(){
                 return  EntityManager::getRepository(\App\Models\Foundation\Marketplace\RemoteCloudService::class);
+            });
+
+        App::singleton(
+            'models\main\IFolderRepository',
+            function(){
+                return  EntityManager::getRepository(File::class);
             });
     }
 }
