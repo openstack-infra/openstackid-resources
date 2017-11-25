@@ -85,22 +85,22 @@ abstract class JsonController extends Controller
         return $res;
     }
 
-    protected function error400($data)
+    protected function error400($data = ['message' => 'Bad Request'])
     {
         return Response::json($data, 400);
     }
 
-    protected function error404($data = array('message' => 'Entity Not Found'))
+    protected function error404($data = ['message' => 'Entity Not Found'])
     {
         return Response::json($data, 404);
     }
 
-    protected function error403($data = array('message' => 'Forbidden'))
+    protected function error403($data = ['message' => 'Forbidden'])
     {
         return Response::json($data, 403);
     }
 
-    protected function error401($data = array('message' => 'You don\'t have access to this item through the API.'))
+    protected function error401($data = ['message' => 'You don\'t have access to this item through the API.'])
     {
         return Response::json($data, 401);
     }

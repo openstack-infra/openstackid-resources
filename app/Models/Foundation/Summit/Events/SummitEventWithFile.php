@@ -31,7 +31,7 @@ class SummitEventWithFile extends SummitEvent
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\ManyToOne(targetEntity="models\main\File",cascade={"persist"})
      * @ORM\JoinColumn(name="AttachmentID", referencedColumnName="ID")
      * @var File
      */

@@ -11,12 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="repositories\main\DoctrineFolderRepository")
  * @ORM\Table(name="File")
  * Class File
  * @package models\main
@@ -29,19 +27,14 @@ class File extends SilverstripeBaseModel
     private $name;
 
     /**
-     * @return string
-     */
-    public function getName(){ return $this->name;}
-
-    /**
      * @ORM\Column(name="Title", type="string")
      */
     private $title;
 
     /**
-     * @return string
+     * @ORM\Column(name="Content", type="string")
      */
-    public function getTitle(){ return $this->title;}
+    private $content;
 
     /**
      * @ORM\Column(name="Filename", type="string")
@@ -49,7 +42,134 @@ class File extends SilverstripeBaseModel
     private $filename;
 
     /**
-     * @return string
+     * @ORM\Column(name="ShowInSearch", type="boolean")
+     * @var bool
      */
-    public function getFilename(){ return $this->filename;}
+    private $show_in_search;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\JoinColumn(name="ParentID", referencedColumnName="ID")
+     * @var File
+     */
+    private $parent;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
+     * @var Member
+     */
+    private $owner;
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param mixed $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param mixed $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param mixed $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFilename()
+    {
+        return $this->filename;
+    }
+
+    /**
+     * @param mixed $filename
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShowInSearch()
+    {
+        return $this->show_in_search;
+    }
+
+    /**
+     * @param bool $show_in_search
+     */
+    public function setShowInSearch($show_in_search)
+    {
+        $this->show_in_search = $show_in_search;
+    }
+
+    /**
+     * @return File
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @param File $parent
+     */
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+    }
+
+    /**
+     * @return Member
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * @param Member $owner
+     */
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
+    }
 }

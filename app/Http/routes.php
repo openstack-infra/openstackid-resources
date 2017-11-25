@@ -194,6 +194,7 @@ Route::group([
                     Route::put('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@publishEvent']);
                     Route::delete('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvent']);
                     Route::post('/feedback', 'OAuth2SummitEventsApiController@addEventFeedback');
+                    Route::post('/attachment', 'OAuth2SummitEventsApiController@addEventAttachment');
                     Route::get('/feedback/{attendee_id?}',  ['middleware' => 'cache:'.Config::get('cache_api_response.get_event_feedback_response_lifetime', 300), 'uses' => 'OAuth2SummitEventsApiController@getEventFeedback'] )->where('attendee_id', 'me|[0-9]+');
                 });
             });

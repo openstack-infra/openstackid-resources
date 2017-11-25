@@ -1,7 +1,9 @@
 <?php namespace services\model;
 
+use Illuminate\Http\UploadedFile;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\File;
 use models\main\Member;
 use models\summit\ConfirmationExternalOrderRequest;
 use models\summit\Summit;
@@ -146,4 +148,15 @@ interface ISummitService
      * @return bool
      */
     public function unRSVPEvent(Summit $summit ,Member $member, $event_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $event_id
+     * @param UploadedFile $file
+     * @param int $max_file_size
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return File
+     */
+    public function addEventAttachment(Summit $summit, $event_id, UploadedFile $file,  $max_file_size = 10485760);
 }
