@@ -22,6 +22,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use LaravelDoctrine\ORM\Facades\Registry;
 use models\main\AssetsSyncRequest;
+use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
+use models\summit\CalendarSync\WorkQueue\AdminSummitEventActionSyncWorkRequest;
 use models\summit\SummitEntityEvent;
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
@@ -168,15 +170,30 @@ class EventServiceProvider extends ServiceProvider
             }
 
             $entity_event->setSummit($event->getSummitEvent()->getSummit());
+            // sync request
+            $request = new AdminSummitEventActionSyncWorkRequest();
+            $request->setSummitEvent($event->getSummitEvent()) ;
+            $request->setType(AbstractCalendarSyncWorkRequest::TypeUpdate);
+            if($owner_id > 0){
+                $member = $member_repository->getById($owner_id);
+                $request->setCreatedBy($member);
+            }
+
+            // check if there was a change on publishing state
 
             if($args->hasChangedField('published')){
-                $entity_event->setMetadata(json_encode([ 'pub_old'=> intval($args->getOldValue('published')),  'pub_new' => intval($args->getNewValue('published'))]));
+                $pub_old = intval($args->getOldValue('published'));
+                $pub_new = intval($args->getNewValue('published'));
+                $entity_event->setMetadata(json_encode([ 'pub_old'=> $pub_old,  'pub_new' => $pub_new]));
+                if($pub_old == 1 && $pub_new == 0)
+                    $request->setType(AbstractCalendarSyncWorkRequest::TypeRemove);
             }
             else
                 $entity_event->setMetadata(json_encode([ 'pub_new' => intval($event->getSummitEvent()->getPublished())]));
 
             $em = Registry::getManager('ss');
             $em->persist($entity_event);
+            $em->persist($request);
             $em->flush();
         });
 
@@ -191,6 +208,7 @@ class EventServiceProvider extends ServiceProvider
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
             $params = $args->getParams();
+            $em     = Registry::getManager('ss');
 
             $entity_event = new SummitEntityEvent;
             $entity_event->setEntityClassName($params['class_name']);
@@ -205,7 +223,24 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($params['summit']);
             $entity_event->setMetadata('');
 
-            $em = Registry::getManager('ss');
+            if(isset($params['published']) && $params['published']){
+                // just record the published state at the moment of the update
+
+                $entity_event->setMetadata( json_encode([
+                    'pub_old' => intval($params['published']),
+                    'pub_new' => intval($params['published'])
+                ]));
+
+                $request = new AdminSummitEventActionSyncWorkRequest();
+                $request->setSummitEventId ($params['id']);
+                $request->setType(AbstractCalendarSyncWorkRequest::TypeRemove);
+                if($owner_id > 0){
+                    $member = $member_repository->getById($owner_id);
+                    $request->setCreatedBy($member);
+                }
+                $em->persist($request);
+            }
+
             $em->persist($entity_event);
             $em->flush();
         });

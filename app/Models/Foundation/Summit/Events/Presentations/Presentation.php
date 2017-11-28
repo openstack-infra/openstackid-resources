@@ -97,6 +97,12 @@ class Presentation extends SummitEvent
     protected $to_record;
 
     /**
+     * @ORM\Column(name="FeatureCloud", type="boolean")
+     * @var bool
+     */
+    protected $feature_cloud;
+
+    /**
      * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="moderated_presentations")
      * @ORM\JoinColumn(name="ModeratorID", referencedColumnName="ID")
      * @var PresentationSpeaker
@@ -435,4 +441,19 @@ class Presentation extends SummitEvent
         $this->selected_presentations = $selected_presentations;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getFeatureCloud()
+    {
+        return $this->feature_cloud;
+    }
+
+    /**
+     * @param mixed $feature_cloud
+     */
+    public function setFeatureCloud($feature_cloud)
+    {
+        $this->feature_cloud = $feature_cloud;
+    }
 }

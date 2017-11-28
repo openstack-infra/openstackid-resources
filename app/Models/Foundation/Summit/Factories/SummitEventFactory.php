@@ -21,15 +21,14 @@ namespace models\summit;
 final class SummitEventFactory
 {
     /**
-     * @param Summit $summit
      * @param SummitEventType $type
      * @return SummitEvent
      */
-    static public function build(Summit $summit, SummitEventType $type)
+    static public function build(SummitEventType $type)
     {
         $event = new SummitEvent();
 
-        if(PresentationType::IsPresentationEventType($summit, $type->getType()))
+        if($type instanceof PresentationType)
             $event = new Presentation();
 
         if(SummitEventType::isPrivate($type->getType()))

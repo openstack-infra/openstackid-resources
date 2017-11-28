@@ -24,7 +24,9 @@ use Illuminate\Support\Facades\Storage;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\File;
+use models\main\ICompanyRepository;
 use models\main\IFolderRepository;
+use models\main\IGroupRepository;
 use models\main\IMemberRepository;
 use models\main\ITagRepository;
 use Models\foundation\summit\EntityEvents\EntityEventTypeFactory;
@@ -41,6 +43,7 @@ use models\summit\ISummitAttendeeRepository;
 use models\summit\ISummitAttendeeTicketRepository;
 use models\summit\ISummitEntityEventRepository;
 use models\summit\ISummitEventRepository;
+use models\summit\ISummitEventType;
 use models\summit\Presentation;
 use models\summit\PresentationType;
 use models\summit\Summit;
@@ -49,7 +52,9 @@ use models\summit\SummitAttendeeTicket;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFactory;
 use models\summit\SummitEventFeedback;
+use models\summit\SummitEventType;
 use models\summit\SummitEventWithFile;
+use models\summit\SummitGroupEvent;
 use services\apis\IEventbriteAPI;
 use libs\utils\ITransactionService;
 use Exception;
@@ -127,6 +132,17 @@ final class SummitService implements ISummitService
     private $folder_repository;
 
     /**
+     * @var ICompanyRepository
+     */
+    private $company_repository;
+
+
+    /**
+     * @var IGroupRepository
+     */
+    private $group_repository;
+
+    /**
      * SummitService constructor.
      * @param ISummitEventRepository $event_repository
      * @param ISpeakerRepository $speaker_repository
@@ -139,6 +155,8 @@ final class SummitService implements ISummitService
      * @param IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository
      * @param IEventbriteAPI $eventbrite_api
      * @param IFolderRepository $folder_repository
+     * @param ICompanyRepository $company_repository
+     * @param IGroupRepository $group_repository,
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -154,6 +172,8 @@ final class SummitService implements ISummitService
         IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository,
         IEventbriteAPI                  $eventbrite_api,
         IFolderRepository               $folder_repository,
+        ICompanyRepository              $company_repository,
+        IGroupRepository                $group_repository,
         ITransactionService             $tx_service
     )
     {
@@ -168,6 +188,8 @@ final class SummitService implements ISummitService
         $this->calendar_sync_work_request_repository = $calendar_sync_work_request_repository;
         $this->eventbrite_api                        = $eventbrite_api;
         $this->folder_repository                     = $folder_repository;
+        $this->company_repository                    = $company_repository;
+        $this->group_repository                     = $group_repository;
         $this->tx_service                            = $tx_service;
     }
 
@@ -578,7 +600,7 @@ final class SummitService implements ISummitService
             }
 
             if (is_null($event_id)) {
-                $event = SummitEventFactory::build($summit, $event_type);
+                $event = SummitEventFactory::build($event_type);
             } else {
                 $event = $this->event_repository->getById($event_id);
                 if (is_null($event))
@@ -586,14 +608,22 @@ final class SummitService implements ISummitService
                 $event_type = $event->getType();
             }
 
-            if (isset($data['title']))
-                $event->setTitle(trim($data['title']));
+            // main data
 
-            if (isset($data['description']))
-                $event->setAbstract(trim($data['description']));
+            if (isset($data['title']))
+                $event->setTitle(html_entity_decode(trim($data['title'])));
+
+            if (isset($data['abstract']))
+                $event->setAbstract(html_entity_decode(trim($data['abstract'])));
+
+            if (isset($data['rsvp_link']))
+                $event->setRsvpLink(html_entity_decode(trim($data['rsvp_link'])));
+
+            if (isset($data['head_count']))
+                $event->setHeadCount(intval(data['head_count']));
 
             if (isset($data['social_summary']))
-                $event->setSocialSummary(trim($data['social_summary']));
+                $event->setSocialSummary(strip_tags(trim($data['social_summary'])));
 
             if (isset($data['allow_feedback']))
                 $event->setAllowFeedBack($data['allow_feedback']);
@@ -611,11 +641,6 @@ final class SummitService implements ISummitService
                 $event->setCategory($track);
             }
 
-            // is event is new and we dont provide speakers ...
-            if(is_null($event_id) && !is_null($event_type) && $event_type instanceof PresentationType
-                && $event_type->isAreSpeakersMandatory() && !isset($data['speakers']))
-                throw new ValidationException('speakers data is required for presentations!');
-
             $event->setSummit($summit);
 
             if (!is_null($location))
@@ -632,25 +657,32 @@ final class SummitService implements ISummitService
                 }
             }
 
-            if (isset($data['speakers'])  && !is_null($event_type) && $event_type->isPresentationType()) {
-                $event->clearSpeakers();
-                foreach ($data['speakers'] as $speaker_id) {
-                    $speaker = $this->speaker_repository->getById(intval($speaker_id));
-                    if(is_null($speaker)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_id));
-                    $event->addSpeaker($speaker);
+            // sponsors
+
+            $sponsors = ($event_type->isUseSponsors() && isset($data['sponsors'])) ?
+                $data['sponsors'] : [];
+
+            if($event_type->isAreSponsorsMandatory() && count($sponsors) == 0){
+                throw new ValidationException('sponsors are mandatory!');
+            }
+
+            if (count($sponsors) > 0) {
+                $event->clearSponsors();
+                foreach ($sponsors as $sponsor_id) {
+                    $sponsor = $this->company_repository->getById(intval($sponsor_id));
+                    if(is_null($sponsor)) throw new EntityNotFoundException(sprintf('sponsor id %s', $sponsor_id));
+                    $event->addSponsor($sponsor);
                 }
             }
 
-            if(isset($data['moderator_speaker_id']) && !is_null($event_type)
-                && $event_type instanceof PresentationType && $event instanceof Presentation){
-                $speaker_id = intval($data['moderator_speaker_id']);
-                if($speaker_id === 0) $event->unsetModerator();
-                else
-                {
-                    $moderator = $this->speaker_repository->getById($speaker_id);
-                    if (is_null($moderator)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_id));
-                    $event->setModerator($speaker);
-                }
+            $this->saveOrUpdatePresentationData($event, $event_type, $data);
+            $this->saveOrUpdateSummitGroupEventData($event, $event_type, $data);
+
+            if($event->isPublished())
+            {
+                $this->validateBlackOutTimesAndTimes($event);
+                $event->unPublish();
+                $event->publish();
             }
 
             $this->event_repository->add($event);
@@ -659,6 +691,82 @@ final class SummitService implements ISummitService
         });
     }
 
+    private function saveOrUpdateSummitGroupEventData(SummitEvent $event, SummitEventType $event_type, array $data ){
+        if(!$event instanceof SummitGroupEvent) return;
+
+        if(!isset($data['groups']) || count($data['groups']) == 0)
+            throw new ValidationException('groups is required');
+        $event->clearGroups();
+
+        foreach ($data['groups'] as $group_id) {
+            $group = $this->group_repository->getById(intval($group_id));
+            if(is_null($group)) throw new EntityNotFoundException(sprintf('group id %s', $group_id));
+            $event->addGroup($group);
+        }
+    }
+
+    private function saveOrUpdatePresentationData(SummitEvent $event, SummitEventType $event_type, array $data ){
+        if(!$event instanceof Presentation) return;
+
+        // main data
+
+        if(!isset($data['expect_learn']))
+            throw new ValidationException('expect_learn is required');
+
+        if(!isset($data['level']))
+            throw new ValidationException('level is required');
+
+        // set data
+        // if we are creating the presentation from admin, then
+        // we should mark it as received and complete
+        $event->setStatus(Presentation::STATUS_RECEIVED);
+        $event->setProgress(Presentation::PHASE_COMPLETE);
+
+        $event->setAttendeesExpectedLearnt(html_entity_decode($data['expect_learn']));
+        $event->setLevel($data['level']);
+        $event->setToRecord(isset($data['to_record'])? $data['to_record'] : 0);
+
+        // speakers
+
+        if($event_type instanceof PresentationType && $event_type->isUseSponsors()) {
+            $speakers = isset($data['speakers']) ?
+                        $data['speakers'] : [];
+
+            if ($event_type->isAreSpeakersMandatory() && count($speakers) == 0) {
+                throw new ValidationException('speakers are mandatory!');
+            }
+
+            if (count($speakers) > 0 && $event instanceof Presentation) {
+                $event->clearSpeakers();
+                foreach ($speakers as $speaker_id) {
+                    $speaker = $this->speaker_repository->getById(intval($speaker_id));
+                    if (is_null($speaker)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_id));
+                    $event->addSpeaker($speaker);
+                }
+            }
+        }
+
+        // moderator
+
+        if($event_type instanceof PresentationType && $event_type->isUseModerator()) {
+            $moderator_id = isset($data['moderator_speaker_id']) ? intval($data['moderator_speaker_id']) : 0;
+
+            if ($event_type->isModeratorMandatory() && $moderator_id == 0) {
+                throw new ValidationException('moderator_speaker_id is mandatory!');
+            }
+
+            if ($moderator_id > 0) {
+                $speaker_id = intval($data['moderator_speaker_id']);
+                if ($speaker_id === 0) $event->unsetModerator();
+                else {
+                    $moderator = $this->speaker_repository->getById($speaker_id);
+                    if (is_null($moderator)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_id));
+                    $event->setModerator($speaker);
+                }
+            }
+        }
+
+    }
     /**
      * @param Summit $summit
      * @param int $event_id
@@ -702,57 +810,7 @@ final class SummitService implements ISummitService
                 $event->setLocation($location);
             }
 
-            $current_event_location = $event->getLocation();
-
-            // validate blackout times
-            $conflict_events = $this->event_repository->getPublishedOnSameTimeFrame($event);
-            if (!is_null($conflict_events)) {
-                foreach ($conflict_events as $c_event) {
-                    // if the published event is BlackoutTime or if there is a BlackoutTime event in this timeframe
-                    if (($event->getType()->isBlackoutTimes() || $c_event->getType()->isBlackoutTimes()) && $event->getId() != $c_event->getId()) {
-                        throw new ValidationException
-                        (
-                            sprintf
-                            (
-                                "You can't publish on this time frame, it conflicts with event id %s",
-                                $c_event->getId()
-                            )
-                        );
-                    }
-                    // if trying to publish an event on a slot occupied by another event
-                    if (!is_null($current_event_location) &&  !is_null($c_event->getLocation()) && $current_event_location->getId() == $c_event->getLocation()->getId() && $event->getId() != $c_event->getId()) {
-                        throw new ValidationException
-                        (
-                            sprintf
-                            (
-                                "You can't publish on this time frame, it conflicts with event id %s",
-                                $c_event->getId()
-                            )
-                        );
-                    }
-
-                    // check speakers collisions
-                    if ($event->getClassName() == 'Presentation' && $c_event->getClassName() == 'Presentation' && $event->getId() != $c_event->getId()) {
-                        foreach ($event->getSpeakers() as $current_speaker) {
-                            foreach ($c_event->getSpeakers() as $c_speaker) {
-                                if (intval($c_speaker->getId()) === intval($current_speaker->getId())) {
-                                    throw new ValidationException
-                                    (
-                                        sprintf
-                                        (
-                                            'speaker id % belongs already to another event ( %s) on that time frame',
-                                            $c_speaker->getId(),
-                                            $c_event->getId()
-                                        )
-                                    );
-                                }
-                            }
-                        }
-                    }
-
-                }
-            }
-
+            $this->validateBlackOutTimesAndTimes($event);
             $event->unPublish();
             $event->publish();
 
@@ -761,6 +819,60 @@ final class SummitService implements ISummitService
         });
     }
 
+    private function validateBlackOutTimesAndTimes(SummitEvent $event){
+        $current_event_location = $event->getLocation();
+
+        // validate blackout times
+        $conflict_events = $this->event_repository->getPublishedOnSameTimeFrame($event);
+        if (!is_null($conflict_events)) {
+            foreach ($conflict_events as $c_event) {
+                // if the published event is BlackoutTime or if there is a BlackoutTime event in this timeframe
+                if ((!is_null($current_event_location) && !$current_event_location->isOverrideBlackouts()) &&  ($event->getType()->isBlackoutTimes() || $c_event->getType()->isBlackoutTimes()) && $event->getId() != $c_event->getId()) {
+                    throw new ValidationException
+                    (
+                        sprintf
+                        (
+                            "You can't publish on this time frame, it conflicts with event id %s",
+                            $c_event->getId()
+                        )
+                    );
+                }
+                // if trying to publish an event on a slot occupied by another event
+                if (!is_null($current_event_location) &&  !is_null($c_event->getLocation()) && $current_event_location->getId() == $c_event->getLocation()->getId() && $event->getId() != $c_event->getId()) {
+                    throw new ValidationException
+                    (
+                        sprintf
+                        (
+                            "You can't publish on this time frame, it conflicts with event id %s",
+                            $c_event->getId()
+                        )
+                    );
+                }
+
+                // check speakers collisions
+                if ($event instanceof Presentation && $c_event instanceof Presentation && $event->getId() != $c_event->getId()) {
+                    foreach ($event->getSpeakers() as $current_speaker) {
+                        foreach ($c_event->getSpeakers() as $c_speaker) {
+                            if (intval($c_speaker->getId()) === intval($current_speaker->getId())) {
+                                throw new ValidationException
+                                (
+                                    sprintf
+                                    (
+                                        "You can't publish Event %s (%s) on this timeframe, speaker %s its presention in room %s at this time.",
+                                        $event->getTitle(),
+                                        $event->getId(),
+                                        $current_speaker->getFullName(),
+                                        $c_event->getLocationName()
+                                    )
+                                );
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+    }
     /**
      * @param Summit $summit
      * @param int $event_id
@@ -781,7 +893,7 @@ final class SummitService implements ISummitService
 
             $event->unPublish();
             $this->event_repository->add($event);
-            $this->event_repository->cleanupAttendeesScheduleForEvent($event_id);
+            $this->event_repository->cleanupScheduleAndFavoritesForEvent($event_id);
             return $event;
         });
     }
@@ -806,7 +918,8 @@ final class SummitService implements ISummitService
 
             $this->event_repository->delete($event);
             // clean up summit attendees schedule
-            $this->event_repository->cleanupAttendeesScheduleForEvent($event_id);
+            $this->event_repository->cleanupScheduleAndFavoritesForEvent($event_id);
+
             return true;
         });
     }

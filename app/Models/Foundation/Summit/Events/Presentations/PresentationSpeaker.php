@@ -352,4 +352,16 @@ class PresentationSpeaker extends SilverstripeBaseModel
     {
         $this->registration_request = $registration_request;
     }
+
+    /**
+     * @return string
+     */
+    public function getFullName(){
+        $fullname = $this->first_name;
+        if(!empty($this->last_name)){
+            if(!empty($fullname)) $fullname .= ', ';
+            $fullname .= $this->last_name;
+        }
+        return $fullname;
+    }
 }

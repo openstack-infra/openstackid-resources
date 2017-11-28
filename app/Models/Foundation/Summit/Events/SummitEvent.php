@@ -19,6 +19,7 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use models\exceptions\ValidationException;
 use models\main\Company;
+use models\main\Member;
 use models\main\Tag;
 use models\utils\PreRemoveEventArgs;
 use models\utils\SilverstripeBaseModel;
@@ -136,6 +137,7 @@ class SummitEvent extends SilverstripeBaseModel
     /**
      * @ORM\ManyToOne(targetEntity="SummitAbstractLocation", fetch="EXTRA_LAZY")
      * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
+     * @var SummitAbstractLocation
      */
     protected $location = null;
 
@@ -147,15 +149,6 @@ class SummitEvent extends SilverstripeBaseModel
      *      )
      */
     protected $sponsors;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\summit\SummitAttendee")
-     * @ORM\JoinTable(name="SummitAttendee_Schedule",
-     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="SummitAttendeeID", referencedColumnName="ID")}
-     *      )
-     */
-    protected $attendees;
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="event", cascade={"persist"})
@@ -211,7 +204,6 @@ class SummitEvent extends SilverstripeBaseModel
         $this->head_count     = 0;
         $this->tags           = new ArrayCollection();
         $this->feedback       = new ArrayCollection();
-        $this->attendees      = new ArrayCollection();
         $this->sponsors       = new ArrayCollection();
         $this->rsvp           = new ArrayCollection();
     }
@@ -576,14 +568,17 @@ class SummitEvent extends SilverstripeBaseModel
     }
 
     /**
-     * @return SummitAttendee[]
+     * @param Company $sponsor
      */
-    public function getAttendees()
-    {
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('IsCheckedIn', 1));
-        return $this->attendees->matching($criteria);
+    public function addSponsor(Company $sponsor){
+        $this->sponsors->add($sponsor);
     }
+
+
+    public function clearSponsors(){
+        $this->sponsors->clear();
+    }
+
 
     public function addFeedBack(SummitEventFeedback $feedback)
     {
@@ -699,13 +694,22 @@ class SummitEvent extends SilverstripeBaseModel
      * @ORM\PreRemove:
      */
     public function deleting($args){
-        $this->pre_remove_events = new PreRemoveEventArgs(['id' => $this->id, 'class_name' => $this->getClassName(), 'summit' => $this->summit ]);
+        $this->pre_remove_events = new PreRemoveEventArgs
+        (
+            [
+                'id'         => $this->id,
+                'class_name' => $this->getClassName(),
+                'summit'     => $this->summit,
+                'published'  => $this->isPublished(),
+            ]
+        );
     }
 
     /**
      * @ORM\PostRemove:
      */
     public function deleted($args){
+
         Event::fire(new SummitEventDeleted($this,  $this->pre_remove_events ));
         $this->pre_remove_events = null;
     }
@@ -812,4 +816,10 @@ class SummitEvent extends SilverstripeBaseModel
         $this->rsvp = $rsvp;
     }
 
+    /**
+     * @return string
+     */
+    public function getLocationName(){
+        return $this->hasLocation() ? $this->location->getName() : 'TBD';
+    }
 }

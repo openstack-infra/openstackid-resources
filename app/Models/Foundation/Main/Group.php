@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="repositories\main\DoctrineGroupRepository")
  * @ORM\Table(name="`Group`")
  * Class Group
  * @package models\main
