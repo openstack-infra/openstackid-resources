@@ -109,12 +109,18 @@ abstract class RetrieveSummitEventsStrategy
     {
         return array
         (
-            'title'          => array('=@', '=='),
-            'tags'           => array('=@', '=='),
-            'start_date'     => array('>', '<', '<=', '>=', '=='),
-            'end_date'       => array('>', '<', '<=', '>=', '=='),
-            'summit_type_id' => array('=='),
-            'event_type_id'  => array('=='),
+            'title'            => ['=@', '=='],
+            'abstract'         => ['=@', '=='],
+            'social_summary'   => ['=@', '=='],
+            'tags'             => ['=@', '=='],
+            'start_date'       => ['>', '<', '<=', '>=', '=='],
+            'end_date'         => ['>', '<', '<=', '>=', '=='],
+            'summit_type_id'   => ['=='],
+            'event_type_id'    => ['=='],
+            'track_id'         => ['=='],
+            'speaker'          => ['=@', '=='],
+            'speaker_email'    => ['=@', '=='],
+            'selection_status' => ['=='],
         );
     }
 }

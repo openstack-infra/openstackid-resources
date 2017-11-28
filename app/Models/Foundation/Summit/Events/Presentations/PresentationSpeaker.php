@@ -35,6 +35,73 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $first_name;
 
     /**
+     * @ORM\Column(name="LastName", type="string")
+     */
+    private $last_name;
+
+    /**
+     * @ORM\Column(name="Title", type="string")
+     */
+    private $title;
+
+    /**
+     * @ORM\Column(name="Bio", type="string")
+     */
+    private $bio;
+
+    /**
+     * @ORM\Column(name="IRCHandle", type="string")
+     */
+    private $irc_handle;
+
+    /**
+     * @ORM\Column(name="TwitterName", type="string")
+     */
+    private $twitter_name;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SpeakerRegistrationRequest")
+     * @ORM\JoinColumn(name="RegistrationRequestID", referencedColumnName="ID")
+     * @var SpeakerRegistrationRequest
+     */
+    private $registration_request;
+
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\Presentation", inversedBy="speakers")
+     * @ORM\JoinTable(name="Presentation_Speakers",
+     *  joinColumns={
+     *      @ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")
+     * },
+     * inverseJoinColumns={
+     *      @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID")
+     * }
+     * )
+     */
+    private $presentations;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Presentation", mappedBy="moderator", cascade={"persist"})
+     * @var Presentation[]
+     */
+    private $moderated_presentations;
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\JoinColumn(name="PhotoID", referencedColumnName="ID")
+     * @var File
+     */
+    private $photo;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
+     * @var Member
+     */
+    private $member;
+
+    /**
      * @return mixed
      */
     public function getFirstName()
@@ -129,50 +196,6 @@ class PresentationSpeaker extends SilverstripeBaseModel
     {
         $this->twitter_name = $twitter_name;
     }
-
-    /**
-     * @ORM\Column(name="LastName", type="string")
-     */
-    private $last_name;
-
-    /**
-     * @ORM\Column(name="Title", type="string")
-     */
-    private $title;
-
-    /**
-     * @ORM\Column(name="Bio", type="string")
-     */
-    private $bio;
-
-    /**
-     * @ORM\Column(name="IRCHandle", type="string")
-     */
-    private $irc_handle;
-
-    /**
-     * @ORM\Column(name="TwitterName", type="string")
-     */
-    private $twitter_name;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\summit\Presentation", inversedBy="speakers")
-     * @ORM\JoinTable(name="Presentation_Speakers",
-     *  joinColumns={
-     *      @ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")
-     * },
-     * inverseJoinColumns={
-     *      @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID")
-     * }
-     * )
-     */
-    private $presentations;
-
-    /**
-     * @ORM\OneToMany(targetEntity="Presentation", mappedBy="moderator", cascade={"persist"})
-     * @var Presentation[]
-     */
-    private $moderated_presentations;
 
     public function __construct()
     {
@@ -278,14 +301,6 @@ class PresentationSpeaker extends SilverstripeBaseModel
         })->toArray();
     }
 
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\File")
-     * @ORM\JoinColumn(name="PhotoID", referencedColumnName="ID")
-     * @var File
-     */
-    protected $photo;
-
     /**
      * @return File
      */
@@ -293,13 +308,6 @@ class PresentationSpeaker extends SilverstripeBaseModel
     {
         return $this->photo;
     }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\Member")
-     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
-     * @var Member
-     */
-    private $member;
 
     /**
      * @return Member
@@ -327,5 +335,21 @@ class PresentationSpeaker extends SilverstripeBaseModel
         catch(\Exception $ex){
             return 0;
         }
+    }
+
+    /**
+     * @return SpeakerRegistrationRequest
+     */
+    public function getRegistrationRequest()
+    {
+        return $this->registration_request;
+    }
+
+    /**
+     * @param SpeakerRegistrationRequest $registration_request
+     */
+    public function setRegistrationRequest($registration_request)
+    {
+        $this->registration_request = $registration_request;
     }
 }

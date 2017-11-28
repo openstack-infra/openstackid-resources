@@ -183,6 +183,10 @@ Route::group([
             Route::group(array('prefix' => 'events'), function () {
 
                 Route::get('', 'OAuth2SummitEventsApiController@getEvents');
+                Route::group(array('prefix' => 'unpublished'), function () {
+                    Route::get('', 'OAuth2SummitEventsApiController@getUnpublishedEvents');
+                    //Route::get('{event_id}', 'OAuth2SummitEventsApiController@getUnpublisedEvent');
+                });
                 Route::get('/published', 'OAuth2SummitEventsApiController@getScheduledEvents');
                 Route::post('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@addEvent']);
                 Route::group(array('prefix' => '{event_id}'), function () {

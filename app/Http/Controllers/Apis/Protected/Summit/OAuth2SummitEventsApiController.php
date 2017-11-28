@@ -821,7 +821,6 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         return [$summit, $event, $data];
     }
 
-
     public function addEventAttachment(LaravelRequest $request, $summit_id, $event_id){
 
         try {
@@ -855,6 +854,31 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         catch (Exception $ex) {
             Log::error($ex);
 
+            return $this->error500($ex);
+        }
+    }
+
+    public function getUnpublishedEvents($summit_id){
+
+        try
+        {
+            $strategy = new RetrieveAllUnPublishedSummitEventsStrategy($this->repository, $this->event_repository);
+            $response = $strategy->getEvents(['summit_id' => $summit_id]);
+            return $this->ok($response->toArray(Request::input('expand', '')));
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
             return $this->error500($ex);
         }
     }

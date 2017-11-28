@@ -76,6 +76,14 @@ final class Filter
 
     /**
      * @param string $field
+     * @return bool
+     */
+    public function hasFilter($field){
+        return count($this->getFilter($field)) > 0;
+    }
+
+    /**
+     * @param string $field
      * @return null|FilterElement[]
      */
     public function getFlatFilter($field)
@@ -166,6 +174,14 @@ final class Filter
                     $query = $mapping->apply($query, $filter);
                     continue;
                 }
+                if ($mapping instanceof DoctrineSwitchFilterMapping) {
+                    $query = $mapping->apply($query, $filter);
+                    continue;
+                }
+                if ($mapping instanceof DoctrineFilterMapping) {
+                    $query = $mapping->apply($query, $filter);
+                    continue;
+                }
                 else if(is_array($mapping)){
                     $condition = '';
                     foreach ($mapping as $mapping_or){
@@ -203,7 +219,19 @@ final class Filter
                         $mapping = $mappings[$e->getField()];
                         if ($mapping instanceof DoctrineJoinFilterMapping) {
                             $condition = $mapping->applyOr($query, $e);
-                            if(!empty($condition)) $condition .= ' OR ';
+                            if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
+                            $sub_or_query .= $condition;
+                            continue;
+                        }
+                        if ($mapping instanceof DoctrineSwitchFilterMapping) {
+                            $condition = $mapping->applyOr($query, $e);
+                            if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
+                            $sub_or_query .= $condition;
+                            continue;
+                        }
+                        if ($mapping instanceof DoctrineFilterMapping) {
+                            $condition = $mapping->applyOr($query, $e);
+                            if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
                             $sub_or_query .= $condition;
                             continue;
                         }

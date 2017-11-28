@@ -17,7 +17,10 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use models\summit\ISummitEventRepository;
 use models\summit\SummitEvent;
 use App\Repositories\SilverStripeDoctrineRepository;
+use utils\DoctrineCaseFilterMapping;
+use utils\DoctrineFilterMapping;
 use utils\DoctrineJoinFilterMapping;
+use utils\DoctrineSwitchFilterMapping;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
@@ -66,11 +69,13 @@ final class DoctrineSummitEventRepository
     protected function getFilterMappings()
     {
         return [
-            'title'         => 'e.title:json_string',
-            'published'     => 'e.published',
-            'start_date'    => 'e.start_date:datetime_epoch',
-            'end_date'      => 'e.end_date:datetime_epoch',
-            'tags'          => new DoctrineJoinFilterMapping
+            'title'          => 'e.title:json_string',
+            'abstract'       => 'e.abstract:json_string',
+            'social_summary' => 'e.social_summary:json_string',
+            'published'      => 'e.published',
+            'start_date'     => 'e.start_date:datetime_epoch',
+            'end_date'       => 'e.end_date:datetime_epoch',
+            'tags'           => new DoctrineJoinFilterMapping
             (
                 'e.tags',
                 't',
@@ -100,11 +105,44 @@ final class DoctrineSummitEventRepository
                 'c',
                 "c.id :operator :value"
             ),
-            'speaker' => new DoctrineJoinFilterMapping
+            'speaker' => new DoctrineFilterMapping
             (
-                'e.speakers',
-                'sp',
-                "concat(sp.first_name, ' ', sp.last_name) :operator ':value'"
+                "( concat(sp.first_name, ' ', sp.last_name) :operator ':value' ".
+                "OR concat(spm.first_name, ' ', spm.last_name) :operator ':value' ".
+                "OR concat(spmm.first_name, ' ', spmm.last_name) :operator ':value' ".
+                "OR sp.first_name :operator ':value' ".
+                "OR sp.last_name :operator ':value' ".
+                "OR spm.first_name :operator ':value' ".
+                "OR spm.last_name :operator ':value' ".
+                "OR spmm.first_name :operator ':value' ".
+                "OR spmm.last_name :operator ':value' )"
+            ),
+            'speaker_email' => new DoctrineFilterMapping
+            (
+                "(sprr.email :operator ':value' OR spmm.email :operator ':value')"
+            ),
+            'selection_status' => new DoctrineSwitchFilterMapping([
+                 'selected' => new DoctrineCaseFilterMapping(
+                      'selected',
+                      "ssp.order is not null and sspl.list_type = 'Group' and sspl.category = e.category"
+                  ),
+                  'accepted' => new DoctrineCaseFilterMapping(
+                    'accepted',
+                    "ssp.`order` is not null and ssp.order <= e.category.session_count and sspl.list_type = 'Group' and sspl.list_class = 'Session' and sspl.category = e.category"
+                  ),
+                  'alternate' => new DoctrineCaseFilterMapping(
+                        'alternate',
+                        "ssp.`order` is not null and ssp.`order` > e.category.session_count and sspl.list_type = 'Group' and sspl.list_class = 'Session' and sspl.category = e.category"
+                  ),
+                  'lightning-accepted' => new DoctrineCaseFilterMapping(
+                        'lightning-accepted',
+                        "ssp.`order` is not null and ssp.`order` <= e.category.lightning_count and sspl.list_type = 'Group' and sspl.list_class = 'Lightning' and sspl.category = e.category"
+                  ),
+                  'lightning-alternate' => new DoctrineCaseFilterMapping(
+                        'lightning-alternate',
+                        "ssp.`order` is not null and ssp.`order` > e.category.lightning_count and sspl.list_type = 'Group' and sspl.list_class = 'Lightning' and sspl.category = e.category"
+                  ),
+              ]
             ),
         ];
     }
@@ -131,8 +169,10 @@ final class DoctrineSummitEventRepository
      */
     public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
-        $class  = count($filter->getFilter('speaker')) > 0?
-            \models\summit\Presentation::class :
+        $class  = $filter->hasFilter('speaker')
+                  || $filter->hasFilter('selection_status')
+                  || $filter->hasFilter('speaker_email')?
+            \models\summit\Presentation::class:
             \models\summit\SummitEvent::class;
 
         $query  = $this->getEntityManager()->createQueryBuilder()
@@ -140,7 +180,6 @@ final class DoctrineSummitEventRepository
             ->from($class, "e");
 
         if(!is_null($filter)){
-
             $filter->apply2Query($query, $this->getFilterMappings());
         }
 
@@ -152,17 +191,26 @@ final class DoctrineSummitEventRepository
             $query = $query->addOrderBy("e.end_date", 'ASC');
         }
 
-        $query= $query
+        if($class == \models\summit\Presentation::class) {
+            $query = $query->innerJoin("e.speakers", "sp", Join::WITH);
+            $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
+            $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
+            $query = $query->leftJoin('e.moderator', "spm", Join::LEFT_JOIN);
+            $query = $query->leftJoin('sp.member', "spmm", Join::LEFT_JOIN);
+            $query = $query->leftJoin('sp.registration_request', "sprr", Join::LEFT_JOIN);
+        }
+
+        $query = $query
             ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')")
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 
         $paginator = new Paginator($query, $fetchJoinCollection = true);
         $total     = $paginator->count();
-        $data      = array();
+        $data      = [];
 
         foreach($paginator as $entity)
-            array_push($data, $entity);
+            $data[]= $entity;
 
         return new PagingResponse
         (

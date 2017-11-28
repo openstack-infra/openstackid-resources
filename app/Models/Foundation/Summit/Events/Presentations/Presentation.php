@@ -26,6 +26,84 @@ class Presentation extends SummitEvent
 {
 
     /**
+     * Defines the phase that a presentation has been created, but
+     * no information has been saved to it.
+     */
+    const PHASE_NEW = 0;
+
+    /**
+     * Defines the phase where a presenation has been given a summary,
+     * but no speakers have been added
+     */
+    const PHASE_SUMMARY = 1;
+
+    /**
+     * defines a phase where a presentation has a tags
+     */
+    const PHASE_TAGS = 2;
+
+    /**
+     * defines a phase where a presentation has a summary and speakers
+     */
+    const PHASE_SPEAKERS = 3;
+
+
+    /**
+     * Defines a phase where a presentation has been submitted successfully
+     */
+    const PHASE_COMPLETE = 4;
+
+    /**
+     *
+     */
+    const STATUS_RECEIVED = 'Received';
+
+    const ClassNamePresentation = 'Presentation';
+
+    /**
+     * @ORM\Column(name="Level", type="string")
+     * @var string
+     */
+    private $level;
+
+    /**
+     * @ORM\Column(name="Status", type="string")
+     * @var string
+     */
+    private $status;
+
+    /**
+     * @ORM\Column(name="Progress", type="integer")
+     * @var int
+     */
+    private $progress;
+
+    /**
+     * @ORM\Column(name="ProblemAddressed", type="string")
+     * @var string
+     */
+    private $problem_addressed;
+
+    /**
+     * @ORM\Column(name="AttendeesExpectedLearnt", type="string")
+     * @var string
+     */
+    private $attendees_expected_learnt;
+
+    /**
+     * @ORM\Column(name="ToRecord", type="boolean")
+     * @var bool
+     */
+    protected $to_record;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="moderated_presentations")
+     * @ORM\JoinColumn(name="ModeratorID", referencedColumnName="ID")
+     * @var PresentationSpeaker
+     */
+    private $moderator;
+
+    /**
      * @ORM\OneToMany(targetEntity="models\summit\PresentationMaterial", mappedBy="presentation", cascade={"persist"}, orphanRemoval=true)
      * @var PresentationMaterial[]
      */
@@ -38,10 +116,10 @@ class Presentation extends SummitEvent
     private $speakers;
 
     /**
-     * @ORM\Column(name="ToRecord", type="boolean")
-     * @var bool
+     * @ORM\OneToMany(targetEntity="models\summit\SummitSelectedPresentation", mappedBy="presentation", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitSelectedPresentation[]
      */
-    protected $to_record;
+    private $selected_presentations;
 
     /**
      * @return bool
@@ -107,23 +185,6 @@ class Presentation extends SummitEvent
         $this->problem_addressed = $problem_addressed;
     }
 
-    /**
-     * @ORM\Column(name="Level", type="string")
-     * @var string
-     */
-    private $level;
-
-    /**
-     * @ORM\Column(name="ProblemAddressed", type="string")
-     * @var string
-     */
-    private $problem_addressed;
-
-    /**
-     * @ORM\Column(name="AttendeesExpectedLearnt", type="string")
-     * @var string
-     */
-    private $attendees_expected_learnt;
 
     /**
      * @return string
@@ -147,8 +208,6 @@ class Presentation extends SummitEvent
     public function getClassName(){
         return self::ClassNamePresentation;
     }
-
-    const ClassNamePresentation = 'Presentation';
 
     /**
      * @return PresentationSpeaker[]
@@ -293,13 +352,6 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="moderated_presentations")
-     * @ORM\JoinColumn(name="ModeratorID", referencedColumnName="ID")
-     * @var PresentationSpeaker
-     */
-    private $moderator;
-
-    /**
      * @return PresentationSpeaker
      */
     public function getModerator()
@@ -317,6 +369,70 @@ class Presentation extends SummitEvent
 
     public function unsetModerator(){
         $this->moderator = null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProgress()
+    {
+        return $this->progress;
+    }
+
+    /**
+     * @param mixed $progress
+     */
+    public function setProgress($progress)
+    {
+        $this->progress = $progress;
+    }
+
+    /**
+     * @return PresentationMaterial[]
+     */
+    public function getMaterials()
+    {
+        return $this->materials;
+    }
+
+    /**
+     * @param PresentationMaterial[] $materials
+     */
+    public function setMaterials($materials)
+    {
+        $this->materials = $materials;
+    }
+
+    /**
+     * @return SummitSelectedPresentation[]
+     */
+    public function getSelectedPresentations()
+    {
+        return $this->selected_presentations;
+    }
+
+    /**
+     * @param SummitSelectedPresentation[] $selected_presentations
+     */
+    public function setSelectedPresentations($selected_presentations)
+    {
+        $this->selected_presentations = $selected_presentations;
     }
 
 }

@@ -44,6 +44,31 @@ class PresentationCategory extends SilverstripeBaseModel
     private $code;
 
     /**
+     * @ORM\Column(name="SessionCount", type="integer")
+     * @var int
+     */
+    private $session_count;
+
+    /**
+     * @ORM\Column(name="AlternateCount", type="integer")
+     * @var int
+     */
+    private $alternate_count;
+
+    /**
+     * @ORM\Column(name="LightningCount", type="integer")
+     * @var int
+     */
+    private $lightning_count;
+
+    /**
+     * @ORM\Column(name="LightningAlternateCount", type="integer")
+     * @var int
+     */
+    private $lightning_alternate_count;
+
+
+    /**
      * @return string
      */
     public function getDescription()
@@ -129,4 +154,67 @@ class PresentationCategory extends SilverstripeBaseModel
         return $this->groups;
     }
 
+    /**
+     * @return int
+     */
+    public function getSessionCount()
+    {
+        return $this->session_count;
+    }
+
+    /**
+     * @param int $session_count
+     */
+    public function setSessionCount($session_count)
+    {
+        $this->session_count = $session_count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAlternateCount()
+    {
+        return $this->alternate_count;
+    }
+
+    /**
+     * @param int $alternate_count
+     */
+    public function setAlternateCount($alternate_count)
+    {
+        $this->alternate_count = $alternate_count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLightningCount()
+    {
+        return $this->lightning_count;
+    }
+
+    /**
+     * @param int $lightning_count
+     */
+    public function setLightningCount($lightning_count)
+    {
+        $this->lightning_count = $lightning_count;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLightningAlternateCount()
+    {
+        return $this->lightning_alternate_count;
+    }
+
+    /**
+     * @param int $lightning_alternate_count
+     */
+    public function setLightningAlternateCount($lightning_alternate_count)
+    {
+        $this->lightning_alternate_count = $lightning_alternate_count;
+    }
 }

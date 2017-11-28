@@ -171,6 +171,12 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf('%s/summits/read', $current_realm)],
             ),
             array(
+                'name' => 'get-unpublished-events',
+                'route' => '/api/v1/summits/{id}/events/unpublished',
+                'http_method' => 'GET',
+                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+            ),
+            array(
                 'name' => 'get-all-events',
                 'route' => '/api/v1/summits/events',
                 'http_method' => 'GET',
