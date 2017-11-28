@@ -11,15 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitEventType")
- * Class SummitEventType
- * @package models\summit
+ * @ORM\InheritanceType("JOINED")
+ * @ORM\DiscriminatorColumn(name="ClassName", type="string")
+ * @ORM\DiscriminatorMap({"SummitEventType" = "SummitEventType", "PresentationType" = "PresentationType", "SummitGroupEvent" = "SummitGroupEvent", "SummitEventWithFile" = "SummitEventWithFile"})
  */
 class SummitEventType extends SilverstripeBaseModel
 {
@@ -29,39 +29,37 @@ class SummitEventType extends SilverstripeBaseModel
      * @ORM\Column(name="Type", type="string")
      * @var string
      */
-    private $type;
+    protected $type;
 
     /**
      * @ORM\Column(name="Color", type="string")
      * @var string
      */
-    private $color;
-
-    /**
-     * @ORM\Column(name="ClassName", type="string")
-     * @var string
-     */
-    private $class_name;
-
-    /**
-     * @return bool
-     */
-    public function isPresentationType(){
-        return $this->class_name === 'PresentationType';
-    }
-
-    /**
-     * @return bool
-     */
-    public function allowsModerator(){
-        return $this->isPresentationType() && in_array($this->type, ['Panel','Keynotes']);
-    }
+    protected $color;
 
     /**
      * @ORM\Column(name="BlackoutTimes", type="boolean")
      * @var bool
      */
-    private $blackout_times;
+    protected $blackout_times;
+
+    /**
+     * @ORM\Column(name="UseSponsors", type="boolean")
+     * @var bool
+     */
+    protected $use_sponsors;
+
+    /**
+     * @ORM\Column(name="AreSponsorsMandatory", type="boolean")
+     * @var bool
+     */
+    protected $are_sponsors_mandatory;
+
+    /**
+     * @ORM\Column(name="AllowsAttachment", type="boolean")
+     * @var bool
+     */
+    protected $allows_attachment;
 
     /**
      * @return string
@@ -125,6 +123,43 @@ class SummitEventType extends SilverstripeBaseModel
     static public function isPrivate($type){
         $private_types = [ISummitEventType::GroupsEvents];
         return in_array($type, $private_types);
+    }
+
+    /**
+     * @param Summit $summit
+     * @param string $type
+     * @return bool
+     */
+    static public function IsSummitEventType(Summit $summit, $type){
+        return !PresentationType::IsPresentationEventType($summit, $type);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUseSponsors()
+    {
+        return $this->use_sponsors;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAreSponsorsMandatory()
+    {
+        return $this->are_sponsors_mandatory;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllowsAttachment()
+    {
+        return $this->allows_attachment;
+    }
+
+    public function getClassName(){
+        return 'SummitEventType';
     }
 
 }

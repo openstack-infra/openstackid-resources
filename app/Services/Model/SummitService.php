@@ -41,6 +41,8 @@ use models\summit\ISummitAttendeeRepository;
 use models\summit\ISummitAttendeeTicketRepository;
 use models\summit\ISummitEntityEventRepository;
 use models\summit\ISummitEventRepository;
+use models\summit\Presentation;
+use models\summit\PresentationType;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
 use models\summit\SummitAttendeeTicket;
@@ -63,7 +65,7 @@ final class SummitService implements ISummitService
     /**
      *  minimun number of minutes that an event must last
      */
-    const MIN_EVENT_MINUTES = 15;
+    const MIN_EVENT_MINUTES = 10;
     /**
      * @var ITransactionService
      */
@@ -486,6 +488,59 @@ final class SummitService implements ISummitService
     }
 
     /**
+     * @param array $data
+     * @param Summit $summit
+     * @param SummitEvent $event
+     * @return SummitEvent
+     * @throws ValidationException
+     */
+    private function updateEventDates(array $data, Summit $summit, SummitEvent $event){
+
+        if (isset($data['start_date']) && isset($data['end_date'])) {
+            $event->setSummit($summit);
+            $summit_time_zone = $summit->getTimeZone();
+            $start_datetime   = intval($data['start_date']);
+            $start_datetime   = new \DateTime("@$start_datetime", $summit_time_zone);
+
+            $end_datetime     = intval($data['end_date']);
+            $end_datetime     = new \DateTime("@$end_datetime", $summit_time_zone);
+
+            $interval_seconds = $end_datetime->getTimestamp() - $start_datetime->getTimestamp();
+            $minutes          = $interval_seconds / 60;
+            if ($minutes < self::MIN_EVENT_MINUTES)
+                throw new ValidationException
+                (
+                    sprintf
+                    (
+                        "event should last at lest %s minutes  - current duration %s",
+                        self::MIN_EVENT_MINUTES,
+                        $minutes
+                    )
+                );
+
+            // set local time from UTC
+            $event->setStartDate($start_datetime);
+            $event->setEndDate($end_datetime);
+
+            if (!$summit->isEventInsideSummitDuration($event))
+                throw new ValidationException
+                (
+                    sprintf
+                    (
+                        "event start/end (%s - %s) does not match with summit start/end (%s - %s)",
+                        $start_datetime->format('Y-m-d H:i:s'),
+                        $end_datetime->format('Y-m-d H:i:s'),
+                        $summit->getLocalBeginDate()->format('Y-m-d H:i:s'),
+                        $summit->getLocalEndDate()->format('Y-m-d H:i:s')
+                    )
+                );
+        }
+
+        return $event;
+
+    }
+
+    /**
      * @param Summit $summit
      * @param array $data
      * @param null|int $event_id
@@ -493,35 +548,11 @@ final class SummitService implements ISummitService
      */
     private function saveOrUpdateEvent(Summit $summit, array $data, $event_id = null)
     {
-        $event_repository = $this->event_repository;
 
-        return $this->tx_service->transaction(function () use ($summit, $data, $event_id, $event_repository) {
-
-            $start_datetime = null;
-            $end_datetime   = null;
-
-            if (isset($data['start_date']) && isset($data['end_date'])) {
-                $start_datetime   = intval($data['start_date']);
-                $start_datetime   = new \DateTime("@$start_datetime");
-
-                $end_datetime     = intval($data['end_date']);
-                $end_datetime     = new \DateTime("@$end_datetime");
-
-                $interval_seconds = $end_datetime->getTimestamp() - $start_datetime->getTimestamp();
-                $minutes          = $interval_seconds / 60;
-                if ($minutes < self::MIN_EVENT_MINUTES)
-                    throw new ValidationException
-                    (
-                        sprintf
-                        (
-                            "event should last at lest %s minutes  - current duration %s",
-                            self::MIN_EVENT_MINUTES,
-                            $minutes
-                        )
-                    );
-            }
+        return $this->tx_service->transaction(function () use ($summit, $data, $event_id) {
 
             $event_type = null;
+
             if (isset($data['type_id'])) {
                 $event_type = $summit->getEventType(intval($data['type_id']));
                 if (is_null($event_type)) {
@@ -547,9 +578,9 @@ final class SummitService implements ISummitService
             }
 
             if (is_null($event_id)) {
-                $event = SummitEventFactory::build($event_type);
+                $event = SummitEventFactory::build($summit, $event_type);
             } else {
-                $event = $event_repository->getById($event_id);
+                $event = $this->event_repository->getById($event_id);
                 if (is_null($event))
                     throw new ValidationException(sprintf("event id %s does not exists!", $event_id));
                 $event_type = $event->getType();
@@ -581,7 +612,8 @@ final class SummitService implements ISummitService
             }
 
             // is event is new and we dont provide speakers ...
-            if(is_null($event_id) && !is_null($event_type) && $event_type->isPresentationType() && !isset($data['speakers']))
+            if(is_null($event_id) && !is_null($event_type) && $event_type instanceof PresentationType
+                && $event_type->isAreSpeakersMandatory() && !isset($data['speakers']))
                 throw new ValidationException('speakers data is required for presentations!');
 
             $event->setSummit($summit);
@@ -589,25 +621,7 @@ final class SummitService implements ISummitService
             if (!is_null($location))
                 $event->setLocation($location);
 
-            // check start/end datetime with summit
-            if (!is_null($start_datetime) && !is_null($end_datetime)) {
-                // set local time from UTC
-                $event->setStartDate($start_datetime);
-                $event->setEndDate($end_datetime);
-
-                if (!$summit->isEventInsideSummitDuration($event))
-                    throw new ValidationException
-                    (
-                        sprintf
-                        (
-                            "event start/end (%s - %s) does not match with summit start/end (%s - %s)",
-                            $start_datetime->format('Y-m-d H:i:s'),
-                            $end_datetime->format('Y-m-d H:i:s'),
-                            $summit->getLocalBeginDate()->format('Y-m-d H:i:s'),
-                            $summit->getLocalEndDate()->format('Y-m-d H:i:s')
-                        )
-                    );
-            }
+            $this->updateEventDates($data, $summit, $event);
 
             if (isset($data['tags']) && count($data['tags']) > 0) {
                 $event->clearTags();
@@ -627,7 +641,8 @@ final class SummitService implements ISummitService
                 }
             }
 
-            if(isset($data['moderator_speaker_id']) && !is_null($event_type) && $event_type->allowsModerator()){
+            if(isset($data['moderator_speaker_id']) && !is_null($event_type)
+                && $event_type instanceof PresentationType && $event instanceof Presentation){
                 $speaker_id = intval($data['moderator_speaker_id']);
                 if($speaker_id === 0) $event->unsetModerator();
                 else
@@ -638,7 +653,7 @@ final class SummitService implements ISummitService
                 }
             }
 
-            $event_repository->add($event);
+            $this->event_repository->add($event);
 
             return $event;
         });
@@ -652,11 +667,10 @@ final class SummitService implements ISummitService
      */
     public function publishEvent(Summit $summit, $event_id, array $data)
     {
-        $event_repository = $this->event_repository;
 
-        return $this->tx_service->transaction(function () use ($summit, $data, $event_id, $event_repository) {
+        return $this->tx_service->transaction(function () use ($summit, $data, $event_id) {
 
-            $event = $event_repository->getById($event_id);
+            $event = $this->event_repository->getById($event_id);
 
             if (is_null($event))
                 throw new EntityNotFoundException(sprintf("event id %s does not exists!", $event_id));
@@ -670,15 +684,10 @@ final class SummitService implements ISummitService
             if ($event->getSummit()->getIdentifier() !== $summit->getIdentifier())
                 throw new ValidationException(sprintf("event %s does not belongs to summit id %s", $event_id, $summit->getIdentifier()));
 
+            $this->updateEventDates($data, $summit, $event);
+
             $start_datetime = $event->getStartDate();
             $end_datetime   = $event->getEndDate();
-
-            if (isset($data['start_date']) && isset($data['end_date'])) {
-                $start_datetime = intval($data['start_date']);
-                $start_datetime = new \DateTime("@$start_datetime");
-                $end_datetime = intval($data['end_date']);
-                $end_datetime = new \DateTime("@$end_datetime");
-            }
 
             if (is_null($start_datetime))
                 throw new ValidationException(sprintf("start_date its not assigned to event id %s!", $event_id));
@@ -690,14 +699,13 @@ final class SummitService implements ISummitService
                 $location = $summit->getLocation(intval($data['location_id']));
                 if (is_null($location))
                     throw new EntityNotFoundException(sprintf("location id %s does not exists!", $data['location_id']));
-
                 $event->setLocation($location);
             }
 
             $current_event_location = $event->getLocation();
 
             // validate blackout times
-            $conflict_events = $event_repository->getPublishedOnSameTimeFrame($event);
+            $conflict_events = $this->event_repository->getPublishedOnSameTimeFrame($event);
             if (!is_null($conflict_events)) {
                 foreach ($conflict_events as $c_event) {
                     // if the published event is BlackoutTime or if there is a BlackoutTime event in this timeframe
@@ -748,7 +756,7 @@ final class SummitService implements ISummitService
             $event->unPublish();
             $event->publish();
 
-            $event_repository->add($event);
+            $this->event_repository->add($event);
             return $event;
         });
     }
@@ -760,11 +768,10 @@ final class SummitService implements ISummitService
      */
     public function unPublishEvent(Summit $summit, $event_id)
     {
-        $event_repository = $this->event_repository;
 
-        return $this->tx_service->transaction(function () use ($summit, $event_id, $event_repository) {
+        return $this->tx_service->transaction(function () use ($summit, $event_id) {
 
-            $event = $event_repository->getById($event_id);
+            $event = $this->event_repository->getById($event_id);
 
             if (is_null($event))
                 throw new EntityNotFoundException(sprintf("event id %s does not exists!", $event_id));
@@ -773,8 +780,8 @@ final class SummitService implements ISummitService
                 throw new ValidationException(sprintf("event %s does not belongs to summit id %s", $event_id, $summit->getIdentifier()));
 
             $event->unPublish();
-            $event_repository->add($event);
-            $event_repository->cleanupAttendeesScheduleForEvent($event_id);
+            $this->event_repository->add($event);
+            $this->event_repository->cleanupAttendeesScheduleForEvent($event_id);
             return $event;
         });
     }
@@ -786,11 +793,10 @@ final class SummitService implements ISummitService
      */
     public function deleteEvent(Summit $summit, $event_id)
     {
-        $event_repository = $this->event_repository;
 
-        return $this->tx_service->transaction(function () use ($summit, $event_id, $event_repository) {
+        return $this->tx_service->transaction(function () use ($summit, $event_id) {
 
-            $event = $event_repository->getById($event_id);
+            $event = $this->event_repository->getById($event_id);
 
             if (is_null($event))
                 throw new EntityNotFoundException(sprintf("event id %s does not exists!", $event_id));
@@ -798,9 +804,9 @@ final class SummitService implements ISummitService
             if ($event->getSummit()->getIdentifier() !== $summit->getIdentifier())
                 throw new ValidationException(sprintf("event %s does not belongs to summit id %s", $event_id, $summit->getIdentifier()));
 
-            $event_repository->delete($event);
+            $this->event_repository->delete($event);
             // clean up summit attendees schedule
-            $event_repository->cleanupAttendeesScheduleForEvent($event_id);
+            $this->event_repository->cleanupAttendeesScheduleForEvent($event_id);
             return true;
         });
     }

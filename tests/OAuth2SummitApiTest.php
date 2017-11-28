@@ -40,7 +40,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     public function testGetAllSummits()
     {
 
-        $params = ['expand' => 'type'];
+        $params = ['expand' => 'type,event_types,tracks'];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
@@ -109,7 +109,8 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $params = array
         (
-            'id' => $summit_id
+            'id'     => $summit_id,
+            'expand' =>'event_types',
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
@@ -198,7 +199,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($groups));
         $this->assertResponseStatus(200);
     }
-
 
     public function testGetCurrentSummit($summit_id = 23)
     {
@@ -964,11 +964,11 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
-    public function testPostEvent($start_date = 1477645200, $end_date = 1477647600)
+    public function testPostEvent($summit_id = 23, $location_id = 0, $type_id = 0, $track_id = 0, $start_date = 1477645200, $end_date = 1477647600)
     {
         $params = array
         (
-            'id' => 7,
+            'id' => $summit_id,
         );
 
         $headers = array
@@ -979,15 +979,19 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $data = array
         (
-            'title' => 'Neutron: tbd',
-            'description' => 'TBD',
-            'location_id' => 179,
+            'title'         => 'Neutron: tbd',
+            'description'    => 'TBD',
             'allow_feedback' => true,
-            'start_date' => $start_date,
-            'end_date' => $end_date,
-            'type_id' => 95,
-            'tags' => ['Neutron']
+            'start_date'     => $start_date,
+            'end_date'       => $end_date,
+            'type_id'        => $type_id,
+            'tags'           => ['Neutron'],
+            'track_id'       => $track_id
         );
+
+        if($location_id > 0){
+            $data['location_id'] = $location_id;
+        }
 
         $response = $this->action
         (
@@ -1004,7 +1008,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
         $content = $response->getContent();
         $event = json_decode($content);
-        $this->assertTrue($event->getId() > 0);
+        $this->assertTrue($event->id > 0);
         return $event;
     }
 
@@ -1131,15 +1135,17 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     }
 
-    public function testPublishEvent($start_date = 1461520800, $end_date = 1461526200)
+    public function testPublishEvent($start_date = 1509789600, $end_date = 1509791400)
     {
-        $event = $this->testPostEvent($start_date, $end_date);
+        $event = $this->testPostEvent($summit_id = 23,$location_id = 0, $type_id = 124, $track_id = 206, $start_date, $end_date);
         unset($event->tags);
 
         $params = array
         (
-            'id' => 6,
-            'event_id' => $event->getId(),
+            'id'         => $summit_id,
+            'event_id'   => $event->id,
+            'start_date' => $start_date,
+            'end_date'   => $end_date
         );
 
         $headers = array

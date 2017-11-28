@@ -81,6 +81,7 @@ final class SerializerRegistry
         $this->registry['SummitWIFIConnection']       = SummitWIFIConnectionSerializer::class;
         $this->registry['SummitType']                 = SummitTypeSerializer::class;
         $this->registry['SummitEventType']            = SummitEventTypeSerializer::class;
+        $this->registry['PresentationType']           = PresentationTypeSerializer::class;
         $this->registry['SummitTicketType']           = SummitTicketTypeSerializer::class;
         $this->registry['PresentationCategory']       = PresentationCategorySerializer::class;
         $this->registry['PresentationCategoryGroup']  = PresentationCategoryGroupSerializer::class;

@@ -21,12 +21,23 @@ namespace models\summit;
 final class SummitEventFactory
 {
     /**
+     * @param Summit $summit
      * @param SummitEventType $type
      * @return SummitEvent
      */
-    static public function build(SummitEventType $type)
+    static public function build(Summit $summit, SummitEventType $type)
     {
-        $event = in_array($type->getType(),[ 'Presentation', 'Keynotes' , 'Panel']) ? new Presentation: new SummitEvent;
+        $event = new SummitEvent();
+
+        if(PresentationType::IsPresentationEventType($summit, $type->getType()))
+            $event = new Presentation();
+
+        if(SummitEventType::isPrivate($type->getType()))
+            $event = new SummitGroupEvent();
+
+        if($type->isAllowsAttachment())
+            $event = new SummitEventWithFile();
+
         return $event;
     }
 }

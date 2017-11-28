@@ -108,7 +108,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
             $summits = [];
 
             foreach($this->repository->getAllOrderedByBeginDate() as $summit){
-                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize();
+                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize(Input::get('expand',''));
             }
 
             $response = new PagingResponse

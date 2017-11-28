@@ -126,6 +126,14 @@ class SilverstripeBaseModel extends BaseEntity
     }
 
     /**
+     * @param string $sql
+     * @return mixed
+     */
+    protected static function prepareRawSQLStatic($sql){
+        return Registry::getManager(self::EntityManager)->getConnection()->prepare($sql);
+    }
+
+    /**
      * @return EntityManager
      */
     protected function getEM(){

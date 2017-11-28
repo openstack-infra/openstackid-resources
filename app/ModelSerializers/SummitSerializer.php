@@ -119,6 +119,56 @@ final class SummitSerializer extends SilverStripeSerializer
             $expand = explode(',', $expand);
             foreach ($expand as $relation) {
                 switch (trim($relation)) {
+                    case 'event_types':{
+                        $event_types = [];
+                        foreach ($summit->getEventTypes() as $event_type) {
+                            $event_types[] = SerializerRegistry::getInstance()->getSerializer($event_type)->serialize();
+                        }
+                        $values['event_types'] = $event_types;
+                    }
+                    break;
+                    case 'tracks':{
+                        $presentation_categories = array();
+                        foreach ($summit->getPresentationCategories() as $cat) {
+                            $presentation_categories[] = SerializerRegistry::getInstance()->getSerializer($cat)->serialize();
+                        }
+                        $values['tracks'] = $presentation_categories;
+                    }
+                    break;
+                    case 'track_groups':{
+                        // track_groups
+                        $track_groups = array();
+                        foreach ($summit->getCategoryGroups() as $group) {
+                            $track_groups[] = SerializerRegistry::getInstance()->getSerializer($group)->serialize();
+                        }
+                        $values['track_groups'] = $track_groups;
+                    }
+                    break;
+                    case 'sponsors':{
+                        $sponsors = array();
+                        foreach ($summit->getSponsors() as $company) {
+                            $sponsors[] = SerializerRegistry::getInstance()->getSerializer($company)->serialize();
+                        }
+                        $values['sponsors'] = $sponsors;
+                    }
+                    break;
+                    case 'speakers':{
+                        $speakers = array();
+                        foreach ($summit->getSpeakers() as $speaker) {
+                            $speakers[] =
+                                SerializerRegistry::getInstance()->getSerializer($speaker)->serialize
+                                (
+                                    null, [], [],
+                                    [
+                                        'summit_id' => $summit->getId(),
+                                        'published' => true
+                                    ]
+                                );
+
+                        }
+                        $values['speakers'] = $speakers;
+                    }
+                    break;
                     case 'schedule': {
                         $event_types = array();
                         foreach ($summit->getEventTypes() as $event_type) {

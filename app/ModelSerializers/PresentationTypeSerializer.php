@@ -1,6 +1,6 @@
 <?php namespace ModelSerializers;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,20 +13,23 @@
  **/
 
 /**
- * Class SummitEventTypeSerializer
+ * Class PresentationEventTypeSerializer
  * @package ModelSerializers
  */
-class SummitEventTypeSerializer extends SilverStripeSerializer
+class PresentationTypeSerializer extends SummitEventTypeSerializer
 {
-    protected static $array_mappings = [
-        'Type'                 => 'name:json_string',
-        'ClassName'            => 'class_name:json_string',
-        'Color'                => 'color:json_string',
-        'BlackoutTimes'        => 'black_out_times:json_boolean',
-        'UseSponsors'          => 'use_sponsors:json_boolean',
-        'AreSponsorsMandatory' => 'are_sponsors_mandatory:json_boolean',
-        'AllowsAttachment'     => 'allows_attachment:json_boolean',
-    ];
+    protected static $array_mappings = array
+    (
+        'MaxSpeakers'          => 'max_speakers:json_int',
+        'MinSpeakers'          => 'min_speakers:json_int',
+        'MaxModerators'        => 'max_moderators:json_int',
+        'MinModerators'        => 'min_moderators:json_int',
+        'UseSpeakers'          => 'use_speakers:json_boolean',
+        'AreSpeakersMandatory' => 'are_speakers_mandatory:json_boolean',
+        'UseModerator'         => 'use_moderator:json_boolean',
+        'ModeratorMandatory'   => 'moderator_mandatory:json_boolean',
+        'ModeratorLabel'       => 'moderator_label:json_string',
+    );
 
     /**
      * @param null $expand
@@ -38,13 +41,6 @@ class SummitEventTypeSerializer extends SilverStripeSerializer
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
-        $color  = isset($values['color']) ? $values['color']:'';
-        if(empty($color))
-            $color = 'f0f0ee';
-        if (strpos($color,'#') === false) {
-            $color = '#'.$color;
-        }
-        $values['color'] = $color;
         return $values;
     }
 }

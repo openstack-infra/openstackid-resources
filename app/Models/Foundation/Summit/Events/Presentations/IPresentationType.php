@@ -12,23 +12,11 @@
  * limitations under the License.
  **/
 
-/**
- * Interface ISummitEventType
- * @package models\summit
- */
-interface ISummitEventType
+interface IPresentationType
 {
-    // default types
-
-    const HandonLabs    = 'Hand-on Labs';
-
-    const Lunch_Breaks  = 'Lunch & Breaks';
-
-    const EveningEvents = 'Evening Events';
-
-    const GroupsEvents  = 'Groups Events';
-
-    const Lunch         = 'Lunch';
-
-    const Breaks        = 'Breaks';
+    const Presentation  = 'Presentation';
+    const Keynotes      = 'Keynotes';
+    const Panel         = 'Panel';
+    const LightingTalks = 'Lightning Talks';
+    const Fishbowl      = 'Fishbowl';
 }
