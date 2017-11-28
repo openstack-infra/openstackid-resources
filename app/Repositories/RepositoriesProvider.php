@@ -15,7 +15,9 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use models\main\AssetsSyncRequest;
+use models\main\Company;
 use models\main\File;
+use models\main\Group;
 
 /**
  * Class RepositoriesProvider
@@ -195,6 +197,18 @@ final class RepositoriesProvider extends ServiceProvider
             'models\main\IAssetsSyncRequestRepository',
             function(){
                 return  EntityManager::getRepository(AssetsSyncRequest::class);
+            });
+
+        App::singleton(
+            'models\main\ICompanyRepository',
+            function(){
+                return  EntityManager::getRepository(Company::class);
+            });
+
+        App::singleton(
+            'models\main\IGroupRepository',
+            function(){
+                return  EntityManager::getRepository(Group::class);
             });
     }
 }

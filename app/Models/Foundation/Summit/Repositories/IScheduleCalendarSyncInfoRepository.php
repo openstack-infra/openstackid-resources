@@ -23,11 +23,11 @@ use utils\PagingResponse;
 interface IScheduleCalendarSyncInfoRepository extends IBaseRepository
 {
     /**
-     * @param SummitEvent $summit_event
+     * @param int $summit_event_id
      * @param PagingInfo $paging_info
      * @return PagingResponse
      */
-    public function getAllBySummitEvent(SummitEvent $summit_event, PagingInfo $paging_info);
+    public function getAllBySummitEvent($summit_event_id, PagingInfo $paging_info);
 
     /**
      * @param SummitAbstractLocation $location

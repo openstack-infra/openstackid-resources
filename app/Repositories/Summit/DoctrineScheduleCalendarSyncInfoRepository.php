@@ -34,20 +34,20 @@ final class DoctrineScheduleCalendarSyncInfoRepository
 {
 
     /**
-     * @param SummitEvent $summit_event
+     * @param int $summit_event_id
      * @param PagingInfo $paging_info
      * @return PagingResponse
      */
-    public function getAllBySummitEvent(SummitEvent $summit_event, PagingInfo $paging_info)
+    public function getAllBySummitEvent($summit_event_id, PagingInfo $paging_info)
     {
         $query  = $this->getEntityManager()
             ->createQueryBuilder()
             ->select("si")
             ->from(ScheduleCalendarSyncInfo::class, "si")
-            ->join('si.summit_event', 'e', Join::WITH, " e.id = :event_id")
             ->join('si.calendar_sync_info', 'ci', Join::WITH, " ci.revoked = :credential_status")
+            ->where("si.summit_event_id = :event_id")
             ->orderBy('si.id', 'ASC')
-            ->setParameter('event_id', $summit_event->getId())
+            ->setParameter('event_id', $summit_event_id)
             ->setParameter('credential_status',false);
 
         $query= $query

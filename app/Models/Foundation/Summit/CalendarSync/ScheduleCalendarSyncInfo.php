@@ -34,11 +34,49 @@ class ScheduleCalendarSyncInfo extends SilverstripeBaseModel
     private $member;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent")
-     * @ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")
-     * @var SummitEvent
+     * @ORM\Column(name="SummitEventID", type="integer")
+     * @var int
      */
-    private $summit_event;
+    private $summit_event_id;
+
+    /**
+     * @return mixed
+     */
+    public function getSummitEventId()
+    {
+        return $this->summit_event_id;
+    }
+
+    /**
+     * @param mixed $summit_event_id
+     */
+    public function setSummitEventId($summit_event_id)
+    {
+        $this->summit_event_id = $summit_event_id;
+    }
+
+    /**
+     * @return SummitEvent
+     */
+    public function getSummitEvent()
+    {
+        $id = $this->summit_event_id;
+        try {
+            $event = $this->getEM()->find(SummitEvent::class, $id);
+        }
+        catch(\Exception $ex){
+            return null;
+        }
+        return $event;
+    }
+
+    /**
+     * @param SummitEvent $summit_event
+     */
+    public function setSummitEvent($summit_event)
+    {
+        $this->summit_event_id = $summit_event->getId();
+    }
 
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\SummitAbstractLocation")
@@ -106,22 +144,6 @@ class ScheduleCalendarSyncInfo extends SilverstripeBaseModel
     public function clearOwner(){
         $this->member = null;
         $this->event  = null;
-    }
-
-    /**
-     * @return SummitEvent
-     */
-    public function getSummitEvent()
-    {
-        return $this->summit_event;
-    }
-
-    /**
-     * @param SummitEvent $event
-     */
-    public function setSummitEvent($event)
-    {
-        $this->summit_event = $event;
     }
 
     /**

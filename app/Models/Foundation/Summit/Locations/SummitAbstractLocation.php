@@ -142,5 +142,11 @@ class SummitAbstractLocation extends SilverstripeBaseModel
      */
     protected $order;
 
-
+    /**
+     * @return boolean
+     */
+    public function isOverrideBlackouts()
+    {
+        return false;
+    }
 }

@@ -104,11 +104,11 @@ final class AdminActionsCalendarSyncProcessingService
 
                     if($request instanceof AdminSummitEventActionSyncWorkRequest){
 
-                        $page         = 1;
-                        $summit_event = $request->getSummitEvent();
+                        $page            = 1;
+                        $summit_event_id = $request->getSummitEventId();
 
                         do{
-                            $page_response = $this->schedule_sync_repository->getAllBySummitEvent($summit_event, new PagingInfo($page, 1000));
+                            $page_response = $this->schedule_sync_repository->getAllBySummitEvent($summit_event_id, new PagingInfo($page, 1000));
                             $has_more      = count($page_response->getItems()) > 0;
                             if(!$has_more) continue;
                             foreach ($page_response->getItems() as $schedule_event){
@@ -117,7 +117,7 @@ final class AdminActionsCalendarSyncProcessingService
                                 $work_request->setType($request->getType());
                                 $work_request->setCalendarSyncInfo($schedule_event->getCalendarSyncInfo());
                                 $work_request->setOwner($schedule_event->getMember());
-                                $work_request->setSummitEvent($summit_event);
+                                $work_request->setSummitEventId($summit_event_id);
                                 $this->work_request_repository->add($work_request);
                             }
                             $page++;
@@ -140,7 +140,7 @@ final class AdminActionsCalendarSyncProcessingService
                                 $work_request->setType(AbstractCalendarSyncWorkRequest::TypeUpdate);
                                 $work_request->setCalendarSyncInfo($schedule_event->getCalendarSyncInfo());
                                 $work_request->setOwner($schedule_event->getMember());
-                                $work_request->setSummitEvent($schedule_event->getSummitEvent());
+                                $work_request->setSummitEventId($schedule_event->getSummitEvent()->getId());
                                 $this->work_request_repository->add($work_request);
                             }
                             $page++;

@@ -24,19 +24,42 @@ class MemberEventScheduleSummitActionSyncWorkRequest
 extends MemberScheduleSummitActionSyncWorkRequest
 {
     const SubType = 'EVENT';
+
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent", cascade={"persist"})
-     * @ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")
-     * @var SummitEvent
+     * @ORM\Column(name="SummitEventID", type="integer")
+     * @var int
      */
-    protected $summit_event;
+    private $summit_event_id;
+
+    /**
+     * @return mixed
+     */
+    public function getSummitEventId()
+    {
+        return $this->summit_event_id;
+    }
+
+    /**
+     * @param mixed $summit_event_id
+     */
+    public function setSummitEventId($summit_event_id)
+    {
+        $this->summit_event_id = $summit_event_id;
+    }
 
     /**
      * @return SummitEvent
      */
     public function getSummitEvent()
     {
-        return $this->summit_event;
+        $id = $this->summit_event_id;
+        try {
+            $event = $this->getEM()->find(SummitEvent::class, $id);
+        }
+        catch(\Exception $ex){
+            return null;
+        }
+        return $event;
     }
 
     /**
@@ -44,9 +67,8 @@ extends MemberScheduleSummitActionSyncWorkRequest
      */
     public function setSummitEvent($summit_event)
     {
-        $this->summit_event = $summit_event;
+        $this->summit_event_id = $summit_event->getId();
     }
-
     /**
      * @return string
      */

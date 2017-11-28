@@ -57,8 +57,9 @@ final class AdminSummitEventActionSyncWorkRequestUpdateStrategy
     public function process(AbstractCalendarSyncWorkRequest $request)
     {
         if(!$request instanceof AdminSummitEventActionSyncWorkRequest) return null;
-        $summit_event     = $request->getSummitEvent();
-        $pending_requests =  $this->queue_manager->getSummitEventRequestFor($summit_event->getId());
+        $summit_event_id  = $request->getSummitEventId();
+        $pending_requests = $this->queue_manager->getSummitEventRequestFor($summit_event_id);
+
         if(count($pending_requests) > 0 ){
             // delete all former and pending  ...
             foreach ($pending_requests as $pending_request) {

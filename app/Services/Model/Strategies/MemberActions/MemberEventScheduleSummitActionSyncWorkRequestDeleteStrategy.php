@@ -58,10 +58,10 @@ implements ICalendarSyncWorkRequestPreProcessorStrategy
     public function process(AbstractCalendarSyncWorkRequest $request)
     {
         if(!$request instanceof MemberEventScheduleSummitActionSyncWorkRequest) return null;
-        $summit_event         = $request->getSummitEvent();
+        $summit_event_id      = $request->getSummitEventId();
         $calendar_sync_info   = $request->getCalendarSyncInfo();
         // check if there is a former add, disregard and omit
-        $pending_requests = $this->queue_manager->getSummitEventRequestFor($calendar_sync_info->getId(), $summit_event->getId());
+        $pending_requests = $this->queue_manager->getSummitEventRequestFor($calendar_sync_info->getId(), $summit_event_id);
         if(count($pending_requests) > 0 ) {
             foreach ($pending_requests as $pending_request) {
                 if($request->getType() == AbstractCalendarSyncWorkRequest::TypeUpdate)
@@ -73,7 +73,7 @@ implements ICalendarSyncWorkRequestPreProcessorStrategy
                     $this->work_request_repository->delete($pending_request);
             }
             // if the event is not already synchronized disregard delete
-            if(!$request->getOwner()->isEventSynchronized($calendar_sync_info, $summit_event)) {
+            if(!$request->getOwner()->isEventSynchronized($calendar_sync_info, $summit_event_id)) {
                 $this->work_request_repository->delete($request);
                 return null;
             }

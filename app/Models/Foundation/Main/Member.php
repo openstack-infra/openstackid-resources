@@ -757,13 +757,13 @@ SQL;
 
     /**
      * @param CalendarSyncInfo $calendar_sync_info
-     * @param SummitEvent $event
+     * @param int $event_id
      * @return bool
      */
-    public function isEventSynchronized(CalendarSyncInfo $calendar_sync_info, SummitEvent $event){
+    public function isEventSynchronized(CalendarSyncInfo $calendar_sync_info, $event_id){
 
         $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('summit_event', $event));
+        $criteria->where(Criteria::expr()->eq('summit_event_id', $event_id));
         $criteria->andWhere(Criteria::expr()->eq('calendar_sync_info', $calendar_sync_info));
         return $this->schedule_sync_info->matching($criteria)->count() > 0;
     }
@@ -806,14 +806,14 @@ SQL;
     }
 
     /**
-     * @param SummitEvent $event
+     * @param int $summit_event_id
      * @param CalendarSyncInfo $calendar_sync_info
      * @return ScheduleCalendarSyncInfo|null
      */
-    public function getScheduleSyncInfoByEvent(SummitEvent $event, CalendarSyncInfo $calendar_sync_info){
+    public function getScheduleSyncInfoByEvent($summit_event_id, CalendarSyncInfo $calendar_sync_info){
         try {
             $criteria = Criteria::create();
-            $criteria->where(Criteria::expr()->eq('summit_event', $event));
+            $criteria->where(Criteria::expr()->eq('summit_event_id', $summit_event_id));
             $criteria->andWhere(Criteria::expr()->eq('calendar_sync_info', $calendar_sync_info));
             $res = $this->schedule_sync_info->matching($criteria)->first();
             return $res === false ? null : $res;

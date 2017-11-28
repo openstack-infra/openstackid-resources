@@ -123,7 +123,10 @@ implements IMemberActionsCalendarSyncProcessingService
                     switch ($request_sub_type) {
 
                         case MemberEventScheduleSummitActionSyncWorkRequest::SubType: {
-                            $summit_event = $request->getSummitEvent();
+
+                            $summit_event_id = $request->getSummitEventId();
+                            $summit_event    = $request->getSummitEvent();
+
                             log::info(sprintf
                             (
                                 "%s - processing work request %s - sub type %s - type %s - event id %s - member %s - credential id %s -revoked credentials %s",
@@ -131,7 +134,7 @@ implements IMemberActionsCalendarSyncProcessingService
                                 $request->getIdentifier(),
                                 $request_sub_type,
                                 $request_type,
-                                $summit_event->getIdentifier(),
+                                $summit_event_id,
                                 $member->getIdentifier(),
                                 $calendar_sync_info->getId(),
                                 $calendar_sync_info->isRevoked()? 1:0
@@ -139,24 +142,32 @@ implements IMemberActionsCalendarSyncProcessingService
 
                             switch ($request_type) {
                                 case AbstractCalendarSyncWorkRequest::TypeAdd:
-                                        if ($calendar_sync_info->isRevoked()){
-                                            Log::warning(sprintf("EVENT ADD : event id %s - member id %s could not be added on external calendar bc credential are revoked!", $summit_event->getId(), $member->getId()));
+                                        if(is_null($summit_event)){
+                                            Log::warning(sprintf("EVENT ADD : event id %s does not exists!", $summit_event_id, $member->getId()));
                                             continue;
                                         }
-                                        if($member->isEventSynchronized($calendar_sync_info, $summit_event)){
-                                            Log::warning(sprintf("EVENT ADD : event id %s - member id %s already synchronized", $summit_event->getId(), $member->getId()));
+                                        if ($calendar_sync_info->isRevoked()){
+                                            Log::warning(sprintf("EVENT ADD : event id %s - member id %s could not be added on external calendar bc credential are revoked!", $summit_event_id, $member->getId()));
+                                            continue;
+                                        }
+                                        if($member->isEventSynchronized($calendar_sync_info, $summit_event_id)){
+                                            Log::warning(sprintf("EVENT ADD : event id %s - member id %s already synchronized", $summit_event_id, $member->getId()));
                                             continue;
                                         }
                                         $schedule_sync_info = $remote_facade->addEvent($request);
                                         if(is_null($schedule_sync_info)){
-                                            Log::warning(sprintf("EVENT ADD : event id %s - member id %s could not be added on external calendar", $summit_event->getId(), $member->getId()));
+                                            Log::warning(sprintf("EVENT ADD : event id %s - member id %s could not be added on external calendar", $summit_event_id, $member->getId()));
                                             continue;
                                         }
                                         $member->add2ScheduleSyncInfo($schedule_sync_info);
                                     break;
                                 case AbstractCalendarSyncWorkRequest::TypeUpdate:
+                                    if(is_null($summit_event)){
+                                        Log::warning(sprintf("EVENT UPDATE : event id %s does not exists!", $summit_event_id, $member->getId()));
+                                        continue;
+                                    }
                                     if($calendar_sync_info->isRevoked()) continue;
-                                    $sync_info    = $member->getScheduleSyncInfoByEvent($summit_event, $calendar_sync_info);
+                                    $sync_info    = $member->getScheduleSyncInfoByEvent($summit_event_id, $calendar_sync_info);
                                     $is_scheduled = $member->isOnSchedule($summit_event);
                                     if(is_null($sync_info)) continue;
                                     if(!$is_scheduled) {
@@ -167,9 +178,9 @@ implements IMemberActionsCalendarSyncProcessingService
                                     break;
                                 case AbstractCalendarSyncWorkRequest::TypeRemove:
                                     if($calendar_sync_info->isRevoked()) continue;
-                                    $schedule_sync_info = $member->getScheduleSyncInfoByEvent($summit_event, $calendar_sync_info);
+                                    $schedule_sync_info = $member->getScheduleSyncInfoByEvent($summit_event_id, $calendar_sync_info);
                                     if(is_null($schedule_sync_info)){
-                                        Log::warning(sprintf("EVENT REMOVE : event id %s - member id %s could not be removed, schedule synch info is null", $summit_event->getId(), $member->getId()));
+                                        Log::warning(sprintf("EVENT REMOVE : event id %s - member id %s could not be removed, schedule synch info is null", $summit_event_id, $member->getId()));
                                         continue;
                                     }
                                     $remote_facade->deleteEvent($request, $schedule_sync_info);

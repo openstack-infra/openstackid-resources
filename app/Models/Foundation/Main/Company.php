@@ -17,7 +17,7 @@ use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="repositories\main\DoctrineCompanyRepository")
  * @ORM\Table(name="Company")
  * @ORM\Cache(usage="NONSTRICT_READ_WRITE", region="sponsors_region")
  * Class Company

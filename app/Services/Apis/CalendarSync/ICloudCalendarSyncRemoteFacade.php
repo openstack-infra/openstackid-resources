@@ -161,7 +161,7 @@ final class ICloudCalendarSyncRemoteFacade
             $sync_info->setExternalUrl($res->getResourceUrl());
             $sync_info->setVCard($vcard);
             // relationships
-            $sync_info->setSummitEvent($summit_event);
+            $sync_info->setSummitEventId($summit_event->getId());
             $sync_info->setCalendarSyncInfo($this->sync_calendar_info);
             $sync_info->setLocation($summit_event->getLocation());
 

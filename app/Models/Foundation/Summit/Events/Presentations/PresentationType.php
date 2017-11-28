@@ -96,7 +96,7 @@ class PresentationType extends SummitEventType
             FROM PresentationType
             INNER JOIN SummitEventType ON SummitEventType.ID = PresentationType.ID
             WHERE SummitEventType.SummitID = :summit_id 
-            AND PresentationType.Type = :type
+            AND SummitEventType.Type = :type
 SQL;
             $stmt = self::prepareRawSQLStatic($sql);
             $stmt->execute(['summit_id' => $summit->getId(), 'type' => $type]);

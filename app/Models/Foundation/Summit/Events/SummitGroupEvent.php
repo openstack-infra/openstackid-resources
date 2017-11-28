@@ -76,4 +76,15 @@ class SummitGroupEvent extends SummitEvent
         return $ids;
     }
 
+    /**
+     * @param Group $group
+     */
+    public function addGroup(Group $group){
+        $this->groups->add($group);
+    }
+
+    public function clearGroups(){
+        $this->groups->clear();
+    }
+
 }

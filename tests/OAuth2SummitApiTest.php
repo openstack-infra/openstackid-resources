@@ -1099,13 +1099,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         unset($event->tags);*/
         $params = array
         (
-            'id' => 6,
-            'event_id' => 15303,
+            'id' => 23,
+            'event_id' => 20619,
         );
 
         $data = array
         (
-            'tags' => ['keystone'],
+            'title' => 'OpenStack Public Cloud Update TEST!',
         );
 
 
@@ -1137,7 +1137,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testPublishEvent($start_date = 1509789600, $end_date = 1509791400)
     {
-        $event = $this->testPostEvent($summit_id = 23,$location_id = 0, $type_id = 124, $track_id = 206, $start_date, $end_date);
+        $event = $this->testPostEvent($summit_id = 23, $location_id = 0, $type_id = 124, $track_id = 206, $start_date, $end_date);
         unset($event->tags);
 
         $params = array
@@ -1202,14 +1202,14 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         return $event;
     }
 
-    public function testDeleteEvent()
+    public function testDeleteEvent($summit_id = 23)
     {
-        $event = $this->testPostEvent();
+        //$event = $this->testPublishEvent();
 
         $params = array
         (
-            'id' => 6,
-            'event_id' => $event->getId(),
+            'id'       => $summit_id,
+            'event_id' => 20617,
         );
 
         $headers = array
@@ -1231,7 +1231,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
         $this->assertResponseStatus(204);
 
-        return $event;
+        //return $event;
     }
 
     public function testAddFeedback2Event()

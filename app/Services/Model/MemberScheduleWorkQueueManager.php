@@ -44,7 +44,7 @@ implements ICalendarSyncWorkRequestQueueManager
     private function getKey(AbstractCalendarSyncWorkRequest $request, $type = null){
         $event_id = null;
         if($request instanceof MemberEventScheduleSummitActionSyncWorkRequest){
-            $event_id = $request->getSummitEvent()->getId();
+            $event_id = $request->getSummitEventId();
         }
         if(empty($type)) $type = $request->getType();
         return $this->generateKey($type, $request->getCalendarSyncInfo()->getId(), $event_id);
