@@ -56,11 +56,147 @@ class Summit extends SilverstripeBaseModel
     private $end_date;
 
     /**
+     * @ORM\Column(name="SubmissionBeginDate", type="datetime")
+     * @var \DateTime
+     */
+    private $submission_begin_date;
+
+    /**
+     * @ORM\Column(name="SubmissionEndDate", type="datetime")
+     * @var \DateTime
+     */
+    private $submission_end_date;
+
+    /**
+     * @ORM\Column(name="VotingBeginDate", type="datetime")
+     * @var \DateTime
+     */
+    private $voting_begin_date;
+
+    /**
+     * @ORM\Column(name="VotingEndDate", type="datetime")
+     * @var \DateTime
+     */
+    private $voting_end_date;
+
+    /**
+     * @ORM\Column(name="SelectionBeginDate", type="datetime")
+     * @var \DateTime
+     */
+    private $selection_begin_date;
+
+    /**
+     * @ORM\Column(name="SelectionEndDate", type="datetime")
+     * @var \DateTime
+     */
+    private $selection_end_date;
+
+    /**
+     * @ORM\Column(name="RegistrationBeginDate", type="datetime")
+     * @var \DateTime
+     */
+    private $registration_begin_date;
+
+    /**
+     * @ORM\Column(name="RegistrationEndDate", type="datetime")
+     * @var \DateTime
+     */
+    private $registration_end_date;
+
+    /**
      * @ORM\Column(name="Active", type="boolean")
      * @var bool
      */
     private $active;
 
+    /**
+     * @ORM\Column(name="AvailableOnApi", type="boolean")
+     * @var bool
+     */
+    private $available_on_api;
+
+    /**
+     * @ORM\Column(name="ExternalEventId", type="string")
+     * @var string
+     */
+    private $external_summit_id;
+
+    /**
+     * @ORM\Column(name="ScheduleDefaultStartDate", type="datetime")
+     * @var \DateTime
+     */
+    private $schedule_default_start_date;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SummitType", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID")
+     * @var SummitType
+     */
+    private $type = null;
+
+    /**
+     * @ORM\Column(name="StartShowingVenuesDate", type="datetime")
+     */
+    private $start_showing_venues_date;
+
+    /**
+     * @ORM\Column(name="TimeZone", type="string")
+     * @var string
+     */
+    private $time_zone_id;
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"})
+     */
+    private $locations;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"})
+     */
+    private $events;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SummitWIFIConnection", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitWIFIConnection[]
+     */
+    private $wifi_connections;
+
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\JoinColumn(name="LogoID", referencedColumnName="ID")
+     * @var File
+     */
+    private $logo;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEventType", mappedBy="summit", cascade={"persist"})
+     */
+    private $event_types;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategory", mappedBy="summit", cascade={"persist"})
+     * @var PresentationCategory[]
+     */
+    private $presentation_categories;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitAttendee", mappedBy="summit", cascade={"persist"})
+     * @var SummitAttendee[]
+     */
+    private $attendees;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"})
+     * @var PresentationCategoryGroup[]
+     */
+    private $category_groups;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"})
+     */
+    private $ticket_types;
     /**
      * @return string
      */
@@ -221,24 +357,6 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\Column(name="AvailableOnApi", type="boolean")
-     * @var bool
-     */
-    private $available_on_api;
-
-    /**
-     * @ORM\Column(name="ExternalEventId", type="string")
-     * @var string
-     */
-    private $external_summit_id;
-
-    /**
-     * @ORM\Column(name="ScheduleDefaultStartDate", type="datetime")
-     * @var \DateTime
-     */
-    private $schedule_default_start_date;
-
-    /**
      * @return SummitType
      */
     public function getType()
@@ -279,13 +397,6 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="SummitType", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID")
-     * @var SummitType
-     */
-    private $type = null;
-
-    /**
      * @return string
      */
     public function getSummitExternalId(){ return $this->external_summit_id; }
@@ -297,16 +408,6 @@ class Summit extends SilverstripeBaseModel
         return $this->active;
     }
 
-    /**
-     * @ORM\Column(name="StartShowingVenuesDate", type="datetime")
-     */
-    private $start_showing_venues_date;
-
-    /**
-     * @ORM\Column(name="TimeZone", type="string")
-     * @var string
-     */
-    private $time_zone_id;
 
     /**
      * @return string
@@ -324,22 +425,6 @@ class Summit extends SilverstripeBaseModel
         $this->time_zone_id = $time_zone_id;
     }
 
-    // ...
-    /**
-     * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"})
-     */
-    private $locations;
-
-    /**
-     * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"})
-     */
-    private $events;
-
-    /**
-     * @ORM\OneToMany(targetEntity="SummitWIFIConnection", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
-     * @var SummitWIFIConnection[]
-     */
-    private $wifi_connections;
 
     /**
      * Summit constructor.
@@ -495,13 +580,6 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\File")
-     * @ORM\JoinColumn(name="LogoID", referencedColumnName="ID")
-     * @var File
-     */
-    private $logo;
-
-    /**
      * @return File
      */
     public function getLogo()
@@ -541,11 +619,6 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitEventType", mappedBy="summit", cascade={"persist"})
-     */
-    private $event_types;
-
-    /**
      * @return SummitEventType[]
      */
     public function getEventTypes()
@@ -576,10 +649,6 @@ class Summit extends SilverstripeBaseModel
         return $wifi_conn === false ? null:$wifi_conn;
     }
 
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"})
-     */
-    private $ticket_types;
 
     /**
      * @return SummitTicketType[]
@@ -658,11 +727,6 @@ class Summit extends SilverstripeBaseModel
         return $event === false ? null:$event;
     }
 
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategory", mappedBy="summit", cascade={"persist"})
-     * @var PresentationCategory[]
-     */
-    private $presentation_categories;
 
     /**
      * @return PresentationCategory[]
@@ -684,12 +748,6 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"})
-     * @var PresentationCategoryGroup[]
-     */
-    private $category_groups;
-
-    /**
      * @return PresentationCategoryGroup[]
      */
     public function getCategoryGroups()
@@ -709,11 +767,6 @@ class Summit extends SilverstripeBaseModel
         return $group === false ? null:$group;
     }
 
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitAttendee", mappedBy="summit", cascade={"persist"})
-     * @var SummitAttendee[]
-     */
-    private $attendees;
 
     /**
      * @param int $member_id
@@ -1009,5 +1062,240 @@ SQL;
         $res .= $this->begin_date->format('Y').'-summit';
         $res  = strtolower(  preg_replace('/[^a-zA-Z0-9\-]/', '',$res));
         return $res;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPresentationVotesCount(){
+
+
+        try{
+            $sql = <<<SQL
+            SELECT COUNT(DISTINCT(Vote.ID)) AS vote_count
+            FROM PresentationVote AS Vote
+            INNER JOIN SummitEvent AS E ON E.ID = Vote.PresentationID
+            WHERE E.SummitID = :summit_id
+SQL;
+            $stmt = $this->prepareRawSQL($sql);
+            $stmt->execute(['summit_id' => $this->id]);
+            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            return count($res) > 0 ? $res[0] : 0;
+        }
+        catch (\Exception $ex){
+
+        }
+        return 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPresentationVotersCount(){
+        try{
+            $sql = <<<SQL
+                SELECT COUNT(DISTINCT(Vote.MemberID)) AS voter_count
+            FROM PresentationVote AS Vote
+            INNER JOIN SummitEvent AS E ON E.ID = Vote.PresentationID
+            WHERE E.SummitID = :summit_id
+SQL;
+            $stmt = $this->prepareRawSQL($sql);
+            $stmt->execute(['summit_id' => $this->id]);
+            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            return count($res) > 0 ? $res[0] : 0;
+        }
+        catch (\Exception $ex){
+
+        }
+        return 0;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getSubmissionBeginDate()
+    {
+        return $this->submission_begin_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getSubmissionEndDate()
+    {
+        return $this->submission_end_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getVotingBeginDate()
+    {
+        return $this->voting_begin_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getVotingEndDate()
+    {
+        return $this->voting_end_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getSelectionBeginDate()
+    {
+        return $this->selection_begin_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getSelectionEndDate()
+    {
+        return $this->selection_end_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getRegistrationBeginDate()
+    {
+        return $this->registration_begin_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getRegistrationEndDate()
+    {
+        return $this->registration_end_date;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getAttendeesCount(){
+        return $this->attendees->count();
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeakersCount(){
+        return count($this->getSpeakers());
+    }
+
+    /**
+     * @return int
+     */
+    public function getPresentationsSubmittedCount(){
+
+        try{
+            $sql = <<<SQL
+            SELECT COUNT(DISTINCT(SummitEvent.ID))
+            FROM SummitEvent
+            INNER JOIN Presentation ON Presentation.ID = SummitEvent.ID
+            WHERE SummitEvent.SummitID = :summit_id AND Presentation.Status = :status
+SQL;
+            $stmt = $this->prepareRawSQL($sql);
+            $stmt->execute(['summit_id' => $this->id, 'status' => Presentation::STATUS_RECEIVED]);
+            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            return count($res) > 0 ? $res[0] : 0;
+        }
+        catch (\Exception $ex){
+
+        }
+        return 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPublishedEventsCount(){
+        try{
+            $sql = <<<SQL
+            SELECT COUNT(DISTINCT(SummitEvent.ID))
+            FROM SummitEvent
+            WHERE SummitEvent.SummitID = :summit_id AND SummitEvent.Published = 1
+SQL;
+            $stmt = $this->prepareRawSQL($sql);
+            $stmt->execute(['summit_id' => $this->id]);
+            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            return count($res) > 0 ? $res[0] : 0;
+        }
+        catch (\Exception $ex){
+
+        }
+        return 0;
+    }
+
+    // speakers emails info
+
+    /**
+     * @param strign $type
+     * @return int
+     */
+    public function getSpeakerAnnouncementEmailCount($type){
+        try{
+            $sql = <<<SQL
+            SELECT COUNT(DISTINCT(SpeakerAnnouncementSummitEmail.ID))
+            FROM SpeakerAnnouncementSummitEmail
+            WHERE SpeakerAnnouncementSummitEmail.SummitID = :summit_id AND SpeakerAnnouncementSummitEmail.AnnouncementEmailTypeSent = :type
+SQL;
+            $stmt = $this->prepareRawSQL($sql);
+            $stmt->execute(['summit_id' => $this->id, 'type' => $type]);
+            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            return count($res) > 0 ? $res[0] : 0;
+        }
+        catch (\Exception $ex){
+
+        }
+        return 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeakerAnnouncementEmailAcceptedCount(){
+        return $this->getSpeakerAnnouncementEmailCount('ACCEPTED');
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeakerAnnouncementEmailRejectedCount(){
+        return $this->getSpeakerAnnouncementEmailCount('REJECTED');
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeakerAnnouncementEmailAlternateCount(){
+        return $this->getSpeakerAnnouncementEmailCount('ALTERNATE');
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeakerAnnouncementEmailAcceptedAlternateCount(){
+        return $this->getSpeakerAnnouncementEmailCount('ACCEPTED_ALTERNATE');
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeakerAnnouncementEmailAcceptedRejectedCount(){
+        return $this->getSpeakerAnnouncementEmailCount('ACCEPTED_REJECTED');
+    }
+
+    /**
+     * @return int
+     */
+    public function getSpeakerAnnouncementEmailAlternateRejectedCount(){
+        return $this->getSpeakerAnnouncementEmailCount('ALTERNATE_REJECTED');
     }
 }

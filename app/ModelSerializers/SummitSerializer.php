@@ -22,17 +22,39 @@ use models\summit\Summit;
  */
 final class SummitSerializer extends SilverStripeSerializer
 {
-    protected static $array_mappings = array
-    (
-        'Name'                     => 'name:json_string',
-        'BeginDate'                => 'start_date:datetime_epoch',
-        'EndDate'                  => 'end_date:datetime_epoch',
-        'StartShowingVenuesDate'   => 'start_showing_venues_date:datetime_epoch',
-        'Active'                   => 'active:json_boolean',
-        'ScheduleDefaultStartDate' => 'schedule_start_date:datetime_epoch',
-        'TypeId'                   => 'type_id:json_int' ,
-        'DatesLabel'               => 'dates_label:json_string' ,
-    );
+    protected static $array_mappings = [
+
+        'Name'                        => 'name:json_string',
+        'BeginDate'                   => 'start_date:datetime_epoch',
+        'EndDate'                     => 'end_date:datetime_epoch',
+        'BeginDate'                   => 'start_date:datetime_epoch',
+        'EndDate'                     => 'end_date:datetime_epoch',
+        'SubmissionBeginDate'         => 'submission_begin_date:datetime_epoch',
+        'SubmissionEndDate'           => 'submission_end_date:datetime_epoch',
+        'VotingBeginDate'             => 'voting_begin_date:datetime_epoch',
+        'VotingEndDate'               => 'voting_end_date:datetime_epoch',
+        'SelectionBeginDate'          => 'selection_begin_date:datetime_epoch',
+        'SelectionEndDate'            => 'selection_end_date:datetime_epoch',
+        'RegistrationBeginDate'       => 'registration_begin_date:datetime_epoch',
+        'RegistrationEndDate'         => 'registration_end_date:datetime_epoch',
+        'StartShowingVenuesDate'      => 'start_showing_venues_date:datetime_epoch',
+        'Active'                      => 'active:json_boolean',
+        'ScheduleDefaultStartDate'    => 'schedule_start_date:datetime_epoch',
+        'TypeId'                      => 'type_id:json_int' ,
+        'DatesLabel'                  => 'dates_label:json_string' ,
+        'PresentationVotesCount'      => 'presentation_votes_count:json_int' ,
+        'PresentationVotersCount'     => 'presentation_voters_count:json_int' ,
+        'AttendeesCount'              => 'attendees_count:json_int',
+        'SpeakersCount'               => 'speakers_count:json_int',
+        'PresentationsSubmittedCount' => 'presentations_submitted_count:json_int',
+        'PublishedEventsCount'        => 'published_events_count:json_int',
+        'SpeakerAnnouncementEmailAcceptedCount'          => 'speaker_announcement_email_accepted_count:json_int',
+        'SpeakerAnnouncementEmailRejectedCount'          => 'speaker_announcement_email_rejected_count:json_int',
+        'SpeakerAnnouncementEmailAlternateCount'         => 'speaker_announcement_email_alternate_count:json_int',
+        'SpeakerAnnouncementEmailAcceptedAlternateCount' => 'speaker_announcement_email_accepted_alternate_count:json_int',
+        'SpeakerAnnouncementEmailAcceptedRejectedCount'  => 'speaker_announcement_email_accepted_rejected_count:json_int',
+        'SpeakerAnnouncementEmailAlternateRejectedCount' => 'speaker_announcement_email_alternate_rejected_count:json_int',
+    ];
 
     /**
      * @param null $expand
