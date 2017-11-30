@@ -25,6 +25,28 @@ final class DoctrineGroupRepository
 {
 
     /**
+     * @return array
+     */
+    protected function getFilterMappings()
+    {
+        return [
+            'code'  => 'e.code:json_string',
+            'title' => 'e.title:json_string',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderMappings()
+    {
+        return [
+            'id'    => 'e.id',
+            'code'  => 'e.code',
+            'title' => 'e.title',
+        ];
+    }
+    /**
      * @return string
      */
     protected function getBaseEntity()

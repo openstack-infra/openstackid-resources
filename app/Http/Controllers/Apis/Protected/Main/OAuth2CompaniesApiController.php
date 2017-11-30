@@ -1,6 +1,4 @@
 <?php namespace App\Http\Controllers;
-
-
 /**
  * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\main\ITagRepository;
+use models\main\ICompanyRepository;
 use models\oauth2\IResourceServerContext;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Validator;
 use utils\Filter;
 use utils\FilterParser;
 use utils\FilterParserException;
@@ -26,28 +22,30 @@ use Illuminate\Support\Facades\Log;
 use utils\PagingInfo;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
 /**
- * Class OAuth2TagsApiController
+ * Class OAuth2CompaniesApiController
  * @package App\Http\Controllers
  */
-final class OAuth2TagsApiController extends OAuth2ProtectedController
+final class OAuth2CompaniesApiController extends OAuth2ProtectedController
 {
     /**
      * OAuth2MembersApiController constructor.
-     * @param ITagRepository $tag_repository
+     * @param ICompanyRepository $company_repository
      * @param IResourceServerContext $resource_server_context
      */
     public function __construct
     (
-        ITagRepository $tag_repository,
+        ICompanyRepository $company_repository,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
-        $this->repository = $tag_repository;
+        $this->repository = $company_repository;
     }
 
-    public function getTags(){
+    public function getAll(){
 
         $values = Input::all();
 
@@ -80,7 +78,7 @@ final class OAuth2TagsApiController extends OAuth2ProtectedController
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'),  array
                 (
-                    'tag' => ['=@', '=='],
+                    'name' => ['=@', '=='],
                 ));
             }
 
@@ -90,7 +88,7 @@ final class OAuth2TagsApiController extends OAuth2ProtectedController
             {
                 $order = OrderParser::parse(Input::get('order'), array
                 (
-                    'tag',
+                    'name',
                     'id',
                 ));
             }
@@ -113,7 +111,6 @@ final class OAuth2TagsApiController extends OAuth2ProtectedController
                 )
             );
         }
-
         catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);
             return $this->error404();

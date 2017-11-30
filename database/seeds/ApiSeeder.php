@@ -64,12 +64,23 @@ final class ApiSeeder extends Seeder
 
         EntityManager::flush();
 
-        //tags
+        //companies
 
         $api = new Api();
         $api->setName('companies');
         $api->setActive(true);
         $api->setDescription('companies API');
+
+        EntityManager::persist($api);
+
+        EntityManager::flush();
+
+        //groups
+
+        $api = new Api();
+        $api->setName('groups');
+        $api->setActive(true);
+        $api->setDescription('groups API');
 
         EntityManager::persist($api);
 

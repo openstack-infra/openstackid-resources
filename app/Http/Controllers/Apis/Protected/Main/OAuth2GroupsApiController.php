@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,13 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\exceptions\EntityNotFoundException;
-use models\exceptions\ValidationException;
-use models\main\IMemberRepository;
+use models\main\IGroupRepository;
 use models\oauth2\IResourceServerContext;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Validator;
-use ModelSerializers\SerializerRegistry;
 use utils\Filter;
 use utils\FilterParser;
 use utils\FilterParserException;
@@ -25,25 +20,29 @@ use utils\OrderParser;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Log;
 use utils\PagingInfo;
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
 /**
- * Class OAuth2MembersApiController
+ * Class OAuth2GroupsApiController
  * @package App\Http\Controllers
  */
-final class OAuth2MembersApiController extends OAuth2ProtectedController
+final class OAuth2GroupsApiController extends OAuth2ProtectedController
 {
     /**
      * OAuth2MembersApiController constructor.
-     * @param IMemberRepository $member_repository
+     * @param IGroupRepository $group_repository
      * @param IResourceServerContext $resource_server_context
      */
     public function __construct
     (
-        IMemberRepository $member_repository,
+        IGroupRepository $group_repository,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
-        $this->repository = $member_repository;
+        $this->repository = $group_repository;
     }
 
     public function getAll(){
@@ -79,16 +78,8 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'),  array
                 (
-                    'irc'            => ['=@', '=='],
-                    'twitter'        => ['=@', '=='],
-                    'first_name'     => ['=@', '=='],
-                    'last_name'      => ['=@', '=='],
-                    'email'          => ['=@', '=='],
-                    'group_slug'     => ['=@', '=='],
-                    'group_id'       => ['=='],
-                    'email_verified' => ['=='],
-                    'active'         => ['=='],
-                    'github_user'    => ['=@', '=='],
+                    'code' => ['=@', '=='],
+                    'title' => ['=@', '=='],
                 ));
             }
 
@@ -98,8 +89,8 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             {
                 $order = OrderParser::parse(Input::get('order'), array
                 (
-                    'first_name',
-                    'last_name',
+                    'code',
+                    'title',
                     'id',
                 ));
             }
@@ -139,29 +130,5 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
-
-    public function getMyMember(){
-
-        $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
-        if (is_null($current_member_id)) return $this->error403();
-
-        $current_member = $this->repository->getById($current_member_id);
-        if (is_null($current_member)) return $this->error404();
-
-        $fields    = Request::input('fields', null);
-        $relations = Request::input('relations', null);
-
-        return $this->ok
-        (
-            SerializerRegistry::getInstance()->getSerializer($current_member, SerializerRegistry::SerializerType_Private)
-                ->serialize
-                (
-                    Request::input('expand', ''),
-                    is_null($fields) ? [] : explode(',', $fields),
-                    is_null($relations) ? [] : explode(',', $relations)
-                )
-        );
-    }
-
 
 }

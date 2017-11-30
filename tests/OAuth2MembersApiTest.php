@@ -27,7 +27,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2MembersApiController@getMembers",
+            "OAuth2MembersApiController@getAll",
             $params,
             array(),
             array(),
@@ -52,7 +52,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $headers  = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2MembersApiController@getMembers",
+            "OAuth2MembersApiController@getAll",
             $params,
             array(),
             array(),
@@ -75,7 +75,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $headers  = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2MembersApiController@getMembers",
+            "OAuth2MembersApiController@getAll",
             $params,
             array(),
             array(),
@@ -123,7 +123,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $headers  = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2MembersApiController@getMembers",
+            "OAuth2MembersApiController@getAll",
             $params,
             array(),
             array(),

@@ -27,7 +27,7 @@ Route::group([
 ], function(){
     // members
     Route::group(['prefix'=>'members'], function() {
-        Route::get('', 'OAuth2MembersApiController@getMembers');
+        Route::get('', 'OAuth2MembersApiController@getAll');
     });
 
     // summits
@@ -84,7 +84,7 @@ Route::group([
 
     // members
     Route::group(['prefix'=>'members'], function(){
-        Route::get('', 'OAuth2MembersApiController@getMembers');
+        Route::get('', 'OAuth2MembersApiController@getAll');
 
         Route::group(['prefix'=>'me'], function(){
             // get my member info
@@ -104,12 +104,17 @@ Route::group([
 
     // tags
     Route::group(['prefix'=>'tags'], function(){
-        Route::get('', 'OAuth2TagsApiController@getTags');
+        Route::get('', 'OAuth2TagsApiController@getAll');
     });
 
     // companies
     Route::group(['prefix'=>'companies'], function(){
-        Route::get('', 'OAuth2CompaniesApiController@getCompanies');
+        Route::get('', 'OAuth2CompaniesApiController@getAll');
+    });
+
+    // groups
+    Route::group(['prefix'=>'groups'], function(){
+        Route::get('', 'OAuth2GroupsApiController@getAll');
     });
 
     // teams
@@ -300,9 +305,8 @@ Route::group([
     });
 
     // speakers
-
     Route::group(array('prefix' => 'speakers'), function () {
-        Route::get('', 'OAuth2SummitSpeakersApiController@getAllSpeakers');
+        Route::get('', 'OAuth2SummitSpeakersApiController@getAll');
     });
 });
 

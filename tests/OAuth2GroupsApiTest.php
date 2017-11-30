@@ -12,22 +12,22 @@
  * limitations under the License.
  **/
 
-class OAuth2CompaniesApiTest extends ProtectedApiTest
+class OAuth2GroupsApiTest extends ProtectedApiTest
 {
 
-    public function testGetCompanies()
+    public function testGetGroups()
     {
 
         $params = [
             //AND FILTER
-            'filter' => ['name=@tip'],
+            'filter' => ['code=@adm'],
             'order'  => '-id'
         ];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2CompaniesApiController@getAll",
+            "OAuth2GroupsApiController@getAll",
             $params,
             array(),
             array(),
@@ -36,8 +36,8 @@ class OAuth2CompaniesApiTest extends ProtectedApiTest
         );
 
         $content = $response->getContent();
-        $companies = json_decode($content);
-        $this->assertTrue(!is_null($companies));
+        $groups = json_decode($content);
+        $this->assertTrue(!is_null($groups));
         $this->assertResponseStatus(200);
     }
 

@@ -27,7 +27,7 @@ class OAuth2TagsApiTest extends ProtectedApiTest
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2TagsApiController@getTags",
+            "OAuth2TagsApiController@getAll",
             $params,
             array(),
             array(),

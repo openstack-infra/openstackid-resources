@@ -156,7 +156,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     }
 
 
-    public function getAllSpeakers(){
+    public function getAll(){
         try {
 
             $values = Input::all();
