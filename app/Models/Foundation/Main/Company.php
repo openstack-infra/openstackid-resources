@@ -25,6 +25,16 @@ use models\utils\SilverstripeBaseModel;
  */
 class Company extends SilverstripeBaseModel
 {
+    /**
+     * @ORM\Column(name="Name", type="string")
+     */
+    private $name;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\SummitEvent", mappedBy="sponsors")
+     */
+    private $sponsorships;
+
     public function __construct()
     {
         parent::__construct();
@@ -46,15 +56,5 @@ class Company extends SilverstripeBaseModel
     {
         $this->name = $name;
     }
-
-    /**
-     * @ORM\Column(name="Name", type="string")
-     */
-    private $name;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\summit\SummitEvent", mappedBy="sponsors")
-     */
-    private $sponsorships;
 
 }

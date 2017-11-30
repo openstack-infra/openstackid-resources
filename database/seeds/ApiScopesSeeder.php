@@ -32,6 +32,8 @@ final class ApiScopesSeeder extends Seeder
         $this->seedSummitScopes();
         $this->seedMembersScopes();
         $this->seedTeamsScopes();
+        $this->seedTagsScopes();
+        $this->seedCompaniesScopes();
     }
 
     private function seedSummitScopes()
@@ -168,6 +170,33 @@ final class ApiScopesSeeder extends Seeder
                 'name' => sprintf('%s/tags/read', $current_realm),
                 'short_description' => 'Get Tags Data',
                 'description' => 'Grants read only access for Tags Data',
+            ),
+        ];
+
+        foreach ($scopes as $scope_info) {
+            $scope = new ApiScope();
+            $scope->setName($scope_info['name']);
+            $scope->setShortDescription($scope_info['short_description']);
+            $scope->setDescription($scope_info['description']);
+            $scope->setActive(true);
+            $scope->setDefault(false);
+            $scope->setApi($api);
+            EntityManager::persist($scope);
+        }
+
+        EntityManager::flush();
+    }
+
+
+    private function seedCompaniesScopes(){
+        $current_realm = Config::get('app.url');
+        $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'companies']);
+
+        $scopes = [
+            array(
+                'name'              => sprintf('%s/companies/read', $current_realm),
+                'short_description' => 'Get Companies Data',
+                'description'       => 'Grants read only access for Companies Data',
             ),
         ];
 
