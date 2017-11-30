@@ -19,8 +19,31 @@ use App\Repositories\SilverStripeDoctrineRepository;
  * Class DoctrineTagRepository
  * @package repositories\main
  */
-final class DoctrineTagRepository extends SilverStripeDoctrineRepository implements ITagRepository
+final class DoctrineTagRepository
+    extends SilverStripeDoctrineRepository
+    implements ITagRepository
 {
+
+    /**
+     * @return array
+     */
+    protected function getFilterMappings()
+    {
+        return [
+            'tag' => 'e.tag:json_string',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderMappings()
+    {
+        return [
+            'id'   => 'e.id',
+            'tag'  => 'e.tag',
+        ];
+    }
 
     /**
      * @param string $tag

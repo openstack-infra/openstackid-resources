@@ -159,6 +159,32 @@ final class ApiScopesSeeder extends Seeder
         EntityManager::flush();
     }
 
+    private function seedTagsScopes(){
+        $current_realm = Config::get('app.url');
+        $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'tags']);
+
+        $scopes = [
+            array(
+                'name' => sprintf('%s/tags/read', $current_realm),
+                'short_description' => 'Get Tags Data',
+                'description' => 'Grants read only access for Tags Data',
+            ),
+        ];
+
+        foreach ($scopes as $scope_info) {
+            $scope = new ApiScope();
+            $scope->setName($scope_info['name']);
+            $scope->setShortDescription($scope_info['short_description']);
+            $scope->setDescription($scope_info['description']);
+            $scope->setActive(true);
+            $scope->setDefault(false);
+            $scope->setApi($api);
+            EntityManager::persist($scope);
+        }
+
+        EntityManager::flush();
+    }
+
     private function seedTeamsScopes(){
         $current_realm = Config::get('app.url');
         $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'teams']);

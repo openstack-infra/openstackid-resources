@@ -102,6 +102,11 @@ Route::group([
         });
     });
 
+    // tags
+    Route::group(['prefix'=>'tags'], function(){
+        Route::get('', 'OAuth2TagsApiController@getTags');
+    });
+
     // teams
     Route::group(['prefix'=>'teams'], function(){
         Route::get('', 'OAuth2TeamsApiController@getMyTeams');

@@ -31,6 +31,7 @@ class ApiEndpointsSeeder extends Seeder
         $this->seedSummitEndpoints();
         $this->seedMemberEndpoints();
         $this->seedTeamEndpoints();
+        $this->seedTagsEndpoints();
     }
 
     /**
@@ -468,10 +469,25 @@ class ApiEndpointsSeeder extends Seeder
         $this->seedApiEndpoints('members', [
                 // members
                 array(
-                    'name' => 'get-my-member',
-                    'route' => '/api/v1/members/me',
+                    'name'        => 'get-my-member',
+                    'route'       => '/api/v1/members/me',
                     'http_method' => 'GET',
-                    'scopes' => [sprintf('%s/members/read/me', $current_realm)],
+                    'scopes'      => [sprintf('%s/members/read/me', $current_realm)],
+                )
+            ]
+        );
+    }
+
+    private function seedTagsEndpoints(){
+        $current_realm = Config::get('app.url');
+
+        $this->seedApiEndpoints('tags', [
+                // members
+                array(
+                    'name' => 'get-tags',
+                    'route' => '/api/v1/tags',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/summits/read', $current_realm), sprintf('%s/tags/read', $current_realm)],
                 )
             ]
         );

@@ -53,6 +53,17 @@ final class ApiSeeder extends Seeder
 
         EntityManager::flush();
 
+        //tags
+
+        $api = new Api();
+        $api->setName('tags');
+        $api->setActive(true);
+        $api->setDescription('tags API');
+
+        EntityManager::persist($api);
+
+        EntityManager::flush();
+
         // teams
 
         $api = new Api();
