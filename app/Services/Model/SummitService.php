@@ -521,11 +521,11 @@ final class SummitService implements ISummitService
         if (isset($data['start_date']) && isset($data['end_date'])) {
             $event->setSummit($summit);
             $start_datetime   = intval($data['start_date']);
-            $utc_timezone     = new DateTimeZone("UTC");
-            $start_datetime   = new \DateTime("@$start_datetime", $utc_timezone);
+            $start_datetime   = new \DateTime("@$start_datetime");
+            $start_datetime->setTimezone($summit->getTimeZone());
             $end_datetime     = intval($data['end_date']);
-            $end_datetime     = new \DateTime("@$end_datetime", $utc_timezone);
-
+            $end_datetime     = new \DateTime("@$end_datetime");
+            $end_datetime->setTimezone($summit->getTimeZone());
             $interval_seconds = $end_datetime->getTimestamp() - $start_datetime->getTimestamp();
             $minutes          = $interval_seconds / 60;
             if ($minutes < self::MIN_EVENT_MINUTES)
@@ -549,8 +549,8 @@ final class SummitService implements ISummitService
                     sprintf
                     (
                         "event start/end (%s - %s) does not match with summit start/end (%s - %s)",
-                        $start_datetime->format('Y-m-d H:i:s'),
-                        $end_datetime->format('Y-m-d H:i:s'),
+                        $event->getLocalStartDate()->format('Y-m-d H:i:s'),
+                        $event->getLocalEndDate()->format('Y-m-d H:i:s'),
                         $summit->getLocalBeginDate()->format('Y-m-d H:i:s'),
                         $summit->getLocalEndDate()->format('Y-m-d H:i:s')
                     )
