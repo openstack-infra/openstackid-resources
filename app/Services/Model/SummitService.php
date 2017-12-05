@@ -70,7 +70,7 @@ final class SummitService implements ISummitService
     /**
      *  minimun number of minutes that an event must last
      */
-    const MIN_EVENT_MINUTES = 10;
+    const MIN_EVENT_MINUTES = 5;
     /**
      * @var ITransactionService
      */
@@ -520,12 +520,11 @@ final class SummitService implements ISummitService
 
         if (isset($data['start_date']) && isset($data['end_date'])) {
             $event->setSummit($summit);
-            $summit_time_zone = $summit->getTimeZone();
             $start_datetime   = intval($data['start_date']);
-            $start_datetime   = new \DateTime("@$start_datetime", $summit_time_zone);
-
+            $utc_timezone     = new DateTimeZone("UTC");
+            $start_datetime   = new \DateTime("@$start_datetime", $utc_timezone);
             $end_datetime     = intval($data['end_date']);
-            $end_datetime     = new \DateTime("@$end_datetime", $summit_time_zone);
+            $end_datetime     = new \DateTime("@$end_datetime", $utc_timezone);
 
             $interval_seconds = $end_datetime->getTimestamp() - $start_datetime->getTimestamp();
             $minutes          = $interval_seconds / 60;
