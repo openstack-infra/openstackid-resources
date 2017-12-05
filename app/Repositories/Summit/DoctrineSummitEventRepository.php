@@ -128,19 +128,19 @@ final class DoctrineSummitEventRepository
                   ),
                   'accepted' => new DoctrineCaseFilterMapping(
                     'accepted',
-                    "ssp.`order` is not null and ssp.order <= e.category.session_count and sspl.list_type = 'Group' and sspl.list_class = 'Session' and sspl.category = e.category"
+                    "ssp.order is not null and ssp.order <= cc.session_count and sspl.list_type = 'Group' and sspl.list_class = 'Session' and sspl.category = e.category"
                   ),
                   'alternate' => new DoctrineCaseFilterMapping(
                         'alternate',
-                        "ssp.`order` is not null and ssp.`order` > e.category.session_count and sspl.list_type = 'Group' and sspl.list_class = 'Session' and sspl.category = e.category"
+                        "ssp.order is not null and ssp.order > cc.session_count and sspl.list_type = 'Group' and sspl.list_class = 'Session' and sspl.category = e.category"
                   ),
                   'lightning-accepted' => new DoctrineCaseFilterMapping(
                         'lightning-accepted',
-                        "ssp.`order` is not null and ssp.`order` <= e.category.lightning_count and sspl.list_type = 'Group' and sspl.list_class = 'Lightning' and sspl.category = e.category"
+                        "ssp.order is not null and ssp.order <= cc.lightning_count and sspl.list_type = 'Group' and sspl.list_class = 'Lightning' and sspl.category = e.category"
                   ),
                   'lightning-alternate' => new DoctrineCaseFilterMapping(
                         'lightning-alternate',
-                        "ssp.`order` is not null and ssp.`order` > e.category.lightning_count and sspl.list_type = 'Group' and sspl.list_class = 'Lightning' and sspl.category = e.category"
+                        "ssp.order is not null and ssp.order > cc.lightning_count and sspl.list_type = 'Group' and sspl.list_class = 'Lightning' and sspl.category = e.category"
                   ),
               ]
             ),
@@ -193,6 +193,7 @@ final class DoctrineSummitEventRepository
 
         if($class == \models\summit\Presentation::class) {
             $query = $query->innerJoin("e.speakers", "sp", Join::WITH);
+            $query = $query->innerJoin("e.category", "cc", Join::WITH);
             $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
             $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
             $query = $query->leftJoin('e.moderator', "spm", Join::LEFT_JOIN);
