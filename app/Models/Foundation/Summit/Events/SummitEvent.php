@@ -541,6 +541,11 @@ class SummitEvent extends SilverstripeBaseModel
         return $this;
     }
 
+    public function clearLocation(){
+        $this->location = null;
+        return $this;
+    }
+
     /**
      * @return SummitAbstractLocation
      */

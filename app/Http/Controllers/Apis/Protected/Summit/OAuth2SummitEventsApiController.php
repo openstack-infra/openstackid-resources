@@ -346,19 +346,18 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             if(!Request::isJson()) return $this->error403();
             $data = Input::json();
 
-            $rules = array
-            (
+            $rules = [
                 'title'           => 'sometimes|required|string|max:100',
-                'description'     => 'sometimes|required|string',
+                'description'     => 'sometimes|string',
                 'social_summary'  => 'sometimes|string|max:100',
-                'location_id'     => 'sometimes|required|integer',
-                'start_date'      => 'sometimes|required|date_format:U',
+                'location_id'     => 'sometimes|integer',
+                'start_date'      => 'sometimes|date_format:U',
                 'end_date'        => 'sometimes|required_with:start_date|date_format:U|after:start_date',
-                'allow_feedback'  => 'sometimes|required|boolean',
+                'allow_feedback'  => 'sometimes|boolean',
                 'type_id'         => 'sometimes|required|integer',
                 'track_id'        => 'sometimes|required|integer',
-                'tags'            => 'sometimes|required|string_array',
-            );
+                'tags'            => 'sometimes|string_array',
+            ];
 
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($data->all(), $rules);
@@ -372,12 +371,11 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 );
             }
 
-            $fields = array
-            (
+            $fields = [
                 'title',
                 'description',
                 'social_summary',
-            );
+            ];
 
             $event = $this->service->updateEvent($summit, $event_id, HTMLCleaner::cleanData($data->all(), $fields));
 

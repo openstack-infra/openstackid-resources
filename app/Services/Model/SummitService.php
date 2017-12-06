@@ -593,7 +593,7 @@ final class SummitService implements ISummitService
             $location = null;
             if (isset($data['location_id'])) {
                 $location = $summit->getLocation(intval($data['location_id']));
-                if (is_null($location)) {
+                if (is_null($location) && intval($data['location_id']) > 0) {
                     throw new EntityNotFoundException(sprintf("location id %s does not exists!", $data['location_id']));
                 }
             }
@@ -619,7 +619,7 @@ final class SummitService implements ISummitService
                 $event->setRsvpLink(html_entity_decode(trim($data['rsvp_link'])));
 
             if (isset($data['head_count']))
-                $event->setHeadCount(intval(data['head_count']));
+                $event->setHeadCount(intval($data['head_count']));
 
             if (isset($data['social_summary']))
                 $event->setSocialSummary(strip_tags(trim($data['social_summary'])));
@@ -641,13 +641,17 @@ final class SummitService implements ISummitService
             }
 
             $event->setSummit($summit);
-
-            if (!is_null($location))
+            if(!is_null($location))
                 $event->setLocation($location);
+
+            if(is_null($location) && isset($data['location_id'])){
+                // clear location
+                $event->clearLocation();
+            }
 
             $this->updateEventDates($data, $summit, $event);
 
-            if (isset($data['tags']) && count($data['tags']) > 0) {
+            if (isset($data['tags'])) {
                 $event->clearTags();
                 foreach ($data['tags'] as $str_tag) {
                     $tag = $this->tag_repository->getByTag($str_tag);
@@ -665,7 +669,7 @@ final class SummitService implements ISummitService
                 throw new ValidationException('sponsors are mandatory!');
             }
 
-            if (count($sponsors) > 0) {
+            if (isset($data['sponsors'])) {
                 $event->clearSponsors();
                 foreach ($sponsors as $sponsor_id) {
                     $sponsor = $this->company_repository->getById(intval($sponsor_id));

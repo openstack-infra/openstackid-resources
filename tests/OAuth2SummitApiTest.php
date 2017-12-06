@@ -2444,7 +2444,12 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $params = [
 
             'id' => 23,
-            'filter' => ['selection_status==lightning-alternate', 'event_type_id==117'],
+            'filter' =>
+                [
+                    'selection_status==lightning-alternate',
+                    'event_type_id==117',
+                    'title=@test,abstract=@test,social_summary=@test,tags=@test,speaker=@test'
+                ],
             'expand' => 'speakers',
         ];
 
