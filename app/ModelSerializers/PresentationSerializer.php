@@ -26,6 +26,7 @@ class PresentationSerializer extends SummitEventSerializer
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
         'ToRecord'                => 'to_record:json_boolean',
+        'FeatureCloud'            => 'feature_cloud:json_boolean',
     );
 
     protected static $allowed_fields = array
