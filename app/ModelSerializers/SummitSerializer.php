@@ -27,8 +27,6 @@ final class SummitSerializer extends SilverStripeSerializer
         'Name'                        => 'name:json_string',
         'BeginDate'                   => 'start_date:datetime_epoch',
         'EndDate'                     => 'end_date:datetime_epoch',
-        'BeginDate'                   => 'start_date:datetime_epoch',
-        'EndDate'                     => 'end_date:datetime_epoch',
         'SubmissionBeginDate'         => 'submission_begin_date:datetime_epoch',
         'SubmissionEndDate'           => 'submission_end_date:datetime_epoch',
         'VotingBeginDate'             => 'voting_begin_date:datetime_epoch',
@@ -56,6 +54,13 @@ final class SummitSerializer extends SilverStripeSerializer
         'SpeakerAnnouncementEmailAlternateRejectedCount' => 'speaker_announcement_email_alternate_rejected_count:json_int',
     ];
 
+    protected static $allowed_relations = [
+
+        'ticket_types',
+        'locations',
+        'wifi_connections',
+    ];
+
     /**
      * @param null $expand
      * @param array $fields
@@ -70,6 +75,7 @@ final class SummitSerializer extends SilverStripeSerializer
         $values              = parent::serialize($expand, $fields, $relations, $params);
         $time_zone_list      = timezone_identifiers_list();
         $time_zone_id        = $summit->getTimeZoneId();
+        if(!count($relations)) $relations = $this->getAllowedRelations();
         $values['time_zone'] = null;
 
         if (!empty($time_zone_id) && isset($time_zone_list[$time_zone_id])) {
@@ -95,25 +101,31 @@ final class SummitSerializer extends SilverStripeSerializer
         $values['schedule_event_detail_url']   = sprintf("%ssummit/%s/%s/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page, $schedule_page, 'events/:event_id/:event_title');
 
         // tickets
-        $ticket_types = [];
-        foreach ($summit->getTicketTypes() as $ticket) {
-            $ticket_types[] = SerializerRegistry::getInstance()->getSerializer($ticket)->serialize($expand);
+        if(in_array('ticket_types', $relations)) {
+            $ticket_types = [];
+            foreach ($summit->getTicketTypes() as $ticket) {
+                $ticket_types[] = SerializerRegistry::getInstance()->getSerializer($ticket)->serialize($expand);
+            }
+            $values['ticket_types'] = $ticket_types;
         }
-        $values['ticket_types'] = $ticket_types;
 
         //locations
-        $locations = [];
-        foreach ($summit->getLocations() as $location) {
-            $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize($expand);
+        if(in_array('locations', $relations)) {
+            $locations = [];
+            foreach ($summit->getLocations() as $location) {
+                $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize($expand);
+            }
+            $values['locations'] = $locations;
         }
-        $values['locations'] = $locations;
 
         // wifi connections
-        $wifi_connections = [];
-        foreach ($summit->getWifiConnections() as $wifi_connection) {
-            $wifi_connections[] = SerializerRegistry::getInstance()->getSerializer($wifi_connection)->serialize($expand);
+        if(in_array('wifi_connections', $relations)) {
+            $wifi_connections = [];
+            foreach ($summit->getWifiConnections() as $wifi_connection) {
+                $wifi_connections[] = SerializerRegistry::getInstance()->getSerializer($wifi_connection)->serialize($expand);
+            }
+            $values['wifi_connections'] = $wifi_connections;
         }
-        $values['wifi_connections'] = $wifi_connections;
 
         if (!empty($expand)) {
             $expand = explode(',', $expand);
@@ -229,6 +241,7 @@ final class SummitSerializer extends SilverStripeSerializer
                 }
             }
         }
+
         $values['timestamp'] = time();
         return $values;
     }

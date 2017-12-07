@@ -79,10 +79,17 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         try {
 
+            $expand    = Request::input('expand', '');
+            $fields    = Request::input('fields', '');
+            $relations = Request::input('relations', '');
+
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+            $fields    = !empty($fields) ? explode(',', $fields) : [];
+
             $summits = [];
 
             foreach($this->_getSummits() as $summit){
-                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize(Input::get('expand',''));
+                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize($expand, $fields, $relations);
             }
 
             $response = new PagingResponse
