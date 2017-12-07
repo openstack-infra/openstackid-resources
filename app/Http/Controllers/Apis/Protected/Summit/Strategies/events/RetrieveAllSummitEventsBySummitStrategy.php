@@ -15,6 +15,7 @@
 
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\oauth2\IResourceServerContext;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
 use models\summit\Summit;
@@ -41,18 +42,31 @@ class RetrieveAllSummitEventsBySummitStrategy extends RetrieveSummitEventsStrate
     protected $summit;
 
     /**
+     * @var IResourceServerContext
+     */
+    protected $resource_server_context;
+
+    /**
      * @var ISummitEventRepository
      */
     protected $events_repository;
 
+    /**
+     * RetrieveAllSummitEventsBySummitStrategy constructor.
+     * @param ISummitRepository $summit_repository
+     * @param ISummitEventRepository $events_repository
+     * @param IResourceServerContext $resource_server_context
+     */
     public function __construct
     (
         ISummitRepository $summit_repository,
-        ISummitEventRepository $events_repository
+        ISummitEventRepository $events_repository,
+        IResourceServerContext $resource_server_context
     )
     {
-        $this->events_repository = $events_repository;
-        $this->summit_repository = $summit_repository;
+        $this->events_repository       = $events_repository;
+        $this->summit_repository       = $summit_repository;
+        $this->resource_server_context = $resource_server_context;
     }
 
     /**
