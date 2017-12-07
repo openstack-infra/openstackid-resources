@@ -1,6 +1,6 @@
 <?php namespace utils;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,42 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-
 /**
- * Class DoctrineJoinFilterMapping
+ * Class DoctrineLeftJoinFilterMapping
  * @package utils
  */
-class DoctrineJoinFilterMapping extends FilterMapping
+class DoctrineLeftJoinFilterMapping extends DoctrineJoinFilterMapping
 {
-    /**
-     * @var string
-     */
-    protected $alias;
-
-    /**
-     * DoctrineJoinFilterMapping constructor.
-     * @param string $table
-     * @param string $alias
-     * @param string $where
-     */
-    public function __construct($table, $alias, $where)
-    {
-        parent::__construct($table, $where);
-        $this->alias = $alias;
-    }
-
-    /**
-     * @param FilterElement $filter
-     * @throws \Exception
-     */
-    public function toRawSQL(FilterElement $filter)
-    {
-        throw new \Exception;
-    }
-
     /**
      * @param QueryBuilder $query
      * @param FilterElement $filter
@@ -56,7 +28,7 @@ class DoctrineJoinFilterMapping extends FilterMapping
         $where = str_replace(":value", $filter->getValue(), $this->where);
         $where = str_replace(":operator", $filter->getOperator(), $where);
         if(!in_array($this->alias, $query->getAllAliases()))
-            $query->innerJoin($this->table, $this->alias, Join::WITH);
+            $query->leftJoin($this->table, $this->alias, Join::WITH);
         return $query->andWhere($where);
     }
 
@@ -69,7 +41,7 @@ class DoctrineJoinFilterMapping extends FilterMapping
         $where = str_replace(":value", $filter->getValue(), $this->where);
         $where = str_replace(":operator", $filter->getOperator(), $where);
         if(!in_array($this->alias, $query->getAllAliases()))
-            $query->innerJoin($this->table, $this->alias, Join::WITH);
+            $query->leftJoin($this->table, $this->alias, Join::WITH);
         return $where;
     }
 }

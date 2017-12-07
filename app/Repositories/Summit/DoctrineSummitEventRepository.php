@@ -26,7 +26,7 @@ use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
 use Doctrine\ORM\Query\Expr\Join;
-
+use utils\DoctrineLeftJoinFilterMapping;
 /**
  * Class DoctrineSummitEventRepository
  * @package App\Repositories\Summit
@@ -75,7 +75,7 @@ final class DoctrineSummitEventRepository
             'published'      => 'e.published',
             'start_date'     => 'e.start_date:datetime_epoch',
             'end_date'       => 'e.end_date:datetime_epoch',
-            'tags'           => new DoctrineJoinFilterMapping
+            'tags'           => new DoctrineLeftJoinFilterMapping
             (
                 'e.tags',
                 't',
@@ -192,8 +192,8 @@ final class DoctrineSummitEventRepository
         }
 
         if($class == \models\summit\Presentation::class) {
-            $query = $query->innerJoin("e.speakers", "sp", Join::WITH);
             $query = $query->innerJoin("e.category", "cc", Join::WITH);
+            $query = $query->leftJoin("e.speakers", "sp", Join::WITH);
             $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
             $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
             $query = $query->leftJoin('e.moderator', "spm", Join::LEFT_JOIN);
