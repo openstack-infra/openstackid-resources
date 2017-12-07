@@ -1,6 +1,6 @@
-<?php namespace App\Http\Controllers;
+<?php namespace App\Http\Utils;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,29 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-
-
+use App\Security\SummitScopes;
+use Illuminate\Support\Facades\Config;
 use models\oauth2\IResourceServerContext;
-use models\utils\IBaseRepository;
-
 /**
- * Class SummitFinderStrategyFactory
- * @package App\Http\Controllers
+ * Class FilterAvailableSummitsStrategy
+ * @package App\Http\Utils
  */
-final class SummitFinderStrategyFactory
+final class FilterAvailableSummitsStrategy
 {
+
     /**
-     * @param IBaseRepository $repository
      * @param IResourceServerContext $resource_server_ctx
-     * @return ISummitFinderStrategy
+     * @return bool
      */
-    public static function build
-    (
-        IBaseRepository $repository,
-        IResourceServerContext $resource_server_ctx
-    )
-    {
-        return new CurrentSummitFinderStrategy($repository, $resource_server_ctx);
+    static public function shouldReturnAllSummits(IResourceServerContext $resource_server_ctx){
+        $scopes         = $resource_server_ctx->getCurrentScope();
+        $current_realm  = Config::get('app.url');
+        $needed_scope   = sprintf(SummitScopes::ReadAllSummitData, $current_realm);
+        return in_array($needed_scope, $scopes);
     }
 }

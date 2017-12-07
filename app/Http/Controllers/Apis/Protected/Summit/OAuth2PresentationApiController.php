@@ -69,7 +69,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
     public function getPresentationVideos($summit_id, $presentation_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $presentation = $this->presentation_repository->getById($presentation_id);
@@ -99,7 +99,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
     public function getPresentationVideo($summit_id, $presentation_id, $video_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
         } catch (Exception $ex) {
@@ -111,7 +111,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
     public function addVideo(LaravelRequest $request, $summit_id, $presentation_id){
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             if (!$request->isJson()) {
@@ -163,7 +163,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
     public function updateVideo(LaravelRequest $request, $summit_id, $presentation_id, $video_id){
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             if (!$request->isJson()) {
@@ -215,7 +215,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
     public function deleteVideo($summit_id, $presentation_id, $video_id){
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $this->presentation_service->deleteVideo($presentation_id, $video_id);

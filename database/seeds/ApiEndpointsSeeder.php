@@ -16,7 +16,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Config;
 use App\Models\ResourceServer\ApiEndpoint;
 use LaravelDoctrine\ORM\Facades\EntityManager;
-
+use App\Security\SummitScopes;
 /**
  * Class ApiEndpointsSeeder
  */
@@ -78,44 +78,56 @@ class ApiEndpointsSeeder extends Seeder
                 'name' => 'get-summits',
                 'route' => '/api/v1/summits',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
-            ),
-            array(
-                'name' => 'get-all-summits',
-                'route' => '/api/v1/summits/all',
-                'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-summit',
                 'route' => '/api/v1/summits/{id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-summit-entity-events',
                 'route' => '/api/v1/summits/{id}/entity-events',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             // attendees
             array(
                 'name' => 'get-attendees',
                 'route' => '/api/v1/summits/{id}/attendees',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-attendee',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-attendee-schedule',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'add-event-attendee-schedule',
@@ -140,19 +152,28 @@ class ApiEndpointsSeeder extends Seeder
                 'name' => 'get-speakers',
                 'route' => '/api/v1/summits/{id}/speakers',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-all-speakers',
                 'route' => '/api/v1/speakers',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-speaker',
                 'route' => '/api/v1/summits/{id}/speakers/{speaker_id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'add-speaker-feedback',
@@ -165,43 +186,64 @@ class ApiEndpointsSeeder extends Seeder
                 'name' => 'get-events',
                 'route' => '/api/v1/summits/{id}/events',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-published-events',
                 'route' => '/api/v1/summits/{id}/events/published',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-unpublished-events',
                 'route' => '/api/v1/summits/{id}/events/unpublished',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-all-events',
                 'route' => '/api/v1/summits/events',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-all-published-events',
                 'route' => '/api/v1/summits/events/published',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-published-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/published',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'add-event',
@@ -261,7 +303,10 @@ class ApiEndpointsSeeder extends Seeder
                 'name' => 'get-event-feedback',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/feedback/{attendee_id?}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'delete-rsvp',
@@ -274,81 +319,120 @@ class ApiEndpointsSeeder extends Seeder
                  'name' => 'get-locations',
                  'route' => '/api/v1/summits/{id}/locations',
                  'http_method' => 'GET',
-                 'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                 'scopes' => [
+                     sprintf(SummitScopes::ReadSummitData, $current_realm),
+                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                 ],
              ),
             array(
                 'name' => 'get-venues',
                 'route' => '/api/v1/summits/{id}/locations/venues',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-external-locations',
                 'route' => '/api/v1/summits/{id}/locations/external-locations',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-hotels',
                 'route' => '/api/v1/summits/{id}/locations/hotels',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-airports',
                 'route' => '/api/v1/summits/{id}/locations/airports',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-location',
                 'route' => '/api/v1/summits/{id}/locations/{location_id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-location-events',
                 'route' => '/api/v1/summits/{id}/locations/{location_id}/events',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-location-published-events',
                 'route' => '/api/v1/summits/{id}/locations/{location_id}/events/published',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             // event types
             array(
                 'name' => 'get-event-types',
                 'route' => '/api/v1/summits/{id}/event-types',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             //tracks
             array(
                 'name' => 'get-tracks',
                 'route' => '/api/v1/summits/{id}/tracks',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-track',
                 'route' => '/api/v1/summits/{id}/tracks/{track_id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-track-groups',
                 'route' => '/api/v1/summits/{id}/track-groups',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-track-group',
                 'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             //external orders
             array(
@@ -368,13 +452,19 @@ class ApiEndpointsSeeder extends Seeder
                 'name' => 'get-presentation-videos',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'get-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/video/{video_id}',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read', $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             ),
             array(
                 'name' => 'create-presentation-video',

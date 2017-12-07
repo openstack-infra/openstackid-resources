@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\FilterAvailableSummitsStrategy;
+use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;
 use models\summit\Summit;
 /**
@@ -25,9 +27,24 @@ class CurrentSummitFinderStrategy implements ISummitFinderStrategy
      */
     private $repository;
 
-    public function __construct(ISummitRepository $repository)
+    /**
+     * @var IResourceServerContext
+     */
+    private $resource_server_ctx;
+
+    /**
+     * CurrentSummitFinderStrategy constructor.
+     * @param ISummitRepository $repository
+     * @param IResourceServerContext $resource_server_ctx
+     */
+    public function __construct
+    (
+        ISummitRepository $repository,
+        IResourceServerContext $resource_server_ctx
+    )
     {
-        $this->repository = $repository;
+        $this->resource_server_ctx = $resource_server_ctx;
+        $this->repository          = $repository;
     }
 
     /**
@@ -38,6 +55,8 @@ class CurrentSummitFinderStrategy implements ISummitFinderStrategy
     {
         $summit = $summit_id === 'current' ? $this->repository->getCurrent() : $this->repository->getById(intval($summit_id));
         if(is_null($summit)) return null;
+        $show_all = FilterAvailableSummitsStrategy::shouldReturnAllSummits($this->resource_server_ctx);
+        if($show_all) return $summit;
         if(!$summit->isAvailableOnApi()) return null;
         return $summit;
     }

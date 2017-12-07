@@ -62,7 +62,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
 
     public function getMyMember($summit_id, $member_id){
 
-        $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+        $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
         if (is_null($summit)) return $this->error404();
 
         $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -90,7 +90,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
     public function getMemberFavoritesSummitEvents($summit_id, $member_id){
 
         try {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -148,7 +148,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
     public function addEventToMemberFavorites($summit_id, $member_id, $event_id){
 
         try {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -193,7 +193,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
     public function removeEventFromMemberFavorites($summit_id, $member_id, $event_id){
 
         try {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -235,7 +235,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
      */
     public function getMemberScheduleSummitEvents($summit_id, $member_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -293,7 +293,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
     public function addEventToMemberSchedule($summit_id, $member_id, $event_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -338,7 +338,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -383,7 +383,7 @@ final class OAuth2SummitMembersApiController extends OAuth2ProtectedController
     public function deleteEventRSVP($summit_id, $member_id, $event_id){
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();

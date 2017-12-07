@@ -80,7 +80,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function getLocations($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //locations
@@ -119,7 +119,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $expand    = Request::input('expand', '');
             $relations = Request::input('relations', '');
             $relations = !empty($relations) ? explode(',', $relations) : [];
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $location = $summit->getLocation($location_id);
@@ -143,7 +143,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     private function _getLocationEvents($summit_id, $location_id, $published = true)
     {
-        $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+        $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
         if (is_null($summit))
             throw new EntityNotFoundException;
 
@@ -281,7 +281,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function getVenues($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //locations
@@ -317,7 +317,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function getExternalLocations($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //locations
@@ -351,7 +351,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function getHotels($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //locations
@@ -386,7 +386,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function getAirports($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //locations

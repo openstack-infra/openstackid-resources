@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Config;;
 use App\Models\ResourceServer\ApiScope;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use Illuminate\Support\Facades\DB;
+use App\Security\SummitScopes;
 
 /**
  * Class ApiScopesSeeder
@@ -45,9 +46,14 @@ final class ApiScopesSeeder extends Seeder
 
         $scopes = [
             array(
-                'name' => sprintf('%s/summits/read', $current_realm),
+                'name' => sprintf(SummitScopes::ReadSummitData, $current_realm),
                 'short_description' => 'Get Summit Data',
                 'description' => 'Grants read only access for Summits Data',
+            ),
+            array(
+                'name' => sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                'short_description' => 'Get All Summits Data',
+                'description' => 'Grants read only access for All Summits Data',
             ),
             array(
                 'name' => sprintf('%s/me/read', $current_realm),

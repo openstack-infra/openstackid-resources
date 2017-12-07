@@ -85,7 +85,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $values = Input::all();
@@ -236,7 +236,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         try
         {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check($speaker_id, $summit);

@@ -63,7 +63,7 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
     {
         try
         {
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $values = Input::all();

@@ -83,7 +83,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
 
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $type     = $attendee_id === 'me' ? CheckAttendeeStrategyFactory::Me : CheckAttendeeStrategyFactory::Own;
@@ -111,7 +111,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $attendee =  CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
@@ -147,7 +147,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
@@ -189,7 +189,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
@@ -231,7 +231,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
     public function deleteEventRSVP($summit_id, $attendee_id, $event_id){
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $event = $summit->getScheduleEvent(intval($event_id));

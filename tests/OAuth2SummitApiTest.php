@@ -37,28 +37,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
-    public function testGetAllSummits()
-    {
-
-        $params = ['expand' => 'type,event_types,tracks'];
-
-        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
-        $response = $this->action(
-            "GET",
-            "OAuth2SummitApiController@getAllSummits",
-            $params,
-            array(),
-            array(),
-            array(),
-            $headers
-        );
-
-        $content = $response->getContent();
-        $summits = json_decode($content);
-        $this->assertTrue(!is_null($summits));
-        $this->assertResponseStatus(200);
-    }
-
     public function testGetSummit($summit_id = 22)
     {
 

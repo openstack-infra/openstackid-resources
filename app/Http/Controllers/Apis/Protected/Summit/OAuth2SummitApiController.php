@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 
+use App\Http\Utils\FilterAvailableSummitsStrategy;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -80,34 +81,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
 
             $summits = [];
 
-            foreach($this->repository->getAvailables() as $summit){
-                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize(Input::get('expand',''));
-            }
-
-            $response = new PagingResponse
-            (
-                count($summits),
-                count($summits),
-                1,
-                1,
-                $summits
-            );
-
-            return $this->ok($response->toArray());
-        }
-        catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    public function getAllSummits()
-    {
-        try {
-
-            $summits = [];
-
-            foreach($this->repository->getAllOrderedByBeginDate() as $summit){
+            foreach($this->_getSummits() as $summit){
                 $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize(Input::get('expand',''));
             }
 
@@ -129,6 +103,14 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     }
 
     /**
+     * @return \models\summit\Summit[]
+     */
+    private function _getSummits(){
+        return FilterAvailableSummitsStrategy::shouldReturnAllSummits($this->resource_server_context) ?
+            $this->repository->getAllOrderedByBeginDate():$this->repository->getAvailables();
+    }
+
+    /**
      * @param $summit_id
      * @return mixed
      */
@@ -136,7 +118,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         $expand = Request::input('expand', '');
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
             return $this->ok(SerializerRegistry::getInstance()->getSerializer($summit)->serialize($expand));
         } catch (Exception $ex) {
@@ -153,7 +135,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     {
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $last_event_id = Request::input('last_event_id', null);
@@ -236,7 +218,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     public function getEventTypes($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //event types
@@ -268,7 +250,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getTracks($summit_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //tracks
@@ -301,7 +283,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getTrack($summit_id, $track_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $track = $summit->getPresentationCategory($track_id);
@@ -320,7 +302,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getTracksGroups($summit_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             //track groups
@@ -353,7 +335,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getTrackGroup($summit_id, $track_group_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $group = $summit->getCategoryGroup($track_group_id);
@@ -373,7 +355,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function getExternalOrder($summit_id, $external_order_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
             $order = $this->service->getExternalOrder($summit, $external_order_id);
             return $this->ok($order);
@@ -400,7 +382,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     public function confirmExternalOrderAttendee($summit_id, $external_order_id, $external_attendee_id){
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
             $member_id = $this->resource_server_context->getCurrentUserExternalId();
             if (is_null($member_id)) {

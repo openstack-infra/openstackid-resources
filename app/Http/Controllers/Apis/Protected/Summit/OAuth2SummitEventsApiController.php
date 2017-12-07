@@ -207,7 +207,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
      */
     private function _getSummitEvent($summit_id, $event_id, $expand = '', $fields = '', $relations = '', $published = true)
     {
-        $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+        $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
         if (is_null($summit)) throw new EntityNotFoundException;
 
         $event =  $published ? $summit->getScheduleEvent(intval($event_id)) : $summit->getEvent(intval($event_id));
@@ -275,7 +275,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
     public function addEvent($summit_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
             if(!Request::isJson()) return $this->error403();
             $data = Input::json();
@@ -340,7 +340,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
     public function updateEvent($summit_id, $event_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             if(!Request::isJson()) return $this->error403();
@@ -406,7 +406,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
     public function publishEvent($summit_id, $event_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             if(!Request::isJson()) return $this->error403();
@@ -459,7 +459,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
     public function unPublishEvent($summit_id, $event_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             if(!Request::isJson()) return $this->error403();
@@ -493,7 +493,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
     public function deleteEvent($summit_id, $event_id)
     {
         try {
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $this->service->deleteEvent($summit, $event_id);
@@ -529,7 +529,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
         try {
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $values = Input::all();
@@ -617,7 +617,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 return $this->error412(array('invalid content type!'));
             }
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
             if(!Request::isJson()) return $this->error403();
 
@@ -779,7 +779,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             return $this->error412(array('invalid content type!'));
         }
 
-        $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+        $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
         if (is_null($summit)) return $this->error404();
         if(!Request::isJson()) return $this->error403();
 
@@ -828,7 +828,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 return $this->error412(array('file param not set!'));
             }
 
-            $summit = SummitFinderStrategyFactory::build($this->repository)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $res = $this->service->addEventAttachment($summit, $event_id, $file);
