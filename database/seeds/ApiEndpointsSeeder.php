@@ -201,6 +201,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
+                'name' => 'get-schedule-empty-spots',
+                'route' => '/api/v1/summits/{id}/events/published/empty-spots',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ),
+            array(
                 'name' => 'get-unpublished-events',
                 'route' => '/api/v1/summits/{id}/events/unpublished',
                 'http_method' => 'GET',

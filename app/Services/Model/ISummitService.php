@@ -1,16 +1,4 @@
 <?php namespace services\model;
-
-use Illuminate\Http\UploadedFile;
-use models\exceptions\EntityNotFoundException;
-use models\exceptions\ValidationException;
-use models\main\File;
-use models\main\Member;
-use models\summit\ConfirmationExternalOrderRequest;
-use models\summit\Summit;
-use models\summit\SummitAttendee;
-use models\summit\SummitEvent;
-use models\summit\SummitEventFeedback;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +11,19 @@ use models\summit\SummitEventFeedback;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Illuminate\Http\UploadedFile;
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
+use models\main\File;
+use models\main\Member;
+use models\summit\ConfirmationExternalOrderRequest;
+use models\summit\Summit;
+use models\summit\SummitAttendee;
+use models\summit\SummitEvent;
+use models\summit\SummitEventFeedback;
+use models\summit\SummitScheduleEmptySpot;
+use DateTime;
+use utils\Filter;
 
 /**
  * Interface ISummitService
@@ -147,7 +148,7 @@ interface ISummitService
      * @param $event_id
      * @return bool
      */
-    public function unRSVPEvent(Summit $summit ,Member $member, $event_id);
+    public function unRSVPEvent(Summit $summit, Member $member, $event_id);
 
     /**
      * @param Summit $summit
@@ -159,4 +160,15 @@ interface ISummitService
      * @return File
      */
     public function addEventAttachment(Summit $summit, $event_id, UploadedFile $file,  $max_file_size = 10485760);
+
+    /**
+     * @param Summit $summit
+     * @param Filter $filter
+     * @return SummitScheduleEmptySpot[]
+     */
+    public function getSummitScheduleEmptySpots
+    (
+        Summit $summit,
+        Filter $filter
+    );
 }

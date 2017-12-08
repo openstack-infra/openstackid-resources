@@ -26,7 +26,7 @@ final class Order
      */
     private $ordering;
 
-    public function __construct($ordering = array())
+    public function __construct($ordering = [])
     {
         $this->ordering = $ordering;
     }

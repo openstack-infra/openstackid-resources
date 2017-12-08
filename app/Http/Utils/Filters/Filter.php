@@ -356,4 +356,24 @@ final class Filter
         }
         return $sql;
     }
+
+    /**
+     * @param string $field
+     * @return array
+     */
+    public function getFilterCollectionByField($field){
+        $list   = [];
+        $filter = $this->getFilter($field);
+
+        if(is_array($filter)){
+            if(is_array($filter[0])){
+                foreach ($filter[0] as $filter_element)
+                    $list[] = intval($filter_element->getValue());
+            }
+            else{
+                $list[] = intval($filter[0]->getValue());
+            }
+        }
+        return $list;
+    }
 }

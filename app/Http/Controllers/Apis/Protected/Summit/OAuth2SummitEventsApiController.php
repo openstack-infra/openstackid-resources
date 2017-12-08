@@ -32,6 +32,7 @@ use utils\FilterParser;
 use utils\FilterParserException;
 use utils\OrderParser;
 use utils\PagingInfo;
+use utils\PagingResponse;
 
 /**
  * Class OAuth2SummitEventsApiController
@@ -851,7 +852,6 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         }
         catch (Exception $ex) {
             Log::error($ex);
-
             return $this->error500($ex);
         }
     }
@@ -873,6 +873,62 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         {
             Log::warning($ex2);
             return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function getScheduleEmptySpots($summit_id){
+        try
+        {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $filter = null;
+            if (Input::has('filter')) {
+                $filter = FilterParser::parse(Input::get('filter'), [
+                    'location_id' => ['=='],
+                    'start_date'  => ['>='],
+                    'end_date'    => ['<='],
+                    'gap'         => ['>', '<', '<=', '>=', '=='],
+                ]);
+            }
+
+            if(empty($filter))
+                throw new ValidationException("filter param is mandatory!");
+
+            $gaps = [];
+            foreach ($this->service->getSummitScheduleEmptySpots($summit, $filter) as $gap)
+            {
+                $gaps[] = SerializerRegistry::getInstance()->getSerializer($gap)->serialize();
+            }
+
+            $response = new PagingResponse
+            (
+                count($gaps),
+                count($gaps),
+                1,
+                1,
+                $gaps
+            );
+
+            return $this->ok($response->toArray());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch(FilterParserException $ex3){
+            Log::warning($ex3);
+            return $this->error412($ex3->getMessages());
         }
         catch (Exception $ex)
         {

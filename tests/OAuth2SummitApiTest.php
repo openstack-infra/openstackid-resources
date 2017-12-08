@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use LaravelDoctrine\ORM\Facades\EntityManager;
+
+/**
+ * Class OAuth2SummitApiTest
+ */
 final class OAuth2SummitApiTest extends ProtectedApiTest
 {
 
@@ -1897,11 +1901,11 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = array
         (
-            'id' => $summit_id,
-            'page' => 1,
-            'per_page' => 50,
+            'id'          => $summit_id,
+            'page'        => 1,
+            'per_page'    => 50,
             'location_id' => 52,
-            'filter' => array
+            'filter'      => array
             (
                 'tags=@Nova',
                 'speaker=@Todd'
@@ -2459,5 +2463,51 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
+
+    public function testGetScheduleEmptySpotsBySummit()
+    {
+        $summit_repository   = EntityManager::getRepository(\models\summit\Summit::class);
+        $summit              = $summit_repository->getById(23);
+        $summit_time_zone    = $summit->getTimeZone();
+        $start_datetime      = new DateTime( "2017-11-04 07:00:00", $summit_time_zone);
+        $end_datetime        = new DateTime("2017-11-05 18:00:00", $summit_time_zone);
+        $start_datetime_unix = $start_datetime->getTimestamp();
+        $end_datetime_unix   = $end_datetime->getTimestamp();
+
+        $params = [
+
+            'id' => 23,
+            'filter' =>
+                [
+                    'location_id==318,location_id==320',
+                    'start_date>='.$start_datetime_unix,
+                    'end_date<='.$end_datetime_unix,
+                    'gap==10',
+                ],
+        ];
+
+        $headers = [
+
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        ];
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getScheduleEmptySpots",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $gaps = json_decode($content);
+        $this->assertTrue(!is_null($gaps));
+    }
 
 }

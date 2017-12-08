@@ -16,11 +16,11 @@ use App\Events\MyFavoritesRemove;
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use App\Http\Utils\FileUploader;
+use App\Models\Utils\IntervalParser;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Storage;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\File;
@@ -55,11 +55,19 @@ use models\summit\SummitEventFeedback;
 use models\summit\SummitEventType;
 use models\summit\SummitEventWithFile;
 use models\summit\SummitGroupEvent;
+use models\summit\SummitScheduleEmptySpot;
 use services\apis\IEventbriteAPI;
 use libs\utils\ITransactionService;
 use Exception;
 use DateTime;
 use Illuminate\Support\Facades\Log;
+use utils\Filter;
+use utils\FilterElement;
+use utils\FilterParser;
+use utils\Order;
+use utils\OrderElement;
+use utils\PagingInfo;
+use DateInterval;
 /**
  * Class SummitService
  * @package services\model
@@ -1157,5 +1165,171 @@ final class SummitService implements ISummitService
 
             return $attachment;
         });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param Filter $filter
+     * @return SummitScheduleEmptySpot[]
+     */
+    public function getSummitScheduleEmptySpots
+    (
+        Summit $summit,
+        Filter $filter
+    )
+    {
+        return $this->tx_service->transaction(function () use
+        (
+            $summit,
+            $filter
+        ){
+            $gaps = [];
+            $order = new Order([
+                OrderElement::buildAscFor("location_id"),
+                OrderElement::buildAscFor("start_date"),
+            ]);
+
+            // parse locations ids
+
+            if(!$filter->hasFilter('location_id'))
+                throw new ValidationException("missing required filter location_id");
+
+            $location_ids = $filter->getFilterCollectionByField('location_id');
+
+            // parse start_date filter
+            $start_datetime_filter = $filter->getFilter('start_date');
+            if(is_null($start_datetime_filter))
+                throw new ValidationException("missing required filter start_date");
+            $start_datetime_unix = intval($start_datetime_filter[0]->getValue());
+            $start_datetime = new \DateTime("@$start_datetime_unix");
+            // parse end_date filter
+            $end_datetime_filter = $filter->getFilter('end_date');
+            if(is_null($end_datetime_filter))
+                throw new ValidationException("missing required filter end_date");
+            $end_datetime_unix = intval($end_datetime_filter[0]->getValue());
+            $end_datetime      = new \DateTime("@$end_datetime_unix");
+            // gap size filter
+
+            $gap_size_filter = $filter->getFilter('gap');
+            if(is_null($end_datetime_filter))
+                throw new ValidationException("missing required filter gap");
+
+            $gap_size       = $gap_size_filter[0];
+
+            $summit_time_zone = $summit->getTimeZone();
+            $start_datetime->setTimezone($summit_time_zone);
+            $end_datetime->setTimezone($summit_time_zone);
+
+            $intervals  = IntervalParser::getInterval($start_datetime, $end_datetime);
+
+            foreach($location_ids as $location_id) {
+
+                foreach($intervals as $interval) {
+
+                    $events_filter = new Filter();
+                    $events_filter->addFilterCondition(FilterParser::buildFilter('published', '==', '1'));
+                    $events_filter->addFilterCondition(FilterParser::buildFilter('summit_id', '==', $summit->getId()));
+                    $events_filter->addFilterCondition(FilterParser::buildFilter('location_id', '==', intval($location_id)));
+                    $events_filter->addFilterCondition(FilterParser::buildFilter('start_date', '>=', $interval[0]->getTimestamp()));
+                    $events_filter->addFilterCondition(FilterParser::buildFilter('end_date', '<=', $interval[1]->getTimestamp()));
+
+                    $paging_response = $this->event_repository->getAllByPage
+                    (
+                        new PagingInfo(1, PHP_INT_MAX),
+                        $events_filter,
+                        $order
+                    );
+
+                    $gap_start_date = $interval[0];
+                    $gap_end_date   = clone $gap_start_date;
+                    // check published items
+                    foreach ($paging_response->getItems() as $event) {
+
+                        while
+                        (
+                            (
+                                $gap_end_date->getTimestamp() + (self::MIN_EVENT_MINUTES * 60)
+                            )
+                            <= $event->getLocalStartDate()->getTimestamp()
+                        ) {
+                            $max_gap_end_date = clone $gap_end_date;
+                            $max_gap_end_date->setTime(23, 59, 59);
+                            if ($gap_end_date->getTimestamp() + (self::MIN_EVENT_MINUTES * 60) > $max_gap_end_date->getTimestamp()) break;
+                            $gap_end_date->add(new DateInterval('PT' . self::MIN_EVENT_MINUTES . 'M'));
+                        }
+
+                        if ($gap_start_date->getTimestamp() == $gap_end_date->getTimestamp()) {
+                            // no gap!
+                            $gap_start_date = $event->getLocalEndDate();
+                            $gap_end_date = clone $gap_start_date;
+                            continue;
+                        }
+
+                        // check min gap ...
+                        if(self::checkGapCriteria($gap_size, $gap_end_date->diff($gap_start_date)))
+                            $gaps[] = new SummitScheduleEmptySpot($location_id, $gap_start_date, $gap_end_date);
+                        $gap_start_date = $event->getLocalEndDate();
+                        $gap_end_date   = clone $gap_start_date;
+                    }
+
+                    // check last possible gap ( from last $gap_start_date till $interval[1]
+
+                    if($gap_start_date < $interval[1]){
+                        // last possible gap
+                        if(self::checkGapCriteria($gap_size, $interval[1]->diff($gap_start_date)))
+                            $gaps[] = new SummitScheduleEmptySpot($location_id, $gap_start_date, $interval[1]);
+                    }
+                }
+            }
+
+            return $gaps;
+
+        });
+    }
+
+
+    /**
+     * @param FilterElement $gap_size_criteria
+     * @param DateInterval $interval
+     * @return bool
+     */
+    private static function checkGapCriteria
+    (
+        FilterElement $gap_size_criteria,
+        DateInterval $interval
+    )
+    {
+        $total_minutes  = $interval->days * 24 * 60;
+        $total_minutes += $interval->h * 60;
+        $total_minutes += $interval->i;
+
+        switch($gap_size_criteria->getOperator()){
+            case '=':
+            {
+                return intval($gap_size_criteria->getValue()) == $total_minutes;
+            }
+            break;
+            case '<':
+            {
+                return $total_minutes < intval($gap_size_criteria->getValue());
+            }
+            break;
+            case '>':
+            {
+                return $total_minutes > intval($gap_size_criteria->getValue());
+            }
+            break;
+            case '<=':
+            {
+                return $total_minutes <= intval($gap_size_criteria->getValue());
+            }
+            break;
+            case '>=':
+            {
+                return $total_minutes >= intval($gap_size_criteria->getValue());
+            }
+            break;
+        }
+        return false;
     }
 }
