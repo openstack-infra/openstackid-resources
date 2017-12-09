@@ -1973,6 +1973,38 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
+    public function testCurrentSummitPublishedLocationTBAEvents()
+    {
+        $params = array
+        (
+            'id'          => 23,
+            'location_id' => "tba",
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getLocationPublishedEvents",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
     public function testAddPresentationVideo($summit_id = 7, $presentation_id = 15404)
     {
         $params = array

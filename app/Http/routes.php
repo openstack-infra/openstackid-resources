@@ -244,8 +244,8 @@ Route::group([
                 Route::get('/airports', 'OAuth2SummitLocationsApiController@getAirports');
                 Route::group(array('prefix' => '{location_id}'), function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
-                    Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents');
-                    Route::get('/events','OAuth2SummitLocationsApiController@getLocationEvents');
+                    Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents')->where('location_id', 'tbd|[0-9]+');
+                    Route::get('/events','OAuth2SummitLocationsApiController@getLocationEvents')->where('location_id', 'tbd|[0-9]+');
                 });
             });
 

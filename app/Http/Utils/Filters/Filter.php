@@ -54,7 +54,7 @@ final class Filter
      */
     public function getFilter($field)
     {
-        $res = array();
+        $res = [];
         foreach ($this->filters as $filter) {
 
             if ($filter instanceof FilterElement && $filter->getField() === $field) {
@@ -62,7 +62,7 @@ final class Filter
             }
             else if (is_array($filter)) {
                 // OR
-                $or_res = array();
+                $or_res = [];
                 foreach ($filter as $e) {
                     if ($e instanceof FilterElement && $e->getField() === $field) {
                         $or_res[] = $e;
@@ -73,6 +73,16 @@ final class Filter
         }
         return $res;
     }
+
+    /**
+     * @param string $field
+     * @return null|FilterElement
+     */
+    public function getUniqueFilter($field){
+        $res = $this->getFilter($field);
+        return count($res) == 1 ? $res[0]:null;
+    }
+
 
     /**
      * @param string $field

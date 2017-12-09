@@ -810,16 +810,19 @@ final class SummitService implements ISummitService
                 throw new ValidationException(sprintf("end_date its not assigned to event id %s!", $event_id));
 
             if (isset($data['location_id'])) {
-                $location = $summit->getLocation(intval($data['location_id']));
-                if (is_null($location))
-                    throw new EntityNotFoundException(sprintf("location id %s does not exists!", $data['location_id']));
-                $event->setLocation($location);
+                $location_id = intval($data['location_id']);
+                $event->clearLocation();
+                if($location_id > 0){
+                    $location    = $summit->getLocation($location_id);
+                    if (is_null($location))
+                        throw new EntityNotFoundException(sprintf("location id %s does not exists!", $data['location_id']));
+                    $event->setLocation($location);
+                }
             }
 
             $this->validateBlackOutTimesAndTimes($event);
             $event->unPublish();
             $event->publish();
-
             $this->event_repository->add($event);
             return $event;
         });

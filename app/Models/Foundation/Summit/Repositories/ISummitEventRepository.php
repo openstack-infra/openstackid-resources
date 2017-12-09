@@ -39,6 +39,14 @@ interface ISummitEventRepository extends IBaseRepository
     public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
 
     /**
+     * @param PagingInfo $paging_info
+     * @param Filter|null $filter
+     * @param Order|null $order
+     * @return PagingResponse
+     */
+    public function getAllByPageLocationTBD(PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+
+    /**
      * @param int $event_id
      */
     public function cleanupScheduleAndFavoritesForEvent($event_id);

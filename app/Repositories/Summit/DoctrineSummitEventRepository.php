@@ -168,14 +168,14 @@ final class DoctrineSummitEventRepository
     public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
         $class  = $filter->hasFilter('speaker')
-                  || $filter->hasFilter('selection_status')
-                  || $filter->hasFilter('speaker_email')?
+        || $filter->hasFilter('selection_status')
+        || $filter->hasFilter('speaker_email')?
             \models\summit\Presentation::class:
             \models\summit\SummitEvent::class;
 
         $query  = $this->getEntityManager()->createQueryBuilder()
             ->select("e")
-            ->from($class, "e");
+            ->from($class, "e")->leftJoin("e.location", 'l', Join::LEFT_JOIN);
 
         if(!is_null($filter)){
             $filter->apply2Query($query, $this->getFilterMappings());
@@ -239,5 +239,69 @@ final class DoctrineSummitEventRepository
     protected function getBaseEntity()
     {
         return SummitEvent::class;
+    }
+
+    /**
+     * @param PagingInfo $paging_info
+     * @param Filter|null $filter
+     * @param Order|null $order
+     * @return PagingResponse
+     */
+    public function getAllByPageLocationTBD(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
+    {
+        $class  = $filter->hasFilter('speaker')
+        || $filter->hasFilter('selection_status')
+        || $filter->hasFilter('speaker_email')?
+            \models\summit\Presentation::class:
+            \models\summit\SummitEvent::class;
+
+        $query  = $this->getEntityManager()->createQueryBuilder()
+            ->select("e")
+            ->from($class, "e")
+            ->leftJoin("e.location", 'l', Join::LEFT_JOIN)
+            ->where("l.id is null");
+
+        if(!is_null($filter)){
+            $filter->apply2Query($query, $this->getFilterMappings());
+        }
+
+        if (!is_null($order)) {
+            $order->apply2Query($query, $this->getOrderMappings());
+        } else {
+            //default order
+            $query = $query->addOrderBy("e.start_date",'ASC');
+            $query = $query->addOrderBy("e.end_date", 'ASC');
+        }
+
+        if($class == \models\summit\Presentation::class) {
+            $query = $query->innerJoin("e.category", "cc", Join::WITH);
+            $query = $query->leftJoin("e.speakers", "sp", Join::WITH);
+            $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
+            $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
+            $query = $query->leftJoin('e.moderator', "spm", Join::LEFT_JOIN);
+            $query = $query->leftJoin('sp.member', "spmm", Join::LEFT_JOIN);
+            $query = $query->leftJoin('sp.registration_request', "sprr", Join::LEFT_JOIN);
+        }
+
+        $query = $query
+            ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')")
+            ->setFirstResult($paging_info->getOffset())
+            ->setMaxResults($paging_info->getPerPage());
+
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+        $total     = $paginator->count();
+        $data      = [];
+
+        foreach($paginator as $entity)
+            $data[]= $entity;
+
+        return new PagingResponse
+        (
+            $total,
+            $paging_info->getPerPage(),
+            $paging_info->getCurrentPage(),
+            $paging_info->getLastPage($total),
+            $data
+        );
     }
 }

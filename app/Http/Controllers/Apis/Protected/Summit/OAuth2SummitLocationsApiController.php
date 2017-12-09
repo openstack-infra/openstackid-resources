@@ -135,7 +135,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
 
     /**
      * @param string $summit_id
-     * @param int $location_id
+     * @param string $location_id
      * @param bool $published
      * @return PagingResponse
      * @throws EntityNotFoundException
@@ -147,17 +147,19 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         if (is_null($summit))
             throw new EntityNotFoundException;
 
-        $location = $summit->getLocation($location_id);
-        if (is_null($location))
-            throw new EntityNotFoundException;
+        if(strtolower($location_id) != "tbd") {
+            $location = $summit->getLocation(intval($location_id));
+            if (is_null($location))
+                throw new EntityNotFoundException;
+        }
 
         $values = Input::all();
 
-        $rules = array
-        (
+        $rules =
+        [
             'page'     => 'integer|min:1',
             'per_page' => 'required_with:page|integer|min:5|max:100',
-        );
+        ];
 
         $validation = Validator::make($values, $rules);
 
@@ -206,14 +208,19 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
 
         if(is_null($filter)) $filter = new Filter();
 
-        $filter->addFilterCondition(FilterParser::buildFilter('location_id','==', $location_id));
+        $filter->addFilterCondition(FilterParser::buildFilter('summit_id','==', $summit_id));
+
+        if(intval($location_id) > 0)
+            $filter->addFilterCondition(FilterParser::buildFilter('location_id','==', $location_id));
 
         if($published)
         {
             $filter->addFilterCondition(FilterParser::buildFilter('published','==', 1));
         }
 
-        return $this->event_repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
+        return strtolower($location_id) == "tbd" ?
+            $this->event_repository->getAllByPageLocationTBD(new PagingInfo($page, $per_page), $filter, $order):
+            $this->event_repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
     }
 
     /**
@@ -252,7 +259,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function getLocationPublishedEvents($summit_id, $location_id)
     {
         try {
-
             return $this->ok($this->_getLocationEvents($summit_id, $location_id, true)->toArray(Request::input('expand', '')));
         }
         catch (EntityNotFoundException $ex1) {
@@ -262,10 +268,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         catch (ValidationException $ex2) {
             Log::warning($ex2);
             return $this->error412($ex2->getMessages());
-        }
-        catch(FilterParserException $ex3){
-            Log::warning($ex3);
-            return $this->error412($ex3->getMessages());
         }
         catch (Exception $ex) {
             Log::error($ex);
