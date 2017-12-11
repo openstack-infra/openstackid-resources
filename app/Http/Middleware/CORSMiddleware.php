@@ -49,10 +49,11 @@ class CORSMiddleware
 		'origin',
 	);
 
-	protected static $simple_content_header_values = array(
+	protected static $simple_content_header_values = [
 		'application/x-www-form-urlencode',
 		'multipart/form-data',
-		'text/plain');
+		'text/plain'
+    ];
 
 	/**
 	 * A method is said to be a simple method if it is a case-sensitive match for one of the following:
@@ -459,7 +460,12 @@ class CORSMiddleware
 
 		$type         = CORSRequestPreflightType::UNKNOWN;
 		$http_method  = $request->getMethod();
-		$content_type = strtolower($request->getContentType());
+		$content_type = $request->headers->has('Content-Type')  ? strtolower( $request->headers->get('Content-Type')) : null;
+
+		if (false !== $pos = strpos($content_type, ';')) {
+            $content_type = substr($content_type, 0, $pos);
+        }
+
 		$http_method  = strtoupper($http_method);
 
 		if ($http_method === 'OPTIONS' && $request->headers->has('Access-Control-Request-Method'))

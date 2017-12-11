@@ -19,7 +19,8 @@
         "guzzlehttp/guzzle": "^6.3",
         "google/apiclient": "^2.2",
         "smarcet/caldavclient": "dev-master",
-        "smarcet/outlook-rest-client": "dev-master"
+        "smarcet/outlook-rest-client": "dev-master",
+        "idct/sftp-client": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
