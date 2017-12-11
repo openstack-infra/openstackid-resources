@@ -588,7 +588,11 @@ class ApiEndpointsSeeder extends Seeder
                     'name' => 'get-tags',
                     'route' => '/api/v1/tags',
                     'http_method' => 'GET',
-                    'scopes' => [sprintf('%s/summits/read', $current_realm), sprintf('%s/tags/read', $current_realm)],
+                    'scopes' => [
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                        sprintf(SummitScopes::ReadSummitData, $current_realm),
+                        sprintf('%s/tags/read', $current_realm)
+                    ],
                 )
             ]
         );
@@ -604,7 +608,8 @@ class ApiEndpointsSeeder extends Seeder
                     'route' => '/api/v1/companies',
                     'http_method' => 'GET',
                     'scopes' => [
-                        sprintf('%s/summits/read', $current_realm),
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                        sprintf(SummitScopes::ReadSummitData, $current_realm),
                         sprintf('%s/companies/read', $current_realm)
                     ],
                 )
@@ -622,7 +627,8 @@ class ApiEndpointsSeeder extends Seeder
                     'route' => '/api/v1/groups',
                     'http_method' => 'GET',
                     'scopes' => [
-                        sprintf('%s/summits/read', $current_realm),
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                        sprintf(SummitScopes::ReadSummitData, $current_realm),
                         sprintf('%s/groups/read', $current_realm)
                     ],
                 )
