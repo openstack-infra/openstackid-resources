@@ -11,15 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\main\Member;
+use models\utils\RandomGenerator;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
 /**
  * Class SpeakerRegistrationRequest
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSpeakerRegistrationRequestRepository")
  * @ORM\Table(name="SpeakerRegistrationRequest")
  * @package models\summit
  */
@@ -49,7 +48,7 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
      * @var PresentationSpeaker
      */
-    private $moderator;
+    private $speaker;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member")
@@ -57,6 +56,17 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
      * @var Member
      */
     private $proposer;
+
+    /**
+     * @ORM\Column(name="ConfirmationHash", type="string")
+     * @var string
+     */
+    private $confirmation_hash;
+
+    /**
+     * @var string
+     */
+    private $token;
 
     /**
      * @return mixed
@@ -109,17 +119,17 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
     /**
      * @return PresentationSpeaker
      */
-    public function getModerator()
+    public function getSpeaker()
     {
-        return $this->moderator;
+        return $this->speaker;
     }
 
     /**
-     * @param PresentationSpeaker $moderator
+     * @param PresentationSpeaker $speaker
      */
-    public function setModerator($moderator)
+    public function setSpeaker($speaker)
     {
-        $this->moderator = $moderator;
+        $this->speaker = $speaker;
     }
 
     /**
@@ -136,5 +146,37 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
     public function setProposer($proposer)
     {
         $this->proposer = $proposer;
+    }
+
+    /**
+     * @return string
+     */
+    public function generateConfirmationToken() {
+        $generator               = new RandomGenerator();
+        $this->is_confirmed      = false;
+        $this->confirmation_date = null;
+        $this->token             = $generator->randomToken();
+        $this->confirmation_hash = self::HashConfirmationToken($this->token);
+        return $this->token;
+    }
+
+    public static function HashConfirmationToken($token){
+        return md5($token);
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfirmationHash()
+    {
+        return $this->confirmation_hash;
+    }
+
+    /**
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
     }
 }

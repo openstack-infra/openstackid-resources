@@ -1,4 +1,4 @@
-<?php namespace App\Security;
+<?php namespace models\main;
 /**
  * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-
+use models\utils\IBaseRepository;
 /**
- * Class SummitScopes
- * @package App\Security
+ * Interface IEmailCreationRequestRepository
+ * @package models\main
  */
-final class SummitScopes
+interface IEmailCreationRequestRepository
+    extends IBaseRepository
 {
-    const ReadSummitData    = '%s/summits/read';
-    const ReadAllSummitData = '%s/summits/read/all';
 
-    const WriteSummitData   = '%s/summits/write';
-    const WriteSpeakersData = '%s/speakers/write';
 }

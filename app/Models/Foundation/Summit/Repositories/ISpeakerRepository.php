@@ -13,6 +13,7 @@
  * limitations under the License.
  **/
 
+use models\main\Member;
 use utils\Order;
 use utils\PagingResponse;
 use utils\PagingInfo;
@@ -33,4 +34,10 @@ interface ISpeakerRepository extends IBaseRepository
      * @return PagingResponse
      */
     public function getSpeakersBySummit(Summit $summit, PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+
+    /**
+     * @param Member $member
+     * @return PresentationSpeaker
+     */
+    public function getByMember(Member $member);
 }

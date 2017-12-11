@@ -1,4 +1,4 @@
-<?php namespace App\Security;
+<?php namespace App\Repositories\Summit;
 /**
  * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-
+use App\Repositories\SilverStripeDoctrineRepository;
+use models\summit\SummitRegistrationPromoCode;
 /**
- * Class SummitScopes
- * @package App\Security
+ * Class DoctrineSummitRegistrationPromoCodeRepository
+ * @package App\Repositories\Summit
  */
-final class SummitScopes
+class DoctrineSummitRegistrationPromoCodeRepository
+    extends SilverStripeDoctrineRepository
 {
-    const ReadSummitData    = '%s/summits/read';
-    const ReadAllSummitData = '%s/summits/read/all';
 
-    const WriteSummitData   = '%s/summits/write';
-    const WriteSpeakersData = '%s/speakers/write';
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+        return SummitRegistrationPromoCode::class;
+    }
 }

@@ -183,6 +183,7 @@ Route::group([
             // speakers
             Route::group(array('prefix' => 'speakers'), function () {
 
+                Route::post('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeaker']);
                 Route::get('', 'OAuth2SummitSpeakersApiController@getSpeakers');
 
                 Route::group(array('prefix' => '{speaker_id}'), function () {

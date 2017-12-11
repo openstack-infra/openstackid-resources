@@ -71,7 +71,7 @@ final class ApiScopesSeeder extends Seeder
                 'description' => 'Allows to remove Summit events as favorite',
             ),
             array(
-                'name' => sprintf('%s/summits/write', $current_realm),
+                'name' => sprintf(SummitScopes::WriteSummitData, $current_realm),
                 'short_description' => 'Write Summit Data',
                 'description' => 'Grants write access for Summits Data',
             ),
@@ -109,7 +109,12 @@ final class ApiScopesSeeder extends Seeder
                 'name' => sprintf('%s/summits/read-notifications', $current_realm),
                 'short_description' => 'Allow to read summit notifications',
                 'description' => 'Allow to read summit notifications',
-            )
+            ),
+            array(
+                'name' => sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                'short_description' => 'Write Speakers Data',
+                'description' => 'Grants write access for Speakers Data',
+            ),
         ];
 
         foreach ($scopes as $scope_info) {

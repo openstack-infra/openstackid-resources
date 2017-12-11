@@ -53,6 +53,8 @@ class ServicesProvider extends ServiceProvider
 
         App::singleton('services\model\ISummitService', 'services\model\SummitService');
 
+        App::singleton('services\model\ISpeakerService', 'services\model\SpeakerService');
+
         App::singleton('services\model\IPresentationService', 'services\model\PresentationService');
 
         App::singleton('services\model\IChatTeamService', 'services\model\ChatTeamService');

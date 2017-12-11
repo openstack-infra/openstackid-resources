@@ -14,6 +14,7 @@
 
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use models\main\Member;
 use models\summit\ISpeakerRepository;
 use models\summit\PresentationSpeaker;
 use models\summit\Summit;
@@ -22,7 +23,6 @@ use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
  * Class DoctrineSpeakerRepository
  * @package App\Repositories\Summit
@@ -354,5 +354,22 @@ SQL;
     protected function getBaseEntity()
     {
         return PresentationSpeaker::class;
+    }
+
+    /**
+     * @param Member $member
+     * @return PresentationSpeaker
+     */
+    public function getByMember(Member $member)
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("s")
+            ->from(PresentationSpeaker::class, "s")
+            ->where("s.member = :member")
+            ->setParameter("member", $member)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

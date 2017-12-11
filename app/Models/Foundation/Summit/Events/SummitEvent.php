@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use Doctrine\ORM\Mapping AS ORM;
 use App\Events\SummitEventCreated;
 use App\Events\SummitEventDeleted;
 use App\Events\SummitEventUpdated;
@@ -23,13 +23,11 @@ use models\main\Member;
 use models\main\Tag;
 use models\utils\PreRemoveEventArgs;
 use models\utils\SilverstripeBaseModel;
-use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 use Cocur\Slugify\Slugify;
-
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEventRepository")
  * @ORM\Table(name="SummitEvent")

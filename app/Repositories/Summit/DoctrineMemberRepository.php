@@ -35,7 +35,15 @@ final class DoctrineMemberRepository
      */
     public function getByEmail($email)
     {
-        // TODO: Implement getByEmail() method.
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("m")
+            ->from(\models\main\Member::class, "m")
+            ->where("m.email = :email")
+            ->setParameter("email", trim($email))
+        ->setMaxResults(1)
+        ->getQuery()
+        ->getOneOrNullResult();
     }
 
     /**

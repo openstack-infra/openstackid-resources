@@ -16,9 +16,11 @@ use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use models\main\AssetsSyncRequest;
 use models\main\Company;
+use models\main\EmailCreationRequest;
 use models\main\File;
 use models\main\Group;
-
+use models\summit\SpeakerRegistrationRequest;
+use models\summit\SpeakerSummitRegistrationPromoCode;
 /**
  * Class RepositoriesProvider
  * @package repositories
@@ -210,5 +212,24 @@ final class RepositoriesProvider extends ServiceProvider
             function(){
                 return  EntityManager::getRepository(Group::class);
             });
+
+        App::singleton(
+            'models\summit\ISpeakerRegistrationRequestRepository',
+            function(){
+                return  EntityManager::getRepository(SpeakerRegistrationRequest::class);
+            });
+
+        App::singleton(
+            'models\summit\ISpeakerSummitRegistrationPromoCodeRepository',
+            function(){
+                return  EntityManager::getRepository(SpeakerSummitRegistrationPromoCode::class);
+            });
+
+        App::singleton(
+            'models\main\IEmailCreationRequestRepository',
+            function(){
+                return  EntityManager::getRepository(EmailCreationRequest::class);
+            });
+
     }
 }

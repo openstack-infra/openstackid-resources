@@ -60,12 +60,28 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $twitter_name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SpeakerRegistrationRequest")
+     * @ORM\Column(name="CreatedFromAPI", type="boolean")
+     */
+    private $created_from_api;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SpeakerRegistrationRequest", cascade={"persist"})
      * @ORM\JoinColumn(name="RegistrationRequestID", referencedColumnName="ID")
      * @var SpeakerRegistrationRequest
      */
     private $registration_request;
 
+    /**
+     * @ORM\OneToMany(targetEntity="PresentationSpeakerSummitAssistanceConfirmationRequest", mappedBy="speaker", cascade={"persist"})
+     * @var PresentationSpeakerSummitAssistanceConfirmationRequest[]
+     */
+    private $summit_assistances;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SpeakerSummitRegistrationPromoCode", mappedBy="speaker", cascade={"persist"})
+     * @var SpeakerSummitRegistrationPromoCode[]
+     */
+    private $promo_codes;
 
     /**
      * @ORM\ManyToMany(targetEntity="models\summit\Presentation", inversedBy="speakers")
@@ -85,7 +101,6 @@ class PresentationSpeaker extends SilverstripeBaseModel
      * @var Presentation[]
      */
     private $moderated_presentations;
-
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\File")
@@ -200,8 +215,11 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
+
         $this->presentations           = new ArrayCollection;
         $this->moderated_presentations = new ArrayCollection;
+        $this->summit_assistances      = new ArrayCollection;
+        $this->promo_codes             = new ArrayCollection;
     }
 
     /**
@@ -209,6 +227,16 @@ class PresentationSpeaker extends SilverstripeBaseModel
      */
     public function addPresentation(Presentation $presentation){
         $this->presentations->add($presentation);
+    }
+
+    /**
+     * @param SpeakerSummitRegistrationPromoCode $code
+     * @return $this
+     */
+    public function addPromoCode(SpeakerSummitRegistrationPromoCode $code){
+        $this->promo_codes->add($code);
+        $code->setSpeaker($this);
+        return $this;
     }
 
     /**
@@ -318,6 +346,13 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param Member $member
+     */
+    public function setMember(Member $member){
+        $this->member = $member;
+    }
+
+    /**
      * @return bool
      */
     public function hasMember(){
@@ -330,6 +365,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function getMemberId()
     {
         try{
+            if(is_null($this->member)) return 0;
             return $this->member->getId();
         }
         catch(\Exception $ex){
@@ -351,6 +387,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function setRegistrationRequest($registration_request)
     {
         $this->registration_request = $registration_request;
+        $registration_request->setSpeaker($this);
     }
 
     /**
@@ -363,5 +400,51 @@ class PresentationSpeaker extends SilverstripeBaseModel
             $fullname .= $this->last_name;
         }
         return $fullname;
+    }
+
+    /**
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest[]
+     */
+    public function getSummitAssistances()
+    {
+        return $this->summit_assistances;
+    }
+
+    /**
+     * @param PresentationSpeakerSummitAssistanceConfirmationRequest $assistance
+     * @return $this
+     */
+    public function addSummitAssistance(PresentationSpeakerSummitAssistanceConfirmationRequest $assistance){
+        $this->summit_assistances->add($assistance);
+        $assistance->setSpeaker($this);
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedFromApi()
+    {
+        return $this->created_from_api;
+    }
+
+    /**
+     * @param mixed $created_from_api
+     */
+    public function setCreatedFromApi($created_from_api)
+    {
+        $this->created_from_api = $created_from_api;
+    }
+
+    /**
+     * @param Summit $summit
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    public function buildAssistanceFor(Summit $summit)
+    {
+        $request = new PresentationSpeakerSummitAssistanceConfirmationRequest;
+        $request->setSummit($summit);
+        $request->setSpeaker($this);
+        return $request;
     }
 }

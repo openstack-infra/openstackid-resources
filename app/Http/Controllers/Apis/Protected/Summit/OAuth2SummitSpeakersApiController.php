@@ -17,12 +17,16 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
+use libs\utils\HTMLCleaner;
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
 use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
+use services\model\ISpeakerService;
 use services\model\ISummitService;
 use utils\FilterParser;
 use utils\FilterParserException;
@@ -36,7 +40,7 @@ use utils\PagingInfo;
 final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 {
     /**
-     * @var ISummitService
+     * @var ISpeakerService
      */
     private $service;
 
@@ -62,7 +66,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
-        ISummitService $service,
+        ISpeakerService $service,
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
@@ -251,4 +255,64 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     }
 
 
+    public function addSpeaker($summit_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = array
+            (
+                'title'             => 'required|string|max:100',
+                'first_name'        => 'required|string|max:100',
+                'last_name'         => 'required|string|max:100',
+                'bio'               => 'sometimes|string',
+                'irc'               => 'sometimes|string|max:50',
+                'twitter'           => 'sometimes|string|max:50',
+                'member_id'         => 'sometimes|integer',
+                'email'             => 'sometimes|string|max:50',
+                'on_site_phone'     => 'sometimes|string|max:50',
+                'registered'        => 'sometimes|boolean',
+                'confirmed'         => 'sometimes|boolean',
+                'checked_in'        => 'sometimes|boolean',
+                'registration_code' => 'sometimes|string',
+            );
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $fields = [
+                'title',
+                'bio',
+            ];
+
+            $speaker = $this->service->addSpeaker($summit, HTMLCleaner::cleanData($data->all(), $fields));
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($speaker)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

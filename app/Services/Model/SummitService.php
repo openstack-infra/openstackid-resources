@@ -79,6 +79,7 @@ final class SummitService implements ISummitService
      *  minimun number of minutes that an event must last
      */
     const MIN_EVENT_MINUTES = 5;
+
     /**
      * @var ITransactionService
      */
@@ -143,7 +144,6 @@ final class SummitService implements ISummitService
      * @var ICompanyRepository
      */
     private $company_repository;
-
 
     /**
      * @var IGroupRepository

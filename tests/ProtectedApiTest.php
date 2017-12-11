@@ -11,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use models\oauth2\AccessToken;
 use App\Models\ResourceServer\IAccessTokenService;
-
+use App\Security\SummitScopes;
 /**
  * Class AccessTokenServiceStub
  */
@@ -57,6 +56,7 @@ class AccessTokenServiceStub implements IAccessTokenService
             $url . '/teams/write',
             $url . '/me/summits/events/favorites/add',
             $url . '/me/summits/events/favorites/delete',
+            sprintf(SummitScopes::WriteSpeakersData, $url),
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','11624', 3600, 'WEB_APPLICATION', '', '');
@@ -101,6 +101,7 @@ class AccessTokenServiceStub2 implements IAccessTokenService
             $url . '/teams/write',
             $url . '/me/summits/events/favorites/add',
             $url . '/me/summits/events/favorites/delete',
+            sprintf(SummitScopes::WriteSpeakersData, $url),
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, null,null, 3600, 'SERVICE', '', '');

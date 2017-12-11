@@ -1,4 +1,4 @@
-<?php namespace App\Security;
+<?php namespace repositories\main;
 /**
  * Copyright 2017 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-
+use App\Repositories\SilverStripeDoctrineRepository;
+use models\main\EmailCreationRequest;
+use models\main\IEmailCreationRequestRepository;
 /**
- * Class SummitScopes
- * @package App\Security
+ * Class DoctrineEmailCreationRequestRepository
+ * @package repositories\main
  */
-final class SummitScopes
+class DoctrineEmailCreationRequestRepository
+    extends SilverStripeDoctrineRepository
+    implements IEmailCreationRequestRepository
 {
-    const ReadSummitData    = '%s/summits/read';
-    const ReadAllSummitData = '%s/summits/read/all';
-
-    const WriteSummitData   = '%s/summits/write';
-    const WriteSpeakersData = '%s/speakers/write';
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+        return EmailCreationRequest::class;
+    }
 }
