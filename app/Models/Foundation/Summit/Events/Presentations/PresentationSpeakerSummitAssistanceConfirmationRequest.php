@@ -52,12 +52,6 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
      */
     private $speaker;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Summit")
-     * @ORM\JoinColumn(name="SummitID", referencedColumnName="ID")
-     * @var Summit
-     */
-    private $summit;
 
     /**
      * @return string
@@ -139,19 +133,17 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
         $this->speaker = $speaker;
     }
 
-    /**
-     * @return Summit
-     */
-    public function getSummit()
-    {
-        return $this->summit;
-    }
+    use SummitOwned;
 
     /**
-     * @param Summit $summit
+     * @return int
      */
-    public function setSummit($summit)
-    {
-        $this->summit = $summit;
+    public function getSpeakerId(){
+        try {
+            return !is_null($this->speaker) ? $this->speaker->getId() : 0;
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
     }
 }

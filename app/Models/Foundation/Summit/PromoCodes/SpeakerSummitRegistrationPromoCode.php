@@ -70,4 +70,16 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
         parent::__construct();
         $this->redeemed = false;
     }
+
+    /**
+     * @return int
+     */
+    public function getSpeakerId(){
+        try {
+            return !is_null($this->speaker) ? $this->speaker->getId() : 0;
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
 }

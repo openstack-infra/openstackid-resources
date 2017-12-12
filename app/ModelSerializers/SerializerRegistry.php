@@ -37,6 +37,7 @@ use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
 use Libs\ModelSerializers\IModelSerializer;
+use models\summit\SummitRegistrationPromoCode;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
 use ModelSerializers\ChatTeams\ChatTeamPushNotificationMessageSerializer;
@@ -98,14 +99,23 @@ final class SerializerRegistry
         $this->registry['PresentationSlide']          = PresentationSlideSerializer::class;
         $this->registry['PresentationLink']           = PresentationLinkSerializer::class;
         $this->registry['Company']                    = CompanySerializer::class;
-        $this->registry['PresentationSpeaker']        = PresentationSpeakerSerializer::class;
-        $this->registry['SummitEventFeedback']        = SummitEventFeedbackSerializer::class;
-        $this->registry['SummitAttendee']             = SummitAttendeeSerializer::class;
-        $this->registry['SummitMemberSchedule']       = SummitMemberScheduleSerializer::class;
-        $this->registry['SummitMemberFavorite']       = SummitMemberFavoriteSerializer::class;
-        $this->registry['SummitEntityEvent']          = SummitEntityEventSerializer::class;
-        $this->registry['SummitEventWithFile']        = SummitEventWithFileSerializer::class;
-        $this->registry['SummitScheduleEmptySpot']    = SummitScheduleEmptySpotSerializer::class;
+
+        $this->registry['PresentationSpeaker']        =
+            [
+                self::SerializerType_Public  =>  PresentationSpeakerSerializer::class,
+                self::SerializerType_Private =>  AdminPresentationSpeakerSerializer::class
+            ];
+
+        $this->registry['SummitEventFeedback']         = SummitEventFeedbackSerializer::class;
+        $this->registry['SummitAttendee']              = SummitAttendeeSerializer::class;
+        $this->registry['SummitMemberSchedule']        = SummitMemberScheduleSerializer::class;
+        $this->registry['SummitMemberFavorite']        = SummitMemberFavoriteSerializer::class;
+        $this->registry['SummitEntityEvent']           = SummitEntityEventSerializer::class;
+        $this->registry['SummitEventWithFile']         = SummitEventWithFileSerializer::class;
+        $this->registry['SummitScheduleEmptySpot']     = SummitScheduleEmptySpotSerializer::class;
+        $this->registry['SummitRegistrationPromoCode'] = SummitRegistrationPromoCodeSerializer::class;
+        $this->registry['SpeakerSummitRegistrationPromoCode'] = SpeakerSummitRegistrationPromoCodeSerializer::class;
+        $this->registry['PresentationSpeakerSummitAssistanceConfirmationRequest'] = PresentationSpeakerSummitAssistanceConfirmationRequestSerializer::class;
         // locations
         $this->registry['SummitVenue']                = SummitVenueSerializer::class;
         $this->registry['SummitVenueRoom']            = SummitVenueRoomSerializer::class;

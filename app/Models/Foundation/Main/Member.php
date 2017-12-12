@@ -582,12 +582,41 @@ class Member extends SilverstripeBaseModel
      */
     public function isAdmin()
     {
+        $admin_group = $this->getGroupByCode(Group::AdminGroupCode);
+        return $admin_group != false && !is_null($admin_group);
+    }
 
-        $admin_group = $this->groups->filter(function ($entity) {
-            return $entity->getCode() == Group::AdminGroupCode;
+    /**
+     * @param string $code
+     * @return bool
+     */
+    public function isOnGroup($code){
+        if($this->isAdmin()) return true;
+        $group = $this->getGroupByCode($code);
+        return $group != false && !is_null($group);
+    }
+
+    /**
+     * @param string $code
+     * @return Group|null
+     */
+    public function getGroupByCode($code){
+        /**
+         *
+         * this is the rite way to do it but due a bug that will
+         * be fixed on doctrine 2.6 (https://github.com/doctrine/doctrine2/pull/1399)this
+         * should be carried on on following
+         * way
+         * $criteria = Criteria::create();
+         * $criteria->where(Criteria::expr()->eq('code', $code));
+         * return $this->groups->matching($criteria)->first();
+         */
+
+        $groups = $this->groups->filter(function ($entity) use($code){
+            return $entity->getCode() == $code;
         });
 
-        return !is_null($admin_group) && $admin_group != false && $admin_group->count() > 0;
+        return !is_null($groups) && $groups != false && $groups->count() > 0 ? $groups[0]: null;
     }
 
     /**

@@ -246,6 +246,16 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param Summit $summit
+     * @return SpeakerSummitRegistrationPromoCode
+     */
+    public function getPromoCodeFor(Summit $summit){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('summit', $summit));
+        return $this->promo_codes->matching($criteria)->first();
+    }
+
+    /**
      * @param null|int $summit_id
      * @param bool|true $published_ones
      * @return Presentation[]

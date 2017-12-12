@@ -36,18 +36,18 @@ abstract class AbstractSerializer implements IModelSerializer
 
     }
 
-    protected static $array_mappings    = array();
+    protected static $array_mappings    = [];
 
-    protected static $allowed_fields    = array();
+    protected static $allowed_fields    = [];
 
-    protected static $allowed_relations = array();
+    protected static $allowed_relations = [];
 
     /**
      * @return array
      */
     protected function getAllowedFields()
     {
-        $mappings  = array();
+        $mappings  = [];
         $hierarchy = $this->getClassHierarchy();
 
         foreach($hierarchy as $class_name){
@@ -89,7 +89,7 @@ abstract class AbstractSerializer implements IModelSerializer
      */
     private function getAttributeMappings()
     {
-        $mappings  = array();
+        $mappings  = [];
         $hierarchy = $this->getClassHierarchy();
 
         foreach($hierarchy as $class_name){

@@ -101,27 +101,28 @@ final class PagingResponse
      * @param array $fields
      * @param array $relations
      * @param array $params
+     * @param string $serializer_type
      * @return array
      */
-    public function toArray($expand = null, array $fields = [], array $relations = [], array $params = [] )
+    public function toArray($expand = null, array $fields = [], array $relations = [], array $params = [], $serializer_type = SerializerRegistry::SerializerType_Public )
     {
         $items = [];
         foreach($this->items as $i)
         {
             if($i instanceof IEntity)
             {
-                $i = SerializerRegistry::getInstance()->getSerializer($i)->serialize($expand, $fields, $relations, $params);
+                $i = SerializerRegistry::getInstance()->getSerializer($i, $serializer_type)->serialize($expand, $fields, $relations, $params);
             }
             $items[] = $i;
         }
 
-        return array
-        (
+        return
+        [
             'total'        =>  $this->total,
             'per_page'     =>  $this->per_page,
             'current_page' =>  $this->page,
             'last_page'    =>  $this->last_page,
             'data'         =>  $items,
-        );
+        ];
     }
 }

@@ -216,10 +216,9 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     {
         $params = [
 
-            'id'       => 'current',
+            'id'       => 23,
             'page'     => 1,
-            'per_page' => 15,
-            'filter'   => 'first_name=@John,last_name=@Bryce,email=@sebastian@',
+            'per_page' => 50,
             'order'    => '+first_name,-last_name'
         ];
 

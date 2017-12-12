@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Validator;
 use libs\utils\HTMLCleaner;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\Group;
+use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
@@ -58,13 +60,29 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     private $event_feedback_repository;
 
+    /**
+     * @var IMemberRepository
+     */
+    private $member_repository;
 
+
+    /**
+     * OAuth2SummitSpeakersApiController constructor.
+     * @param ISummitRepository $summit_repository
+     * @param ISummitEventRepository $event_repository
+     * @param ISpeakerRepository $speaker_repository
+     * @param IEventFeedbackRepository $event_feedback_repository
+     * @param IMemberRepository $member_repository
+     * @param ISpeakerService $service
+     * @param IResourceServerContext $resource_server_context
+     */
     public function __construct
     (
         ISummitRepository $summit_repository,
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
+        IMemberRepository $member_repository,
         ISpeakerService $service,
         IResourceServerContext $resource_server_context
     ) {
@@ -72,6 +90,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         $this->repository                = $summit_repository;
         $this->speaker_repository        = $speaker_repository;
         $this->event_repository          = $event_repository;
+        $this->member_repository         = $member_repository;
         $this->event_feedback_repository = $event_feedback_repository;
         $this->service                   = $service;
     }
@@ -87,8 +106,8 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     public function getSpeakers($summit_id)
     {
         try {
-
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            $serializer_type = SerializerRegistry::SerializerType_Public;
+            $summit          = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $values = Input::all();
@@ -140,16 +159,27 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 ));
             }
 
+            $current_member_id = $this->resource_server_context->getCurrentUserId();
+            if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
+                if($member->isOnGroup(Group::SummitAdministrators)){
+                    $serializer_type = SerializerRegistry::SerializerType_Private;
+                }
+            }
             $result = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
 
             return $this->ok
             (
-                $result->toArray(Request::input('expand', ''),[],[],['summit_id' => $summit_id, 'published' => true])
+                $result->toArray(Request::input('expand', ''),[],[],['summit_id' => $summit_id, 'published' => true, 'summit' => $summit], $serializer_type)
             );
         }
         catch(FilterParserException $ex1){
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex)
         {
@@ -222,6 +252,11 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
         }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
         catch (Exception $ex)
         {
             Log::error($ex);
@@ -238,16 +273,38 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     {
         try
         {
-
+            $serializer_type = SerializerRegistry::SerializerType_Public;
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check($speaker_id, $summit);
             if (is_null($speaker)) return $this->error404();
 
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($speaker)->serialize(Request::input('expand', '')));
+            $current_member_id = $this->resource_server_context->getCurrentUserId();
+            if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
+                if($member->isOnGroup(Group::SummitAdministrators)){
+                    $serializer_type = SerializerRegistry::SerializerType_Private;
+                }
+            }
 
-        } catch (Exception $ex) {
+            return $this->ok
+            (
+                SerializerRegistry::getInstance()->getSerializer($speaker, $serializer_type)->serialize
+                (
+                    Request::input('expand', ''),
+                    [],
+                    [],
+                    ['summit_id' => $summit_id, 'published' => true, 'summit' => $summit]
+                )
+            );
+
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

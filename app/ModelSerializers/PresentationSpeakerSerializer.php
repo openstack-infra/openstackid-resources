@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Support\Facades\Config;
-use models\summit\Presentation;
 use models\summit\PresentationSpeaker;
 
 /**
@@ -22,20 +20,19 @@ use models\summit\PresentationSpeaker;
  */
 class PresentationSpeakerSerializer extends SilverStripeSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
+
         'FirstName'   => 'first_name:json_string',
         'LastName'    => 'last_name:json_string',
         'Title'       => 'title:json_string',
         'Bio'         => 'bio:json_string',
         'IRCHandle'   => 'irc:json_string',
         'TwitterName' => 'twitter:json_string',
-    );
+    ];
 
-    protected static $allowed_relations = array
-    (
+    protected static $allowed_relations = [
         'member',
-    );
+    ];
 
     /**
      * @param null $expand
@@ -44,7 +41,7 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
      * @param array $params
      * @return array
      */
-    public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
+    public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         if(!count($relations)) $relations  = $this->getAllowedRelations();
 
@@ -55,8 +52,11 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
 
         $summit_id                         = isset($params['summit_id'])? intval($params['summit_id']):null;
         $published                         = isset($params['published'])? intval($params['published']):true;
-        $values['presentations']           = $speaker->getPresentationIds($summit_id, $published);
-        $values['moderated_presentations'] = $speaker->getModeratedPresentationIds($summit_id, $published);
+        if(!is_null($summit_id)) {
+            $values['presentations'] = $speaker->getPresentationIds($summit_id, $published);
+            $values['moderated_presentations'] = $speaker->getModeratedPresentationIds($summit_id, $published);
+        }
+
         $values['pic']                     = Config::get("server.assets_base_url", 'https://www.openstack.org/') . 'profile_images/speakers/' . $speaker->getId();
 
         if (in_array('member', $relations) && $speaker->hasMember())
