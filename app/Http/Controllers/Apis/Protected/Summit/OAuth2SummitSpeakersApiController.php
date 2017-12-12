@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Exception;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +31,7 @@ use utils\FilterParser;
 use utils\FilterParserException;
 use utils\OrderParser;
 use utils\PagingInfo;
-
+use Illuminate\Http\Request as LaravelRequest;
 /**
  * Class OAuth2SummitSpeakersApiController
  * @package App\Http\Controllers
@@ -372,6 +371,39 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         {
             Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function addSpeakerPhoto(LaravelRequest $request, $speaker_id){
+
+        try {
+
+            $file = $request->file('file');
+            if (is_null($file)) {
+                return $this->error412(array('file param not set!'));
+            }
+
+            $res = $this->service->addSpeakerAttachment($speaker_id, $file);
+
+            return !is_null($res) ? $this->created($res->getId()) : $this->error400();
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
         }
         catch (Exception $ex) {
             Log::error($ex);

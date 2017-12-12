@@ -22,9 +22,7 @@ use models\summit\SummitAttendee;
 use models\summit\SummitEvent;
 use models\summit\SummitEventFeedback;
 use models\summit\SummitScheduleEmptySpot;
-use DateTime;
 use utils\Filter;
-
 /**
  * Interface ISummitService
  * @package services\model

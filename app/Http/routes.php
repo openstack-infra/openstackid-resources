@@ -1,5 +1,4 @@
 <?php
-
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -10,7 +9,6 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-
 use Illuminate\Support\Facades\Config;
 
 // public api ( without AUTHZ [OAUTH2.0])
@@ -215,7 +213,7 @@ Route::group([
                     Route::put('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@publishEvent']);
                     Route::delete('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvent']);
                     Route::post('/feedback', 'OAuth2SummitEventsApiController@addEventFeedback');
-                    Route::post('/attachment', 'OAuth2SummitEventsApiController@addEventAttachment');
+                    Route::post('/attachment', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@addEventAttachment']);
                     Route::get('/feedback/{attendee_id?}',  ['middleware' => 'cache:'.Config::get('cache_api_response.get_event_feedback_response_lifetime', 300), 'uses' => 'OAuth2SummitEventsApiController@getEventFeedback'] )->where('attendee_id', 'me|[0-9]+');
                 });
             });
@@ -309,6 +307,12 @@ Route::group([
     // speakers
     Route::group(array('prefix' => 'speakers'), function () {
         Route::get('', 'OAuth2SummitSpeakersApiController@getAll');
+
+        Route::group(['prefix' => '{speaker_id}'], function () {
+            Route::post('/photo', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeakerPhoto']);
+        });
+
+
     });
 });
 

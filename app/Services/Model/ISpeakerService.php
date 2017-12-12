@@ -11,10 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\File;
 use models\summit\PresentationSpeaker;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\Summit;
+use Illuminate\Http\UploadedFile;
 /**
  * Interface ISpeakerService
  * @package services\model
@@ -46,4 +49,14 @@ interface ISpeakerService
      * @throws ValidationException
      */
     public function registerSummitPromoCodeByValue(PresentationSpeaker $speaker, Summit $summit, $reg_code);
+
+    /**
+     * @param int $speaker_id
+     * @param UploadedFile $file
+     * @param int $max_file_size
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return File
+     */
+    public function addSpeakerAttachment($speaker_id, UploadedFile $file,  $max_file_size = 10485760);
 }

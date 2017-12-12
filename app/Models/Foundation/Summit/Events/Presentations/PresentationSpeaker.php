@@ -109,7 +109,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $moderated_presentations;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\ManyToOne(targetEntity="models\main\File", cascade={"persist"})
      * @ORM\JoinColumn(name="PhotoID", referencedColumnName="ID")
      * @var File
      */
@@ -341,6 +341,14 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function getPhoto()
     {
         return $this->photo;
+    }
+
+    /**
+     * @param File $photo
+     */
+    public function setPhoto(File $photo)
+    {
+        $this->photo = $photo;
     }
 
     /**

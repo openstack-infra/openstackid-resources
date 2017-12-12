@@ -11,9 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Illuminate\Http\UploadedFile;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\File;
 use models\main\IEmailCreationRequestRepository;
 use models\main\IFolderRepository;
 use models\main\IMemberRepository;
@@ -26,7 +28,7 @@ use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\Summit;
-
+use App\Http\Utils\FileUploader;
 /**
  * Class SpeakerService
  * @package services\model
@@ -334,5 +336,42 @@ final class SpeakerService implements ISpeakerService
 
            return $speaker;
        });
+    }
+
+    /**
+     * @param int $speaker_id
+     * @param UploadedFile $file
+     * @param int $max_file_size
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return File
+     */
+    public function addSpeakerAttachment($speaker_id, UploadedFile $file, $max_file_size = 10485760)
+    {
+        return $this->tx_service->transaction(function () use ($speaker_id, $file, $max_file_size) {
+
+            $allowed_extensions = ['png','jpg','jpeg','gif','pdf'];
+
+            $speaker = $this->speaker_repository->getById($speaker_id);
+
+            if (is_null($speaker)) {
+                throw new EntityNotFoundException('speaker not found!');
+            }
+
+            if(!in_array($file->extension(), $allowed_extensions)){
+                throw new ValidationException("file does not has a valid extension ('png','jpg','jpeg','gif','pdf').");
+            }
+
+            if($file->getSize() > $max_file_size)
+            {
+                throw new ValidationException(sprintf( "file exceeds max_file_size (%s MB).", ($max_file_size/1024)/1024));
+            }
+
+            $uploader = new FileUploader($this->folder_repository);
+            $photo    = $uploader->build($file, 'profile-images');
+            $speaker->setPhoto($photo);
+
+            return $photo;
+        });
     }
 }
