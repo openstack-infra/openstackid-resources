@@ -12,6 +12,9 @@
  * limitations under the License.
  **/
 use App\Events\MyFavoritesAdd;
+use App\Events\PresentationSpeakerCreated;
+use App\Events\PresentationSpeakerDeleted;
+use App\Events\PresentationSpeakerUpdated;
 use App\Events\SummitEventCreated;
 use App\Events\SummitEventDeleted;
 use App\Events\SummitEventUpdated;
@@ -48,7 +51,6 @@ class EventServiceProvider extends ServiceProvider
             'App\Listeners\QueryExecutedListener',
         ],
     ];
-
 
     /**
      * Register any other events for your application.
@@ -356,6 +358,104 @@ class EventServiceProvider extends ServiceProvider
             $em = Registry::getManager('ss');
             $em->persist($asset_sync_request);
             $em->flush();
+
+        });
+
+        Event::listen(\App\Events\PresentationSpeakerCreated::class, function($event)
+        {
+            if(!$event instanceof PresentationSpeakerCreated) return;
+
+            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
+            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
+            if(is_null($owner_id)) $owner_id = 0;
+
+            $em     = Registry::getManager('ss');
+
+            foreach($event->getPresentationSpeaker()->getRelatedSummits() as $summit) {
+
+                $entity_event = new SummitEntityEvent;
+                $entity_event->setEntityClassName("PresentationSpeaker");
+                $entity_event->setEntityId($event->getPresentationSpeaker()->getId());
+                $entity_event->setType('INSERT');
+
+                if ($owner_id > 0) {
+                    $member = $member_repository->getById($owner_id);
+                    $entity_event->setOwner($member);
+                }
+
+                $entity_event->setSummit($summit);
+                $entity_event->setMetadata('');
+
+                $em->persist($entity_event);
+                $em->flush();
+            }
+
+        });
+
+        Event::listen(\App\Events\PresentationSpeakerUpdated::class, function($event)
+        {
+            if(!$event instanceof PresentationSpeakerUpdated) return;
+
+            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
+            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
+            if(is_null($owner_id)) $owner_id = 0;
+
+            $em     = Registry::getManager('ss');
+
+            foreach($event->getPresentationSpeaker()->getRelatedSummits() as $summit) {
+
+                $entity_event = new SummitEntityEvent;
+                $entity_event->setEntityClassName("PresentationSpeaker");
+                $entity_event->setEntityId($event->getPresentationSpeaker()->getId());
+                $entity_event->setType('UPDATE');
+
+                if ($owner_id > 0) {
+                    $member = $member_repository->getById($owner_id);
+                    $entity_event->setOwner($member);
+                }
+
+                $entity_event->setSummit($summit);
+                $entity_event->setMetadata('');
+
+                $em->persist($entity_event);
+                $em->flush();
+            }
+
+        });
+
+        Event::listen(\App\Events\PresentationSpeakerDeleted::class, function($event)
+        {
+            if(!$event instanceof PresentationSpeakerDeleted) return;
+            $args = $event->getArgs();
+            if(!$args instanceof PreRemoveEventArgs) return;
+
+            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
+            $member_repository               = App::make(\models\main\IMemberRepository::class);
+            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
+            if(is_null($owner_id)) $owner_id = 0;
+            $params = $args->getParams();
+            $em     = Registry::getManager('ss');
+
+            foreach($params['summits'] as $summit) {
+
+                $entity_event = new SummitEntityEvent;
+                $entity_event->setEntityClassName($params['class_name']);
+                $entity_event->setEntityId($params['id']);
+                $entity_event->setType('DELETE');
+
+                if ($owner_id > 0) {
+                    $member = $member_repository->getById($owner_id);
+                    $entity_event->setOwner($member);
+                }
+
+                $entity_event->setSummit($summit);
+                $entity_event->setMetadata('');
+
+                $em->persist($entity_event);
+                $em->flush();
+            }
 
         });
 

@@ -19,7 +19,6 @@ use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use models\exceptions\ValidationException;
 use models\main\Company;
-use models\main\Member;
 use models\main\Tag;
 use models\utils\PreRemoveEventArgs;
 use models\utils\SilverstripeBaseModel;

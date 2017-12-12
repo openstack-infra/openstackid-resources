@@ -22,6 +22,7 @@ use models\summit\ISpeakerRegistrationRequestRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISpeakerSummitRegistrationPromoCodeRepository;
 use models\summit\PresentationSpeaker;
+use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\Summit;
@@ -67,6 +68,16 @@ final class SpeakerService implements ISpeakerService
     private $tx_service;
 
 
+    /**
+     * SpeakerService constructor.
+     * @param ISpeakerRepository $speaker_repository
+     * @param IMemberRepository $member_repository
+     * @param ISpeakerRegistrationRequestRepository $speaker_registration_request_repository
+     * @param ISpeakerSummitRegistrationPromoCodeRepository $registration_code_repository
+     * @param IEmailCreationRequestRepository $email_creation_request_repository
+     * @param IFolderRepository $folder_repository
+     * @param ITransactionService $tx_service
+     */
     public function __construct
     (
         ISpeakerRepository $speaker_repository,
@@ -150,18 +161,9 @@ final class SpeakerService implements ISpeakerService
                 }
             }
 
-            $on_site_phone = isset($data['on_site_phone']) ? trim($data['on_site_phone']) : null;
-            $registered    = isset($data['registered']) ? 1 : 0;
-            $checked_in    = isset($data['checked_in']) ? 1 : 0;
-            $confirmed     = isset($data['confirmed'])  ? 1 : 0;
-
-            $summit_assistance = $speaker->buildAssistanceFor($summit);
-            $summit_assistance->setOnSitePhone($on_site_phone);
-            $summit_assistance->setRegistered($registered);
-            $summit_assistance->setIsConfirmed($confirmed);
-            $summit_assistance->setCheckedIn($checked_in);
-
-            $speaker->addSummitAssistance($summit_assistance);
+            $speaker->addSummitAssistance(
+                $this->updateSummitAssistance($speaker->buildAssistanceFor($summit), $data)
+            );
 
             $reg_code = isset($data['registration_code']) ? trim($data['registration_code']) : null;
             if(!empty($reg_code)){
@@ -175,6 +177,25 @@ final class SpeakerService implements ISpeakerService
 
             return $speaker;
         });
+    }
+
+    /**
+     * @param PresentationSpeakerSummitAssistanceConfirmationRequest $summit_assistance
+     * @param array $data
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    private function updateSummitAssistance(PresentationSpeakerSummitAssistanceConfirmationRequest $summit_assistance, array $data){
+        $on_site_phone = isset($data['on_site_phone']) ? trim($data['on_site_phone']) : null;
+        $registered    = isset($data['registered']) ? 1 : 0;
+        $checked_in    = isset($data['checked_in']) ? 1 : 0;
+        $confirmed     = isset($data['confirmed'])  ? 1 : 0;
+
+        $summit_assistance->setOnSitePhone($on_site_phone);
+        $summit_assistance->setRegistered($registered);
+        $summit_assistance->setIsConfirmed($confirmed);
+        $summit_assistance->setCheckedIn($checked_in);
+
+        return $summit_assistance;
     }
 
     /**
@@ -239,6 +260,10 @@ final class SpeakerService implements ISpeakerService
         });
     }
 
+    /**
+     * @param PresentationSpeaker $speaker
+     * @param array $data
+     */
     private function updateSpeakerMainData(PresentationSpeaker $speaker, array $data){
         if(isset($data['title']))
             $speaker->setTitle(trim($data['title']));
@@ -260,4 +285,54 @@ final class SpeakerService implements ISpeakerService
 
     }
 
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @param PresentationSpeaker $speaker
+     * @return PresentationSpeaker
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function updateSpeaker(Summit $summit, PresentationSpeaker $speaker, array $data)
+    {
+       return $this->tx_service->transaction(function() use ($summit, $speaker, $data){
+           $member_id = isset($data['member_id']) ? intval($data['member_id']) : null;
+           if($member_id > 0)
+           {
+               $member = $this->member_repository->getById($member_id);
+               if(is_null($member))
+                   throw new EntityNotFoundException;
+
+               $existent_speaker = $this->speaker_repository->getByMember($member);
+               if($existent_speaker && $existent_speaker->getId() !== $speaker->getId())
+                   throw new ValidationException
+                   (
+                       sprintf
+                       (
+                           "member_id %s already has assigned another speaker id (%s)",
+                           $member_id,
+                           $existent_speaker->getId()
+                       )
+                   );
+
+               $speaker->setMember($member);
+           }
+
+           $this->updateSpeakerMainData($speaker, $data);
+
+           $summit_assistance = $speaker->getAssistanceFor($summit);
+           if(is_null($summit_assistance)){
+               $speaker->addSummitAssistance(
+                   $this->updateSummitAssistance($speaker->buildAssistanceFor($summit), $data)
+               );
+           }
+
+           $reg_code = isset($data['registration_code']) ? trim($data['registration_code']) : null;
+           if(!empty($reg_code)){
+               $this->registerSummitPromoCodeByValue($speaker, $summit, $reg_code);
+           }
+
+           return $speaker;
+       });
+    }
 }

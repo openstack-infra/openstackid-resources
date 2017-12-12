@@ -11,18 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Mapping AS ORM;
+use App\Events\PresentationSpeakerCreated;
+use App\Events\PresentationSpeakerDeleted;
+use App\Events\PresentationSpeakerUpdated;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use models\main\File;
 use models\main\Member;
+use models\utils\PreRemoveEventArgs;
 use models\utils\SilverstripeBaseModel;
-use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
+use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Illuminate\Support\Facades\Event;
+use Doctrine\Common\Collections\Criteria;
 /**
  * @ORM\Entity
  * @ORM\Table(name="PresentationSpeaker")
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSpeakerRepository")
+ * @ORM\HasLifecycleCallbacks
  * Class PresentationSpeaker
  * @package models\summit
  */
@@ -421,6 +427,17 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param Summit $summit
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    public function getAssistanceFor(Summit $summit)
+    {
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('summit', $summit));
+        return $this->summit_assistances->matching($criteria)->first();
+    }
+
+    /**
      * @return mixed
      */
     public function getCreatedFromApi()
@@ -446,5 +463,99 @@ class PresentationSpeaker extends SilverstripeBaseModel
         $request->setSummit($summit);
         $request->setSpeaker($this);
         return $request;
+    }
+
+    /**
+     * @return Summit[]
+     */
+    public function getRelatedSummits(){
+
+        $query = <<<SQL
+SELECT DISTINCT Summit.* FROM Presentation_Speakers 
+INNER JOIN Presentation ON Presentation.ID = Presentation_Speakers.PresentationID
+INNER JOIN SummitEvent ON SummitEvent.ID = Presentation.ID
+INNER JOIN Summit ON Summit.ID = SummitEvent.SummitID
+WHERE SummitEvent.Published = 1 AND Presentation_Speakers.PresentationSpeakerID = :speaker_id; 
+SQL;
+
+        $rsm = new ResultSetMappingBuilder($this->getEM());
+        $rsm->addRootEntityFromClassMetadata(\models\summit\Summit::class, 's');
+
+        // build rsm here
+        $native_query = $this->getEM()->createNativeQuery($query, $rsm);
+
+        $native_query->setParameter("speaker_id", $this->id);
+
+        $summits = $native_query->getResult();
+        if(count($summits) == 0){
+            $assistance = $this->getLatestAssistance();
+            if(is_null($assistance)) return [];
+            return [ $assistance->getSummit() ];
+        }
+        return $summits;
+    }
+
+    /**
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    public function getLatestAssistance(){
+        return $this->summit_assistances->last();
+    }
+
+    // life cycle events
+
+    /**
+     * @var PreRemoveEventArgs
+     */
+    private $pre_remove_events;
+    /**
+     * @ORM\PreRemove:
+     */
+    public function deleting($args){
+        $this->pre_remove_events = new PreRemoveEventArgs
+        (
+            [
+                'id'         => $this->id,
+                'class_name' => "PresentationSpeaker",
+                'summits'    => $this->getRelatedSummits(),
+            ]
+        );
+    }
+
+    /**
+     * @ORM\PostRemove:
+     */
+    public function deleted($args){
+
+        Event::fire(new PresentationSpeakerDeleted($this,  $this->pre_remove_events));
+        $this->pre_remove_events = null;
+    }
+
+    /**
+     * @var PreUpdateEventArgs
+     */
+    private $pre_update_args;
+
+    /**
+     * @ORM\PreUpdate:
+     */
+    public function updating(PreUpdateEventArgs $args){
+        $this->pre_update_args = $args;
+    }
+
+    /**
+     * @ORM\PostUpdate:
+     */
+    public function updated($args)
+    {
+        Event::fire(new PresentationSpeakerUpdated($this, $this->pre_update_args));
+        $this->pre_update_args = null;
+    }
+
+    /**
+     * @ORM\PostPersist
+     */
+    public function inserted($args){
+        Event::fire(new PresentationSpeakerCreated($this, $args));
     }
 }

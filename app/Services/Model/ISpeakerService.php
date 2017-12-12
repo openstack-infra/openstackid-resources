@@ -30,6 +30,15 @@ interface ISpeakerService
     public function addSpeaker(Summit $summit, array $data);
 
     /**
+     * @param Summit $summit
+     * @param array $data
+     * @param PresentationSpeaker $speaker
+     * @return PresentationSpeaker
+     * @throws ValidationException
+     */
+    public function updateSpeaker(Summit $summit, PresentationSpeaker $speaker, array $data);
+
+    /**
      * @param PresentationSpeaker $speaker
      * @param Summit $summit
      * @param string $reg_code

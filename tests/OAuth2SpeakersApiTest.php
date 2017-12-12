@@ -130,4 +130,40 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         $this->assertTrue($speaker->id > 0);
         return $speaker;
     }
+
+    public function testUpdateSpeaker($summit_id = 23)
+    {
+        $params = [
+
+            'id'         => $summit_id,
+            'speaker_id' => 1
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $data = [
+            'title'             => 'Legend!',
+        ];
+
+        $response = $this->action
+        (
+            "PUT",
+            "OAuth2SummitSpeakersApiController@updateSpeaker",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $this->assertResponseStatus(201);
+        $content = $response->getContent();
+        $speaker = json_decode($content);
+        $this->assertTrue($speaker->id > 0);
+        return $speaker;
+    }
 }
