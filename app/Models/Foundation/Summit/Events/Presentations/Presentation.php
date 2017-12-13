@@ -116,8 +116,16 @@ class Presentation extends SummitEvent
     private $materials;
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\summit\PresentationSpeaker", mappedBy="presentations")
-     * @var PresentationSpeaker[]
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationSpeaker", inversedBy="presentations")
+     * @ORM\JoinTable(name="Presentation_Speakers",
+     *  joinColumns={
+     *     @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID")
+     * },
+     * inverseJoinColumns={
+     *      @ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")
+     *
+     * }
+     * )
      */
     private $speakers;
 
@@ -296,6 +304,13 @@ class Presentation extends SummitEvent
     public function removeVideo(PresentationVideo $video){
         $this->materials->removeElement($video);
         $video->unsetPresentation();
+    }
+
+    /**
+     * @param PresentationSpeaker $speaker
+     */
+    public function removeSpeaker(PresentationSpeaker $speaker){
+        $this->speakers->removeElement($speaker);
     }
 
     /**

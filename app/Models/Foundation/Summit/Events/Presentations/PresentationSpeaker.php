@@ -90,15 +90,8 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $promo_codes;
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\summit\Presentation", inversedBy="speakers")
-     * @ORM\JoinTable(name="Presentation_Speakers",
-     *  joinColumns={
-     *      @ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")
-     * },
-     * inverseJoinColumns={
-     *      @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID")
-     * }
-     * )
+     * @ORM\ManyToMany(targetEntity="models\summit\Presentation", mappedBy="speakers")
+     * @var Presentation[]
      */
     private $presentations;
 
@@ -235,6 +228,13 @@ class PresentationSpeaker extends SilverstripeBaseModel
         $this->presentations->add($presentation);
     }
 
+
+    public function clearPresentations(){
+        foreach($this->presentations as $presentation){
+            $presentation->removeSpeaker($this);
+        }
+        $this->presentations->clear();
+    }
     /**
      * @param SpeakerSummitRegistrationPromoCode $code
      * @return $this
