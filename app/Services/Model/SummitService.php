@@ -767,7 +767,7 @@ final class SummitService implements ISummitService
                 else {
                     $moderator = $this->speaker_repository->getById($speaker_id);
                     if (is_null($moderator)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_id));
-                    $event->setModerator($speaker);
+                    $event->setModerator($moderator);
                 }
             }
         }
