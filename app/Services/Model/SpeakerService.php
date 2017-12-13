@@ -333,7 +333,6 @@ final class SpeakerService implements ISpeakerService
            if(!empty($reg_code)){
                $this->registerSummitPromoCodeByValue($speaker, $summit, $reg_code);
            }
-            $speaker->clearPresentations();
            return $speaker;
        });
     }
