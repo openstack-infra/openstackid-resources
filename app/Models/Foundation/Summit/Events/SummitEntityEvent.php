@@ -95,6 +95,13 @@ class SummitEntityEvent extends SilverstripeBaseModel
     }
 
     /**
+     * @return string
+     */
+    public function getRawMetadata(){
+        return $this->metadata;
+    }
+
+    /**
      * @ORM\ManyToOne(targetEntity="models\main\Member", cascade={"persist"})
      * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
      * @var Member

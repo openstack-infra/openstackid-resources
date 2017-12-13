@@ -52,6 +52,85 @@ class EventServiceProvider extends ServiceProvider
         ],
     ];
 
+    private static function persistsEntityEvent(SummitEntityEvent $entity_event){
+        $sql = <<<SQL
+INSERT INTO SummitEntityEvent 
+(EntityID, EntityClassName, Type, Metadata, Created, LastEdited, OwnerID, SummitID) 
+VALUES (:EntityID, :EntityClassName, :Type, :Metadata, :Created, :LastEdited, :OwnerID, :SummitID)
+SQL;
+
+        $bindings = [
+            'EntityID'        => $entity_event->getEntityId(),
+            'EntityClassName' => $entity_event->getEntityClassName(),
+            'Type'            => $entity_event->getType(),
+            'Metadata'        => $entity_event->getRawMetadata(),
+            'Created'         => $entity_event->getCreated(),
+            'LastEdited'      => $entity_event->getLastEdited(),
+            'OwnerID'         => $entity_event->getOwnerId(),
+            'SummitID'        => $entity_event->getSummitId()
+        ];
+
+        $types = [
+           'EntityID'        => 'integer',
+           'EntityClassName' => 'string',
+            'Type'           => 'string',
+            'Metadata'       => 'string',
+            'Created'        => 'datetime',
+            'LastEdited'     => 'datetime',
+            'OwnerID'        => 'integer',
+            'SummitID'       => 'integer',
+        ];
+
+        self::insert($sql, $bindings, $types);
+    }
+
+    private static function persistAdminSyncRequest(AdminSummitEventActionSyncWorkRequest $request){
+        $em = Registry::getManager('ss');
+        $em->persist($request);
+        $em->flush();
+    }
+
+    private static function persistsAssetSyncRequest(AssetsSyncRequest $assets_sync_request){
+
+        $sql = <<<SQL
+INSERT INTO AssetsSyncRequest
+(
+ClassName,
+Created,
+LastEdited,
+`From`,
+`To`,
+Processed,
+ProcessedDate
+)
+VALUES
+('AssetsSyncRequest', NOW(), NOW(), :FromFile, :ToFile, 0, NULL );
+
+SQL;
+
+        $bindings = [
+            'FromFile' => $assets_sync_request->getFrom(),
+            'ToFile'   => $assets_sync_request->getTo(),
+        ];
+
+        $types = [
+            'FromFile' => 'string',
+            'ToFile'   => 'string',
+
+        ];
+
+        self::insert($sql, $bindings, $types);
+
+    }
+
+    /**
+     * @param string $sql
+     * @param array $bindings
+     */
+    private static function insert($sql, array $bindings, array $types){
+        $em = Registry::getManager('ss');
+        $em->getConnection()->executeUpdate($sql, $bindings, $types);
+    }
     /**
      * Register any other events for your application.
      * @return void
@@ -70,9 +149,8 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
+
         });
 
         Event::listen(\App\Events\MyFavoritesAdd::class, function($event)
@@ -85,9 +163,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
         });
 
         Event::listen(\App\Events\MyScheduleRemove::class, function($event)
@@ -100,9 +176,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
 
         });
 
@@ -117,9 +191,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
 
         });
 
@@ -143,9 +215,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($event->getSummitEvent()->getSummit());
             $entity_event->setMetadata( json_encode([ 'pub_new' => intval($event->getSummitEvent()->isPublished())]));
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
 
         });
 
@@ -193,10 +263,9 @@ class EventServiceProvider extends ServiceProvider
             else
                 $entity_event->setMetadata(json_encode([ 'pub_new' => intval($event->getSummitEvent()->getPublished())]));
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->persist($request);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
+            self::persistAdminSyncRequest($request);
+
         });
 
         Event::listen(\App\Events\SummitEventDeleted::class, function($event)
@@ -210,7 +279,6 @@ class EventServiceProvider extends ServiceProvider
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
             $params = $args->getParams();
-            $em     = Registry::getManager('ss');
 
             $entity_event = new SummitEntityEvent;
             $entity_event->setEntityClassName($params['class_name']);
@@ -225,6 +293,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($params['summit']);
             $entity_event->setMetadata('');
 
+            $request = null;
             if(isset($params['published']) && $params['published']){
                 // just record the published state at the moment of the update
 
@@ -240,11 +309,13 @@ class EventServiceProvider extends ServiceProvider
                     $member = $member_repository->getById($owner_id);
                     $request->setCreatedBy($member);
                 }
-                $em->persist($request);
+
             }
 
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
+
+            if(!is_null($request))
+                self::persistAdminSyncRequest($request);
         });
 
         Event::listen(\App\Events\PresentationMaterialCreated::class, function($event)
@@ -268,9 +339,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($event->getMaterial()->getPresentation()->getSummit());
             $entity_event->setMetadata(json_encode([ 'presentation_id' => intval($event->getMaterial()->getPresentation()->getId())]));
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
 
         });
 
@@ -295,9 +364,7 @@ class EventServiceProvider extends ServiceProvider
             $entity_event->setSummit($event->getMaterial()->getPresentation()->getSummit());
             $entity_event->setMetadata(json_encode([ 'presentation_id' => intval($event->getMaterial()->getPresentation()->getId())]));
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
 
         });
 
@@ -321,9 +388,7 @@ class EventServiceProvider extends ServiceProvider
 
             $entity_event->setSummit($event->getPresentation()->getSummit());
 
-            $em = Registry::getManager('ss');
-            $em->persist($entity_event);
-            $em->flush();
+            self::persistsEntityEvent($entity_event);
 
         });
 
@@ -355,9 +420,7 @@ class EventServiceProvider extends ServiceProvider
             $asset_sync_request->setFrom($remote_destination);
             $asset_sync_request->setTo(sprintf("%s/%s", $folder_name, $file_name));
             $asset_sync_request->setProcessed(false);
-            $em = Registry::getManager('ss');
-            $em->persist($asset_sync_request);
-            $em->flush();
+            self::persistsAssetSyncRequest($asset_sync_request);
 
         });
 
@@ -369,8 +432,6 @@ class EventServiceProvider extends ServiceProvider
             $member_repository               = App::make(\models\main\IMemberRepository::class);
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
-
-            $em     = Registry::getManager('ss');
 
             foreach($event->getPresentationSpeaker()->getRelatedSummits() as $summit) {
 
@@ -387,8 +448,7 @@ class EventServiceProvider extends ServiceProvider
                 $entity_event->setSummit($summit);
                 $entity_event->setMetadata('');
 
-                $em->persist($entity_event);
-                $em->flush();
+                self::persistsEntityEvent($entity_event);
             }
 
         });
@@ -401,8 +461,6 @@ class EventServiceProvider extends ServiceProvider
             $member_repository               = App::make(\models\main\IMemberRepository::class);
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
-
-            $em     = Registry::getManager('ss');
 
             foreach($event->getPresentationSpeaker()->getRelatedSummits() as $summit) {
 
@@ -419,8 +477,7 @@ class EventServiceProvider extends ServiceProvider
                 $entity_event->setSummit($summit);
                 $entity_event->setMetadata('');
 
-                $em->persist($entity_event);
-                $em->flush();
+                self::persistsEntityEvent($entity_event);
             }
 
         });
@@ -436,7 +493,6 @@ class EventServiceProvider extends ServiceProvider
             $owner_id                        = $resource_server_context->getCurrentUserExternalId();
             if(is_null($owner_id)) $owner_id = 0;
             $params = $args->getParams();
-            $em     = Registry::getManager('ss');
 
             foreach($params['summits'] as $summit) {
 
@@ -453,8 +509,7 @@ class EventServiceProvider extends ServiceProvider
                 $entity_event->setSummit($summit);
                 $entity_event->setMetadata('');
 
-                $em->persist($entity_event);
-                $em->flush();
+                self::persistsEntityEvent($entity_event);
             }
 
         });

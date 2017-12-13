@@ -136,7 +136,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         $params = [
 
             'id'         => $summit_id,
-            'speaker_id' => 1
+            'speaker_id' => 9161
         ];
 
         $headers = [
@@ -145,7 +145,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         ];
 
         $data = [
-            'title'             => 'Legend!',
+            'title'             => 'Legend!!!',
         ];
 
         $response = $this->action

@@ -1085,12 +1085,13 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $params = array
         (
             'id' => 23,
-            'event_id' => 20619,
+            'event_id' => 19255,
         );
 
         $data = array
         (
-            'title' => 'OpenStack Public Cloud Update TEST!',
+            'title' => 'Using HTTPS to Secure OpenStack Services Update',
+            'speakers' => [210, 9161, 202]
         );
 
 
