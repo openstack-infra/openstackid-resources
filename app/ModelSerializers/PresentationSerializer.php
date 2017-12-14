@@ -12,40 +12,40 @@
  * limitations under the License.
  **/
 use models\summit\Presentation;
-
 /**
  * Class PresentationSerializer
  * @package ModelSerializers
  */
 class PresentationSerializer extends SummitEventSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
+
         'Level'                   => 'level',
         'ModeratorId'             => 'moderator_speaker_id:json_int',
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
         'ToRecord'                => 'to_record:json_boolean',
         'FeatureCloud'            => 'feature_cloud:json_boolean',
-    );
+    ];
 
-    protected static $allowed_fields = array
-    (
+    protected static $allowed_fields = [
+
         'track_id',
         'moderator_speaker_id',
         'level',
         'problem_addressed',
         'attendees_expected_learnt',
-        'to_record'
-    );
+        'to_record',
+        'feature_cloud',
+    ];
 
-    protected static $allowed_relations = array
-    (
+    protected static $allowed_relations = [
+
         'slides',
         'videos',
         'speakers',
         'links',
-    );
+    ];
 
     /**
      * @param null $expand
@@ -92,7 +92,7 @@ class PresentationSerializer extends SummitEventSerializer
 
         if(in_array('videos', $relations))
         {
-            $videos = array();
+            $videos = [];
             foreach ($presentation->getVideos() as $video) {
                 $video_values   = SerializerRegistry::getInstance()->getSerializer($video)->serialize();
                 if(empty($video_values['youtube_id'])) continue;
@@ -105,7 +105,7 @@ class PresentationSerializer extends SummitEventSerializer
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {
                     case 'speakers': {
-                        $speakers = array();
+                        $speakers = [];
                         foreach ($presentation->getSpeakers() as $s) {
                             $speakers[] = SerializerRegistry::getInstance()->getSerializer($s)->serialize();
                         }

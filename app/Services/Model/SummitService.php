@@ -612,7 +612,19 @@ final class SummitService implements ISummitService
                 $event = $this->event_repository->getById($event_id);
                 if (is_null($event))
                     throw new ValidationException(sprintf("event id %s does not exists!", $event_id));
-                $event_type = $event->getType();
+                $old_event_type = $event->getType();
+                if($event_type != null && $old_event_type->getClassName() != $event_type->getClassName()){
+                    throw new ValidationException
+                    (
+                        sprintf
+                        (
+                            "invalid event type transition for event id %s ( from %s to %s)",
+                            $event_id,
+                            $old_event_type->getClassName(),
+                            $event_type->getClassName()
+                        )
+                    );
+                }
             }
 
             // main data
