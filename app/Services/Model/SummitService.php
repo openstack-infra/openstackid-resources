@@ -620,8 +620,8 @@ final class SummitService implements ISummitService
             if (isset($data['title']))
                 $event->setTitle(html_entity_decode(trim($data['title'])));
 
-            if (isset($data['abstract']))
-                $event->setAbstract(html_entity_decode(trim($data['abstract'])));
+            if (isset($data['description']))
+                $event->setAbstract(html_entity_decode(trim($data['description'])));
 
             if (isset($data['rsvp_link']))
                 $event->setRsvpLink(html_entity_decode(trim($data['rsvp_link'])));
@@ -632,8 +632,9 @@ final class SummitService implements ISummitService
             if (isset($data['social_summary']))
                 $event->setSocialSummary(strip_tags(trim($data['social_summary'])));
 
-            if (isset($data['allow_feedback']))
-                $event->setAllowFeedBack($data['allow_feedback']);
+            $event->setAllowFeedBack(isset($data['allow_feedback'])?
+                filter_var($data['allow_feedback'], FILTER_VALIDATE_BOOLEAN) :
+                false);
 
             if (!is_null($event_type))
                 $event->setType($event_type);
@@ -725,12 +726,16 @@ final class SummitService implements ISummitService
         if(isset($data['level']))
             $event->setLevel($data['level']);
 
+        $event->setFeatureCloud(isset($data['feature_cloud'])?
+            filter_var($data['feature_cloud'], FILTER_VALIDATE_BOOLEAN) : 0);
+
         // if we are creating the presentation from admin, then
         // we should mark it as received and complete
         $event->setStatus(Presentation::STATUS_RECEIVED);
         $event->setProgress(Presentation::PHASE_COMPLETE);
 
-        $event->setToRecord(isset($data['to_record'])? $data['to_record'] : 0);
+        $event->setToRecord(isset($data['to_record'])?
+            filter_var($data['to_record'], FILTER_VALIDATE_BOOLEAN): 0);
 
         // speakers
 

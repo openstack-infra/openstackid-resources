@@ -162,9 +162,10 @@ class Presentation extends SummitEvent
     public function __construct()
     {
         parent::__construct();
-        $this->materials = new ArrayCollection();
-        $this->speakers  = new ArrayCollection();
-        $this->to_record = false;
+        $this->materials     = new ArrayCollection();
+        $this->speakers      = new ArrayCollection();
+        $this->to_record     = false;
+        $this->feature_cloud = false;
     }
 
     /**
