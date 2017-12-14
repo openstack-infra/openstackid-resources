@@ -641,8 +641,8 @@ final class SummitService implements ISummitService
             if (isset($data['head_count']))
                 $event->setHeadCount(intval($data['head_count']));
 
-            if (isset($data['social_summary']))
-                $event->setSocialSummary(strip_tags(trim($data['social_summary'])));
+            if (isset($data['social_description']))
+                $event->setSocialSummary(strip_tags(trim($data['social_description'])));
 
             $event->setAllowFeedBack(isset($data['allow_feedback'])?
                 filter_var($data['allow_feedback'], FILTER_VALIDATE_BOOLEAN) :
@@ -733,8 +733,8 @@ final class SummitService implements ISummitService
         if(!$event instanceof Presentation) return;
 
         // main data
-        if(isset($data['expect_learn']))
-            $event->setAttendeesExpectedLearnt(html_entity_decode($data['expect_learn']));
+        if(isset($data['attendees_expected_learnt']))
+            $event->setAttendeesExpectedLearnt(html_entity_decode($data['attendees_expected_learnt']));
         if(isset($data['level']))
             $event->setLevel($data['level']);
 
