@@ -32,15 +32,14 @@ abstract class RetrieveSummitEventsStrategy
      * @return PagingResponse
      * @throws ValidationException
      */
-    public function getEvents(array $params = array())
+    public function getEvents(array $params = [])
     {
             $values = Input::all();
 
-            $rules = array
-            (
+            $rules = [
                 'page'     => 'integer|min:1',
                 'per_page' => 'required_with:page|integer|min:5|max:100',
-            );
+            ];
 
             $validation = Validator::make($values, $rules);
 
@@ -83,14 +82,14 @@ abstract class RetrieveSummitEventsStrategy
         $order = null;
         if (Input::has('order'))
         {
-            $order = OrderParser::parse(Input::get('order'), array
-            (
+            $order = OrderParser::parse(Input::get('order'), [
+
                 'title',
                 'start_date',
                 'end_date',
                 'id',
                 'created',
-            ));
+            ]);
         }
         return $order;
     }
@@ -107,8 +106,8 @@ abstract class RetrieveSummitEventsStrategy
      */
     protected function getValidFilters()
     {
-        return array
-        (
+        return [
+
             'title'            => ['=@', '=='],
             'abstract'         => ['=@', '=='],
             'social_summary'   => ['=@', '=='],
@@ -121,6 +120,7 @@ abstract class RetrieveSummitEventsStrategy
             'speaker'          => ['=@', '=='],
             'speaker_email'    => ['=@', '=='],
             'selection_status' => ['=='],
-        );
+            'id'               => ['=='],
+        ];
     }
 }

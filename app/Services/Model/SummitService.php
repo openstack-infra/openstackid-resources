@@ -570,6 +570,24 @@ final class SummitService implements ISummitService
     }
 
     /**
+     * @param SummitEventType $old_event_type
+     * @param SummitEventType $event_type
+     * @return bool
+     */
+    private function canPerformEventTypeTransition(SummitEventType $old_event_type, SummitEventType $event_type){
+        // cant upgrade from raw event to presentation and vice versa
+        if($old_event_type->getClassName() != $event_type->getClassName()) return false;
+
+        if(!(SummitEventType::isPrivate($old_event_type->getType()) && SummitEventType::isPrivate($event_type->getType())))
+            return false;
+
+        if(!($old_event_type->isAllowsAttachment() && $event_type->isAllowsAttachment()))
+            return false;
+
+        return true;
+    }
+
+    /**
      * @param Summit $summit
      * @param array $data
      * @param null|int $event_id
@@ -606,26 +624,35 @@ final class SummitService implements ISummitService
                 }
             }
 
-            if (is_null($event_id)) {
-                $event = SummitEventFactory::build($event_type);
-            } else {
+            $event = null;
+            // existing event
+
+            if (!is_null($event_id) && intval($event_id) > 0 ) {
                 $event = $this->event_repository->getById($event_id);
                 if (is_null($event))
                     throw new ValidationException(sprintf("event id %s does not exists!", $event_id));
                 $old_event_type = $event->getType();
-                if($event_type != null && $old_event_type->getClassName() != $event_type->getClassName()){
-                    throw new ValidationException
-                    (
-                        sprintf
+
+                // check event type transition ...
+
+                if(!is_null($event_type) && !$this->canPerformEventTypeTransition($old_event_type, $event_type)){
+                        throw new ValidationException
                         (
-                            "invalid event type transition for event id %s ( from %s to %s)",
-                            $event_id,
-                            $old_event_type->getClassName(),
-                            $event_type->getClassName()
-                        )
-                    );
+                            sprintf
+                            (
+                                "invalid event type transition for event id %s ( from %s to %s)",
+                                $event_id,
+                                $old_event_type->getType(),
+                                $event_type->getType()
+                            )
+                        );
                 }
+                if(is_null($event_type)) $event_type = $old_event_type;
             }
+
+            // new event
+            if (is_null($event))
+                $event = SummitEventFactory::build($event_type);
 
             // main data
 
@@ -1351,5 +1378,75 @@ final class SummitService implements ISummitService
             break;
         }
         return false;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return bool
+     */
+    public function unPublishEvents(Summit $summit, array $data)
+    {
+        return $this->tx_service->transaction(function () use
+        (
+            $summit,
+            $data
+        )
+        {
+            foreach ($data['events'] as $event_id){
+                $this->unPublishEvent($summit, intval($event_id));
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return bool
+     */
+    public function updateAndPublishEvents(Summit $summit, array $data)
+    {
+        return $this->tx_service->transaction(function () use
+        (
+            $summit,
+            $data
+        )
+        {
+            foreach ($data['events'] as $event_data){
+                $this->updateEvent($summit, intval($event_data['id']), $event_data);
+                $this->publishEvent($summit, intval($event_data['id']), $event_data);
+            }
+
+            return true;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return bool
+     */
+    public function updateEvents(Summit $summit, array $data)
+    {
+        return $this->tx_service->transaction(function () use
+        (
+            $summit,
+            $data
+        )
+        {
+            foreach ($data['events'] as $event_data){
+                $this->updateEvent($summit, intval($event_data['id']), $event_data);
+            }
+
+            return true;
+        });
     }
 }

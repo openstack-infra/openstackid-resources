@@ -283,16 +283,27 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             $rules = array
             (
-                'title'           => 'required|string|max:100',
-                'description'     => 'required|string',
-                'social_summary'  => 'sometimes|string|max:100',
-                'location_id'     => 'sometimes|required|integer',
-                'start_date'      => 'sometimes|required|date_format:U',
-                'end_date'        => 'sometimes|required_with:start_date|date_format:U|after:start_date',
-                'allow_feedback'  => 'sometimes|required|boolean',
-                'type_id'         => 'required|integer',
-                'track_id'        => 'required|integer',
-                'tags'            => 'sometimes|required|string_array',
+                'title'              => 'required|string|max:100',
+                'description'        => 'required|string',
+                'type_id'            => 'required|integer',
+                'location_id'        => 'sometimes|integer',
+                'start_date'         => 'sometimes|required|date_format:U',
+                'end_date'           => 'sometimes|required_with:start_date|date_format:U|after:start_date',
+                'track_id'           => 'required|integer',
+                'rsvp_link'          => 'sometimes|url',
+                'head_count'         => 'sometimes|integer',
+                'social_description' => 'sometimes|string|max:100',
+                'allow_feedback'     => 'sometimes|boolean',
+                'tags'               => 'sometimes|string_array',
+                'sponsors'           => 'sometimes|int_array',
+                // presentation rules
+                'attendees_expected_learnt' =>  'sometimes|string|max:100',
+                'feature_cloud'             =>  'sometimes|boolean',
+                'to_record'                 =>  'sometimes|boolean',
+                'speakers'                  =>  'sometimes|int_array',
+                'moderator_speaker_id'      =>  'sometimes|integer',
+                // group event
+                'groups'                    =>  'sometimes|int_array',
             );
 
             // Creates a Validator instance and validates the data.
@@ -348,16 +359,28 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $data = Input::json();
 
             $rules = [
-                'title'           => 'sometimes|required|string|max:100',
-                'description'     => 'sometimes|string',
-                'social_summary'  => 'sometimes|string|max:100',
-                'location_id'     => 'sometimes|integer',
-                'start_date'      => 'sometimes|date_format:U',
-                'end_date'        => 'sometimes|required_with:start_date|date_format:U|after:start_date',
-                'allow_feedback'  => 'sometimes|boolean',
-                'type_id'         => 'sometimes|required|integer',
-                'track_id'        => 'sometimes|required|integer',
-                'tags'            => 'sometimes|string_array',
+                // summit event rules
+                'title'                     => 'sometimes|string|max:100',
+                'description'               => 'sometimes|string',
+                'rsvp_link'                 => 'sometimes|url',
+                'head_count'                => 'sometimes|integer',
+                'social_description'        => 'sometimes|string|max:100',
+                'location_id'               => 'sometimes|integer',
+                'start_date'                => 'sometimes|date_format:U',
+                'end_date'                  => 'sometimes|required_with:start_date|date_format:U|after:start_date',
+                'allow_feedback'            => 'sometimes|boolean',
+                'type_id'                   => 'sometimes|required|integer',
+                'track_id'                  => 'sometimes|required|integer',
+                'tags'                      => 'sometimes|string_array',
+                'sponsors'                  => 'sometimes|int_array',
+                // presentation rules
+                'attendees_expected_learnt' =>  'sometimes|string|max:100',
+                'feature_cloud'             =>  'sometimes|boolean',
+                'to_record'                 =>  'sometimes|boolean',
+                'speakers'                  =>  'sometimes|int_array',
+                'moderator_speaker_id'      =>  'sometimes|integer',
+                // group event
+                'groups'                    =>  'sometimes|int_array',
             ];
 
             // Creates a Validator instance and validates the data.
@@ -932,6 +955,141 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         }
         catch (Exception $ex)
         {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function unPublishEvents($summit_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            if(!Request::isJson()) return $this->error403();
+
+            $data = Input::json();
+
+            $rules = [
+                 'events' => 'required|int_array',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $this->service->unPublishEvents($summit, $data->all());
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function updateAndPublishEvents($summit_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            if(!Request::isJson()) return $this->error403();
+
+            $data = Input::json();
+
+            $rules = [
+                 'events' => 'required|event_dto_publish_array',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $this->service->updateAndPublishEvents($summit, $data->all());
+
+            return $this->updated();
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function updateEvents($summit_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            if(!Request::isJson()) return $this->error403();
+
+            $data = Input::json();
+
+            $rules = [
+                'events' => 'required|event_dto_array',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $this->service->updateEvents($summit, $data->all());
+
+            return $this->updated();
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

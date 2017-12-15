@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use models\main\Group;
 use models\summit\ISummitEventRepository;
 use models\summit\SummitEvent;
 use App\Repositories\SilverStripeDoctrineRepository;
@@ -33,6 +34,7 @@ final class DoctrineSummitEventRepository
     extends SilverStripeDoctrineRepository
     implements ISummitEventRepository
 {
+
 
     private static $forbidded_classes = [
         'models\\summit\\SummitGroupEvent'
@@ -67,6 +69,7 @@ final class DoctrineSummitEventRepository
     protected function getFilterMappings()
     {
         return [
+            'id'             => 'e.id:json_int',
             'title'          => 'e.title:json_string',
             'abstract'       => 'e.abstract:json_string',
             'social_summary' => 'e.social_summary:json_string',
@@ -199,8 +202,14 @@ final class DoctrineSummitEventRepository
             $query = $query->leftJoin('sp.registration_request', "sprr", Join::LEFT_JOIN);
         }
 
+        $can_view_private_events = self::isCurrentMemberOnGroup(Group::SummitAdministrators);
+
+        if(!$can_view_private_events){
+            $query = $query
+                ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')");
+        }
+
         $query = $query
-            ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')")
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 
@@ -283,8 +292,15 @@ final class DoctrineSummitEventRepository
             $query = $query->leftJoin('sp.registration_request', "sprr", Join::LEFT_JOIN);
         }
 
+
+        $can_view_private_events = self::isCurrentMemberOnGroup(Group::SummitAdministrators);
+
+        if(!$can_view_private_events){
+            $query = $query
+                ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')");
+        }
+
         $query = $query
-            ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')")
             ->setFirstResult($paging_info->getOffset())
             ->setMaxResults($paging_info->getPerPage());
 

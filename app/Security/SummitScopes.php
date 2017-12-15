@@ -24,4 +24,8 @@ final class SummitScopes
 
     const WriteSummitData   = '%s/summits/write';
     const WriteSpeakersData = '%s/speakers/write';
+
+    const PublishEventData  = '%s/summits/publish-event';
+    const WriteEventData    = '%s/summits/write-event';
+    const WriteVideoData    = '%s/summits/write-videos';
 }

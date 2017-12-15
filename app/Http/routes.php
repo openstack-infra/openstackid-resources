@@ -194,6 +194,11 @@ Route::group([
             Route::group(array('prefix' => 'events'), function () {
 
                 Route::get('', 'OAuth2SummitEventsApiController@getEvents');
+                // bulk actions
+                Route::delete('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvents']);
+                Route::put('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@updateAndPublishEvents']);
+                Route::put('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@updateEvents']);
+
                 Route::group(array('prefix' => 'unpublished'), function () {
                     Route::get('', 'OAuth2SummitEventsApiController@getUnpublishedEvents');
                     //Route::get('{event_id}', 'OAuth2SummitEventsApiController@getUnpublisedEvent');
