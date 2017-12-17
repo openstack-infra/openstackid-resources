@@ -38,20 +38,20 @@ final class OrderParser
             {
                 $field = trim($field,'+');
                 if(!in_array($field, $allowed_fields))
-                    throw new OrderParserException(sprintf("filter by field %s is not allowed", $field));
+                    throw new OrderParserException(sprintf("order by field %s is not allowed", $field));
                 $element = OrderElement::buildAscFor($field);
             }
             else if(strpos($field, '-') === 0)
             {
                 $field = trim($field,'-');
                 if(!in_array($field, $allowed_fields))
-                    throw new OrderParserException(sprintf("filter by field %s is not allowed", $field));
+                    throw new OrderParserException(sprintf("order by field %s is not allowed", $field));
                 $element = OrderElement::buildDescFor($field);
             }
             else
             {
                 if(!in_array($field, $allowed_fields))
-                    throw new OrderParserException(sprintf("filter by field %s is not allowed", $field));
+                    throw new OrderParserException(sprintf("order by field %s is not allowed", $field));
                 $element = OrderElement::buildAscFor($field);
             }
             array_push($res, $element);
