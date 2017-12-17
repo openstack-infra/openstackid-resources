@@ -13,10 +13,10 @@
  **/
 class OAuth2SpeakersApiTest extends ProtectedApiTest
 {
+
     public function testPostSpeaker($summit_id = 23)
     {
         $params = [
-
             'id' => $summit_id,
         ];
 
@@ -166,4 +166,99 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         $this->assertTrue($speaker->id > 0);
         return $speaker;
     }
+
+
+    public function testGetCurrentSummitSpeakersOrderByID()
+    {
+        $params = [
+
+            'id'       => 23,
+            'page'     => 1,
+            'per_page' => 10,
+            'order'    => '+id'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitSpeakersApiController@getSpeakers",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $speakers = json_decode($content);
+        $this->assertTrue(!is_null($speakers));
+    }
+
+    public function testGetCurrentSummitSpeakersOrderByEmail()
+    {
+        $params = [
+
+            'id'       => 23,
+            'page'     => 1,
+            'per_page' => 10,
+            'order'    => '+email'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitSpeakersApiController@getSpeakers",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $speakers = json_decode($content);
+        $this->assertTrue(!is_null($speakers));
+    }
+
+    public function testGetCurrentSummitSpeakersByIDMultiple()
+    {
+        $params = [
+
+            'id'       => 23,
+            'page'     => 1,
+            'per_page' => 10,
+            'filter'   => 'id==1,id==19'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitSpeakersApiController@getSpeakers",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $speakers = json_decode($content);
+        $this->assertTrue(!is_null($speakers));
+    }
+
 }

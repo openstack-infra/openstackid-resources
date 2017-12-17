@@ -513,6 +513,42 @@ SQL;
         return $summits;
     }
 
+
+    /**
+     * @return null|string
+     */
+    public function getEmail(){
+        if($this->hasMember()){
+            return $this->member->getEmail();
+        }
+        if($this->hasRegistrationRequest()){
+            return $this->registration_request->getEmail();
+        }
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRegistrationRequest(){
+        return $this->getRegistrationRequestId() > 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRegistrationRequestId()
+    {
+        try{
+            if(is_null($this->registration_request)) return 0;
+            return $this->registration_request->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+
     /**
      * @return PresentationSpeakerSummitAssistanceConfirmationRequest
      */

@@ -24,10 +24,11 @@ final class OrderParser
      * @param string $orders
      * @param array $allowed_fields
      * @return Order
+     * @throws OrderParserException
      */
-    public static function parse($orders, $allowed_fields = array())
+    public static function parse($orders, $allowed_fields = [])
     {
-        $res    = array();
+        $res    = [];
         $orders = explode(',', $orders);
         //default ordering is asc
         foreach($orders as $field)
@@ -36,18 +37,21 @@ final class OrderParser
             if(strpos($field, '+') === 0)
             {
                 $field = trim($field,'+');
-                if(!in_array($field, $allowed_fields)) continue;
+                if(!in_array($field, $allowed_fields))
+                    throw new OrderParserException(sprintf("filter by field %s is not allowed", $field));
                 $element = OrderElement::buildAscFor($field);
             }
             else if(strpos($field, '-') === 0)
             {
                 $field = trim($field,'-');
-                if(!in_array($field, $allowed_fields)) continue;
+                if(!in_array($field, $allowed_fields))
+                    throw new OrderParserException(sprintf("filter by field %s is not allowed", $field));
                 $element = OrderElement::buildDescFor($field);
             }
             else
             {
-                if(!in_array($field, $allowed_fields)) continue;
+                if(!in_array($field, $allowed_fields))
+                    throw new OrderParserException(sprintf("filter by field %s is not allowed", $field));
                 $element = OrderElement::buildAscFor($field);
             }
             array_push($res, $element);

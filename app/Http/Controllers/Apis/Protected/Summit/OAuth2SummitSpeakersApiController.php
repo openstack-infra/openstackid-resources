@@ -141,22 +141,24 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             if (Input::has('filter'))
             {
-                $filter = FilterParser::parse(Input::get('filter'), array
-                (
-                    'first_name' => array('=@', '=='),
-                    'last_name'  => array('=@', '=='),
-                    'email'      => array('=@', '=='),
-                ));
+                $filter = FilterParser::parse(Input::get('filter'), [
+
+                    'first_name' => ['=@', '=='],
+                    'last_name'  => ['=@', '=='],
+                    'email'      => ['=@', '=='],
+                    'id'         => ['=='],
+                ]);
             }
 
             $order = null;
             if (Input::has('order'))
             {
-                $order = OrderParser::parse(Input::get('order'), array
-                (
+                $order = OrderParser::parse(Input::get('order'), [
                     'first_name',
                     'last_name',
-                ));
+                    'id',
+                    'email',
+                ]);
             }
 
             $current_member_id = $this->resource_server_context->getCurrentUserId();
@@ -172,7 +174,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 $result->toArray(Request::input('expand', ''),[],[],['summit_id' => $summit_id, 'published' => true, 'summit' => $summit], $serializer_type)
             );
         }
-        catch(FilterParserException $ex1){
+        catch(ValidationException $ex1){
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
         }
@@ -223,22 +225,24 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             if (Input::has('filter'))
             {
-                $filter = FilterParser::parse(Input::get('filter'), array
-                (
-                    'first_name' => array('=@', '=='),
-                    'last_name'  => array('=@', '=='),
-                    'email'      => array('=@', '=='),
-                ));
+                $filter = FilterParser::parse(Input::get('filter'), [
+
+                    'first_name' => ['=@', '=='],
+                    'last_name'  => ['=@', '=='],
+                    'email'      => ['=@', '=='],
+                    'id'         => ['=='],
+                ]);
             }
 
             $order = null;
             if (Input::has('order'))
             {
-                $order = OrderParser::parse(Input::get('order'), array
-                (
+                $order = OrderParser::parse(Input::get('order'), [
+                    'id',
+                    'email',
                     'first_name',
                     'last_name',
-                ));
+                ]);
             }
 
             $result = $this->speaker_repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
@@ -248,7 +252,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 $result->toArray(Request::input('expand', ''),[],[])
             );
         }
-        catch(FilterParserException $ex1){
+        catch(ValidationException $ex1){
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
         }
@@ -298,6 +302,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 )
             );
 
+        }
+        catch(ValidationException $ex1){
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
         }
         catch(EntityNotFoundException $ex2)
         {

@@ -69,7 +69,7 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
     private $token;
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getEmail()
     {

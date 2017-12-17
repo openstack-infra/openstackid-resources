@@ -52,6 +52,7 @@ final class DoctrineSpeakerRepository
                 'first_name' => 'FirstName',
                 'last_name'  => 'LastName',
                 'email'      => 'Email',
+                'id'         => 'ID'
             ]);
             if(!empty($where_conditions)) {
                 $extra_filters = " WHERE {$where_conditions}";
@@ -63,6 +64,8 @@ final class DoctrineSpeakerRepository
         {
             $extra_orders = $order->toRawSQL(array
             (
+                'id'         => 'ID',
+                'email'      => 'Email',
                 'first_name' => 'FirstName',
                 'last_name'  => 'LastName',
             ));
@@ -155,7 +158,7 @@ FROM (
 	)
 	UNION
 	SELECT
-     S.ID,
+    S.ID,
     S.ClassName,
     S.Created,
     S.LastEdited,
@@ -242,6 +245,7 @@ SQL;
                 'first_name' => 'FirstName',
                 'last_name'  => 'LastName',
                 'email'      => 'Email',
+                'id'         => 'ID'
             ]);
             if(!empty($where_conditions)) {
                 $extra_filters = " WHERE {$where_conditions}";
@@ -255,6 +259,8 @@ SQL;
             (
                 'first_name' => 'FirstName',
                 'last_name'  => 'LastName',
+                'email'      => 'Email',
+                'id'         => 'ID'
             ));
         }
 

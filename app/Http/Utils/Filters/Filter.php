@@ -324,21 +324,25 @@ final class Filter
      */
     public function toRawSQL(array $mappings)
     {
-        $sql = '';
+        $sql            = '';
         $this->bindings = [];
+        $param_prefix   = "param_%s";
+        $param_idx      = 1;
 
         foreach ($this->filters as $filter) {
             if ($filter instanceof FilterElement) {
                 if (isset($mappings[$filter->getField()])) {
+
                     $mapping = $mappings[$filter->getField()];
                     $mapping = explode(':', $mapping);
-                    $value = $filter->getValue();
-                    $op = $filter->getOperator();
+                    $value   = $filter->getValue();
+                    $op      = $filter->getOperator();
                     if (count($mapping) > 1) {
                         $filter->setValue($this->convertValue($value, $mapping[1]));
                     }
-                    $cond = sprintf(' %s %s :%s', $mapping[0], $op, $filter->getField());
-                    $this->bindings[$filter->getField()] = $filter->getValue();
+                    $cond = sprintf(' %s %s :%s', $mapping[0], $op, sprintf($param_prefix, $param_idx));
+                    $this->bindings[sprintf($param_prefix, $param_idx)] = $filter->getValue();
+                    ++$param_idx;
                     if (!empty($sql)) $sql .= " AND ";
                     $sql .= $cond;
                 }
@@ -350,13 +354,14 @@ final class Filter
                     if ($e instanceof FilterElement && isset($mappings[$e->getField()])) {
                         $mapping = $mappings[$e->getField()];
                         $mapping = explode(':', $mapping);
-                        $value = $e->getValue();
-                        $op = $e->getOperator();
+                        $value   = $e->getValue();
+                        $op      = $e->getOperator();
                         if (count($mapping) > 1) {
                             $e->setValue($this->convertValue($value, $mapping[1]));
                         }
-                        $cond = sprintf(" %s %s :%s", $mapping[0], $op, $e->getField());
-                        $this->bindings[$e->getField()] = $e->getValue();
+                        $cond = sprintf(" %s %s :%s", $mapping[0], $op, sprintf($param_prefix, $param_idx));
+                        $this->bindings[sprintf($param_prefix, $param_idx)] = $e->getValue();
+                        ++$param_idx;
                         if (!empty($sql_or)) $sql_or .= " OR ";
                         $sql_or .= $cond;
                     }

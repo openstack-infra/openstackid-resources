@@ -35,6 +35,7 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
         if(!$speaker instanceof PresentationSpeaker) return [];
 
         $values = parent::serialize($expand, $fields, $relations, $params);
+        $values['email'] = $speaker->getEmail();
         $summit = isset($params['summit'])? $params['summit']:null;
 
         if(!is_null($summit)){
