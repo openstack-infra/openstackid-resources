@@ -169,4 +169,31 @@ interface ISummitService
         Summit $summit,
         Filter $filter
     );
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return bool
+     */
+    public function unPublishEvents(Summit $summit, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return bool
+     */
+    public function updateAndPublishEvents(Summit $summit, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return bool
+     */
+    public function updateEvents(Summit $summit, array $data);
 }
