@@ -161,7 +161,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 ]);
             }
 
-            $current_member_id = $this->resource_server_context->getCurrentUserId();
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
             if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
                 if($member->isOnGroup(Group::SummitAdministrators)){
                     $serializer_type = SerializerRegistry::SerializerType_Private;
@@ -195,12 +195,11 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         try {
 
             $values = Input::all();
-
-            $rules = array
-            (
+            $serializer_type = SerializerRegistry::SerializerType_Public;
+            $rules  = [
                 'page'     => 'integer|min:1',
                 'per_page' => 'required_with:page|integer|min:10|max:100',
-            );
+            ];
 
             $validation = Validator::make($values, $rules);
 
@@ -247,9 +246,16 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             $result = $this->speaker_repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
 
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
+                if($member->isOnGroup(Group::SummitAdministrators)){
+                    $serializer_type = SerializerRegistry::SerializerType_Private;
+                }
+            }
+
             return $this->ok
             (
-                $result->toArray(Request::input('expand', ''),[],[])
+                $result->toArray(Request::input('expand', ''),[] ,[], [], $serializer_type)
             );
         }
         catch(ValidationException $ex1){
@@ -284,7 +290,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check($speaker_id, $summit);
             if (is_null($speaker)) return $this->error404();
 
-            $current_member_id = $this->resource_server_context->getCurrentUserId();
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
             if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
                 if($member->isOnGroup(Group::SummitAdministrators)){
                     $serializer_type = SerializerRegistry::SerializerType_Private;

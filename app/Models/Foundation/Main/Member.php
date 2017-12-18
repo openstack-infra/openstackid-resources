@@ -613,10 +613,10 @@ class Member extends SilverstripeBaseModel
          */
 
         $groups = $this->groups->filter(function ($entity) use($code){
-            return $entity->getCode() == $code;
+            return strtolower(trim($entity->getCode())) == strtolower(trim($code));
         });
 
-        return !is_null($groups) && $groups != false && $groups->count() > 0 ? $groups[0]: null;
+        return !is_null($groups) && $groups != false && $groups->count() > 0 ? $groups->first(): null;
     }
 
     /**
