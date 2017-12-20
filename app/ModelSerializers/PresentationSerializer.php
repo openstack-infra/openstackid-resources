@@ -26,6 +26,7 @@ class PresentationSerializer extends SummitEventSerializer
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
         'ToRecord'                => 'to_record:json_boolean',
         'FeatureCloud'            => 'feature_cloud:json_boolean',
+        'StatusNice'              => 'status:json_string',
     ];
 
     protected static $allowed_fields = [
@@ -37,6 +38,7 @@ class PresentationSerializer extends SummitEventSerializer
         'attendees_expected_learnt',
         'to_record',
         'feature_cloud',
+        'status',
     ];
 
     protected static $allowed_relations = [

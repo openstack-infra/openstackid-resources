@@ -24,12 +24,12 @@ use DateTime;
 class AssetsSyncRequest extends SilverstripeBaseModel
 {
     /**
-     * @ORM\Column(name="`From`", type="string")
+     * @ORM\Column(name="`Source`", type="string")
      */
     private $from;
 
     /**
-     * @ORM\Column(name="`To`", type="string")
+     * @ORM\Column(name="`Destination`", type="string")
      */
     private $to;
 

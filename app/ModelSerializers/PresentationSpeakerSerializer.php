@@ -27,7 +27,6 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
         'Bio'         => 'bio:json_string',
         'IRCHandle'   => 'irc:json_string',
         'TwitterName' => 'twitter:json_string',
-        'StatusNice'  => 'status:json_string',
     ];
 
     protected static $allowed_relations = [
