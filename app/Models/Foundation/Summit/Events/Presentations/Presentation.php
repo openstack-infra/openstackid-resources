@@ -410,6 +410,15 @@ class Presentation extends SummitEvent
     }
 
     /**
+     * @return string
+     */
+    public function getStatusNice() {
+        if ($this->isPublished())
+            return 'Accepted';
+        return $this->status;
+    }
+
+    /**
      * @return mixed
      */
     public function getProgress()

@@ -232,6 +232,7 @@ final class SpeakerService implements ISpeakerService
     public function registerSummitPromoCodeByValue(PresentationSpeaker $speaker, Summit $summit, $reg_code){
 
         return $this->tx_service->transaction(function() use($speaker, $summit, $reg_code) {
+            // check if our speaker already has an assigned code for this summit ...
             $existent_code = $this->registration_code_repository->getBySpeakerAndSummit($speaker, $summit);
 
             // we are trying to update the promo code with another one ....
@@ -241,10 +242,13 @@ final class SpeakerService implements ISpeakerService
                 ));
             }
 
+            // check if reg code is assigned already to another speaker ...
             if ($assigned_code = $this->registration_code_repository->getAssignedCode($reg_code, $summit)) {
-                throw new ValidationException(sprintf(
-                    'there is another speaker with that code for this summit ( speaker id %s )', $assigned_code->getSpeaker()->getId()
-                ));
+
+                if($assigned_code->getSpeaker()->getId() != $speaker->getId())
+                    throw new ValidationException(sprintf(
+                        'there is another speaker with that code for this summit ( speaker id %s )', $assigned_code->getSpeaker()->getId()
+                    ));
             }
 
             $code = $this->registration_code_repository->getNotAssignedCode($reg_code, $summit);

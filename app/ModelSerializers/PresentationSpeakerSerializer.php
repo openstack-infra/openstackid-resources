@@ -21,13 +21,13 @@ use models\summit\PresentationSpeaker;
 class PresentationSpeakerSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-
         'FirstName'   => 'first_name:json_string',
         'LastName'    => 'last_name:json_string',
         'Title'       => 'title:json_string',
         'Bio'         => 'bio:json_string',
         'IRCHandle'   => 'irc:json_string',
         'TwitterName' => 'twitter:json_string',
+        'StatusNice'  => 'status:json_string',
     ];
 
     protected static $allowed_relations = [
@@ -106,7 +106,14 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
                         }
                         $values['moderated_presentations'] = $presentations;
                     }
-
+                    break;
+                    case 'member': {
+                       if($speaker->hasMember()){
+                           unset($values['member_id']);
+                           $values['member'] =  SerializerRegistry::getInstance()->getSerializer($speaker->getMember())->serialize();
+                       }
+                    }
+                    break;
                 }
             }
         }
