@@ -49,10 +49,8 @@ class CheckMeSpeakerStrategy implements ICheckSpeakerStrategy
             if (is_null($member_id)) {
                 return null;
             }
-            $speaker = $summit->getSpeakerByMemberId($member_id);
-        } else {
-            $speaker = $summit->getSpeaker(intval($speaker_id));
+            return $summit->getSpeakerByMemberId($member_id, false);
         }
-        return $speaker;
+        return $summit->getSpeaker(intval($speaker_id, false));
     }
 }

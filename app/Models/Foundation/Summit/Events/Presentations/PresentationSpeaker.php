@@ -246,6 +246,16 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param SpeakerSummitRegistrationPromoCode $code
+     * @return $this
+     */
+    public function removePromoCode(SpeakerSummitRegistrationPromoCode $code){
+        $this->promo_codes->removeElement($code);
+        $code->setSpeaker(null);
+        return $this;
+    }
+
+    /**
      * @param Summit $summit
      * @return SpeakerSummitRegistrationPromoCode
      */

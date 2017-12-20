@@ -20,7 +20,8 @@ use DateTime;
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
  * @ORM\DiscriminatorMap({"EmailCreationRequest" = "EmailCreationRequest",
- *     "SpeakerCreationEmailCreationRequest" = "SpeakerCreationEmailCreationRequest" })
+ *     "SpeakerCreationEmailCreationRequest" = "SpeakerCreationEmailCreationRequest",
+ *     "MemberPromoCodeEmailCreationRequest"= "MemberPromoCodeEmailCreationRequest"})
  * Class EmailCreationRequest
  * @package models\main
  */

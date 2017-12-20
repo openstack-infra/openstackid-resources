@@ -19,6 +19,7 @@ use models\main\File;
 use models\main\IEmailCreationRequestRepository;
 use models\main\IFolderRepository;
 use models\main\IMemberRepository;
+use models\main\MemberPromoCodeEmailCreationRequest;
 use models\main\SpeakerCreationEmailCreationRequest;
 use models\summit\ISpeakerRegistrationRequestRepository;
 use models\summit\ISpeakerRepository;
@@ -120,8 +121,12 @@ final class SpeakerService implements ISpeakerService
                 ("you must provide an email or a member_id in order to create a speaker!");
 
             if(isset($data['member_id']) && intval($data['member_id']) > 0){
-                $member_id        = intval($data['member_id']);
-                $existent_speaker = $this->speaker_repository->getByMember($member_id);
+                $member_id = intval($data['member_id']);
+                $member    =  $this->member_repository->getById($member_id);
+                if(is_null($member))
+                    throw new EntityNotFoundException(sprintf("member id %s does not exists!", $member_id));
+
+                $existent_speaker = $this->speaker_repository->getByMember($member);
                 if(!is_null($existent_speaker))
                     throw new ValidationException
                     (
@@ -132,9 +137,7 @@ final class SpeakerService implements ISpeakerService
                         )
                     );
 
-                $member =  $this->member_repository->getById($member_id);
-                if(is_null($member))
-                    throw new EntityNotFoundException(sprintf("member id %s does not exists!", $member_id));
+
                 $speaker->setMember($member);
             }
 
@@ -236,11 +239,13 @@ final class SpeakerService implements ISpeakerService
             $existent_code = $this->registration_code_repository->getBySpeakerAndSummit($speaker, $summit);
 
             // we are trying to update the promo code with another one ....
-            if ($existent_code && $reg_code !== $existent_code->getCode()) {
+            if (!is_null($existent_code) && $reg_code !== $existent_code->getCode() && $existent_code->isRedeemed()) {
                 throw new ValidationException(sprintf(
-                    'speaker has been already assigned to another registration code (%s)', $existent_code->getCode()
+                    'speaker has been already assigned to another registration code (%s) already redeemed!', $existent_code->getCode()
                 ));
             }
+
+            if(!is_null($existent_code) && $reg_code == $existent_code->getCode()) return $existent_code;
 
             // check if reg code is assigned already to another speaker ...
             if ($assigned_code = $this->registration_code_repository->getAssignedCode($reg_code, $summit)) {
@@ -250,19 +255,28 @@ final class SpeakerService implements ISpeakerService
                         'there is another speaker with that code for this summit ( speaker id %s )', $assigned_code->getSpeaker()->getId()
                     ));
             }
+            // check is not assigned already
+            $new_code = $this->registration_code_repository->getNotAssignedCode($reg_code, $summit);
 
-            $code = $this->registration_code_repository->getNotAssignedCode($reg_code, $summit);
-
-            if (is_null($code)) {
-                //create it
-                $code = new SpeakerSummitRegistrationPromoCode();
-                $code->setSummit($summit);
-                $code->setCode($reg_code);
+            if (is_null($new_code)) {
+                // create it
+                $new_code = new SpeakerSummitRegistrationPromoCode();
+                $new_code->setSummit($summit);
+                $new_code->setCode($reg_code);
+                $new_code->setSourceAdmin();
+                // create email request
+                $email_request = new MemberPromoCodeEmailCreationRequest();
+                $email_request->setPromoCode($new_code);
+                $email_request->setEmail($speaker->getEmail());
+                $email_request->setName($speaker->getFullName());
+                $this->email_creation_request_repository->add($email_request);
             }
 
-            $speaker->addPromoCode($code);
-
-            return $code;
+            $speaker->addPromoCode($new_code);
+            if(!is_null($existent_code)){
+                $speaker->removePromoCode($existent_code);
+            }
+            return $new_code;
         });
     }
 
@@ -303,6 +317,7 @@ final class SpeakerService implements ISpeakerService
     {
        return $this->tx_service->transaction(function() use ($summit, $speaker, $data){
            $member_id = isset($data['member_id']) ? intval($data['member_id']) : null;
+
            if($member_id > 0)
            {
                $member = $this->member_repository->getById($member_id);
@@ -326,12 +341,15 @@ final class SpeakerService implements ISpeakerService
 
            $this->updateSpeakerMainData($speaker, $data);
 
+           // get summit assistance
            $summit_assistance = $speaker->getAssistanceFor($summit);
+           // if does not exists create it
            if(is_null($summit_assistance)){
-               $speaker->addSummitAssistance(
-                   $this->updateSummitAssistance($speaker->buildAssistanceFor($summit), $data)
-               );
+               $summit_assistance = $speaker->buildAssistanceFor($summit);
+               $speaker->addSummitAssistance($summit_assistance);
            }
+
+           $this->updateSummitAssistance($summit_assistance, $data);
 
            $reg_code = isset($data['registration_code']) ? trim($data['registration_code']) : null;
            if(!empty($reg_code)){

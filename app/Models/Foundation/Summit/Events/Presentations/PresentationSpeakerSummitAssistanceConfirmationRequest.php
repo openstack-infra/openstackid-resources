@@ -52,7 +52,6 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
      */
     private $speaker;
 
-
     /**
      * @return string
      */

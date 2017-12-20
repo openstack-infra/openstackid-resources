@@ -316,8 +316,6 @@ Route::group([
         Route::group(['prefix' => '{speaker_id}'], function () {
             Route::post('/photo', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeakerPhoto']);
         });
-
-
     });
 });
 

@@ -146,4 +146,8 @@ class SummitRegistrationPromoCode extends SilverstripeBaseModel
         $this->email_sent = false;
         parent::__construct();
     }
+
+    public function setSourceAdmin(){
+        $this->source = 'ADMIN';
+    }
 }
