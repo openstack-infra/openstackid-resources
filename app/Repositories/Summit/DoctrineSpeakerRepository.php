@@ -186,8 +186,8 @@ FROM (
     S.WillingToPresentVideo,
     S.Notes,
     S.TwitterName,
-    IFNULL(M.FirstName, S.FirstName) AS FirstName,
-    IFNULL(M.Surname,S.LastName) AS LastName,
+    IFNULL(S.FirstName, M.FirstName) AS FirstName,
+	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
     FROM PresentationSpeaker S
@@ -218,8 +218,8 @@ FROM (
     S.WillingToPresentVideo,
     S.Notes,
     S.TwitterName,
-    IFNULL(M.FirstName, S.FirstName) AS FirstName,
-    IFNULL(M.Surname,S.LastName) AS LastName,
+    IFNULL(S.FirstName, M.FirstName) AS FirstName,
+	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
     FROM PresentationSpeaker S
@@ -311,8 +311,8 @@ SQL;
 SELECT COUNT(DISTINCT(ID)) AS QTY
 FROM (
 	SELECT S.ID,
-	IFNULL(M.FirstName, S.FirstName) AS FirstName,
-	IFNULL(M.Surname,S.LastName) AS LastName,
+	IFNULL(S.FirstName, M.FirstName) AS FirstName,
+	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email,R.Email) AS Email
 	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
@@ -352,8 +352,8 @@ FROM (
     S.WillingToPresentVideo,
     S.Notes,
     S.TwitterName,
-    IFNULL(M.FirstName, S.FirstName) AS FirstName,
-    IFNULL(M.Surname,S.LastName) AS LastName,
+    IFNULL(S.FirstName, M.FirstName) AS FirstName,
+	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
     FROM PresentationSpeaker S
