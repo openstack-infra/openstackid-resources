@@ -52,7 +52,7 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
         $summit_id                         = isset($params['summit_id'])? intval($params['summit_id']):null;
         $published                         = isset($params['published'])? intval($params['published']):true;
         if(!is_null($summit_id)) {
-            $values['presentations'] = $speaker->getPresentationIds($summit_id, $published);
+            $values['presentations']           = $speaker->getPresentationIds($summit_id, $published);
             $values['moderated_presentations'] = $speaker->getModeratedPresentationIds($summit_id, $published);
         }
 

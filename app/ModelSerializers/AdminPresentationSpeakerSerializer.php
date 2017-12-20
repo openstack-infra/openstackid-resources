@@ -34,9 +34,9 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
         $speaker                           = $this->object;
         if(!$speaker instanceof PresentationSpeaker) return [];
 
-        $values = parent::serialize($expand, $fields, $relations, $params);
+        $values          = parent::serialize($expand, $fields, $relations, $params);
         $values['email'] = $speaker->getEmail();
-        $summit = isset($params['summit'])? $params['summit']:null;
+        $summit          = isset($params['summit'])? $params['summit']:null;
 
         if(!is_null($summit)){
             $summit_assistance = $speaker->getAssistanceFor($summit);
@@ -47,12 +47,16 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
             if($registration_code){
                 $values['registration_code'] = SerializerRegistry::getInstance()->getSerializer($registration_code)->serialize();
             }
+
+            $values['all_presentations']           = $speaker->getPresentationIds($summit->getId() ,false);
+            $values['all_moderated_presentations'] = $speaker->getModeratedPresentationIds($summit->getId(), false);
         }
 
         if (!empty($expand)) {
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {
                     case 'presentations': {
+                        if(is_null($summit)) continue;
                         $presentations = [];
                         foreach ($speaker->getPresentations($summit->getId(), false) as $p) {
                             $presentations[] = SerializerRegistry::getInstance()->getSerializer($p)->serialize();

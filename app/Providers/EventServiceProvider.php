@@ -98,8 +98,8 @@ INSERT INTO AssetsSyncRequest
 ClassName,
 Created,
 LastEdited,
-`From`,
-`To`,
+`Origin`,
+`Destination`,
 Processed,
 ProcessedDate
 )
