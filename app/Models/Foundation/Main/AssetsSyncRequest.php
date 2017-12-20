@@ -24,7 +24,7 @@ use DateTime;
 class AssetsSyncRequest extends SilverstripeBaseModel
 {
     /**
-     * @ORM\Column(name="`Source`", type="string")
+     * @ORM\Column(name="`Origin`", type="string")
      */
     private $from;
 

@@ -1207,7 +1207,7 @@ final class SummitService implements ISummitService
             }
 
             $uploader   = new FileUploader($this->folder_repository);
-            $attachment = $uploader->build($file, 'summit-event-attachments');
+            $attachment = $uploader->build($file, 'summit-event-attachments', true);
             $event->setAttachment($attachment);
 
             return $attachment;

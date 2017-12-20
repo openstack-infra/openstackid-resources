@@ -35,10 +35,11 @@ final class FileUploader
 
     /**
      * @param UploadedFile $file
-     * @param $folder_name
+     * @param string $folder_name
+     * @param bool $is_image
      * @return File
      */
-    public function build(UploadedFile $file, $folder_name){
+    public function build(UploadedFile $file, $folder_name, $is_image = false){
         $attachment = new File();
         $local_path = Storage::putFileAs(sprintf('/public/%s', $folder_name), $file, $file->getClientOriginalName());
         $folder     = $this->folder_repository->getFolderByName($folder_name);
@@ -47,6 +48,8 @@ final class FileUploader
         $attachment->setFilename(sprintf("assets/%s/%s",$folder_name, $file->getClientOriginalName()));
         $attachment->setTitle(str_replace(array('-','_'),' ', preg_replace('/\.[^.]+$/', '', $file->getClientOriginalName())));
         $attachment->setShowInSearch(true);
+        if($is_image)
+            $attachment->setImage();
         Event::fire(new FileCreated($local_path, $file->getClientOriginalName(), $folder_name));
         return $attachment;
     }

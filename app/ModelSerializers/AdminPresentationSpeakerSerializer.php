@@ -48,6 +48,27 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
                 $values['registration_code'] = SerializerRegistry::getInstance()->getSerializer($registration_code)->serialize();
             }
         }
+
+        if (!empty($expand)) {
+            foreach (explode(',', $expand) as $relation) {
+                switch (trim($relation)) {
+                    case 'presentations': {
+                        $presentations = [];
+                        foreach ($speaker->getPresentations($summit->getId(), false) as $p) {
+                            $presentations[] = SerializerRegistry::getInstance()->getSerializer($p)->serialize();
+                        }
+                        $values['all_presentations'] = $presentations;
+
+                        $moderated_presentations = [];
+                        foreach ($speaker->getModeratedPresentations($summit->getId(), false) as $p) {
+                            $moderated_presentations[] = SerializerRegistry::getInstance()->getSerializer($p)->serialize();
+                        }
+                        $values['all_moderated_presentations'] = $presentations;
+                    }
+                    break;
+                }
+            }
+        }
         return $values;
     }
 }

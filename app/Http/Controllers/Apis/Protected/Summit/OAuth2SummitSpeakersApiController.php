@@ -458,7 +458,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 return $this->error412(array('file param not set!'));
             }
 
-            $res = $this->service->addSpeakerAttachment($speaker_id, $file);
+            $res = $this->service->addSpeakerPhoto($speaker_id, $file);
 
             return !is_null($res) ? $this->created($res->getId()) : $this->error400();
         }

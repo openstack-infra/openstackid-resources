@@ -58,5 +58,5 @@ interface ISpeakerService
      * @throws EntityNotFoundException
      * @return File
      */
-    public function addSpeakerAttachment($speaker_id, UploadedFile $file,  $max_file_size = 10485760);
+    public function addSpeakerPhoto($speaker_id, UploadedFile $file,  $max_file_size = 10485760);
 }

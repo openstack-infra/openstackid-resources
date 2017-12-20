@@ -32,6 +32,11 @@ class File extends SilverstripeBaseModel
     private $title;
 
     /**
+     * @ORM\Column(name="ClassName", type="string")
+     */
+    private $class_name;
+
+    /**
      * @ORM\Column(name="Content", type="string")
      */
     private $content;
@@ -171,5 +176,15 @@ class File extends SilverstripeBaseModel
     public function setOwner($owner)
     {
         $this->owner = $owner;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->class_name = 'File';
+    }
+
+    public function setImage(){
+        $this->class_name = 'Image';
     }
 }

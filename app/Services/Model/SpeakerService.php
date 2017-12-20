@@ -349,7 +349,7 @@ final class SpeakerService implements ISpeakerService
      * @throws EntityNotFoundException
      * @return File
      */
-    public function addSpeakerAttachment($speaker_id, UploadedFile $file, $max_file_size = 10485760)
+    public function addSpeakerPhoto($speaker_id, UploadedFile $file, $max_file_size = 10485760)
     {
         return $this->tx_service->transaction(function () use ($speaker_id, $file, $max_file_size) {
 
@@ -371,7 +371,7 @@ final class SpeakerService implements ISpeakerService
             }
 
             $uploader = new FileUploader($this->folder_repository);
-            $photo    = $uploader->build($file, 'profile-images');
+            $photo    = $uploader->build($file, 'profile-images', true);
             $speaker->setPhoto($photo);
 
             return $photo;
