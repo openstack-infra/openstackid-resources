@@ -359,11 +359,12 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
      * @return SummitLocationImage
      */
     public function getImage($image_id){
-        return $this->images
+        $res = $this->images
             ->matching
             (
                 Criteria::create()->where(Criteria::expr()->eq("id", $image_id))
 
             )->first();
+        return $res === false ? null : $res;
     }
 }

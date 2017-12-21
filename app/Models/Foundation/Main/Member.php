@@ -609,7 +609,8 @@ class Member extends SilverstripeBaseModel
          * way
          * $criteria = Criteria::create();
          * $criteria->where(Criteria::expr()->eq('code', $code));
-         * return $this->groups->matching($criteria)->first();
+         * $res = $this->groups->matching($criteria)->first();
+         * return $res === false ? null : $res;
          */
 
         $groups = $this->groups->filter(function ($entity) use($code){

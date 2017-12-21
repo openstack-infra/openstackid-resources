@@ -262,7 +262,8 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function getPromoCodeFor(Summit $summit){
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('summit', $summit));
-        return $this->promo_codes->matching($criteria)->first();
+        $res = $this->promo_codes->matching($criteria)->first();
+        return $res === false ? null : $res;
     }
 
     /**
@@ -462,7 +463,8 @@ class PresentationSpeaker extends SilverstripeBaseModel
     {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('summit', $summit));
-        return $this->summit_assistances->matching($criteria)->first();
+        $res      = $this->summit_assistances->matching($criteria)->first();
+        return $res === false ? null : $res;
     }
 
     /**

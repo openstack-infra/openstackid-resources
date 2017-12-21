@@ -297,7 +297,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'tags'               => 'sometimes|string_array',
                 'sponsors'           => 'sometimes|int_array',
                 // presentation rules
-                'attendees_expected_learnt' =>  'sometimes|string|max:100',
+                'attendees_expected_learnt' =>  'sometimes|string|max:1000',
                 'feature_cloud'             =>  'sometimes|boolean',
                 'to_record'                 =>  'sometimes|boolean',
                 'speakers'                  =>  'sometimes|int_array',
@@ -374,7 +374,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'tags'                      => 'sometimes|string_array',
                 'sponsors'                  => 'sometimes|int_array',
                 // presentation rules
-                'attendees_expected_learnt' =>  'sometimes|string|max:100',
+                'attendees_expected_learnt' =>  'sometimes|string|max:1000',
                 'feature_cloud'             =>  'sometimes|boolean',
                 'to_record'                 =>  'sometimes|boolean',
                 'speakers'                  =>  'sometimes|int_array',

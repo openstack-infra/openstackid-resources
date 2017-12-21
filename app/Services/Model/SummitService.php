@@ -43,7 +43,6 @@ use models\summit\ISummitAttendeeRepository;
 use models\summit\ISummitAttendeeTicketRepository;
 use models\summit\ISummitEntityEventRepository;
 use models\summit\ISummitEventRepository;
-use models\summit\ISummitEventType;
 use models\summit\Presentation;
 use models\summit\PresentationType;
 use models\summit\Summit;
@@ -575,13 +574,22 @@ final class SummitService implements ISummitService
      * @return bool
      */
     private function canPerformEventTypeTransition(SummitEventType $old_event_type, SummitEventType $event_type){
-        // cant upgrade from raw event to presentation and vice versa
-        if($old_event_type->getClassName() != $event_type->getClassName()) return false;
 
-        if(!(SummitEventType::isPrivate($old_event_type->getType()) && SummitEventType::isPrivate($event_type->getType())))
+        if($old_event_type->getId() == $event_type->getId()) return true;
+        // cant upgrade from raw event to presentation and vice versa
+        if($old_event_type->getClassName() != $event_type->getClassName()) {
+            return false;
+        }
+
+        $old_is_private = SummitEventType::isPrivate($old_event_type->getType());
+        $new_is_private = SummitEventType::isPrivate($event_type->getType());
+        if((!$old_is_private && $new_is_private) || ($old_is_private && !$new_is_private))
             return false;
 
-        if(!($old_event_type->isAllowsAttachment() && $event_type->isAllowsAttachment()))
+        $old_allow_attach = $old_event_type->isAllowsAttachment();
+        $new_allow_attach = $event_type->isAllowsAttachment();
+
+         if((!$old_allow_attach && $new_allow_attach) || ($old_allow_attach && !$new_allow_attach))
             return false;
 
         return true;

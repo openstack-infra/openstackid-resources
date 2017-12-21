@@ -88,7 +88,7 @@ class SummitVenue extends SummitGeoLocatedLocation
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($room_id)));
         $room = $this->rooms->matching($criteria)->first();
-        return $room === false ? null:$room;
+        return $room === false ? null : $room;
     }
 
     /**

@@ -294,9 +294,10 @@ class Presentation extends SummitEvent
      * @return PresentationVideo
      */
     public function getVideoBy($video_id){
-        return $this->materials
+        $res = $this->materials
             ->filter(function( $element) use($video_id) { return $element instanceof PresentationVideo && $element->getId() == $video_id; })
             ->first();
+        return $res === false ? null : $res;
     }
 
     /**
