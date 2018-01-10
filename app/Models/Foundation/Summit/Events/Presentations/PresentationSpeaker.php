@@ -71,6 +71,42 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $created_from_api;
 
     /**
+     * @ORM\Column(name="AvailableForBureau", type="boolean")
+     */
+    private $available_for_bureau;
+
+    /**
+     * @ORM\Column(name="FundedTravel", type="boolean")
+     */
+    private $funded_travel;
+
+    /**
+     * @ORM\Column(name="WillingToTravel", type="boolean")
+     */
+    private $willing_to_travel;
+
+    /**
+     * @ORM\Column(name="Country", type="string")
+     */
+    private $country;
+
+    /**
+     * @ORM\Column(name="WillingToPresentVideo", type="boolean")
+     */
+    private $willing_to_presentVideo;
+
+    /**
+     * @ORM\Column(name="Notes", type="string")
+     */
+    private $notes;
+
+
+    /**
+     * @ORM\Column(name="OrgHasCloud", type="boolean")
+     */
+    private $org_has_cloud;
+
+    /**
      * @ORM\ManyToOne(targetEntity="SpeakerRegistrationRequest", cascade={"persist"})
      * @ORM\JoinColumn(name="RegistrationRequestID", referencedColumnName="ID")
      * @var SpeakerRegistrationRequest
@@ -116,7 +152,51 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $member;
 
     /**
-     * @return mixed
+     * @ORM\OneToMany(targetEntity="SpeakerExpertise", mappedBy="speaker", cascade={"persist"})
+     * @var SpeakerExpertise[]
+     */
+    private $areas_of_expertise;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SpeakerPresentationLink", mappedBy="speaker", cascade={"persist"})
+     * @var SpeakerPresentationLink[]
+     */
+    private $other_presentation_links;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SpeakerTravelPreference", mappedBy="speaker", cascade={"persist"})
+     * @var SpeakerTravelPreference[]
+     */
+    private $travel_preferences;
+
+    /**
+     * @ORM\OneToMany(targetEntity="SpeakerLanguage", mappedBy="speaker", cascade={"persist"})
+     * @var SpeakerLanguage[]
+     */
+    private $languages;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="SpeakerOrganizationalRole", cascade={"persist"})
+     * @ORM\JoinTable(name="PresentationSpeaker_OrganizationalRoles",
+     *      joinColumns={@ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="SpeakerOrganizationalRoleID", referencedColumnName="ID")}
+     *      )
+     * @var SpeakerOrganizationalRole[]
+     */
+    protected $organizational_roles;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="SpeakerOrganizationalRole", cascade={"persist"})
+     * @ORM\JoinTable(name="PresentationSpeaker_ActiveInvolvements",
+     *      joinColumns={@ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="SpeakerActiveInvolvementID", referencedColumnName="ID")}
+     *      )
+     * @var SpeakerActiveInvolvement[]
+     */
+    protected $active_involvements;
+
+    /**
+     * @return string
      */
     public function getFirstName()
     {
@@ -215,10 +295,16 @@ class PresentationSpeaker extends SilverstripeBaseModel
     {
         parent::__construct();
 
-        $this->presentations           = new ArrayCollection;
-        $this->moderated_presentations = new ArrayCollection;
-        $this->summit_assistances      = new ArrayCollection;
-        $this->promo_codes             = new ArrayCollection;
+        $this->presentations            = new ArrayCollection;
+        $this->moderated_presentations  = new ArrayCollection;
+        $this->summit_assistances       = new ArrayCollection;
+        $this->promo_codes              = new ArrayCollection;
+        $this->areas_of_expertise       = new ArrayCollection;
+        $this->other_presentation_links = new ArrayCollection;
+        $this->travel_preferences       = new ArrayCollection;
+        $this->languages                = new ArrayCollection;
+        $this->organizational_roles     = new ArrayCollection;
+        $this->active_involvements      = new ArrayCollection;
     }
 
     /**
@@ -227,7 +313,6 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function addPresentation(Presentation $presentation){
         $this->presentations->add($presentation);
     }
-
 
     public function clearPresentations(){
         foreach($this->presentations as $presentation){
@@ -253,6 +338,13 @@ class PresentationSpeaker extends SilverstripeBaseModel
         $this->promo_codes->removeElement($code);
         $code->setSpeaker(null);
         return $this;
+    }
+
+    /**
+     * @return ArrayCollection|SpeakerSummitRegistrationPromoCode[]
+     */
+    public function getPromoCodes(){
+        return $this->promo_codes;
     }
 
     /**
@@ -320,6 +412,17 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getAllPresentationIds($published_ones = true)
+    {
+        return $this->presentations(null, $published_ones)->map(function($entity)  {
+            return $entity->getId();
+        })->toArray();
+    }
+
+    /**
      * @param null $summit_id
      * @param bool|true $published_ones
      * @return array
@@ -327,6 +430,17 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function getPresentations($summit_id, $published_ones = true)
     {
         return $this->presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity;
+        })->toArray();
+    }
+
+    /**
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getAllPresentations($published_ones = true)
+    {
+        return $this->presentations(null, $published_ones)->map(function($entity)  {
             return $entity;
         })->toArray();
     }
@@ -345,6 +459,17 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getAllModeratedPresentationIds($published_ones = true)
+    {
+        return $this->moderated_presentations(null, $published_ones)->map(function($entity)  {
+            return $entity->getId();
+        })->toArray();
+    }
+
+    /**
      * @param null $summit_id
      * @param bool|true $published_ones
      * @return array
@@ -352,6 +477,17 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function getModeratedPresentations($summit_id, $published_ones = true)
     {
         return $this->moderated_presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity;
+        })->toArray();
+    }
+
+    /**
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getAllModeratedPresentations($published_ones = true)
+    {
+        return $this->moderated_presentations(null, $published_ones)->map(function($entity)  {
             return $entity;
         })->toArray();
     }
@@ -624,4 +760,165 @@ SQL;
     public function inserted($args){
         Event::fire(new PresentationSpeakerCreated($this, $args));
     }
+
+    /**
+     * @return bool
+     */
+    public function isAvailableForBureau()
+    {
+        return $this->available_for_bureau;
+    }
+
+    /**
+     * @param bool $available_for_bureau
+     */
+    public function setAvailableForBureau($available_for_bureau)
+    {
+        $this->available_for_bureau = $available_for_bureau;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFundedTravel()
+    {
+        return $this->funded_travel;
+    }
+
+    /**
+     * @param bool $funded_travel
+     */
+    public function setFundedTravel($funded_travel)
+    {
+        $this->funded_travel = $funded_travel;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWillingToTravel()
+    {
+        return $this->willing_to_travel;
+    }
+
+    /**
+     * @param bool $willing_to_travel
+     */
+    public function setWillingToTravel($willing_to_travel)
+    {
+        $this->willing_to_travel = $willing_to_travel;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+    /**
+     * @param string $country
+     */
+    public function setCountry($country)
+    {
+        $this->country = $country;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWillingToPresentVideo()
+    {
+        return $this->willing_to_presentVideo;
+    }
+
+    /**
+     * @param bool $willing_to_presentVideo
+     */
+    public function setWillingToPresentVideo($willing_to_presentVideo)
+    {
+        $this->willing_to_presentVideo = $willing_to_presentVideo;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNotes()
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @param string $notes
+     */
+    public function setNotes($notes)
+    {
+        $this->notes = $notes;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOrgHasCloud()
+    {
+        return $this->org_has_cloud;
+    }
+
+    /**
+     * @param bool $org_has_cloud
+     */
+    public function setOrgHasCloud($org_has_cloud)
+    {
+        $this->org_has_cloud = $org_has_cloud;
+    }
+
+    /**
+     * @return SpeakerExpertise[]
+     */
+    public function getAreasOfExpertise()
+    {
+        return $this->areas_of_expertise;
+    }
+
+    /**
+     * @return SpeakerPresentationLink[]
+     */
+    public function getOtherPresentationLinks()
+    {
+        return $this->other_presentation_links;
+    }
+
+    /**
+     * @return SpeakerTravelPreference[]
+     */
+    public function getTravelPreferences()
+    {
+        return $this->travel_preferences;
+    }
+
+    /**
+     * @return SpeakerLanguage[]
+     */
+    public function getLanguages()
+    {
+        return $this->languages;
+    }
+
+    /**
+     * @return SpeakerOrganizationalRole[]
+     */
+    public function getOrganizationalRoles()
+    {
+        return $this->organizational_roles;
+    }
+
+    /**
+     * @return SpeakerActiveInvolvement[]
+     */
+    public function getActiveInvolvements()
+    {
+        return $this->active_involvements;
+    }
+
 }

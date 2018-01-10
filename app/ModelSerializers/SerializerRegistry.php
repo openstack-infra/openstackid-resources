@@ -106,6 +106,13 @@ final class SerializerRegistry
                 self::SerializerType_Private =>  AdminPresentationSpeakerSerializer::class
             ];
 
+        $this->registry['SpeakerExpertise']           = SpeakerExpertiseSerializer::class;
+        $this->registry['SpeakerLanguage']            = SpeakerLanguageSerializer::class;
+        $this->registry['SpeakerTravelPreference']    = SpeakerTravelPreferenceSerializer::class;
+        $this->registry['SpeakerPresentationLink']    = SpeakerPresentationLinkSerializer::class;
+        $this->registry['SpeakerActiveInvolvement']   = SpeakerActiveInvolvementSerializer::class;
+        $this->registry['SpeakerOrganizationalRole']  = SpeakerOrganizationalRoleSerializer::class;
+
         $this->registry['SummitEventFeedback']         = SummitEventFeedbackSerializer::class;
         $this->registry['SummitAttendee']              = SummitAttendeeSerializer::class;
         $this->registry['SummitMemberSchedule']        = SummitMemberScheduleSerializer::class;
@@ -171,12 +178,12 @@ final class SerializerRegistry
         $this->registry['CloudServiceOffered']                = CloudServiceOfferedSerializer::class;
         // software
 
-        $this->registry['OpenStackComponent'] = OpenStackComponentSerializer::class;
-        $this->registry['OpenStackRelease']   = OpenStackReleaseSerializer::class;
+        $this->registry['OpenStackComponent']                 = OpenStackComponentSerializer::class;
+        $this->registry['OpenStackRelease']                   = OpenStackReleaseSerializer::class;
 
         // ccla
 
-        $this->registry['Team']               = TeamSerializer::class;
+        $this->registry['Team']                               = TeamSerializer::class;
     }
 
     /**

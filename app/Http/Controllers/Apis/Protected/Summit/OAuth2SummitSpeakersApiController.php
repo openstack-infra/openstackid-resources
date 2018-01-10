@@ -26,6 +26,7 @@ use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
+use ModelSerializers\ISerializerTypeSelector;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISpeakerService;
 use services\model\ISummitService;
@@ -65,6 +66,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     private $member_repository;
 
+    /**
+     * @var ISerializerTypeSelector
+     */
+    private $serializer_type_selector;
 
     /**
      * OAuth2SummitSpeakersApiController constructor.
@@ -74,6 +79,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param IEventFeedbackRepository $event_feedback_repository
      * @param IMemberRepository $member_repository
      * @param ISpeakerService $service
+     * @param ISerializerTypeSelector $serializer_type_selector
      * @param IResourceServerContext $resource_server_context
      */
     public function __construct
@@ -84,6 +90,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         IEventFeedbackRepository $event_feedback_repository,
         IMemberRepository $member_repository,
         ISpeakerService $service,
+        ISerializerTypeSelector $serializer_type_selector,
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
@@ -93,6 +100,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         $this->member_repository         = $member_repository;
         $this->event_feedback_repository = $event_feedback_repository;
         $this->service                   = $service;
+        $this->serializer_type_selector  = $serializer_type_selector;
     }
 
     /**
@@ -106,7 +114,6 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     public function getSpeakers($summit_id)
     {
         try {
-            $serializer_type = SerializerRegistry::SerializerType_Public;
             $summit          = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
@@ -161,13 +168,8 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 ]);
             }
 
-            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
-            if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
-                if($member->isOnGroup(Group::SummitAdministrators)){
-                    $serializer_type = SerializerRegistry::SerializerType_Private;
-                }
-            }
-            $result = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+            $result          = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
 
             return $this->ok
             (
@@ -190,13 +192,16 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
-
+    /**
+     * get all speakers without summit
+     * @return mixed
+     */
     public function getAll(){
         try {
 
-            $values = Input::all();
-            $serializer_type = SerializerRegistry::SerializerType_Public;
-            $rules  = [
+            $values          = Input::all();
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+            $rules           = [
                 'page'     => 'integer|min:1',
                 'per_page' => 'required_with:page|integer|min:10|max:100',
             ];
@@ -246,13 +251,6 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             $result = $this->speaker_repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
 
-            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
-            if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
-                if($member->isOnGroup(Group::SummitAdministrators)){
-                    $serializer_type = SerializerRegistry::SerializerType_Private;
-                }
-            }
-
             return $this->ok
             (
                 $result->toArray(Request::input('expand', ''),[] ,[], [], $serializer_type)
@@ -279,23 +277,17 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $speaker_id
      * @return mixed
      */
-    public function getSpeaker($summit_id, $speaker_id)
+    public function getSummitSpeaker($summit_id, $speaker_id)
     {
         try
         {
-            $serializer_type = SerializerRegistry::SerializerType_Public;
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            $summit          = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check($speaker_id, $summit);
             if (is_null($speaker)) return $this->error404();
 
-            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
-            if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
-                if($member->isOnGroup(Group::SummitAdministrators)){
-                    $serializer_type = SerializerRegistry::SerializerType_Private;
-                }
-            }
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
 
             return $this->ok
             (
@@ -305,6 +297,47 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                     [],
                     [],
                     ['summit_id' => $summit_id, 'published' => true, 'summit' => $summit]
+                )
+            );
+
+        }
+        catch(ValidationException $ex1){
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function getSpeaker($speaker_id)
+    {
+        try
+        {
+
+            $speaker         = $this->speaker_repository->getById($speaker_id);
+            if (is_null($speaker)) return $this->error404();
+
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+
+            return $this->ok
+            (
+                SerializerRegistry::getInstance()->getSerializer($speaker, $serializer_type)->serialize
+                (
+                    Request::input('expand', ''),
+                    [],
+                    [],
+                    []
                 )
             );
 

@@ -14,6 +14,8 @@
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use ModelSerializers\BaseSerializerTypeSelector;
+use ModelSerializers\ISerializerTypeSelector;
 use services\apis\EventbriteAPI;
 use services\apis\FireBaseGCMApi;
 /***
@@ -50,6 +52,8 @@ class ServicesProvider extends ServiceProvider
                 Config::get("server.ss_encrypt_cypher", '')
             );
         });
+
+        App::singleton(ISerializerTypeSelector::class, BaseSerializerTypeSelector::class);
 
         App::singleton('services\model\ISummitService', 'services\model\SummitService');
 

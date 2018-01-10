@@ -192,6 +192,15 @@ class ApiEndpointsSeeder extends Seeder
             ),
             array(
                 'name' => 'get-speaker',
+                'route' => '/api/v1/speakers/{speaker_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ),
+            array(
+                'name' => 'get-speaker-by-summit',
                 'route' => '/api/v1/summits/{id}/speakers/{speaker_id}',
                 'http_method' => 'GET',
                 'scopes' => [
