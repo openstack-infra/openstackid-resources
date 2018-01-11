@@ -655,7 +655,7 @@ SQL;
         $summits = $native_query->getResult();
         if(count($summits) == 0){
             $assistance = $this->getLatestAssistance();
-            if(is_null($assistance)) return [];
+            if(!$assistance) return [];
             return [ $assistance->getSummit() ];
         }
         return $summits;
@@ -882,11 +882,27 @@ SQL;
     }
 
     /**
+     * @param SpeakerExpertise $area_of_expertise
+     */
+    public function addAreaOfExpertise(SpeakerExpertise $area_of_expertise){
+        $this->areas_of_expertise->add($area_of_expertise);
+        $area_of_expertise->setSpeaker($this);
+    }
+
+    /**
      * @return SpeakerPresentationLink[]
      */
     public function getOtherPresentationLinks()
     {
         return $this->other_presentation_links;
+    }
+
+    /**
+     * @param SpeakerPresentationLink $link
+     */
+    public function addOtherPresentationLink(SpeakerPresentationLink $link){
+        $this->other_presentation_links->add($link);
+        $link->setSpeaker($this);
     }
 
     /**
@@ -898,11 +914,27 @@ SQL;
     }
 
     /**
+     * @param SpeakerTravelPreference $travel_preference
+     */
+    public function addTravelPreference(SpeakerTravelPreference $travel_preference){
+        $this->travel_preferences->add($travel_preference);
+        $travel_preference->setSpeaker($this);
+    }
+
+    /**
      * @return SpeakerLanguage[]
      */
     public function getLanguages()
     {
         return $this->languages;
+    }
+
+    /**
+     * @param SpeakerLanguage $language
+     */
+    public function addLanguage(SpeakerLanguage $language){
+        $this->languages->add($language);
+        $language->setSpeaker($this);
     }
 
     /**
@@ -913,12 +945,39 @@ SQL;
         return $this->organizational_roles;
     }
 
+    public function clearOrganizationalRoles(){
+        $this->organizational_roles->clear();
+    }
+
+    public function addOrganizationalRole(SpeakerOrganizationalRole $role){
+        $this->organizational_roles->add($role);
+    }
+
     /**
      * @return SpeakerActiveInvolvement[]
      */
     public function getActiveInvolvements()
     {
         return $this->active_involvements;
+    }
+
+    public function clearActiveInvolvements(){
+        $this->active_involvements->clear();
+    }
+
+    /**
+     * @param SpeakerActiveInvolvement $active_involvement
+     */
+    public function addActiveInvolvement(SpeakerActiveInvolvement $active_involvement){
+        $this->active_involvements->add($active_involvement);
+    }
+
+    /**
+     * @param Presentation $presentation
+     */
+    public function addModeratedPresentation(Presentation $presentation){
+        $this->moderated_presentations->add($presentation);
+        $presentation->setModerator($this);
     }
 
 }

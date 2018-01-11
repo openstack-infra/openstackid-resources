@@ -65,7 +65,6 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         ];
 
         $data = [
-
             'title'             => 'Developer!',
             'first_name'        => 'Sebastian',
             'last_name'         => 'Marcet',
@@ -311,6 +310,47 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
 
         $content = $response->getContent();
         $this->assertResponseStatus(200);
+        $speaker = json_decode($content);
+        $this->assertTrue(!is_null($speaker));
+    }
+
+    public function testMergeSpeakers(){
+
+        $params = [
+            'speaker_from_id' => 3643,
+            'speaker_to_id'   => 1
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $data = [
+            'title'                => 1,
+            'bio'                  => 1,
+            'first_name'           => 1,
+            'last_name'            => 1,
+            'irc'                  => 1,
+            'twitter'              => 1,
+            'pic'                  => 1,
+            'registration_request' => 1,
+            'member'               => 1,
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitSpeakersApiController@merge",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
         $speaker = json_decode($content);
         $this->assertTrue(!is_null($speaker));
     }

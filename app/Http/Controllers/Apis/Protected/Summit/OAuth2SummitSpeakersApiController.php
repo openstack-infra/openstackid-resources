@@ -514,4 +514,39 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $speaker_from_id
+     * @param $speaker_to_id
+     * @return mixed
+     */
+    public function merge($speaker_from_id, $speaker_to_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $speaker_from = $this->speaker_repository->getById($speaker_from_id);
+            if (is_null($speaker_from)) return $this->error404();
+
+            $speaker_to = $this->speaker_repository->getById($speaker_to_id);
+            if (is_null($speaker_to)) return $this->error404();
+
+            $this->service->merge($speaker_from, $speaker_to, $data->all());
+
+            return $this->updated();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

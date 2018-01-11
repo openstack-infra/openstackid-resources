@@ -395,4 +395,135 @@ final class SpeakerService implements ISpeakerService
             return $photo;
         });
     }
+
+    /**
+     * @param PresentationSpeaker $speaker_from
+     * @param PresentationSpeaker $speaker_to
+     * @param array $data
+     * @return void
+     */
+    public function merge(PresentationSpeaker $speaker_from, PresentationSpeaker $speaker_to, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($speaker_from, $speaker_to, $data) {
+            // bio
+            if (!isset($data['bio'])) throw new ValidationException("bio field is required");
+            $speaker_id = intval($data['bio']);
+            $speaker_to->setBio($speaker_id == $speaker_from->getId() ? $speaker_from->getBio() : $speaker_to->getBio());
+
+            // first_name
+            if (!isset($data['first_name'])) throw new ValidationException("first_name field is required");
+            $speaker_id = intval($data['first_name']);
+            $speaker_to->setFirstName($speaker_id == $speaker_from->getId() ? $speaker_from->getFirstName() : $speaker_to->getFirstName());
+
+            // last_name
+            if (!isset($data['last_name'])) throw new ValidationException("last_name field is required");
+            $speaker_id = intval($data['last_name']);
+            $speaker_to->setLastName($speaker_id == $speaker_from->getId() ? $speaker_from->getLastName() : $speaker_to->getLastName());
+
+            // title
+            if (!isset($data['title'])) throw new ValidationException("title field is required");
+            $speaker_id = intval($data['title']);
+            $speaker_to->setTitle($speaker_id == $speaker_from->getId() ? $speaker_from->getTitle() : $speaker_to->getTitle());
+
+            // irc
+            if (!isset($data['irc'])) throw new ValidationException("irc field is required");
+            $speaker_id = intval($data['irc']);
+            $speaker_to->setIrcHandle($speaker_id == $speaker_from->getId() ? $speaker_from->getIrcHandle() : $speaker_to->getIrcHandle());
+
+            // twitter
+            if (!isset($data['twitter'])) throw new ValidationException("twitter field is required");
+            $speaker_id = intval($data['twitter']);
+            $speaker_to->setTwitterName($speaker_id == $speaker_from->getId() ? $speaker_from->getTwitterName() : $speaker_to->getTwitterName());
+
+            // pic
+            try {
+                if (!isset($data['pic'])) throw new ValidationException("pic field is required");
+                $speaker_id = intval($data['pic']);
+                $speaker_to->setPhoto($speaker_id == $speaker_from->getId() ? $speaker_from->getPhoto() : $speaker_to->getPhoto());
+            }
+            catch (\Exception $ex){
+
+            }
+            // registration_request
+            try {
+                if (!isset($data['registration_request'])) throw new ValidationException("registration_request field is required");
+                $speaker_id = intval($data['registration_request']);
+                $speaker_to->setRegistrationRequest($speaker_id == $speaker_from->getId() ? $speaker_from->getRegistrationRequest() : $speaker_to->getRegistrationRequest());
+            }
+            catch (\Exception $ex){
+
+            }
+            // member
+            try {
+                if (!isset($data['member'])) throw new ValidationException("member field is required");
+                $speaker_id = intval($data['member']);
+                $speaker_to->setMember($speaker_id == $speaker_from->getId() ? $speaker_from->getMember() : $speaker_to->getMember());
+            }
+            catch (\Exception $ex){
+
+            }
+            // presentations
+
+            foreach ($speaker_from->getAllPresentations(false) as $presentation){
+                $speaker_to->addPresentation($presentation);
+            }
+
+            foreach ($speaker_from->getAllModeratedPresentations(false) as $presentation){
+                $speaker_to->addModeratedPresentation($presentation);
+            }
+
+            // languages
+
+            foreach($speaker_from->getLanguages() as $language){
+                $speaker_to->addLanguage($language);
+            }
+
+            // promo codes
+
+            foreach($speaker_from->getPromoCodes() as $code){
+                $speaker_to->addPromoCode($code);
+            }
+
+            // summit assistances
+
+            foreach($speaker_from->getSummitAssistances() as $assistance){
+                $speaker_to->addSummitAssistance($assistance);
+            }
+
+            // presentation links
+
+            foreach($speaker_from->getOtherPresentationLinks() as $link){
+                $speaker_to->addOtherPresentationLink($link);
+            }
+
+            // travel preferences
+
+            foreach ($speaker_from->getTravelPreferences() as $travel_preference){
+                $speaker_to->addTravelPreference($travel_preference);
+            }
+
+            // areas of expertise
+
+            foreach ($speaker_from->getAreasOfExpertise() as $areas_of_expertise){
+                $speaker_to->addAreaOfExpertise($areas_of_expertise);
+            }
+
+            // roles
+
+            foreach ($speaker_from->getOrganizationalRoles() as $role){
+                $speaker_to->addOrganizationalRole($role);
+            }
+            $speaker_from->clearOrganizationalRoles();
+
+            // involvements
+
+            foreach ($speaker_from->getActiveInvolvements() as $involvement){
+                $speaker_to->addActiveInvolvement($involvement);
+            }
+
+            $speaker_from->clearActiveInvolvements();
+
+            $this->speaker_repository->delete($speaker_from);
+        });
+    }
 }

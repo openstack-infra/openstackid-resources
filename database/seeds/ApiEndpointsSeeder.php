@@ -200,6 +200,14 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
+                'name' => 'merge-speakers',
+                'route' => '/api/v1/speakers/merge/{speaker_from_id}/{speaker_to_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                ],
+            ),
+            array(
                 'name' => 'get-speaker-by-summit',
                 'route' => '/api/v1/summits/{id}/speakers/{speaker_id}',
                 'http_method' => 'GET',

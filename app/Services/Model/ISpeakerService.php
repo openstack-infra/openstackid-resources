@@ -59,4 +59,12 @@ interface ISpeakerService
      * @return File
      */
     public function addSpeakerPhoto($speaker_id, UploadedFile $file,  $max_file_size = 10485760);
+
+    /**
+     * @param PresentationSpeaker $speaker_from
+     * @param PresentationSpeaker $speaker_to
+     * @param array $data
+     * @return void
+     */
+    public function merge(PresentationSpeaker $speaker_from, PresentationSpeaker $speaker_to, array $data);
 }

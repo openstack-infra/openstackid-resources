@@ -312,7 +312,7 @@ Route::group([
     // speakers
     Route::group(array('prefix' => 'speakers'), function () {
         Route::get('', 'OAuth2SummitSpeakersApiController@getAll');
-
+        Route::put('merge/{speaker_from_id}/{speaker_to_id}', 'OAuth2SummitSpeakersApiController@merge');
         Route::group(['prefix' => '{speaker_id}'], function () {
             Route::get('', 'OAuth2SummitSpeakersApiController@getSpeaker');
             Route::post('/photo', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeakerPhoto']);
