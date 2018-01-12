@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -20,11 +19,17 @@ use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
 use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
+use models\summit\ISummitAttendeeRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
-
+use utils\Filter;
+use utils\FilterParser;
+use utils\OrderParser;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Validator;
+use utils\PagingInfo;
 /**
  * Class OAuth2SummitAttendeesApiController
  * @package App\Http\Controllers
@@ -51,9 +56,15 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
      */
     private $event_feedback_repository;
 
+    /**
+     * @var ISummitAttendeeRepository
+     */
+    private $attendee_repository;
+
 
     public function __construct
     (
+        ISummitAttendeeRepository $attendee_repository,
         ISummitRepository $summit_repository,
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
@@ -62,6 +73,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
+        $this->attendee_repository       = $attendee_repository;
         $this->repository                = $summit_repository;
         $this->speaker_repository        = $speaker_repository;
         $this->event_repository          = $event_repository;
@@ -267,7 +279,92 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             Log::error($ex);
             return $this->error500($ex);
         }
+    }
 
+    public function getAttendeesBySummit($summit_id){
+
+        $values = Input::all();
+        $rules  = [
+
+            'page'     => 'integer|min:1',
+            'per_page' => 'required_with:page|integer|min:5|max:100',
+        ];
+
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $validation = Validator::make($values, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException();
+                throw $ex->setMessages($validation->messages()->toArray());
+            }
+
+            // default values
+            $page     = 1;
+            $per_page = 5;
+
+            if (Input::has('page')) {
+                $page     = intval(Input::get('page'));
+                $per_page = intval(Input::get('per_page'));
+            }
+
+            $filter = null;
+
+            if (Input::has('filter')) {
+                $filter = FilterParser::parse(Input::get('filter'),  array
+                (
+                    'first_name'     => ['=@', '=='],
+                    'last_name'      => ['=@', '=='],
+                    'email'          => ['=@', '=='],
+                ));
+            }
+
+            $order = null;
+
+            if (Input::has('order'))
+            {
+                $order = OrderParser::parse(Input::get('order'), array
+                (
+                    'first_name',
+                    'last_name',
+                    'id',
+                ));
+            }
+
+            if(is_null($filter)) $filter = new Filter();
+
+            $data      = $this->attendee_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
+
+            return $this->ok
+            (
+                $data->toArray
+                (
+                    Request::input('expand', '')
+                )
+            );
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 
 }

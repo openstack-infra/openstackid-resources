@@ -153,7 +153,7 @@ Route::group([
             // attendees
             Route::group(array('prefix' => 'attendees'), function () {
 
-                //Route::get('', 'OAuth2SummitAttendeesApiController@getAttendees');
+                Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@getAttendeesBySummit']);
 
                 Route::group(array('prefix' => '{attendee_id}'), function () {
 
@@ -181,12 +181,12 @@ Route::group([
             // speakers
             Route::group(['prefix' => 'speakers'], function () {
 
-                Route::post('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeaker']);
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeaker']);
                 Route::get('', 'OAuth2SummitSpeakersApiController@getSpeakers');
 
                 Route::group(['prefix' => '{speaker_id}'], function () {
                     Route::get('', 'OAuth2SummitSpeakersApiController@getSummitSpeaker')->where('speaker_id', 'me|[0-9]+');
-                    Route::put('',[ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitSpeakersApiController@updateSpeaker'])->where('speaker_id', 'me|[0-9]+');
+                    Route::put('',[ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@updateSpeaker'])->where('speaker_id', 'me|[0-9]+');
                 });
             });
 
@@ -195,9 +195,9 @@ Route::group([
 
                 Route::get('', 'OAuth2SummitEventsApiController@getEvents');
                 // bulk actions
-                Route::delete('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvents']);
-                Route::put('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@updateAndPublishEvents']);
-                Route::put('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@updateEvents']);
+                Route::delete('/publish', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvents']);
+                Route::put('/publish', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@updateAndPublishEvents']);
+                Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@updateEvents']);
 
                 Route::group(array('prefix' => 'unpublished'), function () {
                     Route::get('', 'OAuth2SummitEventsApiController@getUnpublishedEvents');
@@ -208,17 +208,17 @@ Route::group([
                     Route::get('/empty-spots', 'OAuth2SummitEventsApiController@getScheduleEmptySpots');
                 });
 
-                Route::post('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@addEvent']);
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@addEvent']);
                 Route::group(array('prefix' => '{event_id}'), function () {
 
                     Route::get('', 'OAuth2SummitEventsApiController@getEvent');
                     Route::get('/published', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_published_event_response_lifetime', 300), 'uses' => 'OAuth2SummitEventsApiController@getScheduledEvent']);
-                    Route::put('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@updateEvent' ]);
-                    Route::delete('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@deleteEvent' ]);
-                    Route::put('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@publishEvent']);
-                    Route::delete('/publish', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvent']);
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@updateEvent' ]);
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@deleteEvent' ]);
+                    Route::put('/publish', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@publishEvent']);
+                    Route::delete('/publish', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvent']);
                     Route::post('/feedback', 'OAuth2SummitEventsApiController@addEventFeedback');
-                    Route::post('/attachment', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitEventsApiController@addEventAttachment']);
+                    Route::post('/attachment', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@addEventAttachment']);
                     Route::get('/feedback/{attendee_id?}',  ['middleware' => 'cache:'.Config::get('cache_api_response.get_event_feedback_response_lifetime', 300), 'uses' => 'OAuth2SummitEventsApiController@getEventFeedback'] )->where('attendee_id', 'me|[0-9]+');
                 });
             });
@@ -315,7 +315,7 @@ Route::group([
         Route::put('merge/{speaker_from_id}/{speaker_to_id}', 'OAuth2SummitSpeakersApiController@merge');
         Route::group(['prefix' => '{speaker_id}'], function () {
             Route::get('', 'OAuth2SummitSpeakersApiController@getSpeaker');
-            Route::post('/photo', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeakerPhoto']);
+            Route::post('/photo', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeakerPhoto']);
         });
     });
 });

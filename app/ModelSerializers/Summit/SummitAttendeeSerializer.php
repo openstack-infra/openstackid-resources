@@ -30,10 +30,6 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
         'MemberId'                => 'member_id:json_int',
     );
 
-    protected static $allowed_relations = array
-    (
-        'member',
-    );
 
     /**
      * @param null $expand
@@ -68,19 +64,11 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
         }
         $values['tickets'] = $tickets;
 
-        if(in_array('member', $relations) && $attendee->hasMember())
+        if($attendee->hasMember())
         {
             $member               = $attendee->getMember();
-            $values['first_name'] = JsonUtils::toJsonString($member->getFirstName());
-            $values['last_name']  = JsonUtils::toJsonString($member->getLastName());
-            $values['gender']     = $member->getGender();
-            $values['bio']        = JsonUtils::toJsonString($member->getBio());
-            $values['pic']        = Config::get("server.assets_base_url", 'https://www.openstack.org/'). 'profile_images/members/'. $member->getId();
-            $values['linked_in']  = $member->getLinkedInProfile();
-            $values['irc']        = $member->getIRCHandle();
-            $values['twitter']    = $member->getTwitterHandle();
+            $values['member_id']  = $member->getId();
             $speaker              = $summit->getSpeakerByMember($member);
-
             if (!is_null($speaker)) {
                 $values['speaker_id'] = intval($speaker->getId());
             }
@@ -92,10 +80,10 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
                 switch (trim($relation)) {
                     case 'schedule': {
                         unset($values['schedule']);
-                        $schedule = array();
+                        $schedule = [];
                         foreach ($attendee->getSchedule() as $s) {
                             if(!$summit->isEventOnSchedule($s->getEvent()->getId())) continue;
-                            array_push($schedule, SerializerRegistry::getInstance()->getSerializer($s)->serialize());
+                            $schedule[] = SerializerRegistry::getInstance()->getSerializer($s)->serialize();
                         }
                         $values['schedule'] = $schedule;
                     }
@@ -115,6 +103,14 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
                         {
                             unset($values['speaker_id']);
                             $values['speaker'] = SerializerRegistry::getInstance()->getSerializer($speaker)->serialize();
+                        }
+                    }
+                    break;
+                    case 'member':{
+                        if($attendee->hasMember())
+                        {
+                            unset($values['member_id']);
+                            $values['member']    = SerializerRegistry::getInstance()->getSerializer($attendee->getMember())->serialize();
                         }
                     }
                     break;

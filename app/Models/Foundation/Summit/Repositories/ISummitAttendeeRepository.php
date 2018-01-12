@@ -13,6 +13,10 @@
  **/
 
 use models\utils\IBaseRepository;
+use utils\Filter;
+use utils\Order;
+use utils\PagingInfo;
+use utils\PagingResponse;
 
 /**
  * Class ISummitAttendeeRepository
@@ -20,5 +24,12 @@ use models\utils\IBaseRepository;
  */
 interface ISummitAttendeeRepository extends IBaseRepository
 {
-
+    /**
+     * @param Summit $summit
+     * @param PagingInfo $paging_info
+     * @param Filter|null $filter
+     * @param Order|null $order
+     * @return PagingResponse
+     */
+    public function getBySummit(Summit $summit, PagingInfo $paging_info, Filter $filter = null, Order $order = null);
 }

@@ -12,11 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\summit\ISummitAttendeeRepository;
+use models\summit\Summit;
 use models\summit\SummitAttendee;
 use App\Repositories\SilverStripeDoctrineRepository;
-
+use utils\DoctrineJoinFilterMapping;
+use utils\DoctrineLeftJoinFilterMapping;
+use utils\Filter;
+use utils\Order;
+use utils\PagingInfo;
+use utils\PagingResponse;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 /**
  * Class DoctrineSummitAttendeeRepository
  * @package App\Repositories\Summit
@@ -32,5 +38,82 @@ final class DoctrineSummitAttendeeRepository
     protected function getBaseEntity()
     {
         return SummitAttendee::class;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param PagingInfo $paging_info
+     * @param Filter|null $filter
+     * @param Order|null $order
+     * @return PagingResponse
+     */
+    public function getBySummit(Summit $summit, PagingInfo $paging_info, Filter $filter = null, Order $order = null)
+    {
+        $query  = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("a")
+            ->from(SummitAttendee::class, "a")
+            ->leftJoin('a.summit', 's')
+            ->leftJoin('a.member', 'm')
+            ->where("s.id = :summit_id");
+
+        $query->setParameter("summit_id", $summit->getId());
+
+        if(!is_null($filter)){
+
+            $filter->apply2Query($query, [
+                'first_name'  => new DoctrineLeftJoinFilterMapping
+                (
+                    'a.member',
+                    'm',
+                    "m.first_name :operator ':value'"
+                ),
+                'last_name'  => new DoctrineLeftJoinFilterMapping
+                (
+                    'a.member',
+                    'm',
+                    "m.last_name :operator ':value'"
+                ),
+                'email'  => new DoctrineLeftJoinFilterMapping
+                (
+                    'a.member',
+                    'm',
+                    "m.email :operator ':value'"
+                ),
+            ]);
+        }
+
+        if (!is_null($order)) {
+
+            $order->apply2Query($query, [
+                'id'          => 'a.id',
+                'first_name'  => 'm.first_name',
+                'last_name'   => 'm.last_name',
+            ]);
+        } else {
+            //default order
+            $query = $query->addOrderBy("m.first_name",'ASC');
+            $query = $query->addOrderBy("m.last_name", 'ASC');
+        }
+
+        $query = $query
+            ->setFirstResult($paging_info->getOffset())
+            ->setMaxResults($paging_info->getPerPage());
+
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+        $total     = $paginator->count();
+        $data      = array();
+
+        foreach($paginator as $entity)
+            array_push($data, $entity);
+
+        return new PagingResponse
+        (
+            $total,
+            $paging_info->getPerPage(),
+            $paging_info->getCurrentPage(),
+            $paging_info->getLastPage($total),
+            $data
+        );
     }
 }
