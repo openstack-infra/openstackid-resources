@@ -308,6 +308,10 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
     public function getAttendeesBySummit($summit_id){
 
         $values = Input::all();
@@ -341,24 +345,27 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $filter = null;
 
             if (Input::has('filter')) {
-                $filter = FilterParser::parse(Input::get('filter'),  array
-                (
-                    'first_name'     => ['=@', '=='],
-                    'last_name'      => ['=@', '=='],
-                    'email'          => ['=@', '=='],
-                ));
+                $filter = FilterParser::parse(Input::get('filter'), [
+
+                    'first_name'           => ['=@', '=='],
+                    'last_name'            => ['=@', '=='],
+                    'email'                => ['=@', '=='],
+                    'external_order_id'    => ['=@', '=='],
+                    'external_attendee_id' => ['=@', '=='],
+                ]);
             }
 
             $order = null;
 
             if (Input::has('order'))
             {
-                $order = OrderParser::parse(Input::get('order'), array
-                (
+                $order = OrderParser::parse(Input::get('order'), [
+
                     'first_name',
                     'last_name',
                     'id',
-                ));
+                    'external_order_id',
+                ]);
             }
 
             if(is_null($filter)) $filter = new Filter();

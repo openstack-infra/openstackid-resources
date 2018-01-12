@@ -22,14 +22,12 @@ use models\summit\SummitAttendee;
  */
 final class SummitAttendeeSerializer extends SilverStripeSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
         'SummitHallCheckedIn'     => 'summit_hall_checked_in:json_boolean',
         'SummitHallCheckedInDate' => 'summit_hall_checked_in_date:datetime_epoch',
         'SharedContactInfo'       => 'shared_contact_info:json_boolean',
         'MemberId'                => 'member_id:json_int',
-    );
-
+    ];
 
     /**
      * @param null $expand
@@ -93,7 +91,7 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
                         $tickets = array();
                         foreach($attendee->getTickets() as $t)
                         {
-                            array_push($tickets, SerializerRegistry::getInstance()->getSerializer($t->getTicketType())->serialize());
+                            array_push($tickets, SerializerRegistry::getInstance()->getSerializer($t)->serialize($expand));
                         }
                         $values['tickets'] = $tickets;
                     }

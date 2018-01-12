@@ -55,6 +55,7 @@ final class DoctrineSummitAttendeeRepository
             ->from(SummitAttendee::class, "a")
             ->leftJoin('a.summit', 's')
             ->leftJoin('a.member', 'm')
+            ->leftJoin('a.tickets', 't')
             ->where("s.id = :summit_id");
 
         $query->setParameter("summit_id", $summit->getId());
@@ -80,15 +81,28 @@ final class DoctrineSummitAttendeeRepository
                     'm',
                     "m.email :operator ':value'"
                 ),
+                'external_order_id'  => new DoctrineLeftJoinFilterMapping
+                (
+                    'a.tickets',
+                    't',
+                    "t.external_order_id :operator ':value'"
+                ),
+                'external_attendee_id'  => new DoctrineLeftJoinFilterMapping
+                (
+                    'a.tickets',
+                    't',
+                    "t.external_attendee_id :operator ':value'"
+                ),
             ]);
         }
 
         if (!is_null($order)) {
 
             $order->apply2Query($query, [
-                'id'          => 'a.id',
-                'first_name'  => 'm.first_name',
-                'last_name'   => 'm.last_name',
+                'id'                => 'a.id',
+                'first_name'        => 'm.first_name',
+                'last_name'         => 'm.last_name',
+                'external_order_id' => 't.external_order_id',
             ]);
         } else {
             //default order
