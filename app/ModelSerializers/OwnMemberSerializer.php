@@ -20,6 +20,23 @@ use models\main\Member;
 final class OwnMemberSerializer extends AbstractMemberSerializer
 {
 
+    protected static $array_mappings = [
+
+        'FirstName'       => 'first_name:json_string',
+        'LastName'        => 'last_name:json_string',
+        'Gender'          => 'gender:json_string',
+        'GitHubUser'      => 'github_user:json_string',
+        'Bio'             => 'bio:json_string',
+        'LinkedInProfile' => 'linked_in:json_string',
+        'IrcHandle'       => 'irc:json_string',
+        'TwitterHandle'   => 'twitter:json_string',
+        'State'           => 'state:json_string',
+        'Country'         => 'country:json_string',
+        'Active'          => 'active:json_boolean',
+        'EmailVerified'   => 'email_verified:json_boolean',
+        'Email'           => 'email:json_string',
+    ];
+
     protected static $allowed_relations = [
         'team_memberships',
         'groups_events',

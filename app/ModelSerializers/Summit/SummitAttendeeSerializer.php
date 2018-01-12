@@ -41,12 +41,16 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
         if(!count($relations)) $relations = $this->getAllowedRelations();
         $attendee = $this->object;
         if(!$attendee instanceof SummitAttendee) return [];
+        $serializer_type = SerializerRegistry::SerializerType_Public;
 
-        $summit   = $attendee->getSummit();
-        $values   = parent::serialize($expand, $fields, $relations, $params);
-        $member   = null;
-        $speaker  = null;
-        $schedule = [];
+        if(isset($params['serializer_type']))
+            $serializer_type = $params['serializer_type'];
+
+        $summit         = $attendee->getSummit();
+        $values         = parent::serialize($expand, $fields, $relations, $params);
+        $member         = null;
+        $speaker        = null;
+        $schedule       = [];
 
         foreach ($attendee->getScheduledEventsIds() as $event_id){
             $schedule[] = intval($event_id);
@@ -54,11 +58,11 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
 
         $values['schedule'] = $schedule;
 
-        $tickets = array();
+        $tickets = [];
         foreach($attendee->getTickets() as $t)
         {
             if(!$t->hasTicketType()) continue;
-            array_push($tickets, intval($t->getTicketType()->getId()));
+            $tickets[] = intval($t->getTicketType()->getId());
         }
         $values['tickets'] = $tickets;
 
@@ -88,10 +92,10 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
                     break;
                     case 'tickets': {
                         unset($values['tickets']);
-                        $tickets = array();
+                        $tickets = [];
                         foreach($attendee->getTickets() as $t)
                         {
-                            array_push($tickets, SerializerRegistry::getInstance()->getSerializer($t)->serialize($expand));
+                           $tickets[] = SerializerRegistry::getInstance()->getSerializer($t)->serialize($expand);
                         }
                         $values['tickets'] = $tickets;
                     }
@@ -108,7 +112,7 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
                         if($attendee->hasMember())
                         {
                             unset($values['member_id']);
-                            $values['member']    = SerializerRegistry::getInstance()->getSerializer($attendee->getMember())->serialize($expand);
+                            $values['member']    = SerializerRegistry::getInstance()->getSerializer($attendee->getMember(), $serializer_type)->serialize($expand);
                         }
                     }
                     break;

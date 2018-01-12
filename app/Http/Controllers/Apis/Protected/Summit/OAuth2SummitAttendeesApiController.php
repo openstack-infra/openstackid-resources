@@ -376,7 +376,10 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             (
                 $data->toArray
                 (
-                    Request::input('expand', '')
+                    Request::input('expand', ''),
+                    [],
+                    [],
+                    [ 'serializer_type' => SerializerRegistry::SerializerType_Private ]
                 )
             );
         }
