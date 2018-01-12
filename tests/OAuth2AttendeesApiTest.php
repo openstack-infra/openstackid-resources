@@ -46,4 +46,60 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
         $attendees = json_decode($content);
         $this->assertTrue(!is_null($attendees));
     }
+
+    public function testGetOwnAttendee(){
+
+        $params = [
+            'id' => 23,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitAttendeesApiController@getOwnAttendee",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $attendee = json_decode($content);
+        $this->assertTrue(!is_null($attendee));
+    }
+
+    public function testGetAttendeeByID(){
+
+        $params = [
+            'id'          => 23,
+            'attendee_id' => 12641,
+            'expand'      => 'member,schedule,tickets,affiliations,groups'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitAttendeesApiController@getAttendee",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $attendee = json_decode($content);
+        $this->assertTrue(!is_null($attendee));
+    }
 }

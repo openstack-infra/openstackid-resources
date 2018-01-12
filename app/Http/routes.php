@@ -154,10 +154,10 @@ Route::group([
             Route::group(array('prefix' => 'attendees'), function () {
 
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@getAttendeesBySummit']);
-
+                Route::get('me', 'OAuth2SummitAttendeesApiController@getOwnAttendee');
                 Route::group(array('prefix' => '{attendee_id}'), function () {
 
-                    Route::get('', 'OAuth2SummitAttendeesApiController@getAttendee')->where('attendee_id', 'me');
+                    Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@getAttendee']);
 
                     Route::group(array('prefix' => 'schedule'), function ()
                     {

@@ -50,11 +50,8 @@ class CheckMeAttendeeStrategy implements ICheckAttendeeStrategy
             if (is_null($member_id)) {
                 return null;
             }
-            $attendee = $summit->getAttendeeByMemberId($member_id);
-        } else {
-            $attendee = $summit->getAttendeeById(intval($attendee_id));
+            return $summit->getAttendeeByMemberId($member_id);
         }
-
-        return $attendee;
+        return null;
     }
 }

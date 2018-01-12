@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\Http\Controllers;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-namespace App\Http\Controllers;
-
 use models\oauth2\IResourceServerContext;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
-
 /**
  * Class CheckMyOwnAttendeeStrategy
  * @package App\Http\Controllers
@@ -37,7 +33,8 @@ final class CheckMyOwnAttendeeStrategy extends CheckMeAttendeeStrategy implement
         if(!$attendee) return null;
         $attendee_member_id = intval($attendee->getMember()->getId());
         $member_id          = $this->resource_server_context->getCurrentUserExternalId();
-        if(is_null($member_id) || ($attendee_member_id !== $member_id)) throw new \HTTP401UnauthorizedException;
+        if(is_null($member_id) || ($attendee_member_id !== $member_id))
+            throw new \HTTP401UnauthorizedException;
         return $attendee;
     }
 }

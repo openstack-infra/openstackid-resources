@@ -110,7 +110,7 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
                         if($attendee->hasMember())
                         {
                             unset($values['member_id']);
-                            $values['member']    = SerializerRegistry::getInstance()->getSerializer($attendee->getMember())->serialize();
+                            $values['member']    = SerializerRegistry::getInstance()->getSerializer($attendee->getMember())->serialize($expand);
                         }
                     }
                     break;

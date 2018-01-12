@@ -112,6 +112,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
+                'name' => 'get-own-attendee',
+                'route' => '/api/v1/summits/{id}/attendees/me',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ),
+            array(
                 'name' => 'get-attendee',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
                 'http_method' => 'GET',
