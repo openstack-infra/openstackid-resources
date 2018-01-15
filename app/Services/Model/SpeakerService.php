@@ -405,6 +405,9 @@ final class SpeakerService implements ISpeakerService
     public function merge(PresentationSpeaker $speaker_from, PresentationSpeaker $speaker_to, array $data)
     {
         return $this->tx_service->transaction(function () use ($speaker_from, $speaker_to, $data) {
+
+            if($speaker_from->getIdentifier() == $speaker_to->getIdentifier())
+                throw new ValidationException("You can not merge the same speaker!");
             // bio
             if (!isset($data['bio'])) throw new ValidationException("bio field is required");
             $speaker_id = intval($data['bio']);

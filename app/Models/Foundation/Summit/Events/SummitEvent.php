@@ -504,7 +504,7 @@ class SummitEvent extends SilverstripeBaseModel
     public function getTypeId()
     {
         try {
-            return $this->type->getId();
+            return !is_null($this->type) ? $this->type->getId() : 0;
         }
         catch(\Exception $ex){
             return 0;
