@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,7 +19,6 @@ use models\exceptions\ValidationException;
 use models\main\Member;
 use models\main\SummitMemberSchedule;
 use models\utils\SilverstripeBaseModel;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitAttendee")
@@ -68,6 +66,20 @@ class SummitAttendee extends SilverstripeBaseModel
      */
     public function getSummitHallCheckedIn(){
         return (bool)$this->summit_hall_checked_in;
+    }
+
+    /**
+     * @param bool $summit_hall_checked_in
+     */
+    public function setSummitHallCheckedIn($summit_hall_checked_in){
+        $this->summit_hall_checked_in = $summit_hall_checked_in;
+    }
+
+    /**
+     * @param \DateTime $summit_hall_checked_in_date
+     */
+    public function setSummitHallCheckedInDate(\DateTime $summit_hall_checked_in_date){
+        $this->summit_hall_checked_in_date = $summit_hall_checked_in_date;
     }
 
     /**
@@ -224,5 +236,6 @@ class SummitAttendee extends SilverstripeBaseModel
     public function getRsvpByEvent($event_id){
        return $this->member->getRsvpByEvent($event_id);
     }
+
 
 }

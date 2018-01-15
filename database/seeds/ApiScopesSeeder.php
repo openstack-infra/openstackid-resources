@@ -11,14 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Config;;
 use App\Models\ResourceServer\ApiScope;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use Illuminate\Support\Facades\DB;
 use App\Security\SummitScopes;
-
 /**
  * Class ApiScopesSeeder
  */
@@ -114,6 +112,11 @@ final class ApiScopesSeeder extends Seeder
                 'name' => sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 'short_description' => 'Write Speakers Data',
                 'description' => 'Grants write access for Speakers Data',
+            ),
+            array(
+                'name' => sprintf(SummitScopes::WriteAttendeesData, $current_realm),
+                'short_description' => 'Write Attendees Data',
+                'description' => 'Grants write access for Attendees Data',
             ),
         ];
 

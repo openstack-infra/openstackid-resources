@@ -156,6 +156,14 @@ class ApiEndpointsSeeder extends Seeder
                 'http_method' => 'PUT',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
             ),
+            array(
+                'name' => 'add-attendee',
+                'route' => '/api/v1/summits/{id}/attendees',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteAttendeesData, $current_realm),
+                ],
+            ),
             // speakers
             array(
                 'name' => 'get-speakers',

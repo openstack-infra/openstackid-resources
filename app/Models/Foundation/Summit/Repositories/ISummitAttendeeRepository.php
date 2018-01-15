@@ -11,13 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use models\main\Member;
 use models\utils\IBaseRepository;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
  * Class ISummitAttendeeRepository
  * @package models\summit
@@ -32,4 +31,11 @@ interface ISummitAttendeeRepository extends IBaseRepository
      * @return PagingResponse
      */
     public function getBySummit(Summit $summit, PagingInfo $paging_info, Filter $filter = null, Order $order = null);
+
+    /**
+     * @param Summit $summit
+     * @param Member $member
+     * @return SummitAttendee
+     */
+    public function getBySummitAndMember(Summit $summit, Member $member);
 }

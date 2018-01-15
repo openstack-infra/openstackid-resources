@@ -155,6 +155,7 @@ Route::group([
 
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@getAttendeesBySummit']);
                 Route::get('me', 'OAuth2SummitAttendeesApiController@getOwnAttendee');
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@addAttendee']);
                 Route::group(array('prefix' => '{attendee_id}'), function () {
 
                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@getAttendee']);

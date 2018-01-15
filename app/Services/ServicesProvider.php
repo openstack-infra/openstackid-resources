@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Model\AttendeeService;
+use App\Services\Model\IAttendeeService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -73,6 +75,12 @@ class ServicesProvider extends ServiceProvider
             $api = new FireBaseGCMApi(Config::get("server.firebase_gcm_server_key", null));
             return $api;
         });
+
+        App::singleton
+        (
+            IAttendeeService::class,
+            AttendeeService::class
+        );
 
         // work request pre processors
 

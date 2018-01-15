@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Model\IAttendeeService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -39,7 +40,12 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
     /**
      * @var ISummitService
      */
-    private $service;
+    private $summit_service;
+
+    /**
+     * @var IAttendeeService
+     */
+    private $attendee_service;
 
     /**
      * @var ISpeakerRepository
@@ -61,7 +67,17 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
      */
     private $attendee_repository;
 
-
+    /**
+     * OAuth2SummitAttendeesApiController constructor.
+     * @param ISummitAttendeeRepository $attendee_repository
+     * @param ISummitRepository $summit_repository
+     * @param ISummitEventRepository $event_repository
+     * @param ISpeakerRepository $speaker_repository
+     * @param IEventFeedbackRepository $event_feedback_repository
+     * @param ISummitService $summit_service
+     * @param IAttendeeService $attendee_service
+     * @param IResourceServerContext $resource_server_context
+     */
     public function __construct
     (
         ISummitAttendeeRepository $attendee_repository,
@@ -69,7 +85,8 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
-        ISummitService $service,
+        ISummitService $summit_service,
+        IAttendeeService $attendee_service,
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
@@ -78,7 +95,8 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         $this->speaker_repository        = $speaker_repository;
         $this->event_repository          = $event_repository;
         $this->event_feedback_repository = $event_feedback_repository;
-        $this->service                   = $service;
+        $this->summit_service            = $summit_service;
+        $this->attendee_service          = $attendee_service;
     }
 
     /**
@@ -192,7 +210,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $this->service->addEventToMemberSchedule($summit, $attendee->getMember(), intval($event_id));
+            $this->summit_service->addEventToMemberSchedule($summit, $attendee->getMember(), intval($event_id));
 
             return $this->created();
         }
@@ -234,7 +252,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $this->service->removeEventFromMemberSchedule($summit, $attendee->getMember(), intval($event_id));
+            $this->summit_service->removeEventFromMemberSchedule($summit, $attendee->getMember(), intval($event_id));
 
             return $this->deleted();
 
@@ -282,7 +300,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $attendee = CheckAttendeeStrategyFactory::build(CheckAttendeeStrategyFactory::Own, $this->resource_server_context)->check($attendee_id, $summit);
             if (is_null($attendee)) return $this->error404();
 
-            $this->service->unRSVPEvent($summit, $attendee->getMember(), $event_id);
+            $this->summit_service->unRSVPEvent($summit, $attendee->getMember(), $event_id);
 
             return $this->deleted();
 
@@ -397,6 +415,57 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         {
             Log::warning($ex3);
             return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function addAttendee($summit_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = [
+
+                'member_id'                   => 'required|integer',
+                'share_contact_info'          => 'sometimes|boolean',
+                'summit_hall_checked_in'      => 'sometimes|boolean',
+                'summit_hall_checked_in_date' => 'sometimes|date_format:U',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $attendee = $this->attendee_service->addAttendee($summit, $data->all());
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($attendee)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex) {
             Log::error($ex);

@@ -55,17 +55,11 @@ final class UserAuthEndpoint
             $http_response = Response::json(['error' => 'member not found'], 403);
             return $http_response;
         }
-
-        $groups = $member->getGroups();
-
         $required_groups = explode('|', $required_groups);
 
         foreach ($required_groups as $required_group) {
-            foreach ($groups as $member_group){
-                if (strtolower($required_group) == strtolower($member_group->getCode())) {
-                    return $next($request);
-                }
-            }
+            if($member->isOnGroup($required_group))
+                return $next($request);
         }
 
         $http_response = Response::json(['error' => 'unauthorized member'], 403);

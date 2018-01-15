@@ -12,20 +12,21 @@
  * limitations under the License.
  **/
 
-
 /**
  * Class SummitScopes
  * @package App\Security
  */
 final class SummitScopes
 {
-    const ReadSummitData    = '%s/summits/read';
-    const ReadAllSummitData = '%s/summits/read/all';
+    const ReadSummitData     = '%s/summits/read';
+    const ReadAllSummitData  = '%s/summits/read/all';
 
-    const WriteSummitData   = '%s/summits/write';
-    const WriteSpeakersData = '%s/speakers/write';
+    const WriteSummitData    = '%s/summits/write';
+    const WriteSpeakersData  = '%s/speakers/write';
 
-    const PublishEventData  = '%s/summits/publish-event';
-    const WriteEventData    = '%s/summits/write-event';
-    const WriteVideoData    = '%s/summits/write-videos';
+    const PublishEventData   = '%s/summits/publish-event';
+    const WriteEventData     = '%s/summits/write-event';
+    const WriteVideoData     = '%s/summits/write-videos';
+
+    const WriteAttendeesData = '%s/attendees/write';
 }

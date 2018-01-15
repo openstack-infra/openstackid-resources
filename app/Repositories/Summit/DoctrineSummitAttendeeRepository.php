@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\main\Member;
 use models\summit\ISummitAttendeeRepository;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
@@ -129,5 +130,27 @@ final class DoctrineSummitAttendeeRepository
             $paging_info->getLastPage($total),
             $data
         );
+    }
+
+    /**
+     * @param Summit $summit
+     * @param Member $member
+     * @return SummitAttendee
+     */
+    public function getBySummitAndMember(Summit $summit, Member $member)
+    {
+        $query  = $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("a")
+            ->from(SummitAttendee::class, "a")
+            ->leftJoin('a.summit', 's')
+            ->leftJoin('a.member', 'm')
+            ->where("s.id = :summit_id")->andWhere("m.id = :member_id")
+            ->setParameter("summit_id", $summit->getId())
+            ->setParameter("member_id", $member->getId());
+
+       $res = $query->getQuery()->getOneOrNullResult();
+
+       return $res;
     }
 }
