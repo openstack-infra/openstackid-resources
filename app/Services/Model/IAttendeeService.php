@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
 /**
@@ -25,4 +27,13 @@ interface IAttendeeService
      * @return SummitAttendee
      */
     public function addAttendee(Summit $summit, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $attendee_id
+     * @return void
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function deleteAttendee(Summit $summit, $attendee_id);
 }

@@ -479,4 +479,34 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $attendee_id
+     * @return mixed
+     */
+    public function deleteAttendee($summit_id, $attendee_id)
+    {
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $attendee = $this->attendee_repository->getById($attendee_id);
+            if(is_null($attendee)) return $this->error404();
+
+            $this->attendee_service->deleteAttendee($summit, $attendee->getIdentifier());
+
+            return $this->deleted();
+
+        }
+        catch (\HTTP401UnauthorizedException $ex1) {
+            Log::warning($ex1);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
 }

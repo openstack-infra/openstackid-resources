@@ -23,7 +23,7 @@ use models\summit\SummitAttendee;
  * Class AttendeeService
  * @package App\Services\Model
  */
-class AttendeeService implements IAttendeeService
+final class AttendeeService implements IAttendeeService
 {
 
     /**
@@ -82,6 +82,28 @@ class AttendeeService implements IAttendeeService
             $this->attendee_repository->add($attendee);
 
             return $attendee;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $attendee_id
+     * @return void
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function deleteAttendee(Summit $summit, $attendee_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $attendee_id){
+
+
+            $attendee = $summit->getAttendeeById($attendee_id);
+            if(is_null($attendee))
+                throw new EntityNotFoundException();
+
+            $this->attendee_repository->delete($attendee);
+
+
         });
     }
 }
