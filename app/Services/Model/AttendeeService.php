@@ -96,13 +96,46 @@ final class AttendeeService implements IAttendeeService
     {
         return $this->tx_service->transaction(function() use($summit, $attendee_id){
 
-
             $attendee = $summit->getAttendeeById($attendee_id);
             if(is_null($attendee))
                 throw new EntityNotFoundException();
 
             $this->attendee_repository->delete($attendee);
+        });
+    }
 
+    /**
+     * @param Summit $summit
+     * @param int $attendee_id
+     * @param array $data
+     * @return SummitAttendee
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function updateAttendee(Summit $summit, $attendee_id, array $data)
+    {
+        return $this->tx_service->transaction(function() use($summit, $attendee_id, $data){
+
+            $attendee = $summit->getAttendeeById($attendee_id);
+            if(is_null($attendee))
+                throw new EntityNotFoundException(sprintf("attendee does not belongs to summit id %s", $summit->getId()));
+
+            if(!isset($data['member_id']))
+                throw new ValidationException("member_id is required");
+
+            $member_id = intval($data['member_id']);
+            $member    = $this->member_repository->getById($member_id);
+
+            if(is_null($member))
+                throw new EntityNotFoundException("member not found");
+
+            // check if attendee already exist for this summit
+
+            $old_attendee = $this->attendee_repository->getBySummitAndMember($summit, $member);
+            if(!is_null($old_attendee) && $old_attendee->getId() != $attendee->getId())
+                throw new ValidationException(sprintf("another attendee (%s) already exist for summit id %s and member id %s", $old_attendee->getId(), $summit->getId(), $member->getIdentifier()));
+
+            return SummitAttendeeFactory::updateMainData($summit, $attendee, $member , $data);
 
         });
     }

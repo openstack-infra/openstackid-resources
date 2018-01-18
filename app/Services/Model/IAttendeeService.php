@@ -25,6 +25,8 @@ interface IAttendeeService
      * @param Summit $summit
      * @param array $data
      * @return SummitAttendee
+     * @throws ValidationException
+     * @throws EntityNotFoundException
      */
     public function addAttendee(Summit $summit, array $data);
 
@@ -36,4 +38,14 @@ interface IAttendeeService
      * @throws EntityNotFoundException
      */
     public function deleteAttendee(Summit $summit, $attendee_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $attendee_id
+     * @param array $data
+     * @return SummitAttendee
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function updateAttendee(Summit $summit, $attendee_id, array $data);
 }

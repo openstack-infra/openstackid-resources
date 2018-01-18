@@ -27,8 +27,17 @@ final class SummitAttendeeFactory
      * @return SummitAttendee
      */
     public static function build(Summit $summit, Member $member, array $data){
-        $attendee = new SummitAttendee();
+        return self::updateMainData($summit, new SummitAttendee, $member, $data);
+    }
 
+    /**
+     * @param Summit $summit
+     * @param SummitAttendee $attendee
+     * @param Member $member
+     * @param array $data
+     * @return SummitAttendee
+     */
+    public static function updateMainData(Summit $summit, SummitAttendee $attendee, Member $member, array $data){
         $attendee->setMember($member);
         $attendee->setSummit($summit);
 

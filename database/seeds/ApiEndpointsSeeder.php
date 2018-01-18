@@ -138,6 +138,14 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
+                'name' => 'update-attendee',
+                'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteAttendeesData, $current_realm),
+                ],
+            ),
+            array(
                 'name' => 'get-attendee-schedule',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule',
                 'http_method' => 'GET',

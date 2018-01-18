@@ -159,6 +159,7 @@ Route::group([
                 Route::group(array('prefix' => '{attendee_id}'), function () {
 
                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@getAttendee']);
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@updateAttendee']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@deleteAttendee']);
                     Route::group(array('prefix' => 'schedule'), function ()
                     {

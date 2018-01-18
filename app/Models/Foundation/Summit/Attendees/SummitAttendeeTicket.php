@@ -13,7 +13,6 @@
  **/
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitAttendeeTicket")
@@ -23,6 +22,44 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class SummitAttendeeTicket extends SilverstripeBaseModel
 {
+    /**
+     * @ORM\Column(name="ExternalOrderId", type="string")
+     * @var string
+     */
+    private $external_order_id;
+
+    /**
+     * @ORM\Column(name="ExternalAttendeeId", type="string")
+     * @var
+     */
+    private $external_attendee_id;
+
+    /**
+     * @ORM\Column(name="TicketBoughtDate", type="datetime")
+     * @var \DateTime
+     */
+    private $bought_date;
+
+    /**
+     * @ORM\Column(name="TicketChangedDate", type="datetime")
+     * @var \DateTime
+     */
+    private $changed_date;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SummitTicketType", fetch="EAGER")
+     * @ORM\JoinColumn(name="TicketTypeID", referencedColumnName="ID")
+     * @var SummitTicketType
+     */
+    private $ticket_type;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="SummitAttendee", inversedBy="tickets")
+     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
+     * @var SummitAttendee
+     */
+    private $owner;
+
     /**
      * @return mixed
      */
@@ -136,44 +173,4 @@ class SummitAttendeeTicket extends SilverstripeBaseModel
     {
         $this->owner = $owner;
     }
-
-    /**
-     * @ORM\Column(name="ExternalOrderId", type="string")
-     * @var string
-     */
-    private $external_order_id;
-
-    /**
-     * @ORM\Column(name="ExternalAttendeeId", type="string")
-     * @var
-     */
-    private $external_attendee_id;
-
-    /**
-     * @ORM\Column(name="TicketBoughtDate", type="datetime")
-     * @var \DateTime
-     */
-    private $bought_date;
-
-    /**
-     * @ORM\Column(name="TicketChangedDate", type="datetime")
-     * @var \DateTime
-     */
-    private $changed_date;
-
-
-    /**
-     * @ORM\ManyToOne(targetEntity="SummitTicketType", fetch="EAGER")
-     * @ORM\JoinColumn(name="TicketTypeID", referencedColumnName="ID")
-     * @var SummitTicketType
-     */
-    private $ticket_type;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="SummitAttendee", inversedBy="tickets")
-     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
-     * @var SummitAttendee
-     */
-    private $owner;
-
 }

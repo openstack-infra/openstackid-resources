@@ -74,11 +74,11 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testGetAttendeeByID(){
+    public function testGetAttendeeByID($attendee_id = 12641){
 
         $params = [
             'id'          => 23,
-            'attendee_id' => 12641,
+            'attendee_id' => $attendee_id,
             'expand'      => 'member,schedule,tickets,affiliations,groups'
         ];
 
@@ -101,6 +101,8 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $attendee = json_decode($content);
         $this->assertTrue(!is_null($attendee));
+
+        return $attendee;
     }
 
     public function testGetAttendeeByOrderID(){
@@ -193,5 +195,41 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
 
         $content = $response->getContent();
         $this->assertResponseStatus(204);
+    }
+
+    public function testUpdateAttendee(){
+        $attendee = $this->testGetAttendeeByID(12642);
+
+        $params = [
+            'id' => 23,
+            'attendee_id' => $attendee->id
+        ];
+
+        $data = [
+            'member_id'          => $attendee->member->id,
+            'share_contact_info' => true
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitAttendeesApiController@updateAttendee",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+        $attendee = json_decode($content);
+        $this->assertTrue(!is_null($attendee));
+        return $attendee;
     }
 }
