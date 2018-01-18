@@ -147,7 +147,13 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $attendee = $this->attendee_repository->getById($attendee_id);
             if(is_null($attendee)) return $this->error404();
 
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($attendee)->serialize($expand));
+            return $this->ok
+            (
+                SerializerRegistry::getInstance()->getSerializer
+                (
+                    $attendee,
+                    SerializerRegistry::SerializerType_Private
+                )->serialize($expand));
         }
         catch (\HTTP401UnauthorizedException $ex1) {
             Log::warning($ex1);
