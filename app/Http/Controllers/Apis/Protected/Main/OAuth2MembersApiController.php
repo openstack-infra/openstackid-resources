@@ -254,5 +254,34 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $member_id
+     * @param $rsvp_id
+     * @return mixed
+     */
+    public function deleteRSVP($member_id, $rsvp_id){
+        try{
+
+            $member = $this->repository->getById($member_id);
+            if(is_null($member)) return $this->error404();
+
+            $this->member_service->deleteRSVP($member, $rsvp_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 
 }

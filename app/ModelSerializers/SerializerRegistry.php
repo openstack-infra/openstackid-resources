@@ -106,6 +106,7 @@ final class SerializerRegistry
                 self::SerializerType_Private =>  AdminPresentationSpeakerSerializer::class
             ];
 
+        $this->registry['RSVP']                       = RSVPSerializer::class;
         $this->registry['SpeakerExpertise']           = SpeakerExpertiseSerializer::class;
         $this->registry['SpeakerLanguage']            = SpeakerLanguageSerializer::class;
         $this->registry['SpeakerTravelPreference']    = SpeakerTravelPreferenceSerializer::class;

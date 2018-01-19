@@ -29,8 +29,15 @@ interface IMemberService
 
     /**
      * @param Member $member
-     * @param $affiliation_id
+     * @param int $affiliation_id
      * @return void
      */
     public function deleteAffiliation(Member $member, $affiliation_id);
+
+    /**
+     * @param Member $member
+     * @param int $rsvp_id
+     * @return void
+     */
+    public function deleteRSVP(Member $member, $rsvp_id);
 }

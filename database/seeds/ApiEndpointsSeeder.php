@@ -693,7 +693,15 @@ class ApiEndpointsSeeder extends Seeder
                     'scopes'      => [
                         sprintf(SummitScopes::WriteMemberData, $current_realm)
                     ],
-               ]
+               ],
+               [
+                    'name'        => 'delete-member-rsvp',
+                    'route'       => '/api/v1/members/{member_id}/rsvp/{rsvp_id}',
+                    'http_method' => 'DELETE',
+                    'scopes'      => [
+                        sprintf(SummitScopes::WriteMemberData, $current_realm)
+                    ],
+                ]
             ]
         );
     }

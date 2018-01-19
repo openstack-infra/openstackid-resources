@@ -926,6 +926,26 @@ SQL;
 
     /**
      * @param Summit $summit
+     * @return null|RSVP[]
+     */
+    public function getRsvpBySummit(Summit $summit){
+        $builder = $this->createQueryBuilder();
+        $res     = $builder
+            ->select('r')
+            ->from('models\summit\RSVP','r')
+            ->join('r.owner','o')
+            ->join('r.event','e')
+            ->join('e.summit','s')
+            ->where('o.id = :owner_id and s.id = :summit_id')
+            ->setParameter('owner_id', $this->getId())
+            ->setParameter('summit_id',  $summit->getId())
+            ->getQuery()->getResult();
+
+        return $res;
+    }
+
+    /**
+     * @param Summit $summit
      * @return SummitMemberSchedule[]
      */
     public function getScheduleBySummit(Summit $summit){
@@ -1014,6 +1034,28 @@ SQL;
      */
     public function removeAffiliation(Affiliation $affiliation){
         $this->affiliations->removeElement($affiliation);
+        return $this;
+    }
+
+    /**
+     * @param int $rsvp_id
+     * @return RSVP|null
+     */
+    public function getRsvpById($rsvp_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', $rsvp_id));
+
+        $rsvp = $this->rsvp->matching($criteria)->first();
+
+        return $rsvp ? $rsvp : null;
+    }
+
+    /**
+     * @param RSVP $rsvp
+     * @return $this
+     */
+    public function removeRsvp(RSVP $rsvp){
+        $this->rsvp->removeElement($rsvp);
         return $this;
     }
 }

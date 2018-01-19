@@ -41,6 +41,25 @@ class RSVP extends SilverstripeBaseModel
     private $owner;
 
     /**
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent", inversedBy="rsvp", fetch="LAZY")
+     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID")
+     * @var SummitEvent
+     */
+    private $event;
+
+
+    /**
+     * @ORM\Column(name="SeatType", type="string")
+     */
+    protected $seat_type;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\RSVPAnswer", mappedBy="rsvp", cascade={"persist", "remove"})
+     * @var RSVPAnswer[]
+     */
+    protected $answers;
+
+    /**
      * @return ArrayCollection
      */
     public function getAnswers()
@@ -71,12 +90,6 @@ class RSVP extends SilverstripeBaseModel
         $this->owner = $owner;
     }
 
-    /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent", inversedBy="rsvp", fetch="LAZY")
-     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID")
-     * @var SummitEvent
-     */
-    private $event;
 
     /**
      * @return SummitEvent
@@ -125,9 +138,19 @@ class RSVP extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\RSVPAnswer", mappedBy="rsvp", cascade={"persist", "remove"})
-     * @var RSVPAnswer[]
+     * @return mixed
      */
-    protected $answers;
+    public function getSeatType()
+    {
+        return $this->seat_type;
+    }
+
+    /**
+     * @param mixed $seat_type
+     */
+    public function setSeatType($seat_type)
+    {
+        $this->seat_type = $seat_type;
+    }
 
 }

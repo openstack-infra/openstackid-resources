@@ -108,6 +108,12 @@ Route::group([
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2MembersApiController@deleteAffiliation']);
                 });
             });
+
+            Route::group(array('prefix' => 'rsvp'), function () {
+                Route::group(['prefix' => '{rsvp_id}'], function () {
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2MembersApiController@deleteRSVP']);
+                });
+            });
         });
     });
 

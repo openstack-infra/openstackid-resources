@@ -111,4 +111,20 @@ final class MemberService implements IMemberService
             $member->removeAffiliation($affiliation);
         });
     }
+
+    /**
+     * @param Member $member
+     * @param int $rsvp_id
+     * @return void
+     */
+    public function deleteRSVP(Member $member, $rsvp_id)
+    {
+        return $this->tx_service->transaction(function() use($member, $rsvp_id){
+            $affiliation = $member->getRsvpById($rsvp_id);
+            if(is_null($affiliation))
+                throw new EntityNotFoundException(sprintf("rsvp id %s does not belongs to member id %s", $rsvp_id, $member->getId()));
+
+            $member->removeAffiliation($affiliation);
+        });
+    }
 }

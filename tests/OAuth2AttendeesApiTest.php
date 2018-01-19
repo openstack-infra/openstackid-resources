@@ -23,7 +23,7 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
             'per_page' => 10,
             'order'    => '+id',
             'filter'   => 'email=@jimmy',
-            'expand'   => 'member,schedule'
+            'expand'   => 'member,schedule,rsvp'
         ];
 
         $headers = [
@@ -74,12 +74,12 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testGetAttendeeByID($attendee_id = 12642){
+    public function testGetAttendeeByID($attendee_id = 12923){
 
         $params = [
             'id'          => 23,
             'attendee_id' => $attendee_id,
-            'expand'      => 'member,schedule,tickets,affiliations,groups'
+            'expand'      => 'member,schedule,tickets,affiliations,groups,rsvp'
         ];
 
         $headers = [

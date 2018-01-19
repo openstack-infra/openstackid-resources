@@ -43,6 +43,7 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
         'favorite_summit_events',
         'feedback',
         'schedule_summit_events',
+        'rsvp',
     ];
 
     private static $expand_group_events = [
@@ -170,6 +171,18 @@ final class OwnMemberSerializer extends AbstractMemberSerializer
                                 ->serialize($expand);
                         }
                         $values['schedule_summit_events'] = $schedule;
+                    }
+                    break;
+                    case 'rsvp':{
+                        if(!in_array('rsvp', $relations)) break;
+                        if(is_null($summit)) break;
+                        $rsvps = [];
+                        foreach ($member->getRsvpBySummit($summit) as $rsvp){
+                            $rsvps[] = SerializerRegistry::getInstance()
+                                ->getSerializer($rsvp)
+                                ->serialize($expand);
+                        }
+                        $values['rsvp'] = $rsvps;
                     }
                     break;
                 }
