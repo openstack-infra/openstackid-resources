@@ -175,6 +175,7 @@ Route::group([
                     Route::group(array('prefix' => 'tickets'), function ()
                     {
                         Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@addAttendeeTicket']);
+                        Route::delete('{ticket_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@deleteAttendeeTicket']);
                     });
                 });
             });

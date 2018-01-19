@@ -58,4 +58,13 @@ interface IAttendeeService
      * @return SummitAttendeeTicket
      */
     public function addAttendeeTicket(SummitAttendee $attendee, array $data);
+
+    /**
+     * @param SummitAttendee $attendee
+     * @param int $ticket_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return SummitAttendeeTicket
+     */
+    public function deleteAttendeeTicket(SummitAttendee $attendee, $ticket_id);
 }

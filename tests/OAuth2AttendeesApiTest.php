@@ -74,7 +74,7 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testGetAttendeeByID($attendee_id = 12641){
+    public function testGetAttendeeByID($attendee_id = 12642){
 
         $params = [
             'id'          => 23,
@@ -266,5 +266,30 @@ class OAuth2AttendeesApiTest extends ProtectedApiTest
         $ticket = json_decode($content);
         $this->assertTrue(!is_null($ticket));
         return $ticket;
+    }
+
+    public function testDeleteAttendeeTicket(){
+        $params = [
+            'id'          => 23,
+            'attendee_id' => 12642,
+            'ticket_id'   => 14161
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitAttendeesApiController@deleteAttendeeTicket",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $this->assertResponseStatus(204);
     }
 }

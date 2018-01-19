@@ -242,4 +242,22 @@ final class AttendeeService implements IAttendeeService
             return SummitAttendeeTicketFactory::build($attendee, $type, $data);
         });
     }
+
+    /**
+     * @param SummitAttendee $attendee
+     * @param int $ticket_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return SummitAttendeeTicket
+     */
+    public function deleteAttendeeTicket(SummitAttendee $attendee, $ticket_id)
+    {
+        return $this->tx_service->transaction(function() use($attendee, $ticket_id){
+            $ticket = $attendee->getTicketById($ticket_id);
+            if(is_null($ticket)){
+                throw new EntityNotFoundException(sprintf("ticket id %s does not belongs to attendee id %s", $ticket_id, $attendee->getId()));
+            }
+            $attendee->removeTicket($ticket);
+        });
+    }
 }

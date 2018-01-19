@@ -237,5 +237,25 @@ class SummitAttendee extends SilverstripeBaseModel
        return $this->member->getRsvpByEvent($event_id);
     }
 
+    /**
+     * @param int $ticket_id
+     * @return SummitAttendeeTicket
+     */
+    public function getTicketById($ticket_id){
+        $ticket = $this->tickets->matching(
+            $criteria = Criteria::create()
+                ->where(Criteria::expr()->eq("id", $ticket_id))
+        )->first();
+        return $ticket ? $ticket : null;
+    }
+
+    /**
+     * @param SummitAttendeeTicket $ticket
+     * @return $this
+     */
+    public function removeTicket(SummitAttendeeTicket $ticket){
+        $this->tickets->removeElement($ticket);
+        return $this;
+    }
 
 }

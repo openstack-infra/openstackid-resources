@@ -615,4 +615,37 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @param $attendee_id
+     * @param $ticket_id
+     * @return mixed
+     */
+    public function deleteAttendeeTicket($summit_id, $attendee_id, $ticket_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $attendee = $this->attendee_repository->getById($attendee_id);
+            if(is_null($attendee)) return $this->error404();
+
+            $ticket = $this->attendee_service->deleteAttendeeTicket($attendee, $ticket_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

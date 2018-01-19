@@ -188,6 +188,14 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
             ),
+            array(
+                'name' => 'delete-attendee-ticket',
+                'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/tickets/{ticket_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteAttendeesData, $current_realm),
+                ],
+            ),
             // speakers
             array(
                 'name' => 'get-speakers',
