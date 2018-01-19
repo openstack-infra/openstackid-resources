@@ -29,4 +29,6 @@ final class SummitScopes
     const WriteVideoData     = '%s/summits/write-videos';
 
     const WriteAttendeesData = '%s/attendees/write';
+
+    const WriteMemberData  = '%s/members/write';
 }

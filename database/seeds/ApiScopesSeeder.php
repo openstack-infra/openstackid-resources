@@ -160,6 +160,11 @@ final class ApiScopesSeeder extends Seeder
                 'short_description' => 'Allows write only access to invitations',
                 'description' => 'Allows write only access to invitations',
             ),
+            array(
+                'name' => sprintf(SummitScopes::WriteMemberData, $current_realm),
+                'short_description' => 'Allows write only access to members',
+                'description' => 'Allows write only access to memberss',
+            ),
         ];
 
         foreach ($scopes as $scope_info) {

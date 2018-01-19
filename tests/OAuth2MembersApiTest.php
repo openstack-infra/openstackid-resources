@@ -136,4 +136,39 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($members));
         $this->assertResponseStatus(200);
     }
+
+    public function testUpdateMemberAffiliation(){
+        $params = [
+            'member_id'      => 11624,
+            'affiliation_id' => 61749,
+        ];
+
+        $data = [
+            'is_current' => true,
+            'end_date'   => 0,
+            'job_title'  => 'test update'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2MembersApiController@updateAffiliation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $affiliation = json_decode($content);
+        $this->assertTrue(!is_null($affiliation));
+        return $affiliation;
+    }
 }

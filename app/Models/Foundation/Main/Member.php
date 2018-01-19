@@ -70,6 +70,7 @@ class Member extends SilverstripeBaseModel
 
     /**
      * @ORM\OneToMany(targetEntity="Affiliation", mappedBy="owner", cascade={"persist"})
+     * @var Affiliation[]
      */
     private $affiliations;
 
@@ -994,4 +995,25 @@ SQL;
         $calendar_sync_info->clearOwner();
     }
 
+    /**
+     * @param int $affiliation_id
+     * @return Affiliation|null
+     */
+    public function getAffiliationById($affiliation_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', $affiliation_id));
+
+        $affiliation = $this->affiliations->matching($criteria)->first();
+
+        return $affiliation ? $affiliation : null;
+    }
+
+    /**
+     * @param Affiliation $affiliation
+     * @return $this
+     */
+    public function removeAffiliation(Affiliation $affiliation){
+        $this->affiliations->removeElement($affiliation);
+        return $this;
+    }
 }

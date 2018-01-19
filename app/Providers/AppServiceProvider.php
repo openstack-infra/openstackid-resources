@@ -200,6 +200,29 @@ class AppServiceProvider extends ServiceProvider
             });
             return in_array($value, [ PushNotificationMessagePriority::Normal, PushNotificationMessagePriority::High]);
         });
+
+
+        Validator::extend('after_or_null_epoch', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('after_or_null_epoch', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be zero or after %s", $attribute, $parameters[0]);
+            });
+            $data = $validator->getData();
+            if(is_null($value) || intval($value) == 0 ) return true;
+            if(isset($data[$parameters[0]])){
+                $compare_to = $data[$parameters[0]];
+                return intval($compare_to) < intval($value);
+            }
+            return true;
+        });
+
+        Validator::extend('valid_epoch', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('valid_epoch', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid epoch value", $attribute);
+            });
+           return intval($value) > 0;
+        });
     }
 
     /**

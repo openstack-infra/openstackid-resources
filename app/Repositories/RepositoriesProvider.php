@@ -19,11 +19,11 @@ use models\main\Company;
 use models\main\EmailCreationRequest;
 use models\main\File;
 use models\main\Group;
+use models\main\Organization;
 use models\summit\ISummitTicketTypeRepository;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\SummitTicketType;
-
 /**
  * Class RepositoriesProvider
  * @package repositories
@@ -238,6 +238,12 @@ final class RepositoriesProvider extends ServiceProvider
             ISummitTicketTypeRepository::class,
             function(){
                 return  EntityManager::getRepository(SummitTicketType::class);
+            });
+
+        App::singleton(
+            'models\main\IOrganizationRepository',
+            function(){
+                return  EntityManager::getRepository(Organization::class);
             });
     }
 }

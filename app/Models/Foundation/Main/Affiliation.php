@@ -11,10 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping as ORM;
 use models\utils\SilverstripeBaseModel;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="Affiliation")
@@ -40,6 +38,12 @@ class Affiliation extends SilverstripeBaseModel
      * @var bool
      */
     private $is_current;
+
+    /**
+     * @ORM\Column(name="JobTitle", type="string")
+     * @var string
+     */
+    private $job_title;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="affiliations")
@@ -170,4 +174,19 @@ class Affiliation extends SilverstripeBaseModel
         return $this->getOrganizationId() > 0;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getJobTitle()
+    {
+        return $this->job_title;
+    }
+
+    /**
+     * @param mixed $job_title
+     */
+    public function setJobTitle($job_title)
+    {
+        $this->job_title = $job_title;
+    }
 }

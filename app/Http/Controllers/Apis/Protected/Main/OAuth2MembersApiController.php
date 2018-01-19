@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Model\IMemberService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\IMemberRepository;
@@ -32,18 +33,26 @@ use utils\PagingInfo;
 final class OAuth2MembersApiController extends OAuth2ProtectedController
 {
     /**
+     * @var IMemberService
+     */
+    private $member_service;
+
+    /**
      * OAuth2MembersApiController constructor.
      * @param IMemberRepository $member_repository
+     * @param IMemberService $member_service
      * @param IResourceServerContext $resource_server_context
      */
     public function __construct
     (
         IMemberRepository $member_repository,
+        IMemberService $member_service,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
-        $this->repository = $member_repository;
+        $this->repository     = $member_repository;
+        $this->member_service = $member_service;
     }
 
     public function getAll(){
@@ -161,6 +170,88 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
                     is_null($relations) ? [] : explode(',', $relations)
                 )
         );
+    }
+
+    /**
+     * @param int $member_id
+     * @param int $affiliation_id
+     * @return mixed
+     */
+    public function updateAffiliation($member_id, $affiliation_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $member = $this->repository->getById($member_id);
+            if(is_null($member)) return $this->error404();
+
+            $rules = [
+                'is_current'      => 'sometimes|boolean',
+                'start_date'      => 'sometimes|date_format:U|valid_epoch',
+                'end_date'        => 'sometimes|date_format:U|after_or_null_epoch:start_date',
+                'organization_id' => 'sometimes|integer',
+                'job_title'       => 'sometimes|string|max:255'
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $affiliation = $this->member_service->updateAffiliation($member, $affiliation_id, $data->all());
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $member_id
+     * @param $affiliation_id
+     * @return mixed
+     */
+    public function deleteAffiliation($member_id, $affiliation_id){
+        try{
+
+            $member = $this->repository->getById($member_id);
+            if(is_null($member)) return $this->error404();
+
+            $this->member_service->deleteAffiliation($member, $affiliation_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 
 

@@ -666,23 +666,34 @@ class ApiEndpointsSeeder extends Seeder
 
         $this->seedApiEndpoints('members', [
                // members
-                array(
+               [
                     'name' => 'get-members',
                     'route' => '/api/v1/members',
                     'http_method' => 'GET',
                     'scopes' => [sprintf('%s/members/read', $current_realm)],
-                )
-            ]
-        );
-
-        $this->seedApiEndpoints('members', [
-                // members
-                array(
+               ],
+               [
                     'name'        => 'get-my-member',
                     'route'       => '/api/v1/members/me',
                     'http_method' => 'GET',
                     'scopes'      => [sprintf('%s/members/read/me', $current_realm)],
-                )
+               ],
+               [
+                    'name'        => 'update-member-affiliation',
+                    'route'       => '/api/v1/members/{member_id}/affiliations/{affiliation_id}',
+                    'http_method' => 'PUT',
+                    'scopes'      => [
+                        sprintf(SummitScopes::WriteMemberData, $current_realm)
+                    ],
+               ],
+               [
+                    'name'        => 'delete-member-affiliation',
+                    'route'       => '/api/v1/members/{member_id}/affiliations/{affiliation_id}',
+                    'http_method' => 'DELETE',
+                    'scopes'      => [
+                        sprintf(SummitScopes::WriteMemberData, $current_realm)
+                    ],
+               ]
             ]
         );
     }

@@ -58,6 +58,7 @@ class AccessTokenServiceStub implements IAccessTokenService
             $url . '/me/summits/events/favorites/delete',
             sprintf(SummitScopes::WriteSpeakersData, $url),
             sprintf(SummitScopes::WriteAttendeesData, $url),
+            sprintf(SummitScopes::WriteMemberData, $url),
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','11624', 3600, 'WEB_APPLICATION', '', '');
@@ -104,6 +105,7 @@ class AccessTokenServiceStub2 implements IAccessTokenService
             $url . '/me/summits/events/favorites/delete',
             sprintf(SummitScopes::WriteSpeakersData, $url),
             sprintf(SummitScopes::WriteAttendeesData, $url),
+            sprintf(SummitScopes::WriteMemberData, $url),
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, null,null, 3600, 'SERVICE', '', '');

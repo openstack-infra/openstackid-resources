@@ -11,12 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping as ORM;
 use models\utils\SilverstripeBaseModel;
-
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="repositories\main\DoctrineOrganizationRepository")
  * @ORM\Table(name="Org")
  * Class Organization
  * @package models\main

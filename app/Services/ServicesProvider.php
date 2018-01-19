@@ -13,6 +13,8 @@
  **/
 use App\Services\Model\AttendeeService;
 use App\Services\Model\IAttendeeService;
+use App\Services\Model\IMemberService;
+use App\Services\Model\MemberService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -119,6 +121,11 @@ class ServicesProvider extends ServiceProvider
         (
             'App\Services\Model\IAdminActionsCalendarSyncProcessingService',
             'App\Services\Model\AdminActionsCalendarSyncProcessingService'
+        );
+
+        App::singleton(
+            IMemberService::class,
+            MemberService::class
         );
     }
 }

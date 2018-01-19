@@ -22,9 +22,9 @@ use models\main\Affiliation;
 final class AffiliationSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-
         'StartDate'       => 'start_date:datetime_epoch',
         'EndDate'         => 'end_date:datetime_epoch',
+        'JobTitle'        => 'job_title:json_string',
         'OwnerId'         => 'owner_id:json_int',
         'IsCurrent'       => 'is_current:json_boolean',
         'OrganizationId'  => 'organization_id:json_int'
