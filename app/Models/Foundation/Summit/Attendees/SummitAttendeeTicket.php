@@ -136,7 +136,7 @@ class SummitAttendeeTicket extends SilverstripeBaseModel
      */
     public function getTicketTypeId(){
         try{
-            return $this->ticket_type->getId();
+            return is_null($this->ticket_type) ? 0 : $this->ticket_type->getId();
         }
         catch(\Exception $ex){
             return 0;
@@ -173,4 +173,25 @@ class SummitAttendeeTicket extends SilverstripeBaseModel
     {
         $this->owner = $owner;
     }
+
+    /**
+     * @return int
+     */
+    public function getOwnerId(){
+        try{
+            return is_null($this->owner) ? 0 : $this->owner->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasOwner(){
+        return $this->getOwnerId() > 0;
+    }
+
+
 }

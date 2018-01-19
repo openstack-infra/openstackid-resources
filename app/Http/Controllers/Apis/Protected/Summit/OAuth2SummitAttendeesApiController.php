@@ -563,4 +563,56 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $attendee_id
+     * @return mixed
+     */
+    public function addAttendeeTicket($summit_id, $attendee_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $attendee = $this->attendee_repository->getById($attendee_id);
+            if(is_null($attendee)) return $this->error404();
+
+            $rules = [
+                'ticket_type_id'       => 'required|integer',
+                'external_order_id'    => 'required|string',
+                'external_attendee_id' => 'required|string',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $ticket = $this->attendee_service->addAttendeeTicket($attendee, $data->all());
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($ticket)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

@@ -172,6 +172,10 @@ Route::group([
                             Route::put('/check-in', 'OAuth2SummitAttendeesApiController@checkingAttendeeOnEvent')->where('attendee_id', 'me|[0-9]+');
                         });
                     });
+                    Route::group(array('prefix' => 'tickets'), function ()
+                    {
+                        Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@addAttendeeTicket']);
+                    });
                 });
             });
 

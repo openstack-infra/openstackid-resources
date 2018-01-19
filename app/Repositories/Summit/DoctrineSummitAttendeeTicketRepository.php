@@ -14,6 +14,7 @@
 use models\summit\ISummitAttendeeTicketRepository;
 use models\summit\SummitAttendeeTicket;
 use App\Repositories\SilverStripeDoctrineRepository;
+use models\utils\IEntity;
 
 /**
  * Class DoctrineSummitAttendeeTicketRepository
@@ -50,5 +51,16 @@ final class DoctrineSummitAttendeeTicketRepository
     protected function getBaseEntity()
     {
        return SummitAttendeeTicket::class;
+    }
+
+    /**
+     * @param IEntity $entity
+     * @return void
+     */
+    public function delete($entity)
+    {
+        $this->_em->getConnection()->delete("
+        SummitAttendeeTicket
+        ", ["ID" => $entity->getIdentifier()]);
     }
 }

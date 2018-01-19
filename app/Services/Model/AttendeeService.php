@@ -11,14 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use GuzzleHttp\Exception\ClientException;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\IMemberRepository;
 use models\summit\factories\SummitAttendeeFactory;
+use models\summit\factories\SummitAttendeeTicketFactory;
 use models\summit\ISummitAttendeeRepository;
+use models\summit\ISummitAttendeeTicketRepository;
+use models\summit\ISummitTicketTypeRepository;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
+use models\summit\SummitAttendeeTicket;
+use services\apis\IEventbriteAPI;
+
 /**
  * Class AttendeeService
  * @package App\Services\Model
@@ -37,20 +44,42 @@ final class AttendeeService implements IAttendeeService
     private $member_repository;
 
     /**
+     * @var ISummitTicketTypeRepository
+     */
+    private $ticket_type_repository;
+
+    /**
+     * @var ISummitAttendeeTicketRepository
+     */
+    private $ticket_repository;
+
+    /**
      * @var ITransactionService
      */
     private $tx_service;
+
+    /**
+     * @var IEventbriteAPI
+     */
+    private $eventbrite_api;
+
 
     public function __construct
     (
         ISummitAttendeeRepository $attendee_repository,
         IMemberRepository $member_repository,
+        ISummitAttendeeTicketRepository $ticket_repository,
+        ISummitTicketTypeRepository $ticket_type_repository,
+        IEventbriteAPI $eventbrite_api,
         ITransactionService $tx_service
     )
     {
-        $this->attendee_repository = $attendee_repository;
-        $this->member_repository   = $member_repository;
-        $this->tx_service          = $tx_service;
+        $this->attendee_repository    = $attendee_repository;
+        $this->ticket_repository      = $ticket_repository;
+        $this->member_repository      = $member_repository;
+        $this->ticket_type_repository = $ticket_type_repository;
+        $this->eventbrite_api         = $eventbrite_api;
+        $this->tx_service             = $tx_service;
     }
 
     /**
@@ -137,6 +166,80 @@ final class AttendeeService implements IAttendeeService
 
             return SummitAttendeeFactory::updateMainData($summit, $attendee, $member , $data);
 
+        });
+    }
+
+    /**
+     * @param SummitAttendee $attendee
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return SummitAttendeeTicket
+     */
+    public function addAttendeeTicket(SummitAttendee $attendee, array $data){
+        return $this->tx_service->transaction(function() use($attendee, $data){
+
+            if(!isset($data['ticket_type_id']))
+                throw new ValidationException("ticket_type_id is mandatory!");
+
+            $type = $this->ticket_type_repository->getById(intval($data['ticket_type_id']));
+
+            if(is_null($type))
+                throw new EntityNotFoundException(sprintf("ticket type %s not found!", $data['ticket_type_id']));
+
+            $old_ticket = $this->ticket_repository->getByExternalOrderIdAndExternalAttendeeId
+            (
+                $data['external_order_id'],
+                $data['external_attendee_id']
+            );
+
+            if(!is_null($old_ticket)) {
+                if ($old_ticket->hasOwner())
+                    throw new ValidationException
+                    (
+                        sprintf
+                        (
+                            "external_order_id %s - external_attendee_id %s already assigned to attendee id %s",
+                            $data['external_order_id'],
+                            $data['external_attendee_id'],
+                            $old_ticket->getOwner()->getId()
+                        )
+                    );
+                $this->ticket_repository->delete($old_ticket);
+            }
+
+            // validate with external api ...
+
+            try {
+                $external_order          = $this->eventbrite_api->getOrder($data['external_order_id']);
+                $external_attendee_found = false;
+                $summit_external_id      = $external_order['event_id'];
+
+                if (intval($attendee->getSummit()->getSummitExternalId()) !== intval($summit_external_id))
+                    throw new ValidationException('order %s does not belongs to current summit!', $external_order_id);
+
+                foreach ($external_order['attendees'] as $external_attendee){
+                   if($data['external_attendee_id'] == $external_attendee['id']){
+                       $external_attendee_found = true;
+                       break;
+                   }
+                }
+                if(!$external_attendee_found){
+                    throw new ValidationException
+                    (
+                      sprintf("external_attendee_id %s does not belongs to external_order_id %s", $data['external_attendee_id'], $data['external_order_id'])
+                    );
+                }
+            }
+            catch (ClientException $ex1) {
+                if ($ex1->getCode() === 400)
+                    throw new EntityNotFoundException('external order does not exists!');
+                if ($ex1->getCode() === 403)
+                    throw new EntityNotFoundException('external order does not exists!');
+                throw $ex1;
+            }
+
+            return SummitAttendeeTicketFactory::build($attendee, $type, $data);
         });
     }
 }

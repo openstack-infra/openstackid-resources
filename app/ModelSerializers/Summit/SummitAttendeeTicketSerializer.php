@@ -1,6 +1,4 @@
 <?php namespace ModelSerializers;
-use models\summit\SummitAttendeeTicket;
-
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +11,11 @@ use models\summit\SummitAttendeeTicket;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\SummitAttendeeTicket;
+/**
+ * Class SummitAttendeeTicketSerializer
+ * @package ModelSerializers
+ */
 final class SummitAttendeeTicketSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
@@ -20,6 +23,7 @@ final class SummitAttendeeTicketSerializer extends SilverStripeSerializer
         'ExternalAttendeeId' => 'external_attendee_id:json_string',
         'BoughtDate'         => 'bought_date:datetime_epoch',
         'TicketTypeId'       => 'ticket_type_id:json_int',
+        'OwnerId'            => 'owner_id:json_int',
     ];
 
     /**
@@ -39,11 +43,19 @@ final class SummitAttendeeTicketSerializer extends SilverStripeSerializer
             foreach ($exp_expand as $relation) {
                 switch (trim($relation)) {
                     case 'ticket_type': {
+                        if(!$ticket->hasTicketType()) continue;
                         unset($values['ticket_type_id']);
                         $values['ticket_type'] = SerializerRegistry::getInstance()->getSerializer($ticket->getTicketType())->serialize();
                     }
                     break;
+                    case 'owner_id': {
+                        if(!$ticket->hasOwner()) continue;
+                        unset($values['owner_id']);
+                        $values['owner'] = SerializerRegistry::getInstance()->getSerializer($ticket->getOwner())->serialize();
+                    }
+                    break;
                 }
+
             }
         }
 

@@ -180,6 +180,14 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
             ),
+            array(
+                'name' => 'add-attendee-ticket',
+                'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/tickets',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteAttendeesData, $current_realm),
+                ],
+            ),
             // speakers
             array(
                 'name' => 'get-speakers',

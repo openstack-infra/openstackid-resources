@@ -15,6 +15,7 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
+use models\summit\SummitAttendeeTicket;
 /**
  * Interface IAttendeeService
  * @package App\Services\Model
@@ -48,4 +49,13 @@ interface IAttendeeService
      * @throws EntityNotFoundException
      */
     public function updateAttendee(Summit $summit, $attendee_id, array $data);
+
+    /**
+     * @param SummitAttendee $attendee
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return SummitAttendeeTicket
+     */
+    public function addAttendeeTicket(SummitAttendee $attendee, array $data);
 }

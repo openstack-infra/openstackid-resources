@@ -1,6 +1,6 @@
-<?php namespace models\summit;
+<?php namespace App\Repositories\Summit;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,25 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IBaseRepository;
+use App\Repositories\SilverStripeDoctrineRepository;
+use models\summit\ISummitTicketTypeRepository;
+use models\summit\SummitTicketType;
 /**
- * Interface ISummitRepository
- * @package models\summit
+ * Class DoctrineSummitTicketTypeRepository
+ * @package App\Repositories\Summit
  */
-interface ISummitRepository extends IBaseRepository
+final class DoctrineSummitTicketTypeRepository
+    extends SilverStripeDoctrineRepository
+    implements ISummitTicketTypeRepository
 {
     /**
-     * @return Summit
+     * @return string
      */
-    public function getCurrent();
-
-    /**
-     * @return Summit[]
-     */
-    public function getAvailables();
-
-    /**
-     * @return Summit[]
-     */
-    public function getAllOrderedByBeginDate();
+    protected function getBaseEntity()
+    {
+        return SummitTicketType::class;
+    }
 }

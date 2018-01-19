@@ -1,6 +1,6 @@
 <?php namespace models\summit;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,23 +13,10 @@
  **/
 use models\utils\IBaseRepository;
 /**
- * Interface ISummitRepository
+ * Interface ISummitTicketTypeRepository
  * @package models\summit
  */
-interface ISummitRepository extends IBaseRepository
+interface ISummitTicketTypeRepository extends IBaseRepository
 {
-    /**
-     * @return Summit
-     */
-    public function getCurrent();
 
-    /**
-     * @return Summit[]
-     */
-    public function getAvailables();
-
-    /**
-     * @return Summit[]
-     */
-    public function getAllOrderedByBeginDate();
 }
