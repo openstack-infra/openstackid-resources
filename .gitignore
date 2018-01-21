@@ -25,3 +25,4 @@ doc/build
 storage/*
 *.log
 routes.txt
+/storage/logs/

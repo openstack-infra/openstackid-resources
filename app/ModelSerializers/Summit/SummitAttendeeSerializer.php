@@ -50,13 +50,6 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
         $values         = parent::serialize($expand, $fields, $relations, $params);
         $member         = null;
         $speaker        = null;
-        $schedule       = [];
-
-        foreach ($attendee->getScheduledEventsIds() as $event_id){
-            $schedule[] = intval($event_id);
-        }
-
-        $values['schedule'] = $schedule;
 
         $tickets = [];
         foreach($attendee->getTickets() as $t)
@@ -80,16 +73,6 @@ final class SummitAttendeeSerializer extends SilverStripeSerializer
             $exp_expand = explode(',', $expand);
             foreach ($exp_expand as $relation) {
                 switch (trim($relation)) {
-                    case 'schedule': {
-                        unset($values['schedule']);
-                        $schedule = [];
-                        foreach ($attendee->getSchedule() as $s) {
-                            if(!$summit->isEventOnSchedule($s->getEvent()->getId())) continue;
-                            $schedule[] = SerializerRegistry::getInstance()->getSerializer($s)->serialize();
-                        }
-                        $values['schedule'] = $schedule;
-                    }
-                    break;
                     case 'tickets': {
                         unset($values['tickets']);
                         $tickets = [];

@@ -330,6 +330,13 @@ Route::group([
                 Route::get('{track_group_id}', 'OAuth2SummitApiController@getTrackGroup');
             });
 
+            // promo codes
+            Route::group(['prefix' => 'promo-codes'], function () {
+
+                Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@getAllBySummit']);
+
+            });
+
         });
     });
 

@@ -51,4 +51,33 @@ class SponsorSummitRegistrationPromoCode extends MemberSummitRegistrationPromoCo
     {
         $this->sponsor = $sponsor;
     }
+
+    const ClassName = 'SPONSOR_PROMO_CODE';
+
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return self::ClassName;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function getSponsorId(){
+        try {
+            return is_null($this->sponsor) ? 0: $this->sponsor->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSponsor(){
+        return $this->getSponsorId() > 0;
+    }
 }

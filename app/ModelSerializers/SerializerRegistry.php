@@ -122,8 +122,11 @@ final class SerializerRegistry
         $this->registry['SummitEntityEvent']           = SummitEntityEventSerializer::class;
         $this->registry['SummitEventWithFile']         = SummitEventWithFileSerializer::class;
         $this->registry['SummitScheduleEmptySpot']     = SummitScheduleEmptySpotSerializer::class;
-        $this->registry['SummitRegistrationPromoCode'] = SummitRegistrationPromoCodeSerializer::class;
+        // promo codes
+        $this->registry['SummitRegistrationPromoCode']        = SummitRegistrationPromoCodeSerializer::class;
+        $this->registry['MemberSummitRegistrationPromoCode']  = MemberSummitRegistrationPromoCodeSerializer::class;
         $this->registry['SpeakerSummitRegistrationPromoCode'] = SpeakerSummitRegistrationPromoCodeSerializer::class;
+        $this->registry['SponsorSummitRegistrationPromoCode'] = SponsorSummitRegistrationPromoCodeSerializer::class;
         $this->registry['PresentationSpeakerSummitAssistanceConfirmationRequest'] = PresentationSpeakerSummitAssistanceConfirmationRequestSerializer::class;
         // locations
         $this->registry['SummitVenue']                = SummitVenueSerializer::class;

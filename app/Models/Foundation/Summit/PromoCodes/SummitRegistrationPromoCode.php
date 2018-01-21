@@ -150,4 +150,32 @@ class SummitRegistrationPromoCode extends SilverstripeBaseModel
     public function setSourceAdmin(){
         $this->source = 'ADMIN';
     }
+
+    /**
+     * @return int
+     */
+    public function getCreatorId(){
+        try {
+            return is_null($this->creator) ? 0: $this->creator->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCreator(){
+        return $this->getCreatorId() > 0;
+    }
+
+    const ClassName = 'SUMMIT_PROMO_CODE';
+
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return self::ClassName;
+    }
 }

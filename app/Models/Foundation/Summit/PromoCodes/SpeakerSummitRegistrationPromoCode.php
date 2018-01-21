@@ -82,4 +82,20 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
             return 0;
         }
     }
+
+    /**
+     * @return bool
+     */
+    public function hasSpeaker(){
+        return $this->getSpeakerId() > 0;
+    }
+
+    const ClassName = 'SPEAKER_PROMO_CODE';
+
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return self::ClassName;
+    }
 }

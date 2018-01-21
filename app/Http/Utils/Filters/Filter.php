@@ -192,6 +192,10 @@ final class Filter
                     $query = $mapping->apply($query, $filter);
                     continue;
                 }
+                if ($mapping instanceof DoctrineInstanceOfFilterMapping) {
+                    $query = $mapping->apply($query, $filter);
+                    continue;
+                }
                 else if(is_array($mapping)){
                     $condition = '';
                     foreach ($mapping as $mapping_or){
@@ -240,6 +244,12 @@ final class Filter
                             continue;
                         }
                         if ($mapping instanceof DoctrineFilterMapping) {
+                            $condition = $mapping->applyOr($query, $e);
+                            if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
+                            $sub_or_query .= $condition;
+                            continue;
+                        }
+                        if ($mapping instanceof DoctrineInstanceOfFilterMapping) {
                             $condition = $mapping->applyOr($query, $e);
                             if(!empty($sub_or_query)) $sub_or_query .= ' OR ';
                             $sub_or_query .= $condition;

@@ -134,4 +134,32 @@ class MemberSummitRegistrationPromoCode extends SummitRegistrationPromoCode
         $this->owner = $owner;
     }
 
+    const ClassName = 'MEMBER_PROMO_CODE';
+
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return self::ClassName;
+    }
+
+    /**
+     * @return int
+     */
+    public function getOwnerId(){
+        try {
+            return is_null($this->owner) ? 0: $this->owner->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasOwner(){
+        return $this->getOwnerId() > 0;
+    }
+
 }

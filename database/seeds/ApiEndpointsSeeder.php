@@ -656,6 +656,17 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/notifications',
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/summits/read-notifications', $current_realm)],
+            ),
+            // promo codes
+              // notifications
+            array(
+                'name' => 'get-promo-codes',
+                'route' => '/api/v1/summits/{id}/promo-codes',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             )
         ]);
 
