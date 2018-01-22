@@ -15,6 +15,7 @@ use App\Services\Model\AttendeeService;
 use App\Services\Model\IAttendeeService;
 use App\Services\Model\IMemberService;
 use App\Services\Model\MemberService;
+use App\Services\Model\SummitPromoCodeService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -22,6 +23,8 @@ use ModelSerializers\BaseSerializerTypeSelector;
 use ModelSerializers\ISerializerTypeSelector;
 use services\apis\EventbriteAPI;
 use services\apis\FireBaseGCMApi;
+use services\model\ISummitPromoCodeService;
+
 /***
  * Class ServicesProvider
  * @package services
@@ -126,6 +129,12 @@ class ServicesProvider extends ServiceProvider
         App::singleton(
             IMemberService::class,
             MemberService::class
+        );
+
+        App::singleton
+        (
+            ISummitPromoCodeService::class,
+            SummitPromoCodeService::class
         );
     }
 }

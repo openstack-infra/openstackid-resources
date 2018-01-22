@@ -162,6 +162,11 @@ class Summit extends SilverstripeBaseModel
      */
     private $wifi_connections;
 
+    /**
+     * @ORM\OneToMany(targetEntity="SummitRegistrationPromoCode", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitRegistrationPromoCode[]
+     */
+    private $promo_codes;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\File")
@@ -441,6 +446,7 @@ class Summit extends SilverstripeBaseModel
         $this->attendees               = new ArrayCollection();
         $this->entity_events           = new ArrayCollection();
         $this->wifi_connections        = new ArrayCollection();
+        $this->promo_codes             = new ArrayCollection();
     }
 
     /**
@@ -615,7 +621,7 @@ class Summit extends SilverstripeBaseModel
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($location_id)));
         $location = $this->locations->matching($criteria)->first();
-        return $location === false ? null:$location;
+        return $location === false ? null : $location;
     }
 
     /**
@@ -1336,5 +1342,24 @@ SQL;
      */
     public function getSpeakerAnnouncementEmailAlternateRejectedCount(){
         return $this->getSpeakerAnnouncementEmailCount('ALTERNATE_REJECTED');
+    }
+
+    /**
+     * @param SummitRegistrationPromoCode $promo_code
+     */
+    public function addPromoCode(SummitRegistrationPromoCode $promo_code){
+        $this->promo_codes->add($promo_code);
+        $promo_code->setSummit($this);
+    }
+
+    /**
+     * @param string $code
+     * @return SummitRegistrationPromoCode|null
+     */
+    public function getPromoCodeByCode($code){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('code', trim($code)));
+        $promo_code = $this->promo_codes->matching($criteria)->first();
+        return $promo_code === false ? null : $promo_code;
     }
 }

@@ -333,6 +333,7 @@ Route::group([
             // promo codes
             Route::group(['prefix' => 'promo-codes'], function () {
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@getAllBySummit']);
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@addPromoCodeBySummit']);
                 Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@getMetadata']);
             });
 

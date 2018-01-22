@@ -144,6 +144,7 @@ class SummitRegistrationPromoCode extends SilverstripeBaseModel
     public function __construct()
     {
         $this->email_sent = false;
+        $this->redeemed   = false;
         parent::__construct();
     }
 

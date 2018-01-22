@@ -23,6 +23,7 @@ use models\main\Member;
 class MemberSummitRegistrationPromoCode extends SummitRegistrationPromoCode
 {
 
+    public static $valid_type_values = ["VIP","ATC","MEDIA ANALYST","SPONSOR"];
     /**
      * @ORM\Column(name="FirstName", type="string")
      * @var string

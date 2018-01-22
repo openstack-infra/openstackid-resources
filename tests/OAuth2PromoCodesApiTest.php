@@ -187,7 +187,7 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
 
         $response = $this->action(
             "GET",
-            "OAuth2SummitPromoCodesApiController@getMetadata",
+            "OAuth2SummitPromoCodesApiController@addPromoCodeBySummit",
             $params,
             [],
             [],
@@ -197,7 +197,44 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
 
         $content = $response->getContent();
         $this->assertResponseStatus(200);
-        $metadata = json_decode($content);
-        $this->assertTrue(!is_null($metadata));
+        $promo_code = json_decode($content);
+        $this->assertTrue(!is_null($promo_code));
+    }
+
+    public function testAddPromoCode($code = "12344KG_SPEAKER"){
+        $params = [
+            'id' => 23,
+        ];
+
+        $data = [
+            'code'       => $code,
+            'class_name' => \models\summit\MemberSummitRegistrationPromoCode::ClassName,
+            'first_name' => 'Sebastian',
+            'last_name'  => 'Marcet',
+            'email'      => 'test@test.com',
+            'type'       => \models\summit\MemberSummitRegistrationPromoCode::$valid_type_values[0]
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitPromoCodesApiController@addPromoCodeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $promo_code = json_decode($content);
+        $this->assertTrue(!is_null($promo_code));
+        return $promo_code;
     }
 }

@@ -101,7 +101,7 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
 
     public static $metadata = [
         'class_name' => self::ClassName,
-        'speaker_id'   => 'integer'
+        'speaker_id' => 'integer'
     ];
 
     /**
@@ -110,4 +110,6 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
     public static function getMetadata(){
         return array_merge(SummitRegistrationPromoCode::getMetadata(), self::$metadata);
     }
+
+    public static $valid_type_values = ["ACCEPTED", "ALTERNATE"];
 }

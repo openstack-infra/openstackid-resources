@@ -61,7 +61,6 @@ class SponsorSummitRegistrationPromoCode extends MemberSummitRegistrationPromoCo
         return self::ClassName;
     }
 
-
     /**
      * @return int
      */
