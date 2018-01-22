@@ -102,7 +102,7 @@ Route::group([
         Route::group(['prefix'=>'{member_id}'], function(){
 
             Route::group(['prefix' => 'affiliations'], function(){
-
+                Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2MembersApiController@getMemberAffiliations']);
                 Route::group(['prefix' => '{affiliation_id}'], function(){
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2MembersApiController@updateAffiliation']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2MembersApiController@deleteAffiliation']);

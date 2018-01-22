@@ -26,6 +26,8 @@ use utils\OrderParser;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Log;
 use utils\PagingInfo;
+use utils\PagingResponse;
+
 /**
  * Class OAuth2MembersApiController
  * @package App\Http\Controllers
@@ -170,6 +172,48 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
                     is_null($relations) ? [] : explode(',', $relations)
                 )
         );
+    }
+
+
+    /**
+     * @param $member_id
+     * @return mixed
+     */
+    public function getMemberAffiliations($member_id){
+        try {
+
+            $member = $this->repository->getById($member_id);
+            if(is_null($member)) return $this->error404();
+            $affiliations = $member->getAffiliations()->toArray();
+
+            $response    = new PagingResponse
+            (
+                count($affiliations),
+                count($affiliations),
+                1,
+                1,
+                $affiliations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand','')));
+
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2) {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch(FilterParserException $ex3){
+            Log::warning($ex3);
+            return $this->error412($ex3->getMessages());
+        }
+        catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 
     /**

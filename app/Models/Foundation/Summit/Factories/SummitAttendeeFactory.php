@@ -41,8 +41,8 @@ final class SummitAttendeeFactory
         $attendee->setMember($member);
         $attendee->setSummit($summit);
 
-        if(isset($data['share_contact_info']))
-            $attendee->setShareContactInfo($data['share_contact_info']);
+        if(isset($data['shared_contact_info']))
+            $attendee->setShareContactInfo($data['shared_contact_info']);
 
         if(isset($data['summit_hall_checked_in']))
             $attendee->setSummitHallCheckedIn($data['summit_hall_checked_in']);

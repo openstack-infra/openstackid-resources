@@ -120,11 +120,11 @@ final class MemberService implements IMemberService
     public function deleteRSVP(Member $member, $rsvp_id)
     {
         return $this->tx_service->transaction(function() use($member, $rsvp_id){
-            $affiliation = $member->getRsvpById($rsvp_id);
-            if(is_null($affiliation))
+            $rsvp = $member->getRsvpById($rsvp_id);
+            if(is_null($rsvp))
                 throw new EntityNotFoundException(sprintf("rsvp id %s does not belongs to member id %s", $rsvp_id, $member->getId()));
 
-            $member->removeAffiliation($affiliation);
+            $member->removeRsvp($rsvp);
         });
     }
 }

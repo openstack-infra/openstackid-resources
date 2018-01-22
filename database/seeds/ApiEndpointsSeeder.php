@@ -706,6 +706,12 @@ class ApiEndpointsSeeder extends Seeder
                     'scopes'      => [sprintf('%s/members/read/me', $current_realm)],
                ],
                [
+                    'name'        => 'get-member-affiliations',
+                    'route'       => '/api/v1/members/{member_id}/affiliations',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf('%s/members/read', $current_realm)],
+               ],
+               [
                     'name'        => 'update-member-affiliation',
                     'route'       => '/api/v1/members/{member_id}/affiliations/{affiliation_id}',
                     'http_method' => 'PUT',

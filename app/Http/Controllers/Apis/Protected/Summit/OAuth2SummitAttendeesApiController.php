@@ -449,7 +449,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $rules = [
 
                 'member_id'                   => 'required|integer',
-                'share_contact_info'          => 'sometimes|boolean',
+                'shared_contact_info'         => 'sometimes|boolean',
                 'summit_hall_checked_in'      => 'sometimes|boolean',
                 'summit_hall_checked_in_date' => 'sometimes|date_format:U',
             ];
@@ -533,7 +533,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
 
             $rules = [
                 'member_id'                   => 'required|integer',
-                'share_contact_info'          => 'sometimes|boolean',
+                'shared_contact_info'         => 'sometimes|boolean',
                 'summit_hall_checked_in'      => 'sometimes|boolean',
                 'summit_hall_checked_in_date' => 'sometimes|date_format:U',
             ];
