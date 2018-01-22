@@ -174,4 +174,17 @@ class DoctrineSummitRegistrationPromoCodeRepository
             $data
         );
     }
+
+    /**
+     * @param Summit $summit
+     * @return array
+     */
+    public function getMetadata(Summit $summit)
+    {
+       return [
+           MemberSummitRegistrationPromoCode::getMetadata(),
+           SpeakerSummitRegistrationPromoCode::getMetadata(),
+           SponsorSummitRegistrationPromoCode::getMetadata()
+       ];
+    }
 }

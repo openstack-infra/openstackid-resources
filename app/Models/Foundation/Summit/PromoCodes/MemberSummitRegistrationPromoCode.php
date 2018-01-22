@@ -136,6 +136,22 @@ class MemberSummitRegistrationPromoCode extends SummitRegistrationPromoCode
 
     const ClassName = 'MEMBER_PROMO_CODE';
 
+    public static $metadata = [
+        'class_name' => self::ClassName,
+        'first_name' => 'string',
+        'last_name'  => 'string',
+        'email'      => 'string',
+        'type'       => "enum(VIP,ATC,MEDIA ANALYST,SPONSOR)",
+        'owner_id'   => 'integer'
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(SummitRegistrationPromoCode::getMetadata(), self::$metadata);
+    }
+
     /**
      * @return string
      */

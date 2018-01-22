@@ -178,4 +178,20 @@ class SummitRegistrationPromoCode extends SilverstripeBaseModel
     public function getClassName(){
         return self::ClassName;
     }
+
+    public static $metadata = [
+        'code'       => 'string',
+        'email_sent' => 'boolean',
+        'redeemed'   => 'boolean',
+        'source'     => "enum(CSV,ADMIN)",
+        'summit_id'  => 'integer',
+        'creator_id' => 'integer',
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return self::$metadata;
+    }
 }

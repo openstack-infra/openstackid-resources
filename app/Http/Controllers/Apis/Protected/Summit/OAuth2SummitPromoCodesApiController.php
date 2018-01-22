@@ -184,4 +184,18 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getMetadata($summit_id){
+        $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+        if (is_null($summit)) return $this->error404();
+
+        return $this->ok
+        (
+            $this->promo_code_repository->getMetadata($summit)
+        );
+    }
 }

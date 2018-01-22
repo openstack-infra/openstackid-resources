@@ -80,4 +80,16 @@ class SponsorSummitRegistrationPromoCode extends MemberSummitRegistrationPromoCo
     public function hasSponsor(){
         return $this->getSponsorId() > 0;
     }
+
+    public static $metadata = [
+        'class_name' => self::ClassName,
+        'sponsor_id' => 'integer'
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(MemberSummitRegistrationPromoCode::getMetadata(), self::$metadata);
+    }
 }

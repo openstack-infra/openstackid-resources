@@ -174,4 +174,30 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
         $promo_codes = json_decode($content);
         $this->assertTrue(!is_null($promo_codes));
     }
+
+    public function testGetPromoCodesMetadata(){
+        $params = [
+            'id'       => 23,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitPromoCodesApiController@getMetadata",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $metadata = json_decode($content);
+        $this->assertTrue(!is_null($metadata));
+    }
 }

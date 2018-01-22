@@ -658,7 +658,6 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf('%s/summits/read-notifications', $current_realm)],
             ),
             // promo codes
-              // notifications
             array(
                 'name' => 'get-promo-codes',
                 'route' => '/api/v1/summits/{id}/promo-codes',
@@ -667,9 +666,17 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
+            ),
+            array(
+                'name' => 'get-promo-codes-metadata',
+                'route' => '/api/v1/summits/{id}/promo-codes/metadata',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
             )
         ]);
-
     }
 
     private function seedMemberEndpoints(){

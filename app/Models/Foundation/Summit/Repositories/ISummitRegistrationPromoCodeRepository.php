@@ -35,4 +35,10 @@ interface ISummitRegistrationPromoCodeRepository extends IBaseRepository
         Filter $filter = null,
         Order $order = null
     );
+
+    /**
+     * @param Summit $summit
+     * @return array
+     */
+    public function getMetadata( Summit $summit);
 }

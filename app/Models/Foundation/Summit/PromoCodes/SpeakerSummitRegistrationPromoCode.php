@@ -98,4 +98,16 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
     public function getClassName(){
         return self::ClassName;
     }
+
+    public static $metadata = [
+        'class_name' => self::ClassName,
+        'speaker_id'   => 'integer'
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(SummitRegistrationPromoCode::getMetadata(), self::$metadata);
+    }
 }
