@@ -76,16 +76,6 @@ class AbstractMemberSerializer extends SilverStripeSerializer
             $values['affiliations'] = $res;
         }
 
-        if(in_array('all_affiliations', $relations)){
-            $res = [];
-            foreach ($member->getAllAffiliations() as $affiliation){
-                $res[] = SerializerRegistry::getInstance()
-                    ->getSerializer($affiliation)
-                    ->serialize('organization');
-            }
-            $values['affiliations'] = $res;
-        }
-
         if (!empty($expand)) {
             $exp_expand = explode(',', $expand);
             foreach ($exp_expand as $relation) {
@@ -108,6 +98,17 @@ class AbstractMemberSerializer extends SilverStripeSerializer
                             $teams[] = SerializerRegistry::getInstance()->getSerializer($t)->serialize('company', [], ['none']);
                         }
                         $values['ccla_teams'] = $teams;
+                    }
+                    break;
+                    case 'all_affiliations':
+                    {
+                        $res = [];
+                        foreach ($member->getAllAffiliations() as $affiliation){
+                            $res[] = SerializerRegistry::getInstance()
+                                ->getSerializer($affiliation)
+                                ->serialize('organization');
+                        }
+                        $values['affiliations'] = $res;
                     }
                     break;
                 }
