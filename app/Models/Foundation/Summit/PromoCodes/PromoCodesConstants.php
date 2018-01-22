@@ -14,16 +14,22 @@
 use models\summit\MemberSummitRegistrationPromoCode;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\SponsorSummitRegistrationPromoCode;
-
 /**
  * Class PromoCodesValidClasses
  * @package App\Models\Foundation\Summit\PromoCodes
  */
-final class PromoCodesValidClasses
+final class PromoCodesConstants
 {
     public static $valid_class_names = [
         SpeakerSummitRegistrationPromoCode::ClassName,
         SponsorSummitRegistrationPromoCode::ClassName,
         MemberSummitRegistrationPromoCode::ClassName,
     ];
+
+    /**
+     * @return array
+     */
+    public static function getValidTypes(){
+        return array_merge(MemberSummitRegistrationPromoCode::$valid_type_values, SpeakerSummitRegistrationPromoCode::$valid_type_values);
+    }
 }

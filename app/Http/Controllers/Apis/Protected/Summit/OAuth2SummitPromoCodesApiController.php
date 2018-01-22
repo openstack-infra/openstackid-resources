@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\Summit\PromoCodes\PromoCodesValidClasses;
+use App\Models\Foundation\Summit\PromoCodes\PromoCodesConstants;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use models\exceptions\EntityNotFoundException;
@@ -85,11 +85,26 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
      */
     private function validateClassName($filter_element){
         if($filter_element instanceof FilterElement){
-            return in_array($filter_element->getValue(), PromoCodesValidClasses::$valid_class_names);
+            return in_array($filter_element->getValue(), PromoCodesConstants::$valid_class_names);
         }
         $valid = true;
         foreach($filter_element[0] as $elem){
-            $valid = $valid && in_array($elem->getValue(), PromoCodesValidClasses::$valid_class_names);
+            $valid = $valid && in_array($elem->getValue(), PromoCodesConstants::$valid_class_names);
+        }
+        return $valid;
+    }
+
+    /**
+     * @param $filter_element
+     * @return bool
+     */
+    private function validateTypes($filter_element){
+        if($filter_element instanceof FilterElement){
+            return in_array($filter_element->getValue(), PromoCodesConstants::getValidTypes());
+        }
+        $valid = true;
+        foreach($filter_element[0] as $elem){
+            $valid = $valid && in_array($elem->getValue(), PromoCodesConstants::getValidTypes());
         }
         return $valid;
     }
@@ -141,6 +156,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                     'speaker_email' => ['=@', '=='],
                     'sponsor'       => ['=@', '=='],
                     'class_name'    => ['=='],
+                    'type'          => ['=='],
                 ]);
             }
 
@@ -162,7 +178,17 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                     sprintf
                     (
                         "class_name filter has an invalid value ( valid values are %s",
-                        implode(", ", PromoCodesValidClasses::$valid_class_names)
+                        implode(", ", PromoCodesConstants::$valid_class_names)
+                    )
+                );
+            }
+
+            if($filter->hasFilter("type") && !$this->validateTypes($filter->getFilter("type"))){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "type filter has an invalid value ( valid values are %s",
+                        implode(", ", PromoCodesConstants::getValidTypes())
                     )
                 );
             }

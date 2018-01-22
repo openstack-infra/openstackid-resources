@@ -88,6 +88,10 @@ class DoctrineSummitRegistrationPromoCodeRepository
             (
                 "(sprr.email :operator ':value' OR spmm.email :operator ':value')"
             ),
+            'type' => new DoctrineFilterMapping
+            (
+                "(mpc.type :operator ':value' OR spkpc.type :operator ':value')"
+            ),
            'class_name' => new DoctrineInstanceOfFilterMapping(
                "pc",
                [

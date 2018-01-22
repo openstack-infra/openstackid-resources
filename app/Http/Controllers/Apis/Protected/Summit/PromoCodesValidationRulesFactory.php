@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\Summit\PromoCodes\PromoCodesValidClasses;
+use App\Models\Foundation\Summit\PromoCodes\PromoCodesConstants;
 use models\exceptions\ValidationException;
 use models\summit\MemberSummitRegistrationPromoCode;
 use models\summit\SpeakerSummitRegistrationPromoCode;
@@ -33,12 +33,12 @@ final class PromoCodesValidationRulesFactory
 
         $class_name = trim($data['class_name']);
 
-        if(!in_array($class_name, PromoCodesValidClasses::$valid_class_names)){
+        if(!in_array($class_name, PromoCodesConstants::$valid_class_names)){
             throw new ValidationException(
                 sprintf
                 (
                     "class_name param has an invalid value ( valid values are %s",
-                    implode(", ", PromoCodesValidClasses::$valid_class_names)
+                    implode(", ", PromoCodesConstants::$valid_class_names)
                 )
             );
         }
