@@ -241,6 +241,10 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
         );
     }
 
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
     public function addPromoCodeBySummit($summit_id){
         try {
             if(!Request::isJson()) return $this->error403();
@@ -286,6 +290,11 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $promo_code_id
+     * @return mixed
+     */
     public function updatePromoCodeBySummit($summit_id, $promo_code_id)
     {
         try {
@@ -316,6 +325,33 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
             $promo_code = $this->promo_code_service->updatePromoCode($summit, $promo_code_id, $data->all(), $current_member);
 
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($promo_code)->serialize());
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $promo_code_id
+     * @return mixed
+     */
+    public function deletePromoCodeBySummit($summit_id, $promo_code_id)
+    {
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->promo_code_service->deletePromoCode($summit, $promo_code_id);
+
+            return $this->deleted();
         } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));

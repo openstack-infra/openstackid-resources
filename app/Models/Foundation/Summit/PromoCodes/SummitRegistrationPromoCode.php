@@ -52,7 +52,35 @@ class SummitRegistrationPromoCode extends SilverstripeBaseModel
      */
     protected $source;
 
-    use SummitOwned;
+    /**
+     * @ORM\ManyToOne(targetEntity="models\summit\Summit", inversedBy="promo_codes")
+     * @ORM\JoinColumn(name="SummitID", referencedColumnName="ID")
+     * @var Summit
+     */
+    protected $summit;
+
+    public function setSummit($summit){
+        $this->summit = $summit;
+    }
+
+    /**
+     * @return Summit
+     */
+    public function getSummit(){
+        return $this->summit;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSummitId(){
+        try {
+            return $this->summit->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member")

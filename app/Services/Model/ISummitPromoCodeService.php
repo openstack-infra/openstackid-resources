@@ -42,4 +42,13 @@ interface ISummitPromoCodeService
      * @throws ValidationException
      */
     public function updatePromoCode(Summit $summit, $promo_code_id, array $data, Member $current_user = null);
+
+    /**
+     * @param Summit $summit
+     * @param int $promo_code_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deletePromoCode(Summit $summit, $promo_code_id);
 }

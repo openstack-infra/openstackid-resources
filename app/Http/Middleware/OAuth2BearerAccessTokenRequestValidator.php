@@ -90,7 +90,7 @@ class OAuth2BearerAccessTokenRequestValidator
                 throw new OAuth2ResourceServerException(
                     400,
                     OAuth2Protocol::OAuth2Protocol_Error_InvalidRequest,
-                    sprintf('API endpoint does not exits! (%s:%s)', $url, $method)
+                    sprintf('API endpoint does not exists! (%s:%s)', $url, $method)
                 );
             }
 

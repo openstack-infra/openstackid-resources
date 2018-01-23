@@ -1373,4 +1373,14 @@ SQL;
         $promo_code = $this->promo_codes->matching($criteria)->first();
         return $promo_code === false ? null : $promo_code;
     }
+
+    /**
+     * @param SummitRegistrationPromoCode $promo_code
+     * @return $this
+     */
+    public function removePromoCode(SummitRegistrationPromoCode $promo_code){
+       $this->promo_codes->removeElement($promo_code);
+       $promo_code->setSummit(null);
+       return $this;
+    }
 }

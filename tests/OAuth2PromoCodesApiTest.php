@@ -278,4 +278,33 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($promo_code));
         return $promo_code;
     }
+
+    public function testDeletePromoCode($summit_id  = 23){
+
+        $code       = str_random(16).'_PROMOCODE_TEST';
+        $promo_code = $this->testAddPromoCode($summit_id, $code);
+        $params = [
+            'id'            => $summit_id,
+            'promo_code_id' => $promo_code->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitPromoCodesApiController@deletePromoCodeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
 }

@@ -677,6 +677,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'delete-promo-code',
+                'route' => '/api/v1/summits/{id}/promo-codes/{promo_code_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePromoCodeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'update-promo-code',
                 'route' => '/api/v1/summits/{id}/promo-codes/{promo_code_id}',
                 'http_method' => 'PUT',

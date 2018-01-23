@@ -172,4 +172,30 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
             return $promo_code;
         });
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $promo_code_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deletePromoCode(Summit $summit, $promo_code_id)
+    {
+        return $this->tx_service->transaction(function() use($promo_code_id, $summit){
+
+            $promo_code = $summit->getPromoCodeById($promo_code_id);
+            if(is_null($promo_code))
+                throw new EntityNotFoundException(sprintf("promo code id %s does not belongs to summit id %s", $promo_code_id, $summit->getId()));
+
+            if ($promo_code->isEmailSent())
+                throw new EntityValidationException("Cannot delete a code that has been already sent.");
+
+            if ($promo_code->isRedeemed())
+                throw new EntityValidationException("Cannot delete a code that has been already redeemed.");
+
+            $summit->removePromoCode($promo_code);
+
+        });
+    }
 }
