@@ -101,6 +101,7 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
 
     public static $metadata = [
         'class_name' => self::ClassName,
+        'type'       => ["ACCEPTED", "ALTERNATE"],
         'speaker_id' => 'integer'
     ];
 

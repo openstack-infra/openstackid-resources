@@ -142,7 +142,7 @@ class MemberSummitRegistrationPromoCode extends SummitRegistrationPromoCode
         'first_name' => 'string',
         'last_name'  => 'string',
         'email'      => 'string',
-        'type'       => "enum(VIP,ATC,MEDIA ANALYST,SPONSOR)",
+        'type'       => ['VIP','ATC','MEDIA ANALYST','SPONSOR'],
         'owner_id'   => 'integer'
     ];
 

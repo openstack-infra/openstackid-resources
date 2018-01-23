@@ -187,7 +187,7 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
 
         $response = $this->action(
             "GET",
-            "OAuth2SummitPromoCodesApiController@addPromoCodeBySummit",
+            "OAuth2SummitPromoCodesApiController@getMetadata",
             $params,
             [],
             [],
@@ -197,8 +197,8 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
 
         $content = $response->getContent();
         $this->assertResponseStatus(200);
-        $promo_code = json_decode($content);
-        $this->assertTrue(!is_null($promo_code));
+        $metadata = json_decode($content);
+        $this->assertTrue(!is_null($metadata));
     }
 
     public function testAddPromoCode($code = "12344KG_SPEAKER"){

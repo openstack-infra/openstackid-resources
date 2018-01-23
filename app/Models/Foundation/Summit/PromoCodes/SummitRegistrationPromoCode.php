@@ -184,7 +184,7 @@ class SummitRegistrationPromoCode extends SilverstripeBaseModel
         'code'       => 'string',
         'email_sent' => 'boolean',
         'redeemed'   => 'boolean',
-        'source'     => "enum(CSV,ADMIN)",
+        'source'     => ['CSV','ADMIN'],
         'summit_id'  => 'integer',
         'creator_id' => 'integer',
     ];
