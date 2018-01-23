@@ -15,17 +15,50 @@ use models\summit\MemberSummitRegistrationPromoCode;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\SponsorSummitRegistrationPromoCode;
 use models\summit\Summit;
+use models\summit\SummitRegistrationPromoCode;
 /**
  * Class SummitPromoCodeFactory
  * @package App\Models\Foundation\Summit\Factories
  */
 final class SummitPromoCodeFactory
 {
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @param array $params
+     * @return SummitRegistrationPromoCode|null
+     */
     public static function build(Summit $summit, array $data, array $params = []){
         $promo_code = null;
         switch ($data['class_name']){
             case MemberSummitRegistrationPromoCode::ClassName:{
                 $promo_code = new MemberSummitRegistrationPromoCode();
+            }
+            break;
+            case SpeakerSummitRegistrationPromoCode::ClassName:{
+                $promo_code = new SpeakerSummitRegistrationPromoCode();
+            }
+            break;
+            case SponsorSummitRegistrationPromoCode::ClassName:{
+                $promo_code = new SponsorSummitRegistrationPromoCode();
+            }
+            break;
+        }
+
+        if(is_null($promo_code)) return null;
+        return self::populate($promo_code, $summit, $data, $params);
+    }
+
+    /**
+     * @param SummitRegistrationPromoCode $promo_code
+     * @param Summit $summit
+     * @param array $data
+     * @param array $params
+     * @return SummitRegistrationPromoCode
+     */
+    public static function populate(SummitRegistrationPromoCode $promo_code, Summit $summit, array $data, array $params = []){
+        switch ($data['class_name']){
+            case MemberSummitRegistrationPromoCode::ClassName:{
                 if(isset($params['owner']))
                     $promo_code->setOwner($params['owner']);
                 if(isset($data['type']))
@@ -37,22 +70,18 @@ final class SummitPromoCodeFactory
                 if(isset($data['email']))
                     $promo_code->setEmail(trim($data['email']));
             }
-            break;
+                break;
             case SpeakerSummitRegistrationPromoCode::ClassName:{
-                $promo_code = new SpeakerSummitRegistrationPromoCode();
                 if(isset($data['type']))
                     $promo_code->setType($data['type']);
                 $promo_code->setSpeaker($params['speaker']);
             }
-            break;
+                break;
             case SponsorSummitRegistrationPromoCode::ClassName:{
-                $promo_code = new SponsorSummitRegistrationPromoCode();
                 $promo_code->setSponsor($params['sponsor']);
             }
             break;
         }
-
-        if(is_null($promo_code)) return null;
 
         $promo_code->setCode(trim($data['code']));
         $summit->addPromoCode($promo_code);

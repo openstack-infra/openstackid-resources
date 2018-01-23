@@ -249,7 +249,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $rules = PromoCodesValidationRulesFactory::buildAddRules($data->all());
+            $rules = PromoCodesValidationRulesFactory::build($data->all());
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($data->all(), $rules);
 
@@ -281,6 +281,48 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
             return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function updatePromoCodeBySummit($summit_id, $promo_code_id)
+    {
+        try {
+            if (!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = PromoCodesValidationRulesFactory::build($data->all());
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $current_member = null;
+            if (!is_null($this->resource_server_context->getCurrentUserExternalId())) {
+                $current_member = $this->member_repository->getById($this->resource_server_context->getCurrentUserExternalId());
+            }
+
+            $promo_code = $this->promo_code_service->updatePromoCode($summit, $promo_code_id, $data->all(), $current_member);
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($promo_code)->serialize());
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

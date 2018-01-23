@@ -32,4 +32,14 @@ interface ISummitPromoCodeService
      */
     public function addPromoCode(Summit $summit, array $data, Member $current_user = null);
 
+    /**
+     * @param Summit $summit
+     * @param int $promo_code_id
+     * @param array $data
+     * @param Member $current_user
+     * @return SummitRegistrationPromoCode
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updatePromoCode(Summit $summit, $promo_code_id, array $data, Member $current_user = null);
 }

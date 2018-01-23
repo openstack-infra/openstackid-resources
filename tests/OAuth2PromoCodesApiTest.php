@@ -201,9 +201,9 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($metadata));
     }
 
-    public function testAddPromoCode($code = "12344KG_SPEAKER"){
+    public function testAddPromoCode($summit_id = 23, $code = "12344KG_SPEAKER"){
         $params = [
-            'id' => 23,
+            'id' => $summit_id,
         ];
 
         $data = [
@@ -223,6 +223,47 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
         $response = $this->action(
             "POST",
             "OAuth2SummitPromoCodesApiController@addPromoCodeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $promo_code = json_decode($content);
+        $this->assertTrue(!is_null($promo_code));
+        return $promo_code;
+    }
+
+    public function testUpdatePromoCode($summit_id  = 23){
+
+        $code       = str_random(16).'_PROMOCODE_TEST';
+        $promo_code = $this->testAddPromoCode($summit_id, $code);
+        $params = [
+            'id'            => $summit_id,
+            'promo_code_id' => $promo_code->id
+        ];
+
+        $data = [
+            'code'       => $code.'_UPDATE',
+            'class_name' => \models\summit\MemberSummitRegistrationPromoCode::ClassName,
+            'first_name' => 'Sebastian update',
+            'last_name'  => 'Marcet update',
+            'email'      => 'test@test.com',
+            'type'       => \models\summit\MemberSummitRegistrationPromoCode::$valid_type_values[2]
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitPromoCodesApiController@updatePromoCodeBySummit",
             $params,
             [],
             [],

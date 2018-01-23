@@ -79,6 +79,38 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
     }
 
     /**
+     * @param array $data
+     * @return array
+     * @throws EntityNotFoundException
+     */
+    private function getPromoCodeParams(array $data){
+        $params     = [];
+
+        if(isset($data['owner_id'])){
+            $owner = $this->member_repository->getById(intval($data['owner_id']));
+            if(is_null($owner))
+                throw new EntityNotFoundException(sprintf("owner_id %s not found", $data['owner_id']));
+            $params['owner'] = $owner;
+        }
+
+        if(isset($data['speaker_id'])){
+            $speaker = $this->speaker_repository->getById(intval($data['speaker_id']));
+            if(is_null($speaker))
+                throw new EntityNotFoundException(sprintf("speaker_id %s not found", $data['speaker_id']));
+            $params['speaker'] = $speaker;
+        }
+
+
+        if(isset($data['sponsor_id'])){
+            $sponsor = $this->company_repository->getById(intval($data['sponsor_id']));
+            if(is_null($sponsor))
+                throw new EntityNotFoundException(sprintf("sponsor_id %s not found", $data['sponsor_id']));
+            $params['sponsor'] = $sponsor;
+        }
+
+        return $params;
+    }
+    /**
      * @param Summit $summit
      * @param array $data
      * @param Member $current_user
@@ -94,33 +126,44 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
 
             if(!is_null($old_promo_code))
                 throw new ValidationException(sprintf("promo code %s already exits on summit id %s", trim($data['code']), $summit->getId()));
-            $params     = [];
 
-            if(isset($data['owner_id'])){
-                $owner = $this->member_repository->getById(intval($data['owner_id']));
-                if(is_null($owner))
-                    throw new EntityNotFoundException(sprintf("owner_id %s not found", $data['owner_id']));
-                $params['owner'] = $owner;
-            }
-
-            if(isset($data['speaker_id'])){
-                $speaker = $this->speaker_repository->getById(intval($data['speaker_id']));
-                if(is_null($speaker))
-                    throw new EntityNotFoundException(sprintf("speaker_id %s not found", $data['speaker_id']));
-                $params['speaker'] = $speaker;
-            }
-
-
-            if(isset($data['sponsor_id'])){
-                $sponsor = $this->company_repository->getById(intval($data['sponsor_id']));
-                if(is_null($sponsor))
-                    throw new EntityNotFoundException(sprintf("sponsor_id %s not found", $data['sponsor_id']));
-                $params['sponsor'] = $sponsor;
-            }
-
-            $promo_code = SummitPromoCodeFactory::build($summit, $data, $params);
+            $promo_code = SummitPromoCodeFactory::build($summit, $data, $this->getPromoCodeParams($data));
             if(is_null($promo_code))
-                throw new ValidationException("class_name %s is invalid", $data['class_name']);
+                throw new ValidationException(sprintf("class_name %s is invalid", $data['class_name']));
+
+            if(!is_null($current_user))
+                $promo_code->setCreator($current_user);
+
+            $promo_code->setSourceAdmin();
+
+            return $promo_code;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $promo_code_id
+     * @param array $data
+     * @param Member $current_user
+     * @return SummitRegistrationPromoCode
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updatePromoCode(Summit $summit, $promo_code_id, array $data, Member $current_user = null)
+    {
+        return $this->tx_service->transaction(function() use($promo_code_id, $summit, $data, $current_user){
+
+            $old_promo_code = $summit->getPromoCodeByCode(trim($data['code']));
+
+            if(!is_null($old_promo_code) && $old_promo_code->getId() != $promo_code_id)
+                throw new ValidationException(sprintf("promo code %s already exits on summit id %s for promo code id %s", trim($data['code']), $summit->getId(), $old_promo_code->getId()));
+
+            $promo_code = $summit->getPromoCodeById($promo_code_id);
+            if(is_null($promo_code))
+                throw new EntityNotFoundException(sprintf("promo code id %s does not belongs to summit id %s", $promo_code_id, $summit->getId()));
+
+            $promo_code = SummitPromoCodeFactory::populate($promo_code, $summit, $data, $this->getPromoCodeParams($data));
+
             if(!is_null($current_user))
                 $promo_code->setCreator($current_user);
 

@@ -1362,4 +1362,15 @@ SQL;
         $promo_code = $this->promo_codes->matching($criteria)->first();
         return $promo_code === false ? null : $promo_code;
     }
+
+    /**
+     * @param int $promo_code_id
+     * @return SummitRegistrationPromoCode|null
+     */
+    public function getPromoCodeById($promo_code_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', $promo_code_id));
+        $promo_code = $this->promo_codes->matching($criteria)->first();
+        return $promo_code === false ? null : $promo_code;
+    }
 }

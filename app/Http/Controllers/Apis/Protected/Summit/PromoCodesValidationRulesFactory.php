@@ -27,7 +27,7 @@ final class PromoCodesValidationRulesFactory
      * @return array
      * @throws ValidationException
      */
-    public static function buildAddRules(array $data){
+    public static function build(array $data){
         if(!isset($data['class_name']))
             throw new ValidationException("class_name parameter is mandatory");
 
