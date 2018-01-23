@@ -13,6 +13,7 @@
  **/
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\EmailCreationRequest;
 use models\main\Member;
 use models\summit\Summit;
 use models\summit\SummitRegistrationPromoCode;
@@ -51,4 +52,14 @@ interface ISummitPromoCodeService
      * @throws ValidationException
      */
     public function deletePromoCode(Summit $summit, $promo_code_id);
+
+
+    /**
+     * @param Summit $summit
+     * @param int $promo_code_id
+     * @return EmailCreationRequest
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function sendPromoCodeMail(Summit $summit, $promo_code_id);
 }

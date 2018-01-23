@@ -1058,4 +1058,16 @@ SQL;
         $this->rsvp->removeElement($rsvp);
         return $this;
     }
+
+    /**
+     * @return string
+     */
+    public function getFullName(){
+        $fullname = $this->first_name;
+        if(!empty($this->last_name)){
+            if(!empty($fullname)) $fullname .= ', ';
+            $fullname .= $this->last_name;
+        }
+        return $fullname;
+    }
 }

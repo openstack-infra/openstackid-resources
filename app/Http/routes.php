@@ -338,6 +338,7 @@ Route::group([
                 Route::group(['prefix' => '{promo_code_id}'], function () {
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@updatePromoCodeBySummit']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@deletePromoCodeBySummit']);
+                    Route::post('mail', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@sendPromoCodeMail']);
                 });
             });
 

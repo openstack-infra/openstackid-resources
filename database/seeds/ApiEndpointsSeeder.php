@@ -695,6 +695,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'send-promo-code-mail',
+                'route' => '/api/v1/summits/{id}/promo-codes/{promo_code_id}/mail',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePromoCodeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-promo-codes-metadata',
                 'route' => '/api/v1/summits/{id}/promo-codes/metadata',
                 'http_method' => 'GET',

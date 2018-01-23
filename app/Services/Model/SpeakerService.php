@@ -65,11 +65,11 @@ final class SpeakerService implements ISpeakerService
      * @var IEmailCreationRequestRepository
      */
     private $email_creation_request_repository;
+
     /**
      * @var ITransactionService
      */
     private $tx_service;
-
 
     /**
      * SpeakerService constructor.

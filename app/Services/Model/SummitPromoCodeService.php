@@ -15,11 +15,16 @@ use App\Models\Foundation\Summit\Factories\SummitPromoCodeFactory;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\EmailCreationRequest;
 use models\main\ICompanyRepository;
+use models\main\IEmailCreationRequestRepository;
 use models\main\IMemberRepository;
 use models\main\Member;
+use models\main\MemberPromoCodeEmailCreationRequest;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitRegistrationPromoCodeRepository;
+use models\summit\MemberSummitRegistrationPromoCode;
+use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\Summit;
 use models\summit\SummitRegistrationPromoCode;
 use services\model\ISummitPromoCodeService;
@@ -50,6 +55,11 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
     private $speaker_repository;
 
     /**
+     * @var IEmailCreationRequestRepository
+     */
+    private $email_creation_request_repository;
+
+    /**
      * @var ITransactionService
      */
     private $tx_service;
@@ -60,6 +70,7 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
      * @param IMemberRepository $member_repository
      * @param ICompanyRepository $company_repository
      * @param ISpeakerRepository $speaker_repository
+     * @param IEmailCreationRequestRepository $email_creation_request_repository
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -68,14 +79,16 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
         IMemberRepository $member_repository,
         ICompanyRepository $company_repository,
         ISpeakerRepository $speaker_repository,
+        IEmailCreationRequestRepository $email_creation_request_repository,
         ITransactionService $tx_service
     )
     {
-        $this->promo_code_repository = $promo_code_repository;
-        $this->member_repository     = $member_repository;
-        $this->company_repository    = $company_repository;
-        $this->speaker_repository    = $speaker_repository;
-        $this->tx_service            = $tx_service;
+        $this->promo_code_repository             = $promo_code_repository;
+        $this->member_repository                 = $member_repository;
+        $this->company_repository                = $company_repository;
+        $this->speaker_repository                = $speaker_repository;
+        $this->email_creation_request_repository = $email_creation_request_repository;
+        $this->tx_service                        = $tx_service;
     }
 
     /**
@@ -186,16 +199,72 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
 
             $promo_code = $summit->getPromoCodeById($promo_code_id);
             if(is_null($promo_code))
-                throw new EntityNotFoundException(sprintf("promo code id %s does not belongs to summit id %s", $promo_code_id, $summit->getId()));
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.promo_code_delete_code_not_found',
+                        [ 'promo_code_id' => $promo_code_id, 'summit_id' => $summit->getId()]
+                    )
+                );
 
             if ($promo_code->isEmailSent())
-                throw new EntityValidationException("Cannot delete a code that has been already sent.");
+                throw new ValidationException(trans('validation_errors.promo_code_delete_already_sent'));
 
             if ($promo_code->isRedeemed())
-                throw new EntityValidationException("Cannot delete a code that has been already redeemed.");
+                throw new ValidationException(trans('validation_errors.promo_code_delete_already_redeemed'));
 
             $summit->removePromoCode($promo_code);
 
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $promo_code_id
+     * @return EmailCreationRequest
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function sendPromoCodeMail(Summit $summit, $promo_code_id)
+    {
+        return $this->tx_service->transaction(function() use($promo_code_id, $summit){
+
+            $promo_code = $summit->getPromoCodeById($promo_code_id);
+            if(is_null($promo_code))
+                throw new EntityNotFoundException(trans('not_found_errors.promo_code_email_code_not_found', [ 'promo_code_id' => $promo_code_id, 'summit_id' => $summit->getId()]));
+
+            if ($promo_code->isEmailSent())
+                throw new ValidationException(trans('validation_errors.promo_code_email_send_already_sent'));
+
+            $name  = null;
+            $email = null;
+
+            if($promo_code instanceof SpeakerSummitRegistrationPromoCode){
+                $name  = $promo_code->getSpeaker()->getFullName();
+                $email = $promo_code->getSpeaker()->getEmail();
+            }
+            if($promo_code instanceof MemberSummitRegistrationPromoCode){
+                $name  = $promo_code->getFullName();
+                $email = $promo_code->getEmail();
+            }
+
+            if(empty($name)){
+                throw new ValidationException(trans("validation_errors.promo_code_email_send_empty_email"));
+            }
+
+            if(empty($name)){
+                throw new ValidationException(trans("validation_errors.promo_code_email_send_empty_name"));
+            }
+
+            // create email request
+            $email_request = new MemberPromoCodeEmailCreationRequest();
+            $email_request->setPromoCode($promo_code);
+            $email_request->setEmail($name);
+            $email_request->setName($email);
+            $this->email_creation_request_repository->add($email_request);
+            $promo_code->setEmailSent(true);
+            return $email_request;
         });
     }
 }

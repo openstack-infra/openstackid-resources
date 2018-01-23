@@ -88,11 +88,24 @@ class MemberSummitRegistrationPromoCode extends SummitRegistrationPromoCode
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
     public function getEmail()
     {
-        return $this->email;
+        if(!empty($this->email)) return $this->email;
+        if($this->hasOwner()) return $this->getOwner()->getEmail();
+        return null;
+    }
+
+    public function getFullName(){
+        $fullname = $this->first_name;
+        if(!empty($this->last_name)){
+            if(!empty($fullname)) $fullname .= ', ';
+            $fullname .= $this->last_name;
+        }
+        if(!empty($fullname)) return $fullname;
+        if($this->hasOwner()) return $this->getOwner()->getFullName();
+        return null;
     }
 
     /**
