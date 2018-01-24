@@ -336,6 +336,7 @@ Route::group([
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@addPromoCodeBySummit']);
                 Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@getMetadata']);
                 Route::group(['prefix' => '{promo_code_id}'], function () {
+                    Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@getPromoCodeBySummit']);
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@updatePromoCodeBySummit']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@deletePromoCodeBySummit']);
                     Route::post('mail', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@sendPromoCodeMail']);

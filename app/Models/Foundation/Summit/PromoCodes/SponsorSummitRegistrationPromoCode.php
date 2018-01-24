@@ -82,7 +82,8 @@ class SponsorSummitRegistrationPromoCode extends MemberSummitRegistrationPromoCo
 
     public static $metadata = [
         'class_name' => self::ClassName,
-        'sponsor_id' => 'integer'
+        'sponsor_id' => 'integer',
+        'type'       => ['SPONSOR'],
     ];
 
     /**

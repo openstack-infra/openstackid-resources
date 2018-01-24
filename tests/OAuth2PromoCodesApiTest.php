@@ -308,6 +308,38 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
         $this->assertResponseStatus(204);
     }
 
+    public function testGetPromoCodeById($summit_id  = 23){
+
+        $code       = str_random(16).'_PROMOCODE_TEST';
+        $promo_code = $this->testAddPromoCode($summit_id, $code);
+        $params = [
+            'id'            => $summit_id,
+            'promo_code_id' => $promo_code->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitPromoCodesApiController@getPromoCodeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $promo_code = json_decode($content);
+        $this->assertTrue(!is_null($promo_code));
+        return $promo_code;
+    }
+
     public function testEmailPromoCode($summit_id  = 23){
 
         $code       = str_random(16).'_PROMOCODE_TEST';
