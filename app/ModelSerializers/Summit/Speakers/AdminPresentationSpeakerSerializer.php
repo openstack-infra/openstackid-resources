@@ -11,15 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\summit\PresentationSpeaker;
-
 /**
  * Class AdminPresentationSpeakerSerializer
  * @package ModelSerializers
  */
 final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerializer
 {
+    protected static $array_mappings = [
+        'AvailableForBureau'    => 'available_for_bureau:json_boolean',
+        'FundedTravel'          => 'funded_travel:json_boolean',
+        'WillingToTravel'       => 'willing_to_travel:json_boolean',
+        'WillingToPresentVideo' => 'willing_to_present_video:json_boolean',
+        'Notes'                 => 'notes:json_string'
+    ];
+
     /**
      * @param null $expand
      * @param array $fields
@@ -67,7 +73,6 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
 
             $values['all_presentations']           = $speaker->getAllPresentationIds(false);
             $values['all_moderated_presentations'] = $speaker->getAllModeratedPresentationIds( false);
-
         }
 
         $languages = [];

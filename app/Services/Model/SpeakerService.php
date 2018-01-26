@@ -107,7 +107,7 @@ final class SpeakerService implements ISpeakerService
      * @throws ValidationException
      * @return PresentationSpeaker
      */
-    public function addSpeaker(Summit $summit, array $data){
+    public function addSpeakerBySummit(Summit $summit, array $data){
 
         return $this->tx_service->transaction(function() use($data, $summit){
 
@@ -303,6 +303,20 @@ final class SpeakerService implements ISpeakerService
         if(isset($data['twitter']))
             $speaker->setTwitterName(trim($data['twitter']));
 
+        if(isset($data['notes']))
+            $speaker->setNotes(trim($data['notes']));
+
+        if(isset($data['available_for_bureau']))
+            $speaker->setAvailableForBureau(boolval($data['available_for_bureau']));
+
+        if(isset($data['funded_travel']))
+            $speaker->setFundedTravel(boolval($data['funded_travel']));
+
+        if(isset($data['willing_to_travel']))
+            $speaker->setWillingToTravel(boolval($data['willing_to_travel']));
+
+        if(isset($data['willing_to_present_video']))
+            $speaker->setWillingToPresentVideo(boolval($data['willing_to_present_video']));
     }
 
     /**
@@ -529,4 +543,79 @@ final class SpeakerService implements ISpeakerService
             $this->speaker_repository->delete($speaker_from);
         });
     }
+
+    /**
+     * @param array $data
+     * @throws ValidationException
+     * @return PresentationSpeaker
+     */
+    public function addSpeaker(array $data){
+
+        return $this->tx_service->transaction(function() use($data){
+
+            $speaker = new PresentationSpeaker();
+            $speaker->setCreatedFromApi(true);
+            $member_id = 0;
+
+            if(!isset($data['email']) && !isset($data['member_id']))
+                throw
+                new ValidationException
+                ("you must provide an email or a member_id in order to create a speaker!");
+
+            if(isset($data['member_id']) && intval($data['member_id']) > 0){
+                $member_id = intval($data['member_id']);
+                $member    =  $this->member_repository->getById($member_id);
+                if(is_null($member))
+                    throw new EntityNotFoundException(sprintf("member id %s does not exists!", $member_id));
+
+                $existent_speaker = $this->speaker_repository->getByMember($member);
+                if(!is_null($existent_speaker))
+                    throw new ValidationException
+                    (
+                        sprintf
+                        (
+                            "member_id %s already has assigned an speaker!",
+                            $member_id
+                        )
+                    );
+
+
+                $speaker->setMember($member);
+            }
+
+            $this->updateSpeakerMainData($speaker, $data);
+
+            if($member_id === 0 && isset($data['email'])){
+                $email  = trim($data['email']);
+                $member = $this->member_repository->getByEmail($email);
+                if(is_null($member)){
+                    $this->registerSpeaker($speaker, $email);
+                }
+                else
+                {
+                    $existent_speaker = $this->speaker_repository->getByMember($member);
+                    if(!is_null($existent_speaker))
+                        throw new ValidationException
+                        (
+                            sprintf
+                            (
+                                "member id %s already has assigned a speaker id %s!",
+                                $member->getIdentifier(),
+                                $existent_speaker->getIdentifier()
+                            )
+                        );
+                    $speaker->setMember($member);
+                }
+            }
+
+            $this->speaker_repository->add($speaker);
+
+            $email_request = new SpeakerCreationEmailCreationRequest();
+            $email_request->setSpeaker($speaker);
+            $this->email_creation_request_repository->add($email_request);
+
+            return $speaker;
+        });
+    }
+
 }

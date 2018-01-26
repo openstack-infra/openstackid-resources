@@ -207,7 +207,7 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
-                'name' => 'add-speaker',
+                'name' => 'add-speaker-by-summit',
                 'route' => '/api/v1/summits/{id}/speakers',
                 'http_method' => 'POST',
                 'scopes' => [
@@ -225,6 +225,14 @@ class ApiEndpointsSeeder extends Seeder
             array(
                 'name' => 'add-speaker-photo',
                 'route' => '/api/v1/speakers/{speaker_id}/photo',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                ],
+            ),
+            array(
+                'name' => 'add-speaker',
+                'route' => '/api/v1/speakers',
                 'http_method' => 'POST',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSpeakersData, $current_realm),

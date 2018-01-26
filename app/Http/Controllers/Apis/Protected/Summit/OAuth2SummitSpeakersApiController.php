@@ -357,7 +357,11 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
-    public function addSpeaker($summit_id){
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function addSpeakerBySummit($summit_id){
         try {
             if(!Request::isJson()) return $this->error403();
             $data = Input::json();
@@ -418,7 +422,12 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
-    public function updateSpeaker($summit_id, $speaker_id){
+    /**
+     * @param $summit_id
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function updateSpeakerBySummit($summit_id, $speaker_id){
         try {
             if(!Request::isJson()) return $this->error403();
             $data = Input::json();
@@ -549,4 +558,66 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @return mixed
+     */
+    public function addSpeaker(){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $rules = [
+                'title'                    => 'required|string|max:100',
+                'first_name'               => 'required|string|max:100',
+                'last_name'                => 'required|string|max:100',
+                'bio'                      => 'sometimes|string',
+                'notes'                    => 'sometimes|string',
+                'irc'                      => 'sometimes|string|max:50',
+                'twitter'                  => 'sometimes|string|max:50',
+                'member_id'                => 'sometimes|integer',
+                'email'                    => 'sometimes|string|max:50',
+                'available_for_bureau'     => 'sometimes|boolean',
+                'funded_travel'            => 'sometimes|boolean',
+                'willing_to_travel'        => 'sometimes|boolean',
+                'willing_to_present_video' => 'sometimes|boolean',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $fields = [
+                'title',
+                'bio',
+                'notes'
+            ];
+
+            $speaker = $this->service->addSpeaker(HTMLCleaner::cleanData($data->all(), $fields));
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($speaker, SerializerRegistry::SerializerType_Private)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
 }

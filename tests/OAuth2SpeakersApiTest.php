@@ -11,10 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-class OAuth2SpeakersApiTest extends ProtectedApiTest
+final class OAuth2SpeakersApiTest extends ProtectedApiTest
 {
 
-    public function testPostSpeaker($summit_id = 23)
+    public function testPostSpeakerBySummit($summit_id = 23)
     {
         $params = [
             'id' => $summit_id,
@@ -36,7 +36,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         $response = $this->action
         (
             "POST",
-            "OAuth2SummitSpeakersApiController@addSpeaker",
+            "OAuth2SummitSpeakersApiController@addSpeakerBySummit",
             $params,
             [],
             [],
@@ -52,7 +52,46 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         return $speaker;
     }
 
-    public function testPostSpeakerRegCode($summit_id = 23)
+    public function testPostSpeaker()
+    {
+        $email_rand       = 'smarcet'.str_random(16);
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $data = [
+            'title'                    => 'Developer!',
+            'first_name'               => 'Sebastian',
+            'last_name'                => 'Marcet',
+            'email'                    => $email_rand.'@gmail.com',
+            'notes'                    => 'test',
+            'willing_to_present_video' => true,
+        ];
+
+        $response = $this->action
+        (
+            "POST",
+            "OAuth2SummitSpeakersApiController@addSpeaker",
+            [],
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $this->assertResponseStatus(201);
+        $content = $response->getContent();
+        $speaker = json_decode($content);
+        $this->assertTrue($speaker->id > 0);
+        $this->assertTrue($speaker->notes == "test");
+        $this->assertTrue($speaker->willing_to_present_video == true);
+        return $speaker;
+    }
+
+    public function testPostSpeakerRegCodeBySummit($summit_id = 23)
     {
         $params = [
 
@@ -75,7 +114,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         $response = $this->action
         (
             "POST",
-            "OAuth2SummitSpeakersApiController@addSpeaker",
+            "OAuth2SummitSpeakersApiController@addSpeakerBySummit",
             $params,
             [],
             [],
@@ -91,7 +130,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         return $speaker;
     }
 
-    public function testPostSpeakerExistent($summit_id = 23)
+    public function testPostSpeakerExistentBySummit($summit_id = 23)
     {
         $params = [
 
@@ -114,7 +153,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         $response = $this->action
         (
             "POST",
-            "OAuth2SummitSpeakersApiController@addSpeaker",
+            "OAuth2SummitSpeakersApiController@addSpeakerBySummit",
             $params,
             [],
             [],
@@ -130,7 +169,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         return $speaker;
     }
 
-    public function testUpdateSpeaker($summit_id = 23)
+    public function testUpdateSpeakerBySummit($summit_id = 23)
     {
         $params = [
 
@@ -150,7 +189,7 @@ class OAuth2SpeakersApiTest extends ProtectedApiTest
         $response = $this->action
         (
             "PUT",
-            "OAuth2SummitSpeakersApiController@updateSpeaker",
+            "OAuth2SummitSpeakersApiController@updateSpeakerBySummit",
             $params,
             [],
             [],

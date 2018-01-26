@@ -93,7 +93,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     /**
      * @ORM\Column(name="WillingToPresentVideo", type="boolean")
      */
-    private $willing_to_presentVideo;
+    private $willing_to_present_video;
 
     /**
      * @ORM\Column(name="Notes", type="string")
@@ -294,7 +294,11 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-
+        $this->available_for_bureau     = false;
+        $this->willing_to_present_video = false;
+        $this->willing_to_travel        = false;
+        $this->funded_travel            = false;
+        $this->org_has_cloud            = false;
         $this->presentations            = new ArrayCollection;
         $this->moderated_presentations  = new ArrayCollection;
         $this->summit_assistances       = new ArrayCollection;
@@ -696,7 +700,6 @@ SQL;
         }
     }
 
-
     /**
      * @return PresentationSpeakerSummitAssistanceConfirmationRequest
      */
@@ -830,15 +833,15 @@ SQL;
      */
     public function isWillingToPresentVideo()
     {
-        return $this->willing_to_presentVideo;
+        return $this->willing_to_present_video;
     }
 
     /**
-     * @param bool $willing_to_presentVideo
+     * @param bool $willing_to_present_video
      */
-    public function setWillingToPresentVideo($willing_to_presentVideo)
+    public function setWillingToPresentVideo($willing_to_present_video)
     {
-        $this->willing_to_presentVideo = $willing_to_presentVideo;
+        $this->willing_to_present_video = $willing_to_present_video;
     }
 
     /**
