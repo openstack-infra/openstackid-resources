@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Validator;
 use libs\utils\HTMLCleaner;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
-use models\main\Group;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\IEventFeedbackRepository;
@@ -29,9 +28,7 @@ use models\summit\ISummitRepository;
 use ModelSerializers\ISerializerTypeSelector;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISpeakerService;
-use services\model\ISummitService;
 use utils\FilterParser;
-use utils\FilterParserException;
 use utils\OrderParser;
 use utils\PagingInfo;
 use Illuminate\Http\Request as LaravelRequest;
@@ -472,9 +469,9 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'bio',
             ];
 
-            $speaker = $this->service->updateSpeaker($summit, $speaker, HTMLCleaner::cleanData($data->all(), $fields));
+            $speaker = $this->service->updateSpeakerBySummit($summit, $speaker, HTMLCleaner::cleanData($data->all(), $fields));
 
-            return $this->created(SerializerRegistry::getInstance()->getSerializer($speaker)->serialize());
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($speaker)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
@@ -491,6 +488,11 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param LaravelRequest $request
+     * @param $speaker_id
+     * @return mixed
+     */
     public function addSpeakerPhoto(LaravelRequest $request, $speaker_id){
 
         try {
@@ -604,6 +606,100 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = $this->service->addSpeaker(HTMLCleaner::cleanData($data->all(), $fields));
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($speaker, SerializerRegistry::SerializerType_Private)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function updateSpeaker($speaker_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+
+            $speaker = $this->speaker_repository->getById($speaker_id);
+            if (is_null($speaker)) return $this->error404();
+
+            $rules = array
+            (
+                'title'                    => 'sometimes|string|max:100',
+                'first_name'               => 'sometimes|string|max:100',
+                'last_name'                => 'sometimes|string|max:100',
+                'bio'                      => 'sometimes|string',
+                'notes'                    => 'sometimes|string',
+                'irc'                      => 'sometimes|string|max:50',
+                'twitter'                  => 'sometimes|string|max:50',
+                'member_id'                => 'sometimes|integer',
+                'email'                    => 'sometimes|string|max:50',
+                'available_for_bureau'     => 'sometimes|boolean',
+                'funded_travel'            => 'sometimes|boolean',
+                'willing_to_travel'        => 'sometimes|boolean',
+                'willing_to_present_video' => 'sometimes|boolean',
+            );
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $fields = [
+                'title',
+                'bio',
+                'notes',
+            ];
+
+            $speaker = $this->service->updateSpeaker($speaker, HTMLCleaner::cleanData($data->all(), $fields));
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($speaker, SerializerRegistry::SerializerType_Private)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function deleteSpeaker($speaker_id){
+        try {
+
+            $speaker = $this->speaker_repository->getById($speaker_id);
+            if (is_null($speaker)) return $this->error404();
+            $this->service->deleteSpeaker($speaker_id);
+            return $this->deleted();
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);

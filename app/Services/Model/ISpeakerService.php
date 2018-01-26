@@ -46,7 +46,15 @@ interface ISpeakerService
      * @return PresentationSpeaker
      * @throws ValidationException
      */
-    public function updateSpeaker(Summit $summit, PresentationSpeaker $speaker, array $data);
+    public function updateSpeakerBySummit(Summit $summit, PresentationSpeaker $speaker, array $data);
+
+    /**
+     * @param array $data
+     * @param PresentationSpeaker $speaker
+     * @return PresentationSpeaker
+     * @throws ValidationException
+     */
+    public function updateSpeaker(PresentationSpeaker $speaker, array $data);
 
     /**
      * @param PresentationSpeaker $speaker
@@ -74,4 +82,12 @@ interface ISpeakerService
      * @return void
      */
     public function merge(PresentationSpeaker $speaker_from, PresentationSpeaker $speaker_to, array $data);
+
+    /**
+     * @param int $speaker_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSpeaker($speaker_id);
 }

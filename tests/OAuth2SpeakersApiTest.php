@@ -91,6 +91,73 @@ final class OAuth2SpeakersApiTest extends ProtectedApiTest
         return $speaker;
     }
 
+    public function testUpdateSpeaker()
+    {
+        $speaker = $this->testPostSpeaker();
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $data = [
+            'title'                    => 'Developer update!',
+            'first_name'               => 'Sebastian update',
+            'last_name'                => 'Marcet update',
+            'notes'                    => 'test update',
+            'willing_to_present_video' => false,
+        ];
+
+        $response = $this->action
+        (
+            "PUT",
+            "OAuth2SummitSpeakersApiController@updateSpeaker",
+            [
+                'speaker_id' => $speaker->id
+            ],
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $this->assertResponseStatus(201);
+        $content = $response->getContent();
+        $speaker = json_decode($content);
+        $this->assertTrue($speaker->id > 0);
+        $this->assertTrue($speaker->notes == "test update");
+        $this->assertTrue($speaker->willing_to_present_video == false);
+        return $speaker;
+    }
+
+    public function testDeleteSpeaker()
+    {
+        $speaker = $this->testPostSpeaker();
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+
+        $response = $this->action
+        (
+            "DELETE",
+            "OAuth2SummitSpeakersApiController@deleteSpeaker",
+            [
+                'speaker_id' => $speaker->id
+            ],
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $this->assertResponseStatus(204);
+        $content = $response->getContent();
+    }
+
     public function testPostSpeakerRegCodeBySummit($summit_id = 23)
     {
         $params = [

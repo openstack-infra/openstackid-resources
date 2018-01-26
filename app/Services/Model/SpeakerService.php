@@ -327,7 +327,7 @@ final class SpeakerService implements ISpeakerService
      * @throws ValidationException
      * @throws EntityNotFoundException
      */
-    public function updateSpeaker(Summit $summit, PresentationSpeaker $speaker, array $data)
+    public function updateSpeakerBySummit(Summit $summit, PresentationSpeaker $speaker, array $data)
     {
        return $this->tx_service->transaction(function() use ($summit, $speaker, $data){
            $member_id = isset($data['member_id']) ? intval($data['member_id']) : null;
@@ -618,4 +618,58 @@ final class SpeakerService implements ISpeakerService
         });
     }
 
+    /**
+     * @param array $data
+     * @param PresentationSpeaker $speaker
+     * @return PresentationSpeaker
+     * @throws ValidationException
+     */
+    public function updateSpeaker(PresentationSpeaker $speaker, array $data)
+    {
+        return $this->tx_service->transaction(function() use ($speaker, $data){
+            $member_id = isset($data['member_id']) ? intval($data['member_id']) : null;
+
+            if($member_id > 0)
+            {
+                $member = $this->member_repository->getById($member_id);
+                if(is_null($member))
+                    throw new EntityNotFoundException;
+
+                $existent_speaker = $this->speaker_repository->getByMember($member);
+                if($existent_speaker && $existent_speaker->getId() !== $speaker->getId())
+                    throw new ValidationException
+                    (
+                        sprintf
+                        (
+                            "member_id %s already has assigned another speaker id (%s)",
+                            $member_id,
+                            $existent_speaker->getId()
+                        )
+                    );
+
+                $speaker->setMember($member);
+            }
+
+            $this->updateSpeakerMainData($speaker, $data);
+
+            return $speaker;
+        });
+    }
+
+    /**
+     * @param int $speaker_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSpeaker($speaker_id)
+    {
+        return $this->tx_service->transaction(function() use($speaker_id){
+            $speaker = $this->speaker_repository->getById($speaker_id);
+            if(is_null($speaker))
+                throw new EntityNotFoundException;
+
+            $this->speaker_repository->delete($speaker);
+        });
+    }
 }

@@ -107,20 +107,20 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $org_has_cloud;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SpeakerRegistrationRequest", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="SpeakerRegistrationRequest", cascade={"persist"}), orphanRemoval=true
      * @ORM\JoinColumn(name="RegistrationRequestID", referencedColumnName="ID")
      * @var SpeakerRegistrationRequest
      */
     private $registration_request;
 
     /**
-     * @ORM\OneToMany(targetEntity="PresentationSpeakerSummitAssistanceConfirmationRequest", mappedBy="speaker", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="PresentationSpeakerSummitAssistanceConfirmationRequest", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
      * @var PresentationSpeakerSummitAssistanceConfirmationRequest[]
      */
     private $summit_assistances;
 
     /**
-     * @ORM\OneToMany(targetEntity="SpeakerSummitRegistrationPromoCode", mappedBy="speaker", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SpeakerSummitRegistrationPromoCode", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
      * @var SpeakerSummitRegistrationPromoCode[]
      */
     private $promo_codes;
@@ -152,25 +152,25 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $member;
 
     /**
-     * @ORM\OneToMany(targetEntity="SpeakerExpertise", mappedBy="speaker", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SpeakerExpertise", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
      * @var SpeakerExpertise[]
      */
     private $areas_of_expertise;
 
     /**
-     * @ORM\OneToMany(targetEntity="SpeakerPresentationLink", mappedBy="speaker", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SpeakerPresentationLink", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
      * @var SpeakerPresentationLink[]
      */
     private $other_presentation_links;
 
     /**
-     * @ORM\OneToMany(targetEntity="SpeakerTravelPreference", mappedBy="speaker", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SpeakerTravelPreference", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
      * @var SpeakerTravelPreference[]
      */
     private $travel_preferences;
 
     /**
-     * @ORM\OneToMany(targetEntity="SpeakerLanguage", mappedBy="speaker", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SpeakerLanguage", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
      * @var SpeakerLanguage[]
      */
     private $languages;

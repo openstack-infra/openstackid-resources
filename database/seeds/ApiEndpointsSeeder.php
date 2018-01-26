@@ -215,7 +215,7 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
-                'name' => 'update-speaker',
+                'name' => 'update-speaker-by-summit',
                 'route' => '/api/v1/summits/{id}/speakers/{speaker_id}',
                 'http_method' => 'PUT',
                 'scopes' => [
@@ -234,6 +234,22 @@ class ApiEndpointsSeeder extends Seeder
                 'name' => 'add-speaker',
                 'route' => '/api/v1/speakers',
                 'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                ],
+            ),
+            array(
+                'name' => 'update-speaker',
+                'route' => '/api/v1/speakers/{speaker_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                ],
+            ),
+            array(
+                'name' => 'delete-speaker',
+                'route' => '/api/v1/speakers/{speaker_id}',
+                'http_method' => 'DELETE',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 ],
