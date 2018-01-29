@@ -214,6 +214,12 @@ Route::group([
                 });
             });
 
+            // speakers assistance
+            Route::group(['prefix' => 'speakers-assistances'], function () {
+                Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@getBySummit']);
+            });
+
+
             // events
             Route::group(array('prefix' => 'events'), function () {
 

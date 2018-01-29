@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
@@ -22,6 +23,7 @@ use models\main\Group;
 use models\main\Organization;
 use models\summit\ISummitRegistrationPromoCodeRepository;
 use models\summit\ISummitTicketTypeRepository;
+use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\SummitRegistrationPromoCode;
@@ -252,6 +254,13 @@ final class RepositoriesProvider extends ServiceProvider
             ISummitRegistrationPromoCodeRepository::class,
             function(){
                 return  EntityManager::getRepository(SummitRegistrationPromoCode::class);
+            }
+        );
+
+        App::singleton(
+            IPresentationSpeakerSummitAssistanceConfirmationRequestRepository::class,
+            function(){
+                return  EntityManager::getRepository(PresentationSpeakerSummitAssistanceConfirmationRequest::class);
             }
         );
     }

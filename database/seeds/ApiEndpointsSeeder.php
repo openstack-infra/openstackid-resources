@@ -687,7 +687,6 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/promo-codes',
                 'http_method' => 'GET',
                 'scopes' => [
-                    sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
@@ -696,7 +695,6 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/promo-codes/{promo_code_id}',
                 'http_method' => 'GET',
                 'scopes' => [
-                    sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
@@ -741,10 +739,17 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/promo-codes/metadata',
                 'http_method' => 'GET',
                 'scopes' => [
-                    sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ]
+            ],
+            array(
+                'name' => 'get-speaker-assistances-by-summit',
+                'route' => '/api/v1/summits/{id}/speakers-assistances',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ),
         ]);
     }
 

@@ -13,7 +13,6 @@
  **/
 use App\Repositories\SilverStripeDoctrineRepository;
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\QueryBuilder;
 use models\summit\ISummitRegistrationPromoCodeRepository;
 use models\summit\MemberSummitRegistrationPromoCode;
 use models\summit\SpeakerSummitRegistrationPromoCode;
@@ -22,8 +21,6 @@ use models\summit\Summit;
 use models\summit\SummitRegistrationPromoCode;
 use utils\DoctrineFilterMapping;
 use utils\DoctrineInstanceOfFilterMapping;
-use utils\DoctrineJoinFilterMapping;
-use utils\DoctrineLeftJoinFilterMapping;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;

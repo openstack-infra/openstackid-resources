@@ -15,7 +15,7 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
  * Class PresentationSpeakerSummitAssistanceConfirmationRequest
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrinePresentationSpeakerSummitAssistanceConfirmationRequestRepository")
  * @ORM\Table(name="PresentationSpeakerSummitAssistanceConfirmationRequest")
  * @package models\summit
  */
@@ -44,6 +44,12 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
      * @var bool
      */
     private $checked_in;
+
+    /**
+     * @ORM\Column(name="ConfirmationDate", type="datetime")
+     * @var \DateTime
+     */
+    private $confirmation_date;
 
     /**
      * @ORM\ManyToOne(targetEntity="PresentationSpeaker")
@@ -144,5 +150,21 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
         catch(\Exception $ex){
             return 0;
         }
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getConfirmationDate()
+    {
+        return $this->confirmation_date;
+    }
+
+    /**
+     * @param \DateTime $confirmation_date
+     */
+    public function setConfirmationDate(\DateTime $confirmation_date)
+    {
+        $this->confirmation_date = $confirmation_date;
     }
 }
