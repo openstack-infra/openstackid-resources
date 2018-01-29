@@ -90,4 +90,13 @@ interface ISpeakerService
      * @return void
      */
     public function deleteSpeaker($speaker_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $assistance_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSpeakerAssistance(Summit $summit, $assistance_id);
 }

@@ -17,4 +17,5 @@ return [
     'promo_code_email_send_already_sent' => 'Cannot resend a code that has been already sent.',
     'promo_code_email_send_empty_email'  => 'Cannot find an email address for the promocode owner.',
     'promo_code_email_send_empty_name'   => 'Cannot find a name for the promocode owner.',
+    'speaker_assistance_delete_already_confirmed' => 'Cannot delete summit assistance :assistance_id because is already confirmed by speaker :speaker_id',
 ];

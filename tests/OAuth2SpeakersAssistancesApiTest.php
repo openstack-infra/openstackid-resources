@@ -47,6 +47,7 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $assistances = json_decode($content);
         $this->assertTrue(!is_null($assistances));
+        return $assistances;
     }
 
     public function testGetAllBySummitAndConfirmed($summit_id = 23){
@@ -80,6 +81,69 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $assistances = json_decode($content);
         $this->assertTrue(!is_null($assistances));
+        return $assistances;
+    }
+
+    public function testGetAllBySummitAndNonConfirmed($summit_id = 23){
+
+        $params = [
+
+            'id'       => $summit_id,
+            'page'     => 1,
+            'per_page' => 10,
+            'filter'   => 'is_confirmed==0',
+            'order'    => '+id',
+            'expand'   => 'speaker'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitSpeakersAssistanceApiController@getBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $assistances = json_decode($content);
+        $this->assertTrue(!is_null($assistances));
+        return $assistances;
+    }
+
+    public function testDeletePromoCode($summit_id  = 23){
+
+        $assistances = $this->testGetAllBySummitAndNonConfirmed($summit_id);
+        $params = [
+            'id'            => $summit_id,
+            'assistance_id' => $assistances->data[0]->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitSpeakersAssistanceApiController@deleteSpeakerSummitAssistanceSummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
     }
 
 }

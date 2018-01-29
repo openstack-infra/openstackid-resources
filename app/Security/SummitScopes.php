@@ -20,6 +20,7 @@ final class SummitScopes
 {
     const ReadSummitData     = '%s/summits/read';
     const ReadAllSummitData  = '%s/summits/read/all';
+    const ReadNotifications  = '%s/summits/read-notifications';
 
     const WriteSummitData    = '%s/summits/write';
     const WriteSpeakersData  = '%s/speakers/write';
@@ -33,4 +34,6 @@ final class SummitScopes
     const WriteMemberData    = '%s/members/write';
 
     const WritePromoCodeData = '%s/promo-codes/write';
+
+    const WriteSummitSpeakerAssistanceData = '%s/summit-speaker-assistance/write';
 }

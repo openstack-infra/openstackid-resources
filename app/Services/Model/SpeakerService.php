@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use Illuminate\Http\UploadedFile;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
@@ -72,6 +73,12 @@ final class SpeakerService implements ISpeakerService
     private $tx_service;
 
     /**
+     * @var IPresentationSpeakerSummitAssistanceConfirmationRequestRepository
+     */
+    private $speakers_assistance_repository;
+
+
+    /**
      * SpeakerService constructor.
      * @param ISpeakerRepository $speaker_repository
      * @param IMemberRepository $member_repository
@@ -79,6 +86,7 @@ final class SpeakerService implements ISpeakerService
      * @param ISpeakerSummitRegistrationPromoCodeRepository $registration_code_repository
      * @param IEmailCreationRequestRepository $email_creation_request_repository
      * @param IFolderRepository $folder_repository
+     * @param IPresentationSpeakerSummitAssistanceConfirmationRequestRepository $speakers_assistance_repository
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -89,6 +97,7 @@ final class SpeakerService implements ISpeakerService
         ISpeakerSummitRegistrationPromoCodeRepository $registration_code_repository,
         IEmailCreationRequestRepository $email_creation_request_repository,
         IFolderRepository $folder_repository,
+        IPresentationSpeakerSummitAssistanceConfirmationRequestRepository $speakers_assistance_repository,
         ITransactionService $tx_service
     )
     {
@@ -98,6 +107,7 @@ final class SpeakerService implements ISpeakerService
         $this->speaker_registration_request_repository = $speaker_registration_request_repository;
         $this->registration_code_repository            = $registration_code_repository;
         $this->email_creation_request_repository       = $email_creation_request_repository;
+        $this->speakers_assistance_repository          = $speakers_assistance_repository;
         $this->tx_service                              = $tx_service;
     }
 
@@ -670,6 +680,34 @@ final class SpeakerService implements ISpeakerService
                 throw new EntityNotFoundException;
 
             $this->speaker_repository->delete($speaker);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $assistance_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSpeakerAssistance(Summit $summit, $assistance_id){
+        return $this->tx_service->transaction(function() use($assistance_id){
+            $assistance = $this->speakers_assistance_repository->getById($assistance_id);
+            if(is_null($assistance))
+                throw new EntityNotFoundException;
+            if($assistance->isConfirmed())
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.speaker_assistance_delete_already_confirmed',
+                            [
+                                'assistance_id' => $assistance_id,
+                                'speaker_id'    => $assistance->getSpeakerId()
+                            ]
+                    )
+                );
+            $this->speakers_assistance_repository->delete($assistance);
         });
     }
 }

@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Config;
 use App\Models\ResourceServer\ApiEndpoint;
@@ -656,31 +655,33 @@ class ApiEndpointsSeeder extends Seeder
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf('%s/me/summits/events/favorites/delete', $current_realm)],
             ),
-            array(
+           [
                 'name' => 'get-own-member-schedule',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/schedule',
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/me/read', $current_realm)],
-            ),
-            array(
+            ],
+           [
                 'name' => 'add-2-own-member-schedule',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
-            array(
+            ],
+           [
                 'name' => 'remove-from-own-member-schedule',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
+            ],
             // notifications
-            array(
+           [
                 'name' => 'get-notifications',
                 'route' => '/api/v1/summits/{id}/notifications',
                 'http_method' => 'GET',
-                'scopes' => [sprintf('%s/summits/read-notifications', $current_realm)],
-            ),
+                'scopes' => [
+                    sprintf(SummitScopes::ReadNotifications, $current_realm)
+                ],
+            ],
             // promo codes
             [
                 'name' => 'get-promo-codes',
@@ -742,14 +743,25 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
-            array(
+            // summit speakers assistances
+            [
                 'name' => 'get-speaker-assistances-by-summit',
                 'route' => '/api/v1/summits/{id}/speakers-assistances',
                 'http_method' => 'GET',
                 'scopes' => [
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+            ],
+            // summit speakers assistances
+            [
+                'name' => 'delete-speaker-assistance-by-id',
+                'route' => '/api/v1/summits/{id}/speakers-assistances/{assistance_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitSpeakerAssistanceData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
         ]);
     }
 
