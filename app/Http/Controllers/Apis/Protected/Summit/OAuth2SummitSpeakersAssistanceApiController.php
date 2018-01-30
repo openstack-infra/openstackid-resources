@@ -110,12 +110,12 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
 
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'), [
-                    'id' => ['=='],
-                    'on_site_phone' => ['==', '=@'],
-                    'speaker_email' => ['==', '=@'],
-                    'speaker' => ['==', '=@'],
-                    'is_confirmed' => ['=='],
-                    'registered' => ['=='],
+                    'id'                => ['=='],
+                    'on_site_phone'     => ['==', '=@'],
+                    'speaker_email'     => ['==', '=@'],
+                    'speaker'           => ['==', '=@'],
+                    'is_confirmed'      => ['=='],
+                    'registered'        => ['=='],
                     'confirmation_date' => ['>', '<', '>=', '<=']
                 ]);
             }
@@ -278,6 +278,42 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
             $this->service->deleteSpeakerAssistance($summit, $assistance_id);
 
             return $this->deleted();
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+
+    }
+
+    /**
+     * @param $summit_id
+     * @param $assistance_id
+     * @return mixed
+     */
+    public function getSpeakerSummitAssistanceBySummit($summit_id, $assistance_id)
+    {
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $speaker_assistance = $summit->getSpeakerAssistanceById($assistance_id);
+
+            if (is_null($speaker_assistance)) return $this->error404();
+
+            return $this->ok
+            (
+                SerializerRegistry::getInstance()->getSerializer($speaker_assistance)->serialize
+                (
+                    Request::input('expand', '')
+                )
+            );
         } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));

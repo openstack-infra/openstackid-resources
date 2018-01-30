@@ -169,6 +169,12 @@ class Summit extends SilverstripeBaseModel
     private $promo_codes;
 
     /**
+     * @ORM\OneToMany(targetEntity="PresentationSpeakerSummitAssistanceConfirmationRequest", mappedBy="summit")
+     * @var PresentationSpeakerSummitAssistanceConfirmationRequest[]
+     */
+    private $speaker_assistances;
+
+    /**
      * @ORM\ManyToOne(targetEntity="models\main\File")
      * @ORM\JoinColumn(name="LogoID", referencedColumnName="ID")
      * @var File
@@ -447,6 +453,18 @@ class Summit extends SilverstripeBaseModel
         $this->entity_events           = new ArrayCollection();
         $this->wifi_connections        = new ArrayCollection();
         $this->promo_codes             = new ArrayCollection();
+        $this->speaker_assistances     = new ArrayCollection();
+    }
+
+    /**
+     * @param int $assistance_id
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest|null
+     */
+    public function getSpeakerAssistanceById($assistance_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($assistance_id)));
+        $speaker_assistance = $this->speaker_assistances->matching($criteria)->first();
+        return $speaker_assistance === false ? null : $speaker_assistance;
     }
 
     /**

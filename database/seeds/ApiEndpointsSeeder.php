@@ -771,6 +771,14 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-speaker-assistance',
+                'route' => '/api/v1/summits/{id}/speakers-assistances/{assistance_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'update-speaker-assistance',
                 'route' => '/api/v1/summits/{id}/speakers-assistances/{assistance_id}',
                 'http_method' => 'PUT',
