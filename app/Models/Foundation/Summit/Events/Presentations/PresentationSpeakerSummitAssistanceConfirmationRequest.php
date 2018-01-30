@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\utils\RandomGenerator;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
@@ -59,6 +60,12 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
     private $speaker;
 
     /**
+     * @ORM\Column(name="ConfirmationHash", type="string")
+     * @var string
+     */
+    private $confirmation_hash;
+
+    /**
      * @return string
      */
     public function getOnSitePhone()
@@ -103,7 +110,8 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
      */
     public function setIsConfirmed($is_confirmed)
     {
-        $this->is_confirmed = $is_confirmed;
+        $this->is_confirmed      = $is_confirmed;
+        $this->confirmation_date = new \DateTime('now', new \DateTimeZone(self::DefaultTimeZone));
     }
 
     /**
@@ -166,5 +174,29 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
     public function setConfirmationDate(\DateTime $confirmation_date)
     {
         $this->confirmation_date = $confirmation_date;
+    }
+
+
+    /**
+     * @var string
+     */
+    private $token;
+
+    /**
+     * @return string
+     */
+    public function generateConfirmationToken() {
+        $generator               = new RandomGenerator();
+        $this->token             = $generator->randomToken();
+        $this->confirmation_hash = self::HashConfirmationToken($this->token);
+        return $this->token;
+    }
+
+    /**
+     * @param string $token
+     * @return string
+     */
+    public static function HashConfirmationToken($token){
+        return md5($token);
     }
 }

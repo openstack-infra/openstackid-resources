@@ -685,34 +685,6 @@ final class SpeakerService implements ISpeakerService
 
     /**
      * @param Summit $summit
-     * @param int $assistance_id
-     * @throws ValidationException
-     * @throws EntityNotFoundException
-     * @return void
-     */
-    public function deleteSpeakerAssistance(Summit $summit, $assistance_id){
-        return $this->tx_service->transaction(function() use($assistance_id){
-            $assistance = $this->speakers_assistance_repository->getById($assistance_id);
-            if(is_null($assistance))
-                throw new EntityNotFoundException;
-            if($assistance->isConfirmed())
-                throw new ValidationException
-                (
-                    trans
-                    (
-                        'validation_errors.speaker_assistance_delete_already_confirmed',
-                            [
-                                'assistance_id' => $assistance_id,
-                                'speaker_id'    => $assistance->getSpeakerId()
-                            ]
-                    )
-                );
-            $this->speakers_assistance_repository->delete($assistance);
-        });
-    }
-
-    /**
-     * @param Summit $summit
      * @param array $data
      * @throws ValidationException
      * @throws EntityNotFoundException
@@ -751,6 +723,87 @@ final class SpeakerService implements ISpeakerService
             );
 
             return $assistance;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $assistance_id
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    public function updateSpeakerAssistance(Summit $summit, $assistance_id, array $data)
+    {
+        return $this->tx_service->transaction(function() use($summit, $assistance_id , $data){
+            $assistance = $this->speakers_assistance_repository->getById($assistance_id);
+            if(is_null($assistance))
+                throw new EntityNotFoundException;
+
+            if($assistance->getSummitId() != $summit->getId()){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.speaker_assistance_does_not_belongs_to_summit',
+                        [
+                            'assistance_id' => $assistance_id,
+                            'summit_id'     => $summit->getId()
+                        ]
+                    )
+                );
+            }
+
+            $this->updateSummitAssistance($assistance, $data);
+
+            return $assistance;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $assistance_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSpeakerAssistance(Summit $summit, $assistance_id){
+        return $this->tx_service->transaction(function() use($summit, $assistance_id){
+
+            $assistance = $this->speakers_assistance_repository->getById($assistance_id);
+
+            if(is_null($assistance))
+                throw new EntityNotFoundException;
+
+            if($assistance->getSummitId() != $summit->getId()){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.speaker_assistance_does_not_belongs_to_summit',
+                        [
+                            'assistance_id' => $assistance_id,
+                            'summit_id'     => $summit->getId()
+                        ]
+                    )
+                );
+            }
+
+            if($assistance->isConfirmed())
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.speaker_assistance_delete_already_confirmed',
+                        [
+                            'assistance_id' => $assistance_id,
+                            'speaker_id'    => $assistance->getSpeakerId()
+                        ]
+                    )
+                );
+
+            $this->speakers_assistance_repository->delete($assistance);
         });
     }
 }

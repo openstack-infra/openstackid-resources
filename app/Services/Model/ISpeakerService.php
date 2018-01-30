@@ -104,6 +104,16 @@ interface ISpeakerService
     /**
      * @param Summit $summit
      * @param int $assistance_id
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    public function updateSpeakerAssistance(Summit $summit, $assistance_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $assistance_id
      * @throws ValidationException
      * @throws EntityNotFoundException
      * @return void

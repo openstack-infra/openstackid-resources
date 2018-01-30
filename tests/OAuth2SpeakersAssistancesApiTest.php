@@ -20,7 +20,6 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
     public function testGetAllBySummit($summit_id = 23){
 
         $params = [
-
             'id'       => $summit_id,
             'page'     => 1,
             'per_page' => 10,
@@ -118,7 +117,7 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         return $assistances;
     }
 
-    public function testDeletePromoCode($summit_id  = 23){
+    public function testDeleteSummitAssistance($summit_id  = 23){
 
         $assistances = $this->testGetAllBySummitAndNonConfirmed($summit_id);
         $params = [
@@ -163,6 +162,43 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         $response = $this->action(
             "POST",
             "OAuth2SummitSpeakersAssistanceApiController@addSpeakerSummitAssistance",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $assistance = json_decode($content);
+        $this->assertTrue(!is_null($assistance));
+        return $assistance;
+    }
+
+    public function testUpdateSummitAssistance($summit_id = 23){
+
+        $response = $this->testGetAllBySummitAndConfirmed($summit_id);
+
+        $params = [
+            'id'            => $summit_id,
+            'assistance_id' => $response->data[0]->id
+        ];
+
+        $data = [
+           'is_confirmed'  => true,
+           'on_site_phone' => '+5491133943659'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitSpeakersAssistanceApiController@updateSpeakerSummitAssistance",
             $params,
             [],
             [],

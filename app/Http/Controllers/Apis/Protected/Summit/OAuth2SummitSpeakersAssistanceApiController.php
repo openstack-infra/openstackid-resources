@@ -216,6 +216,58 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
      * @param $assistance_id
      * @return mixed
      */
+    public function updateSpeakerSummitAssistance($summit_id, $assistance_id)
+    {
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json()->all();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = [
+                'on_site_phone'     => 'sometimes|string|max:50',
+                'registered'        => 'sometimes|boolean',
+                'is_confirmed'      => 'sometimes|boolean',
+                'checked_in'        => 'sometimes|boolean',
+            ];
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $speaker_assistance  = $this->service->updateSpeakerAssistance($summit, $assistance_id, $data);
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($speaker_assistance)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
+    /**
+     * @param $summit_id
+     * @param $assistance_id
+     * @return mixed
+     */
     public function deleteSpeakerSummitAssistance($summit_id, $assistance_id)
     {
         try {
