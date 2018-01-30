@@ -15,6 +15,8 @@ use models\utils\IBaseRepository;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
+use utils\PagingResponse;
+
 /**
  * Interface ISummitRegistrationPromoCodeRepository
  * @package models\summit
@@ -26,7 +28,7 @@ interface ISummitRegistrationPromoCodeRepository extends IBaseRepository
      * @param PagingInfo $paging_info
      * @param Filter|null $filter
      * @param Order|null $order
-     * @return mixed
+     * @return PagingResponse
      */
     public function getBySummit
     (

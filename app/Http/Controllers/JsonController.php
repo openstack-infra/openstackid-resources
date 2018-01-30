@@ -1,5 +1,4 @@
 <?php namespace App\Http\Controllers;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use App\Http\Utils\CSVExporter;
 use Exception;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
-
 /**
  * Class JsonController
  * @package App\Http\Controllers
@@ -122,5 +120,35 @@ abstract class JsonController extends Controller
     protected function error412($messages)
     {
         return Response::json(array('message' => 'Validation Failed', 'errors' => $messages), 412);
+    }
+
+    /**
+     * @param string $format
+     * @param string $filename
+     * @param array $items
+     * @return \Illuminate\Http\Response
+     */
+    protected function export($format, $filename, array $items){
+        if($format == 'csv') return $this->csv($filename, $items);
+    }
+
+    /**
+     * @param string $filename
+     * @param array $items
+     * @param string $field_separator
+     * @param string $mime_type
+     * @return \Illuminate\Http\Response
+     */
+    private function csv($filename, array $items, $field_separator = ",", $mime_type = 'application/vnd.ms-excel'){
+        $headers = [
+            'Cache-Control'             => 'must-revalidate, post-check=0, pre-check=0',
+            'Content-type'              => $mime_type,
+            'Content-Transfer-Encoding' => 'binary',
+            'Content-Disposition'       => 'attachment; filename='.$filename.".csv",
+            'Expires'                   => '0',
+            'Pragma'                    => 'public',
+        ];
+
+        return Response::make(CSVExporter::getInstance()->export($items, $field_separator), 200, $headers);
     }
 }

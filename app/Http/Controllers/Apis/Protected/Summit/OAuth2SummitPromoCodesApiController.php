@@ -227,6 +227,104 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
         }
     }
 
+    public function getAllBySummitCSV($summit_id){
+        $values = Input::all();
+        $rules  = [
+    ];
+
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $validation = Validator::make($values, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException();
+                throw $ex->setMessages($validation->messages()->toArray());
+            }
+
+            // default values
+            $page     = 1;
+            $per_page = PHP_INT_MAX;
+            $filter   = null;
+
+            if (Input::has('filter')) {
+                $filter = FilterParser::parse(Input::get('filter'), [
+
+                    'code'          => ['=@', '=='],
+                    'creator'       => ['=@', '=='],
+                    'creator_email' => ['=@', '=='],
+                    'owner'         => ['=@', '=='],
+                    'owner_email'   => ['=@', '=='],
+                    'speaker'       => ['=@', '=='],
+                    'speaker_email' => ['=@', '=='],
+                    'sponsor'       => ['=@', '=='],
+                    'class_name'    => ['=='],
+                    'type'          => ['=='],
+                ]);
+            }
+
+            $order = null;
+
+            if (Input::has('order'))
+            {
+                $order = OrderParser::parse(Input::get('order'), [
+
+                    'id',
+                    'code',
+                ]);
+            }
+
+            if(is_null($filter)) $filter = new Filter();
+
+            if($filter->hasFilter("class_name") && !$this->validateClassName($filter->getFilter("class_name"))){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "class_name filter has an invalid value ( valid values are %s",
+                        implode(", ", PromoCodesConstants::$valid_class_names)
+                    )
+                );
+            }
+
+            if($filter->hasFilter("type") && !$this->validateTypes($filter->getFilter("type"))){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "type filter has an invalid value ( valid values are %s",
+                        implode(", ", PromoCodesConstants::getValidTypes())
+                    )
+                );
+            }
+
+            $data     = $this->promo_code_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
+            $filename = "promocodes-" . date('Ymd');
+            $list     =  $data->toArray();
+            return $this->export('csv', $filename, $list['data']);
+
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * @param $summit_id
      * @return mixed

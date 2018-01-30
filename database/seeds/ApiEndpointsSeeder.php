@@ -692,6 +692,14 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-promo-codes-csv',
+                'route' => '/api/v1/summits/{id}/promo-codes/csv',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-promo-code',
                 'route' => '/api/v1/summits/{id}/promo-codes/{promo_code_id}',
                 'http_method' => 'GET',

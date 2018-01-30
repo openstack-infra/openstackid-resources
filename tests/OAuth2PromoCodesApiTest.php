@@ -79,6 +79,34 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($promo_codes));
     }
 
+    public function testGetPromoCodesByClassNameSpeakerSummitRegistrationPromoCodeCSV(){
+        $params = [
+
+            'id'       => 23,
+            'filter'   => 'class_name=='.\models\summit\SpeakerSummitRegistrationPromoCode::ClassName,
+            'order'    => '+code'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitPromoCodesApiController@getAllBySummitCSV",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $this->assertTrue(!is_null($content));
+    }
+
     public function testGetPromoCodesByClassNameOR(){
         $params = [
 
