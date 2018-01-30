@@ -15,6 +15,7 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\File;
 use models\summit\PresentationSpeaker;
+use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\Summit;
 use Illuminate\Http\UploadedFile;
@@ -90,6 +91,15 @@ interface ISpeakerService
      * @return void
      */
     public function deleteSpeaker($speaker_id);
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    public function addSpeakerAssistance(Summit $summit, array $data);
 
     /**
      * @param Summit $summit

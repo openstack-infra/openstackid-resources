@@ -3,7 +3,7 @@
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * You may obtain a copy of the License atN
  * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,17 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Libs\ModelSerializers\AbstractSerializer;
-
 /**
  * Class SilverStripeSerializer
  * @package ModelSerializers
  */
 class SilverStripeSerializer extends AbstractSerializer
 {
-    protected static $array_mappings = array
-    (
-        'Id' => 'id:json_int',
-    );
+    protected static $array_mappings = [
+
+        'Id'         => 'id:json_int',
+        'Created'    => 'created:datetime_epoch',
+        'LastEdited' => 'last_edited:datetime_epoch',
+    ];
 }

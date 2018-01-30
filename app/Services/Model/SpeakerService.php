@@ -203,7 +203,7 @@ final class SpeakerService implements ISpeakerService
         $on_site_phone = isset($data['on_site_phone']) ? trim($data['on_site_phone']) : null;
         $registered    = isset($data['registered']) ? 1 : 0;
         $checked_in    = isset($data['checked_in']) ? 1 : 0;
-        $confirmed     = isset($data['confirmed'])  ? 1 : 0;
+        $confirmed     = isset($data['is_confirmed'])  ? 1 : 0;
 
         $summit_assistance->setOnSitePhone($on_site_phone);
         $summit_assistance->setRegistered($registered);
@@ -708,6 +708,49 @@ final class SpeakerService implements ISpeakerService
                     )
                 );
             $this->speakers_assistance_repository->delete($assistance);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
+     */
+    public function addSpeakerAssistance(Summit $summit, array $data)
+    {
+        return $this->tx_service->transaction(function() use($data, $summit){
+
+            $speaker_id = intval($data['speaker_id']);
+            $speaker    = $this->speaker_repository->getById($speaker_id);
+
+            if(is_null($speaker))
+                throw new EntityNotFoundException(trans('not_found_errors.add_speaker_assistance_speaker_not_found', ['speaker_id' => $speaker_id]));
+
+            if(!$speaker->isSpeakerOfSummit($summit)){
+                throw new ValidationException(trans('validation_errors.add_speaker_assistance_speaker_is_not_on_summit',
+                    [
+                        'speaker_id' => $speaker_id,
+                        'summit_id'  => $summit->getId()
+                    ]
+                ));
+            }
+
+            if($speaker->hasAssistanceFor($summit))
+                throw new ValidationException(trans('validation_errors.add_speaker_assistance_speaker_already_has_assistance',
+                    [
+                        'speaker_id' => $speaker_id,
+                        'summit_id'  => $summit->getId()
+                    ]
+                ));
+
+            $assistance = $speaker->buildAssistanceFor($summit);
+            $speaker->addSummitAssistance(
+                $this->updateSummitAssistance($assistance, $data)
+            );
+
+            return $assistance;
         });
     }
 }

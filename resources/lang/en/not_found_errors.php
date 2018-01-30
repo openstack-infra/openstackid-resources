@@ -14,4 +14,5 @@
 return [
     'promo_code_delete_code_not_found' => 'promo code id :promo_code_id does not belongs to summit id :summit_id.',
     'promo_code_email_code_not_found'  => 'promo code id :promo_code_id does not belongs to summit id :summit_id.',
+    'add_speaker_assistance_speaker_not_found' => 'speaker id :speaker_id not found',
 ];

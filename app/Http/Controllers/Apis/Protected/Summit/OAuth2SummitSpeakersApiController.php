@@ -378,7 +378,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'email'             => 'sometimes|string|max:50',
                 'on_site_phone'     => 'sometimes|string|max:50',
                 'registered'        => 'sometimes|boolean',
-                'confirmed'         => 'sometimes|boolean',
+                'is_confirmed'      => 'sometimes|boolean',
                 'checked_in'        => 'sometimes|boolean',
                 'registration_code' => 'sometimes|string',
             );
@@ -447,7 +447,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'email'             => 'sometimes|string|max:50',
                 'on_site_phone'     => 'sometimes|string|max:50',
                 'registered'        => 'sometimes|boolean',
-                'confirmed'         => 'sometimes|boolean',
+                'is_confirmed'      => 'sometimes|boolean',
                 'checked_in'        => 'sometimes|boolean',
                 'registration_code' => 'sometimes|string',
             );

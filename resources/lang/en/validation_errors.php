@@ -18,4 +18,6 @@ return [
     'promo_code_email_send_empty_email'  => 'Cannot find an email address for the promocode owner.',
     'promo_code_email_send_empty_name'   => 'Cannot find a name for the promocode owner.',
     'speaker_assistance_delete_already_confirmed' => 'Cannot delete summit assistance :assistance_id because is already confirmed by speaker :speaker_id',
+    'add_speaker_assistance_speaker_already_has_assistance' => 'speaker id :speaker_id already has an assistance for summit id :summit_id',
+    'add_speaker_assistance_speaker_is_not_on_summit' => 'speaker id :speaker_id is not related to summit id :summit_id ( is not assigned as speaker of any published presentations nor its assigned as moderator)',
 ];

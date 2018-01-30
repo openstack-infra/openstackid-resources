@@ -752,9 +752,17 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
-            // summit speakers assistances
             [
-                'name' => 'delete-speaker-assistance-by-id',
+                'name' => 'add-speaker-assistance',
+                'route' => '/api/v1/summits/{id}/speakers-assistances',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitSpeakerAssistanceData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-speaker-assistance',
                 'route' => '/api/v1/summits/{id}/speakers-assistances/{assistance_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [

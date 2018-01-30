@@ -133,7 +133,7 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
 
         $response = $this->action(
             "DELETE",
-            "OAuth2SummitSpeakersAssistanceApiController@deleteSpeakerSummitAssistanceSummit",
+            "OAuth2SummitSpeakersAssistanceApiController@deleteSpeakerSummitAssistance",
             $params,
             [],
             [],
@@ -144,6 +144,38 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
 
         $content = $response->getContent();
         $this->assertResponseStatus(204);
+    }
+
+    public function testAddSummitAssistance($summit_id = 23){
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $data = [
+            'speaker_id' => 1
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitSpeakersAssistanceApiController@addSpeakerSummitAssistance",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $assistance = json_decode($content);
+        $this->assertTrue(!is_null($assistance));
+        return $assistance;
     }
 
 }

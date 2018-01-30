@@ -100,7 +100,6 @@ class PresentationSpeaker extends SilverstripeBaseModel
      */
     private $notes;
 
-
     /**
      * @ORM\Column(name="OrgHasCloud", type="boolean")
      */
@@ -608,6 +607,14 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param Summit $summit
+     * @return bool
+     */
+    public function hasAssistanceFor(Summit $summit){
+        return $this->getAssistanceFor($summit) != null;
+    }
+
+    /**
      * @return mixed
      */
     public function getCreatedFromApi()
@@ -636,6 +643,44 @@ class PresentationSpeaker extends SilverstripeBaseModel
     }
 
     /**
+     * @param Summit $summit
+     * @return bool
+     */
+    public function isSpeakerOfSummit(Summit $summit){
+
+        $query = <<<SQL
+SELECT DISTINCT Summit.* FROM SummitEvent 
+INNER JOIN Summit ON Summit.ID = SummitEvent.SummitID
+INNER JOIN Presentation ON Presentation.ID = SummitEvent.ID
+WHERE
+SummitEvent.Published = 1
+AND (
+	EXISTS ( 
+		SELECT Presentation_Speakers.ID FROM Presentation_Speakers 
+		WHERE Presentation_Speakers.PresentationID = Presentation.ID AND
+		Presentation_Speakers.PresentationSpeakerID = :speaker_id
+	) OR
+    Presentation.ModeratorID = :speaker_id
+)
+AND Summit.ID = :summit_id;
+SQL;
+
+        $rsm = new ResultSetMappingBuilder($this->getEM());
+        $rsm->addRootEntityFromClassMetadata(\models\summit\Summit::class, 's');
+
+        // build rsm here
+        $native_query = $this->getEM()->createNativeQuery($query, $rsm);
+
+
+        $native_query->setParameter("speaker_id", $this->id);
+        $native_query->setParameter("summit_id", $summit->getId());
+
+        $summits = $native_query->getResult();
+
+        return count($summits) > 0;
+    }
+
+    /**
      * @return Summit[]
      */
     public function getRelatedSummits(){
@@ -645,7 +690,8 @@ SELECT DISTINCT Summit.* FROM Presentation_Speakers
 INNER JOIN Presentation ON Presentation.ID = Presentation_Speakers.PresentationID
 INNER JOIN SummitEvent ON SummitEvent.ID = Presentation.ID
 INNER JOIN Summit ON Summit.ID = SummitEvent.SummitID
-WHERE SummitEvent.Published = 1 AND Presentation_Speakers.PresentationSpeakerID = :speaker_id; 
+WHERE SummitEvent.Published = 1 AND 
+( Presentation_Speakers.PresentationSpeakerID = :speaker_id OR  Presentation.ModeratorID = :speaker_id )
 SQL;
 
         $rsm = new ResultSetMappingBuilder($this->getEM());

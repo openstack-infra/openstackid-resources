@@ -20,13 +20,14 @@ use Illuminate\Support\Facades\Validator;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
+use models\summit\ISpeakerRepository;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISpeakerService;
 use utils\FilterParser;
 use utils\OrderParser;
 use utils\PagingInfo;
-
+use Exception;
 /**
  * Class OAuth2SummitSpeakersAssistanceApiController
  * @package App\Http\Controllers
@@ -44,6 +45,11 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
     private $speakers_assistance_repository;
 
     /**
+     * @var ISpeakerRepository
+     */
+    private $speaker_repository;
+
+    /**
      * @var ISpeakerService
      */
     private $service;
@@ -53,13 +59,15 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
     (
         ISummitRepository $summit_repository,
         IPresentationSpeakerSummitAssistanceConfirmationRequestRepository $speakers_assistance_repository,
+        ISpeakerRepository $speaker_repository,
         ISpeakerService $service,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
-        $this->summit_repository = $summit_repository;
-        $this->service = $service;
+        $this->summit_repository              = $summit_repository;
+        $this->speaker_repository             = $speaker_repository;
+        $this->service                        = $service;
         $this->speakers_assistance_repository = $speakers_assistance_repository;
     }
 
@@ -154,10 +162,61 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
 
     /**
      * @param $summit_id
+     * @return mixed
+     */
+    public function addSpeakerSummitAssistance($summit_id)
+    {
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json()->all();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = [
+                'speaker_id'        => 'required:integer',
+                'on_site_phone'     => 'sometimes|string|max:50',
+                'registered'        => 'sometimes|boolean',
+                'is_confirmed'      => 'sometimes|boolean',
+                'checked_in'        => 'sometimes|boolean',
+            ];
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $speaker_assistance  = $this->service->addSpeakerAssistance($summit, $data);
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($speaker_assistance)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
      * @param $assistance_id
      * @return mixed
      */
-    public function deleteSpeakerSummitAssistanceSummit($summit_id, $assistance_id)
+    public function deleteSpeakerSummitAssistance($summit_id, $assistance_id)
     {
         try {
 
@@ -179,4 +238,5 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
         }
 
     }
+
 }
