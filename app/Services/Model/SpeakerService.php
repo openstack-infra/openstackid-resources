@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Factories\PresentationSpeakerSummitAssistanceConfirmationRequestFactory;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use Illuminate\Http\UploadedFile;
 use libs\utils\ITransactionService;
@@ -177,7 +178,7 @@ final class SpeakerService implements ISpeakerService
             }
 
             $speaker->addSummitAssistance(
-                $this->updateSummitAssistance($speaker->buildAssistanceFor($summit), $data)
+                PresentationSpeakerSummitAssistanceConfirmationRequestFactory::build($summit, $speaker, $data)
             );
 
             $reg_code = isset($data['registration_code']) ? trim($data['registration_code']) : null;
@@ -192,25 +193,6 @@ final class SpeakerService implements ISpeakerService
 
             return $speaker;
         });
-    }
-
-    /**
-     * @param PresentationSpeakerSummitAssistanceConfirmationRequest $summit_assistance
-     * @param array $data
-     * @return PresentationSpeakerSummitAssistanceConfirmationRequest
-     */
-    private function updateSummitAssistance(PresentationSpeakerSummitAssistanceConfirmationRequest $summit_assistance, array $data){
-        $on_site_phone = isset($data['on_site_phone']) ? trim($data['on_site_phone']) : null;
-        $registered    = isset($data['registered']) ? 1 : 0;
-        $checked_in    = isset($data['checked_in']) ? 1 : 0;
-        $confirmed     = isset($data['is_confirmed'])  ? 1 : 0;
-
-        $summit_assistance->setOnSitePhone($on_site_phone);
-        $summit_assistance->setRegistered($registered);
-        $summit_assistance->setIsConfirmed($confirmed);
-        $summit_assistance->setCheckedIn($checked_in);
-
-        return $summit_assistance;
     }
 
     /**
@@ -373,7 +355,7 @@ final class SpeakerService implements ISpeakerService
                $speaker->addSummitAssistance($summit_assistance);
            }
 
-           $this->updateSummitAssistance($summit_assistance, $data);
+           PresentationSpeakerSummitAssistanceConfirmationRequestFactory::populate($summit_assistance, $data);
 
            $reg_code = isset($data['registration_code']) ? trim($data['registration_code']) : null;
            if(!empty($reg_code)){
@@ -717,10 +699,14 @@ final class SpeakerService implements ISpeakerService
                     ]
                 ));
 
-            $assistance = $speaker->buildAssistanceFor($summit);
-            $speaker->addSummitAssistance(
-                $this->updateSummitAssistance($assistance, $data)
+            $assistance = PresentationSpeakerSummitAssistanceConfirmationRequestFactory::build
+            (
+                $summit,
+                $speaker,
+                $data
             );
+
+            $speaker->addSummitAssistance($assistance);
 
             return $assistance;
         });
@@ -755,9 +741,12 @@ final class SpeakerService implements ISpeakerService
                 );
             }
 
-            $this->updateSummitAssistance($assistance, $data);
+            return PresentationSpeakerSummitAssistanceConfirmationRequestFactory::populate
+            (
+                $assistance,
+                $data
+            );
 
-            return $assistance;
         });
     }
 

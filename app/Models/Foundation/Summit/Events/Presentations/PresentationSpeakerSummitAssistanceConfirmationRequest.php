@@ -199,4 +199,11 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
     public static function HashConfirmationToken($token){
         return md5($token);
     }
+
+    public function __construct()
+    {
+        $this->registered   = false;
+        $this->is_confirmed = false;
+        $this->checked_in   = false;
+    }
 }

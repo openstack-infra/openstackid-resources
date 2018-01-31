@@ -15,7 +15,7 @@
 /**
  * Class OAuth2SpeakersAssistancesApiTest
  */
-class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
+final class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
 {
     public function testGetAllBySummit($summit_id = 23){
 
@@ -146,12 +146,16 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         return $assistances;
     }
 
-    public function testDeleteSummitAssistance($summit_id  = 23){
+    public function testDeleteSummitAssistance($summit_id  = 23, $assistance_id = 3561){
 
-        $assistances = $this->testGetAllBySummitAndNonConfirmed($summit_id);
+        if($assistance_id <= 0) {
+            $assistances   = $this->testGetAllBySummitAndNonConfirmed($summit_id);
+            $assistance_id = $assistances->data[0]->id;
+        }
+
         $params = [
             'id'            => $summit_id,
-            'assistance_id' => $assistances->data[0]->id
+            'assistance_id' => $assistance_id
         ];
 
         $headers = [
@@ -180,7 +184,10 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         ];
 
         $data = [
-            'speaker_id' => 1
+            'speaker_id'   => 15,
+            'checked_in'   => false,
+            'registered'   => true,
+            'is_confirmed' => false,
         ];
 
         $headers = [
@@ -203,6 +210,7 @@ class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
         $assistance = json_decode($content);
         $this->assertTrue(!is_null($assistance));
+
         return $assistance;
     }
 
