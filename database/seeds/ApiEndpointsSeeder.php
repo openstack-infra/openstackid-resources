@@ -761,6 +761,14 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-speaker-assistances-by-summit-csv',
+                'route' => '/api/v1/summits/{id}/speakers-assistances/csv',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'add-speaker-assistance',
                 'route' => '/api/v1/summits/{id}/speakers-assistances',
                 'http_method' => 'POST',

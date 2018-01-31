@@ -49,6 +49,33 @@ final class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         return $assistances;
     }
 
+    public function testGetAllBySummitCSV($summit_id = 23){
+
+        $params = [
+            'id'       => $summit_id,
+            'order'    => '+id',
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitSpeakersAssistanceApiController@getBySummitCSV",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $this->assertTrue(!empty($content));
+    }
+
     public function testGetBySummitAndId($summit_id = 23, $assistance_id = 3129){
 
         $params = [

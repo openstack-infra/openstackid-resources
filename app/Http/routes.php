@@ -217,6 +217,7 @@ Route::group([
             // speakers assistance
             Route::group(['prefix' => 'speakers-assistances'], function () {
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@getBySummit']);
+                Route::get('csv', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@getBySummitCSV']);
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@addSpeakerSummitAssistance']);
                 Route::group(['prefix' => '{assistance_id}'], function () {
                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@getSpeakerSummitAssistanceBySummit']);

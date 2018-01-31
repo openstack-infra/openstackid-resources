@@ -164,6 +164,68 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
      * @param $summit_id
      * @return mixed
      */
+    public function getBySummitCSV($summit_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            // default values
+            $page = 1;
+            $per_page = PHP_INT_MAX;
+
+            if (Input::has('page')) {
+                $page = intval(Input::get('page'));
+                $per_page = intval(Input::get('per_page'));
+            }
+
+            $filter = null;
+
+            if (Input::has('filter')) {
+                $filter = FilterParser::parse(Input::get('filter'), [
+                    'id'                => ['=='],
+                    'on_site_phone'     => ['==', '=@'],
+                    'speaker_email'     => ['==', '=@'],
+                    'speaker'           => ['==', '=@'],
+                    'is_confirmed'      => ['=='],
+                    'registered'        => ['=='],
+                    'confirmation_date' => ['>', '<', '>=', '<=']
+                ]);
+            }
+
+            $order = null;
+            if (Input::has('order')) {
+                $order = OrderParser::parse(Input::get('order'), [
+                    'id',
+                    'is_confirmed',
+                    'confirmation_date',
+                    'created',
+                    'registered',
+                ]);
+            }
+
+            $serializer_type = SerializerRegistry::SerializerType_Private;
+            $data = $this->speakers_assistance_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
+
+            $filename = "summit-speaker-assistances-" . date('Ymd');
+            $list     =  $data->toArray();
+            return $this->export('csv', $filename, $list['data']);
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
     public function addSpeakerSummitAssistance($summit_id)
     {
         try {
