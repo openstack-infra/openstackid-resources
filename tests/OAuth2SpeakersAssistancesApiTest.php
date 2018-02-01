@@ -278,4 +278,31 @@ final class OAuth2SpeakersAssistancesApiTest extends ProtectedApiTest
         return $assistance;
     }
 
+    public function testSendAnnouncementEmail($summit_id = 23, $assistance_id = 3541){
+
+        $params = [
+            'id'            => $summit_id,
+            'assistance_id' => $assistance_id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitSpeakersAssistanceApiController@sendSpeakerSummitAssistanceAnnouncementMail",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+    }
+
 }

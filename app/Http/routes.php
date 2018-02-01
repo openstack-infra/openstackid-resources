@@ -223,6 +223,7 @@ Route::group([
                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@getSpeakerSummitAssistanceBySummit']);
                     Route::delete('',[ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@deleteSpeakerSummitAssistance']);
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@updateSpeakerSummitAssistance']);
+                    Route::post('mail', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersAssistanceApiController@sendSpeakerSummitAssistanceAnnouncementMail']);
                 });
             });
 

@@ -46,4 +46,11 @@ interface ISpeakerSummitRegistrationPromoCodeRepository
      * @return SpeakerSummitRegistrationPromoCode
      */
     public function getAssignedCode($code, Summit $summit);
+
+    /**
+     * @param Summit $summit
+     * @param string $type
+     * @return SpeakerSummitRegistrationPromoCode
+     */
+    public function getNextAvailableByType(Summit $summit, $type);
 }

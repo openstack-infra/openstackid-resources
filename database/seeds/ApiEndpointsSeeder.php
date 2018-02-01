@@ -803,6 +803,15 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSummitData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'send-speaker-assistance-mail',
+                'route' => '/api/v1/summits/{id}/speakers-assistances/{assistance_id}/mail',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitSpeakerAssistanceData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
         ]);
     }
 
