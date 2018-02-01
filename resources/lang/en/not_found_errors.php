@@ -12,7 +12,8 @@
  * limitations under the License.
  **/
 return [
-    'promo_code_delete_code_not_found' => 'promo code id :promo_code_id does not belongs to summit id :summit_id.',
-    'promo_code_email_code_not_found'  => 'promo code id :promo_code_id does not belongs to summit id :summit_id.',
-    'add_speaker_assistance_speaker_not_found' => 'speaker id :speaker_id not found',
+    'promo_code_delete_code_not_found'                                      => 'promo code id :promo_code_id does not belongs to summit id :summit_id.',
+    'promo_code_email_code_not_found'                                       => 'promo code id :promo_code_id does not belongs to summit id :summit_id.',
+    'add_speaker_assistance_speaker_not_found'                              => 'speaker id :speaker_id not found',
+    'send_speaker_summit_assistance_announcement_mail_not_found_assistance' => 'summit speaker assistance :assistance_id not found for summit id :summit_id',
 ];

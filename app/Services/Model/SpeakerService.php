@@ -17,12 +17,15 @@ use Illuminate\Http\UploadedFile;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\EmailCreationRequest;
 use models\main\File;
 use models\main\IEmailCreationRequestRepository;
 use models\main\IFolderRepository;
 use models\main\IMemberRepository;
 use models\main\MemberPromoCodeEmailCreationRequest;
 use models\main\SpeakerCreationEmailCreationRequest;
+use models\main\SpeakerSelectionAnnouncementEmailCreationRequest;
+use models\summit\factories\SpeakerSelectionAnnouncementEmailTypeFactory;
 use models\summit\ISpeakerRegistrationRequestRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISpeakerSummitRegistrationPromoCodeRepository;
@@ -793,6 +796,161 @@ final class SpeakerService implements ISpeakerService
                 );
 
             $this->speakers_assistance_repository->delete($assistance);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $assistance_id
+     * @return EmailCreationRequest
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function sendSpeakerSummitAssistanceAnnouncementMail(Summit $summit, $assistance_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $assistance_id){
+
+            $speaker_assistance = $summit->getSpeakerAssistanceById($assistance_id);
+
+            if(is_null($speaker_assistance))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.send_speaker_summit_assistance_announcement_mail_not_found_assistance',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'assistance_id' => $assistance_id
+                        ]
+                    )
+                );
+            $speaker = $speaker_assistance->getSpeaker();
+
+            $role    = $speaker->isModeratorFor($summit) ?
+                PresentationSpeaker::RoleModerator : PresentationSpeaker::RoleSpeaker;
+
+            /*
+            if($speaker->announcementEmailAlreadySent($summit))
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.send_speaker_summit_assistance_announcement_mail_email_already_sent',
+                        [
+                            'summit_id'  => $summit->getId(),
+                            'speaker_id' => $speaker->getId()
+                        ]
+                    )
+                );
+            */
+
+            $promo_code = $speaker->getPromoCodeFor($summit);
+
+            if(is_null($promo_code)){
+                // try to get a new one
+                $has_published =
+                    $speaker->hasPublishedRegularPresentations($summit, $role, true, $summit->getExcludedCategoriesForAcceptedPresentations()) ||
+                    $speaker->hasPublishedLightningPresentations($summit, $role, true, $summit->getExcludedCategoriesForAcceptedPresentations());
+                $has_alternate = $speaker->hasAlternatePresentations($summit, $role, true, $summit->getExcludedCategoriesForAlternatePresentations());
+
+                if ($has_published) //get approved code
+                {
+                    $promo_code = $this->registration_code_repository->getNextAvailableByType
+                    (
+                        $summit,
+                        SpeakerSummitRegistrationPromoCode::TypeAccepted
+                    );
+                    if (is_null($promo_code))
+                        throw new ValidationException
+                        (
+                            trans
+                            (
+                                'validation_errors.send_speaker_summit_assistance_announcement_mail_run_out_promo_code',
+                                [
+                                    'summit_id'  => $summit->getId(),
+                                    'speaker_id' => $speaker->getId(),
+                                    'type'       => SpeakerSummitRegistrationPromoCode::TypeAccepted
+                                ]
+                            )
+                        );
+                    $speaker->addPromoCode($promo_code);
+                }
+                else if ($has_alternate) // get alternate code
+                {
+                    $promo_code = $this->registration_code_repository->getNextAvailableByType
+                    (
+                        $summit,
+                        SpeakerSummitRegistrationPromoCode::TypeAlternate
+                    );
+                    if (is_null($promo_code))
+                        throw new ValidationException
+                        (
+                            trans
+                            (
+                                'validation_errors.send_speaker_summit_assistance_announcement_mail_run_out_promo_code',
+                                [
+                                    'summit_id'  => $summit->getId(),
+                                    'speaker_id' => $speaker->getId(),
+                                    'type'       => SpeakerSummitRegistrationPromoCode::TypeAccepted
+                                ]
+                            )
+
+                        );
+                    $speaker->addPromoCode($promo_code);
+                }
+            }
+
+            if (is_null($promo_code))
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.send_speaker_summit_assistance_promo_code_not_set',
+                        [
+                            'summit_id'  => $summit->getId(),
+                            'speaker_id' => $speaker->getId(),
+                        ]
+                    )
+
+                );
+
+            $type = SpeakerSelectionAnnouncementEmailTypeFactory::build($summit, $speaker, $role);
+
+            if($promo_code->isRedeemed())
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.send_speaker_summit_assistance_announcement_mail_code_already_redeemed',
+                        [
+                            'promo_code' => $promo_code->getCode()
+                        ]
+                    )
+                );
+
+            if(!SpeakerSelectionAnnouncementEmailCreationRequest::isValidType($type))
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.send_speaker_summit_assistance_announcement_mail_invalid_mail_type',
+                        [
+                            'mail_type' => $type
+                        ]
+                    )
+                );
+
+            // create email request
+            $email_request = new SpeakerSelectionAnnouncementEmailCreationRequest();
+            $email_request->setPromoCode($promo_code);
+            $email_request->setSummit($summit);
+            $email_request->setSpeaker($speaker);
+            $email_request->setType($type);
+            $email_request->setSpeakerRole($role);
+            $this->email_creation_request_repository->add($email_request);
+            $promo_code->setEmailSent(true);
+            return $email_request;
+
         });
     }
 }

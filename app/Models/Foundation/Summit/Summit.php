@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\ORM\Cache;
 use models\main\File;
 use models\main\Member;
+use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -145,7 +146,6 @@ class Summit extends SilverstripeBaseModel
      */
     private $time_zone_id;
 
-
     /**
      * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"})
      */
@@ -208,6 +208,57 @@ class Summit extends SilverstripeBaseModel
      * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"})
      */
     private $ticket_types;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory")
+     * @ORM\JoinTable(name="Summit_ExcludedCategoriesForAcceptedPresentations",
+     *      joinColumns={@ORM\JoinColumn(name="SummitID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")}
+     * )
+     * @var PresentationCategory[]
+     */
+    private $excluded_categories_for_accepted_presentations;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory")
+     * @ORM\JoinTable(name="Summit_ExcludedCategoriesForAlternatePresentations",
+     *      joinColumns={@ORM\JoinColumn(name="SummitID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")}
+     * )
+     * @var PresentationCategory[]
+     */
+    private $excluded_categories_for_alternate_presentations;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory")
+     * @ORM\JoinTable(name="Summit_ExcludedCategoriesForRejectedPresentations",
+     *      joinColumns={@ORM\JoinColumn(name="SummitID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")}
+     * )
+     * @var PresentationCategory[]
+     */
+    private $excluded_categories_for_rejected_presentations;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory")
+     * @ORM\JoinTable(name="Summit_ExcludedTracksForUploadPresentationSlideDeck",
+     *      joinColumns={@ORM\JoinColumn(name="SummitID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")}
+     * )
+     * @var PresentationCategory[]
+     */
+    private $excluded_categories_for_upload_slide_decks;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\main\Tag")
+     * @ORM\JoinTable(name="Summit_CategoryDefaultTags",
+     *      joinColumns={@ORM\JoinColumn(name="SummitID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="TagID", referencedColumnName="ID")}
+     * )
+     * @var Tag[]
+     */
+    private $category_default_tags;
+
     /**
      * @return string
      */
@@ -443,17 +494,22 @@ class Summit extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->locations               = new ArrayCollection();
-        $this->events                  = new ArrayCollection();
-        $this->event_types             = new ArrayCollection();
-        $this->ticket_types            = new ArrayCollection();
-        $this->presentation_categories = new ArrayCollection();
-        $this->category_groups         = new ArrayCollection();
-        $this->attendees               = new ArrayCollection();
-        $this->entity_events           = new ArrayCollection();
-        $this->wifi_connections        = new ArrayCollection();
-        $this->promo_codes             = new ArrayCollection();
-        $this->speaker_assistances     = new ArrayCollection();
+        $this->locations                                       = new ArrayCollection;
+        $this->events                                          = new ArrayCollection;
+        $this->event_types                                     = new ArrayCollection;
+        $this->ticket_types                                    = new ArrayCollection;
+        $this->presentation_categories                         = new ArrayCollection;
+        $this->category_groups                                 = new ArrayCollection;
+        $this->attendees                                       = new ArrayCollection;
+        $this->entity_events                                   = new ArrayCollection;
+        $this->wifi_connections                                = new ArrayCollection;
+        $this->promo_codes                                     = new ArrayCollection;
+        $this->speaker_assistances                             = new ArrayCollection;
+        $this->excluded_categories_for_accepted_presentations  = new ArrayCollection;
+        $this->excluded_categories_for_alternate_presentations = new ArrayCollection;
+        $this->excluded_categories_for_rejected_presentations  = new ArrayCollection;
+        $this->excluded_categories_for_upload_slide_decks      = new ArrayCollection;
+        $this->category_default_tags                           = new ArrayCollection;
     }
 
     /**
@@ -1400,5 +1456,45 @@ SQL;
        $this->promo_codes->removeElement($promo_code);
        $promo_code->setSummit(null);
        return $this;
+    }
+
+    /**
+     * @return PresentationCategory[]
+     */
+    public function getExcludedCategoriesForAcceptedPresentations()
+    {
+        return $this->excluded_categories_for_accepted_presentations->toArray();
+    }
+
+    /**
+     * @return PresentationCategory[]
+     */
+    public function getExcludedCategoriesForAlternatePresentations()
+    {
+        return $this->excluded_categories_for_alternate_presentations->toArray();
+    }
+
+    /**
+     * @return PresentationCategory[]
+     */
+    public function getExcludedCategoriesForRejectedPresentations()
+    {
+        return $this->excluded_categories_for_rejected_presentations->toArray();
+    }
+
+    /**
+     * @return PresentationCategory[]
+     */
+    public function getExcludedCategoriesForUploadSlideDecks()
+    {
+        return $this->excluded_categories_for_upload_slide_decks->toArray();
+    }
+
+    /**
+     * @return Tag[]
+     */
+    public function getCategoryDefaultTags()
+    {
+        return $this->category_default_tags->toArray();
     }
 }

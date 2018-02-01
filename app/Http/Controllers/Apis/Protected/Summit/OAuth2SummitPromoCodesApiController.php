@@ -473,7 +473,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
             $mail_request = $this->promo_code_service->sendPromoCodeMail($summit, $promo_code_id);
-            return $this->ok($mail_request->getId());
+            return $this->created($mail_request->getId());
         } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));

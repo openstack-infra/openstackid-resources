@@ -35,6 +35,15 @@ use Doctrine\Common\Collections\Criteria;
 class PresentationSpeaker extends SilverstripeBaseModel
 {
 
+    const AnnouncementEmailAccepted          = 'ACCEPTED';
+    const AnnouncementEmailRejected          = 'REJECTED';
+    const AnnouncementEmailAlternate         = 'ALTERNATE';
+    const AnnouncementEmailAcceptedAlternate = 'ACCEPTED_ALTERNATE';
+    const AnnouncementEmailAcceptedRejected  = 'ACCEPTED_REJECTED';
+    const AnnouncementEmailAlternateRejected = 'ALTERNATE_REJECTED';
+    const RoleSpeaker                        = 'SPEAKER';
+    const RoleModerator                      = 'MODERATOR';
+
     /**
      * @ORM\Column(name="FirstName", type="string")
      */
@@ -195,6 +204,12 @@ class PresentationSpeaker extends SilverstripeBaseModel
     protected $active_involvements;
 
     /**
+     * @ORM\OneToMany(targetEntity="SpeakerAnnouncementSummitEmail", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
+     * @var SpeakerAnnouncementSummitEmail[]
+     */
+    private $announcement_summit_emails;
+
+    /**
      * @return string
      */
     public function getFirstName()
@@ -293,21 +308,22 @@ class PresentationSpeaker extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->available_for_bureau     = false;
-        $this->willing_to_present_video = false;
-        $this->willing_to_travel        = false;
-        $this->funded_travel            = false;
-        $this->org_has_cloud            = false;
-        $this->presentations            = new ArrayCollection;
-        $this->moderated_presentations  = new ArrayCollection;
-        $this->summit_assistances       = new ArrayCollection;
-        $this->promo_codes              = new ArrayCollection;
-        $this->areas_of_expertise       = new ArrayCollection;
-        $this->other_presentation_links = new ArrayCollection;
-        $this->travel_preferences       = new ArrayCollection;
-        $this->languages                = new ArrayCollection;
-        $this->organizational_roles     = new ArrayCollection;
-        $this->active_involvements      = new ArrayCollection;
+        $this->available_for_bureau       = false;
+        $this->willing_to_present_video   = false;
+        $this->willing_to_travel          = false;
+        $this->funded_travel              = false;
+        $this->org_has_cloud              = false;
+        $this->presentations              = new ArrayCollection;
+        $this->moderated_presentations    = new ArrayCollection;
+        $this->summit_assistances         = new ArrayCollection;
+        $this->promo_codes                = new ArrayCollection;
+        $this->areas_of_expertise         = new ArrayCollection;
+        $this->other_presentation_links   = new ArrayCollection;
+        $this->travel_preferences         = new ArrayCollection;
+        $this->languages                  = new ArrayCollection;
+        $this->organizational_roles       = new ArrayCollection;
+        $this->active_involvements        = new ArrayCollection;
+        $this->announcement_summit_emails = new ArrayCollection;
     }
 
     /**
@@ -376,6 +392,414 @@ class PresentationSpeaker extends SilverstripeBaseModel
                 return $res;
             });
     }
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @return bool
+     */
+    public function hasPublishedRegularPresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles = false,
+        array $excluded_tracks = []
+    )
+    {
+        return count($this->getPublishedRegularPresentations($summit, $role, $include_sub_roles, $excluded_tracks)) > 0;
+    }
+
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @return array
+     */
+    public function getPublishedRegularPresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles = false,
+        array $excluded_tracks = []
+    )
+    {
+        $list = $this->getPublishedPresentationsByType
+        (
+            $summit,
+            $role,
+            [IPresentationType::Keynotes, IPresentationType::Panel, IPresentationType::Presentation],
+            true,
+            $excluded_tracks
+        );
+
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
+            $presentations = $this->getPublishedPresentationsByType
+            (
+                $summit,
+                PresentationSpeaker::RoleSpeaker,
+                [IPresentationType::Keynotes, IPresentationType::Panel, IPresentationType::Presentation],
+                true,
+                $excluded_tracks
+            );
+            if($presentations) {
+                foreach ($presentations as $speaker_presentation)
+                    $list[] = $speaker_presentation;
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @return bool
+     */
+    public function hasPublishedLightningPresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles = false,
+        array $excluded_tracks = []
+    )
+    {
+        return count($this->getPublishedLightningPresentations
+            (
+                $summit,
+                $role,
+                $include_sub_roles,
+                $excluded_tracks
+            ))> 0;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @return array
+     */
+    public function getPublishedLightningPresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles = false,
+        array $excluded_tracks = []
+    )
+    {
+        $list = $this->getPublishedPresentationsByType($summit, $role, [IPresentationType::LightingTalks], true , $excluded_tracks);
+
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
+            $presentations = $this->getPublishedPresentationsByType($summit, PresentationSpeaker::RoleSpeaker, [IPresentationType::LightingTalks], true, $excluded_tracks) ;
+            if($presentations) {
+                foreach ($presentations as $speaker_presentation) {
+                    $list[] = $speaker_presentation;
+                }
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @param bool $published_ones
+     * @return bool
+     */
+    public function hasAlternatePresentations
+    (
+        Summit $summit,
+        $role                  = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles     = false,
+        array $excluded_tracks = [],
+        $published_ones = false
+    )
+    {
+        return count($this->getAlternatePresentations($summit, $role, $include_sub_roles, $excluded_tracks, $published_ones)) > 0;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @param bool $published_ones
+     * @return array
+     */
+    public function getAlternatePresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles = false,
+        array $excluded_tracks = [],
+        $published_ones = false
+    )
+    {
+        $alternate_presentations = [];
+
+        $exclude_category_dql = '';
+        if(count($excluded_tracks) > 0){
+            $exclude_category_dql = ' AND p.category NOT IN (:exclude_tracks)';
+        }
+
+        if($role == PresentationSpeaker::RoleSpeaker) {
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.speakers sp 
+            WHERE s.id = :summit_id 
+            AND p.published = :published
+            AND sp.id = :speaker_id".$exclude_category_dql);
+        }
+        else{
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.moderator m 
+            WHERE s.id = :summit_id 
+            AND p.published = :published
+            AND m.id = :speaker_id".$exclude_category_dql);
+        }
+
+        $query
+            ->setParameter('summit_id', $summit->getId())
+            ->setParameter('speaker_id', $this->id)
+            ->setParameter('published', $published_ones ? 1 : 0);
+
+        if(count($excluded_tracks) > 0){
+            $query->setParameter('exclude_tracks', $excluded_tracks);
+        }
+
+        $presentations = $query->getResult();
+
+        foreach ($presentations as $p) {
+            if ($p->getSelectionStatus() == Presentation::SelectionStatus_Alternate) {
+                $alternate_presentations[] = $p;
+            }
+        }
+
+        // if role is moderator, add also the ones that belongs to role speaker ( if $include_sub_roles is true)
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
+            $presentations = $this->getAlternatePresentations($summit,PresentationSpeaker::RoleSpeaker, $include_sub_roles, $excluded_tracks);
+            if($presentations) {
+                foreach ($presentations as $speaker_presentation)
+                    $alternate_presentations[] = $speaker_presentation;
+            }
+        }
+
+        return $alternate_presentations;
+    }
+
+    /**
+     * @param Summit $summit,
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @return bool
+     */
+    public function hasRejectedPresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles = false,
+        array $excluded_tracks = []
+    )
+    {
+        return count($this->getRejectedPresentations($summit, $role, $include_sub_roles, $excluded_tracks)) > 0;
+    }
+
+    /**
+     * @param Summit $summit,
+     * @param string $role
+     * @param bool $include_sub_roles
+     * @param array $excluded_tracks
+     * @return array
+     */
+    public function getRejectedPresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $include_sub_roles = false,
+        array $excluded_tracks = []
+    ){
+        $list = $this->getUnacceptedPresentations($summit, $role, true, $excluded_tracks);
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
+            $presentations = $this->getUnacceptedPresentations($summit, PresentationSpeaker::RoleSpeaker, true, $excluded_tracks);
+            if($presentations) {
+                foreach ($presentations as $speaker_presentation) {
+                    $list[] = $speaker_presentation;
+                }
+            }
+        }
+        return $list;
+    }
+
+    /**
+     * @param Summit $summit,
+     * @param string $role
+     * @param bool $exclude_privates_tracks
+     * @param array $excluded_tracks
+     * @return array
+     */
+    public function getUnacceptedPresentations
+    (
+        Summit $summit,
+        $role = PresentationSpeaker::RoleSpeaker,
+        $exclude_privates_tracks = true,
+        array $excluded_tracks = []
+    )
+    {
+        $unaccepted_presentations = [];
+        $private_tracks           = [];
+
+        if($exclude_privates_tracks){
+            $private_track_groups = $this->createQuery("SELECT pg from models\summit\PrivatePresentationCategoryGroup pg 
+            JOIN pg.summit s
+            WHERE s.id = :summit_id")
+                ->setParameter('summit_id', $summit->getId())
+                ->getResult();
+
+            foreach($private_track_groups as $private_track_group){
+                $current_private_tracks = $private_track_group->getCategories();
+                if(count($current_private_tracks) == 0) continue;
+                $private_tracks = array_merge($private_tracks, array_values($current_private_tracks));
+            }
+        }
+
+        if(count($private_tracks) > 0) {
+            $excluded_tracks = array_merge($excluded_tracks, $private_tracks);
+        }
+
+        $exclude_category_dql = '';
+        if(count($excluded_tracks) > 0){
+            $exclude_category_dql = ' AND p.category NOT IN (:exclude_tracks)';
+        }
+
+        if($role == PresentationSpeaker::RoleSpeaker) {
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.speakers sp 
+            WHERE s.id = :summit_id 
+            AND p.published = 0
+            AND sp.id = :speaker_id".$exclude_category_dql);
+        }
+        else{
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.moderator m 
+            WHERE s.id = :summit_id 
+            AND p.published = 0
+            AND m.id = :speaker_id".$exclude_category_dql);
+        }
+
+        $query
+            ->setParameter('summit_id', $summit->getId())
+            ->setParameter('speaker_id', $this->id);
+
+        if(count($excluded_tracks) > 0){
+            $query->setParameter('exclude_tracks', $excluded_tracks);
+        }
+        $presentations = $query->getResult();
+
+        foreach ($presentations as $p) {
+            if ($p->getSelectionStatus() == Presentation::SelectionStatus_Unaccepted) {
+                $unaccepted_presentations[] = $p;
+            }
+        }
+
+        return $unaccepted_presentations;
+    }
+
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @param array $types_slugs
+     * @param bool $exclude_privates_tracks
+     * @param array $excluded_tracks
+     * @return array
+     */
+    public function getPublishedPresentationsByType
+    (
+        Summit $summit,
+        $role                    = PresentationSpeaker::RoleSpeaker,
+        array $types_slugs       = [IPresentationType::Keynotes, IPresentationType::Panel, IPresentationType::Presentation, IPresentationType::LightingTalks],
+        $exclude_privates_tracks = true,
+        array $excluded_tracks   = []
+    )
+    {
+        $query = $this->createQuery("SELECT pt from models\summit\PresentationType pt JOIN pt.summit s 
+        WHERE s.id = :summit_id and pt.type IN (:types) ");
+        $types = $query
+            ->setParameter('summit_id', $summit->getIdentifier())
+            ->setParameter('types', $types_slugs)
+            ->getResult();
+
+        if(count($types) == 0 ) return [];
+
+        $private_tracks          = [];
+        $exclude_privates_tracks = boolval($exclude_privates_tracks);
+
+        if($exclude_privates_tracks){
+
+            $query = $this->createQuery("SELECT ppcg from models\summit\PrivatePresentationCategoryGroup ppcg JOIN ppcg.summit s 
+            WHERE s.id = :summit_id");
+            $private_track_groups = $query
+                ->setParameter('summit_id', $summit->getIdentifier())
+                ->getResult();
+
+            foreach($private_track_groups as $private_track_group){
+                $current_private_tracks = $private_track_group->getCategories();
+                if($current_private_tracks->count() == 0) continue;
+                $private_tracks = array_merge($private_tracks, array_values($current_private_tracks));
+            }
+        }
+
+        if(count($private_tracks) > 0) {
+            $excluded_tracks = array_merge($excluded_tracks, $private_tracks);
+        }
+
+        $exclude_category_dql = '';
+        if(count($excluded_tracks) > 0){
+            $exclude_category_dql = ' and p.category NOT IN (:exclude_tracks)';
+        }
+
+        if($role == PresentationSpeaker::RoleSpeaker) {
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.speakers sp 
+            WHERE s.id = :summit_id 
+            and sp.id = :speaker_id
+            and p.published = 1 and p.type IN (:types)".$exclude_category_dql);
+        }
+        else{
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.moderator m 
+            WHERE s.id = :summit_id 
+            and m.id = :speaker_id
+            and p.published = 1 and p.type IN (:types)".$exclude_category_dql);
+        }
+
+        $query
+            ->setParameter('summit_id', $summit->getId())
+            ->setParameter('types', $types)
+            ->setParameter('speaker_id', $this->id);
+
+        if(count($excluded_tracks) > 0){
+            $query->setParameter('exclude_tracks', $excluded_tracks);
+        }
+
+        return $query->getResult();
+    }
+
 
     /**
      * @param null|int $summit_id
@@ -1029,4 +1453,44 @@ SQL;
         $presentation->setModerator($this);
     }
 
+    /**
+     * @param Summit $summit
+     * @return bool
+     */
+    public function isModeratorFor(Summit $summit){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('summit', $summit));
+        return $this->moderated_presentations->matching($criteria)->count() > 0;
+    }
+
+    /**
+     * @param Summit $summit
+     * @return bool
+     */
+    public function announcementEmailAlreadySent(Summit $summit)
+    {
+        $email_type = $this->getAnnouncementEmailTypeSent($summit);
+        return !is_null($email_type) && $email_type !== SpeakerAnnouncementSummitEmail::TypeNone;
+    }
+
+    /**
+     * @param Summit $summit
+     * @return string|null
+     */
+    public function getAnnouncementEmailTypeSent(Summit $summit)
+    {
+        $criteria = Criteria::create();
+
+        $criteria
+            ->where(Criteria::expr()->eq('summit', $summit))
+            ->andWhere(Criteria::expr()->notIn('type', [
+                SpeakerAnnouncementSummitEmail::TypeCreateMembership,
+                SpeakerAnnouncementSummitEmail::TypeSecondBreakoutRegister,
+                SpeakerAnnouncementSummitEmail::TypeSecondBreakoutReminder,
+            ]));
+
+        $email = $this->announcement_summit_emails->matching($criteria)->first();
+
+        return $email ? $email->getType() : null;
+    }
 }

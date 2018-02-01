@@ -1,5 +1,4 @@
 <?php namespace models\summit;
-
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
 /**
  * Class PresentationCategoryGroup
  * @ORM\Entity
  * @ORM\Table(name="PresentationCategoryGroup")
+ * @ORM\InheritanceType("JOINED")
+ * @ORM\DiscriminatorColumn(name="ClassName", type="string")
+ * @ORM\DiscriminatorMap({"PresentationCategoryGroup" = "PresentationCategoryGroup", "PrivatePresentationCategoryGroup" = "PrivatePresentationCategoryGroup"})
  * @package models\summit
  */
 class PresentationCategoryGroup extends SilverstripeBaseModel
@@ -30,19 +30,19 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
      * @ORM\Column(name="Name", type="string")
      * @var string
      */
-    private $name;
+    protected $name;
 
     /**
      * @ORM\Column(name="Color", type="string")
      * @var string
      */
-    private $color;
+    protected $color;
 
     /**
      * @ORM\Column(name="Description", type="string")
      * @var string
      */
-    private $description;
+    protected $description;
 
     /**
      * @return mixed
@@ -110,8 +110,6 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
         return $this->summit;
     }
 
-
-
     public function __construct()
     {
         parent::__construct();
@@ -126,7 +124,7 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
      * )
      * @var PresentationCategory[]
      */
-    private $categories;
+    protected $categories;
 
     /**
      * @return PresentationCategory[]

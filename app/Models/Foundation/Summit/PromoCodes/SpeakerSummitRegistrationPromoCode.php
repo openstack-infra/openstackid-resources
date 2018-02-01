@@ -20,6 +20,9 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
 {
+    const TypeAccepted  = 'ACCEPTED';
+    const TypeAlternate = 'ALTERNATE';
+
     /**
      * @ORM\Column(name="Type", type="string")
      * @var string

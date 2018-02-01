@@ -13,6 +13,7 @@
  **/
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\EmailCreationRequest;
 use models\main\File;
 use models\summit\PresentationSpeaker;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
@@ -119,4 +120,14 @@ interface ISpeakerService
      * @return void
      */
     public function deleteSpeakerAssistance(Summit $summit, $assistance_id);
+
+
+    /**
+     * @param Summit $summit
+     * @param int $assistance_id
+     * @return EmailCreationRequest
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function sendSpeakerSummitAssistanceAnnouncementMail(Summit $summit, $assistance_id);
 }

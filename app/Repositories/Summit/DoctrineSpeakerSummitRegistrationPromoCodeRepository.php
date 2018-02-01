@@ -104,4 +104,25 @@ final class DoctrineSpeakerSummitRegistrationPromoCodeRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * @param Summit $summit
+     * @param string $type
+     * @return SpeakerSummitRegistrationPromoCode
+     */
+    public function getNextAvailableByType(Summit $summit, $type)
+    {
+        return $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("c")
+            ->from(SpeakerSummitRegistrationPromoCode::class, "c")
+            ->where("c.speaker is null")
+            ->andWhere("c.summit = :summit")
+            ->andWhere("c.type = :type")
+            ->setParameter("summit", $summit)
+            ->setParameter("type", trim($type))
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

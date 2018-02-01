@@ -21,7 +21,8 @@ use DateTime;
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
  * @ORM\DiscriminatorMap({"EmailCreationRequest" = "EmailCreationRequest",
  *     "SpeakerCreationEmailCreationRequest" = "SpeakerCreationEmailCreationRequest",
- *     "MemberPromoCodeEmailCreationRequest"= "MemberPromoCodeEmailCreationRequest"})
+ *     "MemberPromoCodeEmailCreationRequest"= "MemberPromoCodeEmailCreationRequest",
+ *     "SpeakerSelectionAnnouncementEmailCreationRequest" = "SpeakerSelectionAnnouncementEmailCreationRequest"})
  * Class EmailCreationRequest
  * @package models\main
  */

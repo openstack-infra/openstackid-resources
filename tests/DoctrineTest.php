@@ -155,4 +155,43 @@ final class DoctrineTest extends TestCase
         $member = $speaker->getMember();
         $id = $member->getId();
     }
+
+    public function testGetSpeakerPublishedRegularPresentations($speaker_id = 1759){
+        $repo1     = EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
+        $repo2     = EntityManager::getRepository(\models\summit\Summit::class);
+        $summit    = $repo2->getById(23);
+        $speaker   = $repo1->getById($speaker_id);
+
+        $this->assertTrue($speaker->hasPublishedRegularPresentations($summit));
+
+        $presentations = $speaker->getPublishedRegularPresentations($summit);
+
+        $this->assertTrue(count($presentations) > 0);
+    }
+
+    public function testGetSpeakerAlternatePresentations($speaker_id = 70){
+        $repo1     = EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
+        $repo2     = EntityManager::getRepository(\models\summit\Summit::class);
+        $summit    = $repo2->getById(23);
+        $speaker   = $repo1->getById($speaker_id);
+
+        $this->assertTrue($speaker->hasAlternatePresentations($summit));
+
+        $presentations = $speaker->getAlternatePresentations($summit);
+
+        $this->assertTrue(count($presentations) > 0);
+    }
+
+    public function testGetSpeakerRejectedPresentations($speaker_id = 70){
+        $repo1     = EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
+        $repo2     = EntityManager::getRepository(\models\summit\Summit::class);
+        $summit    = $repo2->getById(23);
+        $speaker   = $repo1->getById($speaker_id);
+
+        $this->assertTrue($speaker->hasRejectedPresentations($summit));
+
+        $presentations = $speaker->getRejectedPresentations($summit);
+
+        $this->assertTrue(count($presentations) > 0);
+    }
 }
