@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\BooleanCellFormatter;
+use App\Http\Utils\EpochCellFormatter;
 use App\Models\Foundation\Summit\PromoCodes\PromoCodesConstants;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -301,7 +303,18 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
             $data     = $this->promo_code_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
             $filename = "promocodes-" . date('Ymd');
             $list     =  $data->toArray();
-            return $this->export('csv', $filename, $list['data']);
+            return $this->export
+            (
+                'csv',
+                $filename,
+                $list['data'],
+                [
+                    'created'     => new EpochCellFormatter,
+                    'last_edited' => new EpochCellFormatter,
+                    'redeemed'    => new BooleanCellFormatter,
+                    'email_sent'  => new BooleanCellFormatter,
+                ]
+            );
 
         }
         catch (ValidationException $ex1)

@@ -126,20 +126,22 @@ abstract class JsonController extends Controller
      * @param string $format
      * @param string $filename
      * @param array $items
+     * @param array $formatters
      * @return \Illuminate\Http\Response
      */
-    protected function export($format, $filename, array $items){
-        if($format == 'csv') return $this->csv($filename, $items);
+    protected function export($format, $filename, array $items, array $formatters = []){
+        if($format == 'csv') return $this->csv($filename, $items, $formatters);
     }
 
     /**
      * @param string $filename
      * @param array $items
+     * @param array $formatters
      * @param string $field_separator
      * @param string $mime_type
      * @return \Illuminate\Http\Response
      */
-    private function csv($filename, array $items, $field_separator = ",", $mime_type = 'application/vnd.ms-excel'){
+    private function csv($filename, array $items,  array $formatters = [], $field_separator = ",", $mime_type = 'application/vnd.ms-excel'){
         $headers = [
             'Cache-Control'             => 'must-revalidate, post-check=0, pre-check=0',
             'Content-type'              => $mime_type,
@@ -149,6 +151,6 @@ abstract class JsonController extends Controller
             'Pragma'                    => 'public',
         ];
 
-        return Response::make(CSVExporter::getInstance()->export($items, $field_separator), 200, $headers);
+        return Response::make(CSVExporter::getInstance()->export($items, $field_separator, [] , $formatters), 200, $headers);
     }
 }

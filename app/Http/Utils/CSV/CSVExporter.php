@@ -47,7 +47,7 @@ final class CSVExporter
      * @param array $header
      * @return string
      */
-    public function export(array $items, $field_separator = ",", array $header = []){
+    public function export(array $items, $field_separator = ",", array $header = [], array $formatters){
         $flag   = false;
         $output = '';
         foreach ($items as $row) {
@@ -62,7 +62,10 @@ final class CSVExporter
             array_walk($row, array($this, 'cleanData'));
             $values = [];
             foreach ($header as $key){
-                $values[] = isset($row[$key])? $row[$key] : '';
+               $val      = isset($row[$key])? $row[$key] : '';
+               if(isset($formatters[$key]))
+                   $val = $formatters[$key]->format($val);
+               $values[] = $val;
             }
             $output .= implode($field_separator, $values) . PHP_EOL;;
         }
@@ -72,10 +75,6 @@ final class CSVExporter
     function cleanData(&$str)
     {
         if (is_null($str)) {$str = ''; return;};
-        if(is_bool($str)){
-             $str = boolval($str) ? '1' : '0';
-             return;
-        }
         $str = preg_replace("/\t/", "\\t", $str);
         $str = preg_replace("/\r?\n/", "\\n", $str);
         $str = preg_replace("/,/", "-", $str);

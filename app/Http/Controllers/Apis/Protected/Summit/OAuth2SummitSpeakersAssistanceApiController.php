@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\BooleanCellFormatter;
+use App\Http\Utils\EpochCellFormatter;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -208,7 +210,19 @@ final class OAuth2SummitSpeakersAssistanceApiController extends OAuth2ProtectedC
 
             $filename = "summit-speaker-assistances-" . date('Ymd');
             $list     =  $data->toArray();
-            return $this->export('csv', $filename, $list['data']);
+            return $this->export(
+                'csv',
+                $filename,
+                $list['data'],
+                [
+                    'created'           => new EpochCellFormatter,
+                    'last_edited'       => new EpochCellFormatter,
+                    'confirmation_date' => new EpochCellFormatter,
+                    'registered'        => new BooleanCellFormatter,
+                    'is_confirmed'      => new BooleanCellFormatter,
+                    'checked_in'        => new BooleanCellFormatter,
+                ]
+            );
 
         } catch (ValidationException $ex1) {
             Log::warning($ex1);
