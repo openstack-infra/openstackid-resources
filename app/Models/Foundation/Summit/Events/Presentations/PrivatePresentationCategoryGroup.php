@@ -70,4 +70,36 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
 
         return ($now >= $start_date && $now <= $end_date);
     }
+
+    /**
+     * @return DateTime
+     */
+    public function getSubmissionBeginDate()
+    {
+        return $this->submission_begin_date;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getSubmissionEndDate()
+    {
+        return $this->submission_end_date;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxSubmissionAllowedPerUser()
+    {
+        return $this->max_submission_allowed_per_user;
+    }
+
+    /**
+     * @return Group[]
+     */
+    public function getAllowedGroups()
+    {
+        return $this->allowed_groups;
+    }
 }

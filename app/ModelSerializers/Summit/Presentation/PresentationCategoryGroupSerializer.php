@@ -16,14 +16,13 @@
  * Class PresentationCategoryGroupSerializer
  * @package ModelSerializers
  */
-final class PresentationCategoryGroupSerializer extends SilverStripeSerializer
+class PresentationCategoryGroupSerializer extends SilverStripeSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
         'Name'        => 'name:json_string',
         'Color'       => 'color:json_string',
         'Description' => 'description:json_string',
-    );
+    ];
 
     /**
      * @param null $expand

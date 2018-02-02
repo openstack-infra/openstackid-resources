@@ -90,6 +90,7 @@ final class SerializerRegistry
         $this->registry['SummitTicketType']           = SummitTicketTypeSerializer::class;
         $this->registry['PresentationCategory']       = PresentationCategorySerializer::class;
         $this->registry['PresentationCategoryGroup']  = PresentationCategoryGroupSerializer::class;
+        $this->registry['PrivatePresentationCategoryGroup'] = PrivatePresentationCategoryGroupSerializer::class;
         $this->registry['Tag']                        = TagSerializer::class;
         $this->registry['SummitEvent']                = SummitEventSerializer::class;
         $this->registry['SummitGroupEvent']           = SummitGroupEventSerializer::class;
