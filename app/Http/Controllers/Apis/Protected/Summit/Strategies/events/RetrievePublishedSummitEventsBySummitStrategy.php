@@ -27,7 +27,6 @@ final class RetrievePublishedSummitEventsBySummitStrategy extends RetrieveAllSum
     protected function getValidFilters()
     {
         $valid_filters = parent::getValidFilters();
-        $valid_filters['published'] = array('==');
         return $valid_filters;
     }
 

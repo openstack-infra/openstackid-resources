@@ -90,7 +90,8 @@ class RetrieveAllSummitEventsBySummitStrategy extends RetrieveSummitEventsStrate
     protected function getValidFilters()
     {
         $valid_filters = parent::getValidFilters();
-        $valid_filters['summit_id'] = array('==');
+        $valid_filters['summit_id'] = ['=='];
+        $valid_filters['published'] = ['=='];
         return $valid_filters;
     }
 
