@@ -117,7 +117,7 @@ class Presentation extends SummitEvent
     private $moderator;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationMaterial", mappedBy="presentation", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationMaterial", mappedBy="presentation", cascade={"persist", "remove"}, orphanRemoval=true)
      * @var PresentationMaterial[]
      */
     private $materials;
@@ -137,7 +137,7 @@ class Presentation extends SummitEvent
     private $speakers;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitSelectedPresentation", mappedBy="presentation", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="models\summit\SummitSelectedPresentation", mappedBy="presentation", cascade={"persist", "remove"}, orphanRemoval=true)
      * @var SummitSelectedPresentation[]
      */
     private $selected_presentations;
