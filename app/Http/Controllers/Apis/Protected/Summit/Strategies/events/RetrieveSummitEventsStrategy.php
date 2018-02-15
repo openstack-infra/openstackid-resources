@@ -20,13 +20,25 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use utils\FilterParser;
 use utils\PagingInfo;
-
 /**
  * Class RetrieveSummitEventsStrategy
  * @package App\Http\Controllers
  */
 abstract class RetrieveSummitEventsStrategy
 {
+
+    protected function getPageParams(){
+        // default values
+        $page     = 1;
+        $per_page = 5;
+
+        if (Input::has('page')) {
+            $page     = intval(Input::get('page'));
+            $per_page = intval(Input::get('per_page'));
+        }
+        return [$page, $per_page];
+    }
+
     /**
      * @param array $params
      * @return PagingResponse
@@ -48,15 +60,8 @@ abstract class RetrieveSummitEventsStrategy
                 throw $ex->setMessages($validation->messages()->toArray());
             }
 
-            // default values
-            $page     = 1;
-            $per_page = 5;
 
-            if (Input::has('page')) {
-                $page     = intval(Input::get('page'));
-                $per_page = intval(Input::get('per_page'));
-            }
-
+            list($page, $per_page) = $this->getPageParams();
 
             return $this->retrieveEventsFromSource
             (

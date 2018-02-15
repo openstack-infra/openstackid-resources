@@ -12,6 +12,8 @@
  * limitations under the License.
  **/
 
+use App\Http\Utils\BooleanCellFormatter;
+use App\Http\Utils\EpochCellFormatter;
 use Exception;
 use Illuminate\Http\Request as LaravelRequest;
 use Illuminate\Support\Facades\Input;
@@ -93,6 +95,53 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $strategy = new RetrieveAllSummitEventsBySummitStrategy($this->repository, $this->event_repository, $this->resource_server_context);
             $response = $strategy->getEvents(['summit_id' => $summit_id]);
             return $this->ok($response->toArray(Request::input('expand', '')));
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getEventsCSV($summit_id)
+    {
+        try
+        {
+            $strategy = new RetrieveAllSummitEventsBySummitCSVStrategy($this->repository, $this->event_repository, $this->resource_server_context);
+            $response = $strategy->getEvents(['summit_id' => $summit_id]);
+
+            $filename = "events-" . date('Ymd');
+            $list     = $response->toArray(null, [], ['none']);
+
+            return $this->export
+            (
+                'csv',
+                $filename,
+                $list['data'],
+                [
+                    'created'        => new EpochCellFormatter(),
+                    'last_edited'    => new EpochCellFormatter(),
+                    'start_date'     => new EpochCellFormatter(),
+                    'end_date'       => new EpochCellFormatter(),
+                    'allow_feedback' => new BooleanCellFormatter(),
+                    'is_published'   => new BooleanCellFormatter(),
+                    'rsvp_external'  => new BooleanCellFormatter(),
+                ]
+            );
         }
         catch (EntityNotFoundException $ex1)
         {

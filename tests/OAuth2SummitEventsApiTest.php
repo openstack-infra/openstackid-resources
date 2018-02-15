@@ -329,6 +329,43 @@ class OAuth2SummitEventsApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
+    public function testCurrentSummitEventsWithFilterCSV()
+    {
+        $params = array
+        (
+            'id' => 6,
+            'expand' => 'feedback',
+            'filter' => array
+            (
+                'tags=@design',
+                'start_date>1445895000'
+            )
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getEventsCSV",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $csv = $response->getContent();
+        $this->assertResponseStatus(200);
+
+
+        $this->assertTrue(!empty($csv));
+    }
+
     public function testCurrentSelectionMotiveSummitEvents()
     {
         $params = array

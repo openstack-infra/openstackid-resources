@@ -75,7 +75,7 @@ class RetrieveAllSummitEventsBySummitStrategy extends RetrieveSummitEventsStrate
      * @throws EntityNotFoundException
      * @throws ValidationException
      */
-    public function getEvents(array $params = array())
+    public function getEvents(array $params = [])
     {
         $summit_id    = isset($params['summit_id'])? $params['summit_id']:0;
         $this->summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);

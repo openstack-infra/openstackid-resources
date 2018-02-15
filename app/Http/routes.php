@@ -230,7 +230,8 @@ Route::group([
             // events
             Route::group(array('prefix' => 'events'), function () {
 
-                Route::get('', 'OAuth2SummitEventsApiController@getEvents');
+                Route::get('',[ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@getEvents']);
+                Route::get('csv',[ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@getEventsCSV']);
                 // bulk actions
                 Route::delete('/publish', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@unPublishEvents']);
                 Route::put('/publish', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitEventsApiController@updateAndPublishEvents']);

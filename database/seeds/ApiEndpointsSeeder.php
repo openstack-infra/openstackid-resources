@@ -305,6 +305,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
+                'name' => 'get-events-csv',
+                'route' => '/api/v1/summits/{id}/events/csv',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ),
+            array(
                 'name' => 'get-published-events',
                 'route' => '/api/v1/summits/{id}/events/published',
                 'http_method' => 'GET',
