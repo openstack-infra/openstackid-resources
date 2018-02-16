@@ -12,10 +12,13 @@
  * limitations under the License.
  **/
 use App\Services\Apis\CalendarSync\Exceptions\RateLimitExceededException;
+use App\Services\Apis\CalendarSync\Exceptions\RevokedAccessException;
 use CalDAVClient\Facade\Exceptions\ForbiddenException;
 use CalDAVClient\Facade\Exceptions\NotFoundResourceException;
 use CalDAVClient\Facade\Exceptions\ServerErrorException;
 use CalDAVClient\Facade\Exceptions\UserUnAuthorizedException;
+use models\main\CalendarSyncErrorEmailRequest;
+use models\main\IEmailCreationRequestRepository;
 use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberCalendarScheduleSummitActionSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberEventScheduleSummitActionSyncWorkRequest;
@@ -58,9 +61,15 @@ implements IMemberActionsCalendarSyncProcessingService
     private $preprocessor_requests;
 
     /**
+     * @var IEmailCreationRequestRepository
+     */
+    private $email_creation_request_repository;
+
+    /**
      * MemberActionsCalendarSyncProcessingService constructor.
      * @param IAbstractCalendarSyncWorkRequestRepository $work_request_repository
      * @param ICalendarSyncInfoRepository $calendar_sync_repository
+     * @param IEmailCreationRequestRepository $email_creation_request_repository
      * @param ICalendarSyncWorkRequestPreProcessor $preprocessor_requests
      * @param ITransactionService $tx_manager
      */
@@ -68,14 +77,16 @@ implements IMemberActionsCalendarSyncProcessingService
     (
         IAbstractCalendarSyncWorkRequestRepository $work_request_repository,
         ICalendarSyncInfoRepository $calendar_sync_repository,
+        IEmailCreationRequestRepository $email_creation_request_repository,
         ICalendarSyncWorkRequestPreProcessor $preprocessor_requests,
         ITransactionService $tx_manager
     )
     {
-        $this->work_request_repository  = $work_request_repository;
-        $this->calendar_sync_repository = $calendar_sync_repository;
-        $this->preprocessor_requests    = $preprocessor_requests;
-        $this->tx_manager               = $tx_manager;
+        $this->work_request_repository           = $work_request_repository;
+        $this->calendar_sync_repository          = $calendar_sync_repository;
+        $this->email_creation_request_repository = $email_creation_request_repository;
+        $this->preprocessor_requests             = $preprocessor_requests;
+        $this->tx_manager                        = $tx_manager;
     }
 
 
@@ -215,8 +226,17 @@ implements IMemberActionsCalendarSyncProcessingService
                     // cant create calendar (CAL DAV)...
                     Log::warning($ex1);
                 }
-                catch(UserUnAuthorizedException $ex2){
+                catch(RevokedAccessException $ex2){
                     Log::warning($ex2);
+
+                    if(!is_null($calendar_sync_info) && !$calendar_sync_info->isRevoked()){
+                        // revoke it ...
+                        $calendar_sync_info->setRevoked(true);
+                        // create email request
+                        $email_request = new CalendarSyncErrorEmailRequest();
+                        $email_request->setSyncInfo($calendar_sync_info);
+                        $this->email_creation_request_repository->add($email_request);
+                    }
                 }
                 catch(NotFoundResourceException $ex3){
                     Log::error($ex3);

@@ -246,7 +246,6 @@ final class OutlookCalendarSyncRemoteFacade
                 $this->sync_calendar_info->setEtag($res->getChangeKey());
                 return true;
             }
-
             return false;
         }
         catch (Exception $ex){
