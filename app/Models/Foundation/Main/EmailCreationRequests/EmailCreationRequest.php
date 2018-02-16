@@ -22,6 +22,7 @@ use DateTime;
  * @ORM\DiscriminatorMap({"EmailCreationRequest" = "EmailCreationRequest",
  *     "SpeakerCreationEmailCreationRequest" = "SpeakerCreationEmailCreationRequest",
  *     "MemberPromoCodeEmailCreationRequest"= "MemberPromoCodeEmailCreationRequest",
+ *     "CalendarSyncErrorEmailRequest" = "CalendarSyncErrorEmailRequest",
  *     "SpeakerSelectionAnnouncementEmailCreationRequest" = "SpeakerSelectionAnnouncementEmailCreationRequest"})
  * Class EmailCreationRequest
  * @package models\main

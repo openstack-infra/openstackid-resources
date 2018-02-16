@@ -11,10 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\main\Member;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * Class AdminScheduleSummitActionSyncWorkRequest
  * @ORM\Entity
@@ -46,4 +44,18 @@ class AdminScheduleSummitActionSyncWorkRequest
     {
         $this->created_by = $created_by;
     }
+
+    /**
+     * @return int
+     */
+    public function getCreatedById(){
+        try {
+            return is_null($this->created_by) ? 0 :$this->created_by->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+
 }

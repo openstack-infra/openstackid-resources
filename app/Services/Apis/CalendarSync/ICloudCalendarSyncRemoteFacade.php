@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Apis\CalendarSync\Exceptions\RevokedAccessException;
 use CalDAVClient\Facade\CalDavClient;
 use CalDAVClient\Facade\Exceptions\ForbiddenException;
+use CalDAVClient\Facade\Exceptions\UserUnAuthorizedException;
 use CalDAVClient\Facade\Requests\EventRequestVO;
 use CalDAVClient\Facade\Requests\MakeCalendarRequestVO;
 use CalDAVClient\ICalDavClient;
@@ -289,6 +291,11 @@ final class ICloudCalendarSyncRemoteFacade
             $res = $this->client->getCalendar($calendar_url);
             $this->sync_calendar_info->setCalendarSyncToken($res->getSyncToken());
             return true;
+        }
+        catch(UserUnAuthorizedException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
+            return false;
         }
         catch (Exception $ex){
             Log::error($ex);

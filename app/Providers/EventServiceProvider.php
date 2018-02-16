@@ -11,35 +11,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Events\MyFavoritesAdd;
+use App\EntityPersisters\AdminSummitEventActionSyncWorkRequestPersister;
+use App\EntityPersisters\AssetSyncRequestPersister;
+use App\EntityPersisters\EntityEventPersister;
 use App\Events\PresentationSpeakerCreated;
 use App\Events\PresentationSpeakerDeleted;
 use App\Events\PresentationSpeakerUpdated;
-use App\Events\SummitEventCreated;
-use App\Events\SummitEventDeleted;
-use App\Events\SummitEventUpdated;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use App\Factories\AssetsSyncRequest\FileCreatedAssetSyncRequestFactory;
+use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventDeletedCalendarSyncWorkRequestFactory;
+use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventUpdatedCalendarSyncWorkRequestFactory;
+use App\Factories\EntityEvents\MyFavoritesAddEntityEventFactory;
+use App\Factories\EntityEvents\MyScheduleAddEntityEventFactory;
+use App\Factories\EntityEvents\SummitEventCreatedEntityEventFactory;
+use App\Factories\EntityEvents\SummitEventDeletedEntityEventFactory;
+use App\Factories\EntityEvents\SummitEventUpdatedEntityEventFactory;
+use App\Services\Utils\SCPFileUploader;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
-use LaravelDoctrine\ORM\Facades\Registry;
-use models\main\AssetsSyncRequest;
-use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
-use models\summit\CalendarSync\WorkQueue\AdminSummitEventActionSyncWorkRequest;
 use models\summit\SummitEntityEvent;
-use App\Events\MyScheduleAdd;
-use App\Events\MyScheduleRemove;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use models\utils\PreRemoveEventArgs;
-use IDCT\Networking\Ssh\SftpClient;
-use IDCT\Networking\Ssh\Credentials;
-
 /**
  * Class EventServiceProvider
  * @package App\Providers
  */
-class EventServiceProvider extends ServiceProvider
+final class EventServiceProvider extends ServiceProvider
 {
     /**
      * The event listener mappings for the application.
@@ -52,85 +48,6 @@ class EventServiceProvider extends ServiceProvider
         ],
     ];
 
-    private static function persistsEntityEvent(SummitEntityEvent $entity_event){
-        $sql = <<<SQL
-INSERT INTO SummitEntityEvent 
-(EntityID, EntityClassName, Type, Metadata, Created, LastEdited, OwnerID, SummitID) 
-VALUES (:EntityID, :EntityClassName, :Type, :Metadata, :Created, :LastEdited, :OwnerID, :SummitID)
-SQL;
-
-        $bindings = [
-            'EntityID'        => $entity_event->getEntityId(),
-            'EntityClassName' => $entity_event->getEntityClassName(),
-            'Type'            => $entity_event->getType(),
-            'Metadata'        => $entity_event->getRawMetadata(),
-            'Created'         => $entity_event->getCreated(),
-            'LastEdited'      => $entity_event->getLastEdited(),
-            'OwnerID'         => $entity_event->getOwnerId(),
-            'SummitID'        => $entity_event->getSummitId()
-        ];
-
-        $types = [
-           'EntityID'        => 'integer',
-           'EntityClassName' => 'string',
-            'Type'           => 'string',
-            'Metadata'       => 'string',
-            'Created'        => 'datetime',
-            'LastEdited'     => 'datetime',
-            'OwnerID'        => 'integer',
-            'SummitID'       => 'integer',
-        ];
-
-        self::insert($sql, $bindings, $types);
-    }
-
-    private static function persistAdminSyncRequest(AdminSummitEventActionSyncWorkRequest $request){
-        $em = Registry::getManager('ss');
-        $em->persist($request);
-        $em->flush();
-    }
-
-    private static function persistsAssetSyncRequest(AssetsSyncRequest $assets_sync_request){
-
-        $sql = <<<SQL
-INSERT INTO AssetsSyncRequest
-(
-ClassName,
-Created,
-LastEdited,
-`Origin`,
-`Destination`,
-Processed,
-ProcessedDate
-)
-VALUES
-('AssetsSyncRequest', NOW(), NOW(), :FromFile, :ToFile, 0, NULL );
-
-SQL;
-
-        $bindings = [
-            'FromFile' => $assets_sync_request->getFrom(),
-            'ToFile'   => $assets_sync_request->getTo(),
-        ];
-
-        $types = [
-            'FromFile' => 'string',
-            'ToFile'   => 'string',
-
-        ];
-
-        self::insert($sql, $bindings, $types);
-
-    }
-
-    /**
-     * @param string $sql
-     * @param array $bindings
-     */
-    private static function insert($sql, array $bindings, array $types){
-        $em = Registry::getManager('ss');
-        $em->getConnection()->executeUpdate($sql, $bindings, $types);
-    }
     /**
      * Register any other events for your application.
      * @return void
@@ -141,29 +58,12 @@ SQL;
 
         Event::listen(\App\Events\MyScheduleAdd::class, function($event)
         {
-            $entity_event = new SummitEntityEvent;
-            $entity_event->setEntityClassName('MySchedule');
-            $entity_event->setEntityId($event->getEventId());
-            $entity_event->setType('INSERT');
-            $entity_event->setOwner($event->getMember());
-            $entity_event->setSummit($event->getSummit());
-            $entity_event->setMetadata('');
-
-            self::persistsEntityEvent($entity_event);
-
+            EntityEventPersister::persist(MyScheduleAddEntityEventFactory::build($event));
         });
 
         Event::listen(\App\Events\MyFavoritesAdd::class, function($event)
         {
-            $entity_event = new SummitEntityEvent;
-            $entity_event->setEntityClassName('MyFavorite');
-            $entity_event->setEntityId($event->getEventId());
-            $entity_event->setType('INSERT');
-            $entity_event->setOwner($event->getMember());
-            $entity_event->setSummit($event->getSummit());
-            $entity_event->setMetadata('');
-
-            self::persistsEntityEvent($entity_event);
+            EntityEventPersister::persist(MyFavoritesAddEntityEventFactory::build($event));
         });
 
         Event::listen(\App\Events\MyScheduleRemove::class, function($event)
@@ -176,7 +76,7 @@ SQL;
             $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
-            self::persistsEntityEvent($entity_event);
+            EntityEventPersister::persist($entity_event);
 
         });
 
@@ -191,131 +91,28 @@ SQL;
             $entity_event->setSummit($event->getSummit());
             $entity_event->setMetadata('');
 
-            self::persistsEntityEvent($entity_event);
+            EntityEventPersister::persist($entity_event);
 
         });
 
         Event::listen(\App\Events\SummitEventCreated::class, function($event)
         {
-            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
-            $member_repository               = App::make(\models\main\IMemberRepository::class);
-            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
-            if(is_null($owner_id)) $owner_id = 0;
-
-            $entity_event                  = new SummitEntityEvent;
-            $entity_event->setEntityClassName($event->getSummitEvent()->getClassName());
-            $entity_event->setEntityId($event->getSummitEvent()->getId());
-            $entity_event->setType('INSERT');
-
-            if($owner_id > 0){
-                $member = $member_repository->getById($owner_id);
-                $entity_event->setOwner($member);
-            }
-
-            $entity_event->setSummit($event->getSummitEvent()->getSummit());
-            $entity_event->setMetadata( json_encode([ 'pub_new' => intval($event->getSummitEvent()->isPublished())]));
-
-            self::persistsEntityEvent($entity_event);
-
+            EntityEventPersister::persist(SummitEventCreatedEntityEventFactory::build($event));
         });
 
         Event::listen(\App\Events\SummitEventUpdated::class, function($event)
         {
-            if(!$event instanceof SummitEventUpdated) return;
-            $args = $event->getArgs();
-            if(!$args instanceof PreUpdateEventArgs) return;
-
-            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
-            $member_repository               = App::make(\models\main\IMemberRepository::class);
-
-            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
-            if(is_null($owner_id)) $owner_id = 0;
-
-            $entity_event                  = new SummitEntityEvent;
-            $entity_event->setEntityClassName($event->getSummitEvent()->getClassName());
-            $entity_event->setEntityId($event->getSummitEvent()->getId());
-            $entity_event->setType('UPDATE');
-
-            if($owner_id > 0){
-                $member = $member_repository->getById($owner_id);
-                $entity_event->setOwner($member);
-            }
-
-            $entity_event->setSummit($event->getSummitEvent()->getSummit());
-            // sync request from admin
-            $request = new AdminSummitEventActionSyncWorkRequest();
-            $request->setSummitEvent($event->getSummitEvent()) ;
-            $request->setType(AbstractCalendarSyncWorkRequest::TypeUpdate);
-            if($owner_id > 0){
-                $member = $member_repository->getById($owner_id);
-                $request->setCreatedBy($member);
-            }
-
-            // check if there was a change on publishing state
-
-            if($args->hasChangedField('published')){
-                $pub_old = intval($args->getOldValue('published'));
-                $pub_new = intval($args->getNewValue('published'));
-                $entity_event->setMetadata(json_encode([ 'pub_old'=> $pub_old,  'pub_new' => $pub_new]));
-                if($pub_old == 1 && $pub_new == 0)
-                    $request->setType(AbstractCalendarSyncWorkRequest::TypeRemove);
-            }
-            else
-                $entity_event->setMetadata(json_encode([ 'pub_new' => intval($event->getSummitEvent()->getPublished())]));
-
-            self::persistsEntityEvent($entity_event);
-            self::persistAdminSyncRequest($request);
-
+            EntityEventPersister::persist(SummitEventUpdatedEntityEventFactory::build($event));
+            AdminSummitEventActionSyncWorkRequestPersister::persist(SummitEventUpdatedCalendarSyncWorkRequestFactory::build($event));
         });
 
         Event::listen(\App\Events\SummitEventDeleted::class, function($event)
         {
-            if(!$event instanceof SummitEventDeleted) return;
-            $args = $event->getArgs();
-            if(!$args instanceof PreRemoveEventArgs) return;
+            EntityEventPersister::persist(SummitEventDeletedEntityEventFactory::build($event));
 
-            $resource_server_context         = App::make(\models\oauth2\IResourceServerContext::class);
-            $member_repository               = App::make(\models\main\IMemberRepository::class);
-            $owner_id                        = $resource_server_context->getCurrentUserExternalId();
-            if(is_null($owner_id)) $owner_id = 0;
-            $params = $args->getParams();
-
-            $entity_event = new SummitEntityEvent;
-            $entity_event->setEntityClassName($params['class_name']);
-            $entity_event->setEntityId($params['id']);
-            $entity_event->setType('DELETE');
-
-            if($owner_id > 0){
-                $member = $member_repository->getById($owner_id);
-                $entity_event->setOwner($member);
-            }
-
-            $entity_event->setSummit($params['summit']);
-            $entity_event->setMetadata('');
-
-            $request = null;
-            if(isset($params['published']) && $params['published']){
-                // just record the published state at the moment of the update
-
-                $entity_event->setMetadata( json_encode([
-                    'pub_old' => intval($params['published']),
-                    'pub_new' => intval($params['published'])
-                ]));
-
-                $request = new AdminSummitEventActionSyncWorkRequest();
-                $request->setSummitEventId ($params['id']);
-                $request->setType(AbstractCalendarSyncWorkRequest::TypeRemove);
-                if($owner_id > 0){
-                    $member = $member_repository->getById($owner_id);
-                    $request->setCreatedBy($member);
-                }
-
-            }
-
-            self::persistsEntityEvent($entity_event);
-
+            $request = SummitEventDeletedCalendarSyncWorkRequestFactory::build($event);
             if(!is_null($request))
-                self::persistAdminSyncRequest($request);
+                AdminSummitEventActionSyncWorkRequestPersister::persist($request);
         });
 
         Event::listen(\App\Events\PresentationMaterialCreated::class, function($event)
@@ -339,7 +136,7 @@ SQL;
             $entity_event->setSummit($event->getMaterial()->getPresentation()->getSummit());
             $entity_event->setMetadata(json_encode([ 'presentation_id' => intval($event->getMaterial()->getPresentation()->getId())]));
 
-            self::persistsEntityEvent($entity_event);
+            EntityEventPersister::persist($entity_event);
 
         });
 
@@ -364,7 +161,7 @@ SQL;
             $entity_event->setSummit($event->getMaterial()->getPresentation()->getSummit());
             $entity_event->setMetadata(json_encode([ 'presentation_id' => intval($event->getMaterial()->getPresentation()->getId())]));
 
-            self::persistsEntityEvent($entity_event);
+            EntityEventPersister::persist($entity_event);
 
         });
 
@@ -388,40 +185,13 @@ SQL;
 
             $entity_event->setSummit($event->getPresentation()->getSummit());
 
-            self::persistsEntityEvent($entity_event);
-
+            EntityEventPersister::persist($entity_event);
         });
 
         Event::listen(\App\Events\FileCreated::class, function($event)
         {
-
-            $storage_path      = storage_path();
-            $local_path        = $event->getLocalPath();
-            $file_name         = $event->getFileName();
-            $folder_name       = $event->getFolderName();
-            $remote_base_path  = Config::get('scp.scp_remote_base_path', null);
-            $client            = new SftpClient();
-            $host              = Config::get('scp.scp_host', null);
-
-            $credentials       = Credentials::withPublicKey
-            (
-                Config::get('scp.ssh_user', null),
-                Config::get('scp.ssh_public_key', null),
-                Config::get('scp.ssh_private_key', null)
-            );
-
-            $client->setCredentials($credentials);
-            $client->connect($host);
-            $remote_destination = sprintf("%s/%s",$remote_base_path, $file_name);
-            $client->scpUpload(sprintf("%s/app/%s", $storage_path, $local_path), $remote_destination);
-            $client->close();
-
-            $asset_sync_request = new AssetsSyncRequest();
-            $asset_sync_request->setFrom($remote_destination);
-            $asset_sync_request->setTo(sprintf("%s/%s", $folder_name, $file_name));
-            $asset_sync_request->setProcessed(false);
-            self::persistsAssetSyncRequest($asset_sync_request);
-
+            SCPFileUploader::upload($event);
+            AssetSyncRequestPersister::persist(FileCreatedAssetSyncRequestFactory::build($event));
         });
 
         Event::listen(\App\Events\PresentationSpeakerCreated::class, function($event)
@@ -448,7 +218,7 @@ SQL;
                 $entity_event->setSummit($summit);
                 $entity_event->setMetadata('');
 
-                self::persistsEntityEvent($entity_event);
+                EntityEventPersister::persist($entity_event);
             }
 
         });
@@ -477,7 +247,7 @@ SQL;
                 $entity_event->setSummit($summit);
                 $entity_event->setMetadata('');
 
-                self::persistsEntityEvent($entity_event);
+                EntityEventPersister::persist($entity_event);
             }
 
         });
@@ -509,7 +279,7 @@ SQL;
                 $entity_event->setSummit($summit);
                 $entity_event->setMetadata('');
 
-                self::persistsEntityEvent($entity_event);
+                EntityEventPersister::persist($entity_event);
             }
 
         });

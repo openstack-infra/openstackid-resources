@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Services\Apis\CalendarSync\Exceptions\RateLimitExceededException;
+use App\Services\Apis\CalendarSync\Exceptions\RevokedAccessException;
 use models\summit\CalendarSync\CalendarSyncInfo;
 use models\summit\CalendarSync\CalendarSyncInfoOAuth2;
 use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
@@ -84,6 +85,7 @@ final class GoogleCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @throws RateLimitExceededException
      * @throws Google_Service_Exception
+     * @throws RevokedAccessException
      * @return ScheduleCalendarSyncInfo
      */
     public function addEvent(MemberEventScheduleSummitActionSyncWorkRequest $request)
@@ -112,6 +114,9 @@ final class GoogleCalendarSyncRemoteFacade
             if($ex1->getCode() == 403) {
                 Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+            }
+            if($ex1->getCode() == 401){
+                throw new RevokedAccessException($ex1->getMessage());
             }
             Log::warning($ex1);
             return null;
@@ -171,6 +176,7 @@ final class GoogleCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @throws RateLimitExceededException
+     * @throws RevokedAccessException
      * @throws Google_Service_Exception
      * @return bool
      */
@@ -193,6 +199,9 @@ final class GoogleCalendarSyncRemoteFacade
                 Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
             }
+            if($ex1->getCode() == 401){
+                throw new RevokedAccessException($ex1->getMessage());
+            }
             Log::warning($ex1);
             return false;
         }
@@ -206,6 +215,7 @@ final class GoogleCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @throws RateLimitExceededException
+     * @throws RevokedAccessException
      * @throws Google_Service_Exception
      * @return bool
      */
@@ -235,6 +245,9 @@ final class GoogleCalendarSyncRemoteFacade
                 Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
             }
+            if($ex1->getCode() == 401){
+                throw new RevokedAccessException($ex1->getMessage());
+            }
             Log::warning($ex1);
             return false;
         }
@@ -248,6 +261,7 @@ final class GoogleCalendarSyncRemoteFacade
      * @param MemberCalendarScheduleSummitActionSyncWorkRequest $request
      * @param CalendarSyncInfo $calendar_sync_info
      * @throws RateLimitExceededException
+     * @throws RevokedAccessException
      * @throws Google_Service_Exception
      * @return bool
      */
@@ -276,6 +290,9 @@ final class GoogleCalendarSyncRemoteFacade
                 Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
             }
+            if($ex1->getCode() == 401){
+                throw new RevokedAccessException($ex1->getMessage());
+            }
             Log::warning($ex1);
             return false;
         }
@@ -289,6 +306,7 @@ final class GoogleCalendarSyncRemoteFacade
      * @param MemberCalendarScheduleSummitActionSyncWorkRequest $request
      * @param CalendarSyncInfo $calendar_sync_info
      * @throws RateLimitExceededException
+     * @throws RevokedAccessException
      * @throws Google_Service_Exception
      * @return bool
      */
@@ -310,6 +328,9 @@ final class GoogleCalendarSyncRemoteFacade
             if($ex1->getCode() == 403) {
                 Log::error($ex1);
                 throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+            }
+            if($ex1->getCode() == 401){
+                throw new RevokedAccessException($ex1->getMessage());
             }
             Log::warning($ex1);
             return false;
