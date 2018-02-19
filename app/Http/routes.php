@@ -294,7 +294,7 @@ Route::group([
 
             // event types
             Route::group(array('prefix' => 'event-types'), function () {
-                Route::get('', 'OAuth2SummitApiController@getEventTypes');
+                Route::get('', 'OAuth2SummitsEventTypesApiController@getAllBySummit');
             });
 
             // external orders

@@ -199,4 +199,6 @@ SQL;
     public function getClassName(){
         return 'PresentationType';
     }
+
+    const ClassName = 'PRESENTATION_TYPE';
 }

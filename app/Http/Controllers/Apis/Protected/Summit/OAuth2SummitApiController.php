@@ -222,39 +222,6 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      * @param $summit_id
      * @return mixed
      */
-    public function getEventTypes($summit_id)
-    {
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            //event types
-            $event_types = array();
-            foreach ($summit->getEventTypes() as $event_type)
-            {
-                $event_types[] = SerializerRegistry::getInstance()->getSerializer($event_type)->serialize();
-            }
-
-            $response = new PagingResponse
-            (
-                count($event_types),
-                count($event_types),
-                1,
-                1,
-                $event_types
-            );
-
-            return $this->ok($response->toArray());
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @return mixed
-     */
     public function getTracks($summit_id){
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);

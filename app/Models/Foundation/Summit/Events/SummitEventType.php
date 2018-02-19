@@ -15,7 +15,7 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEventTypeRepository")
  * @ORM\Table(name="SummitEventType")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
@@ -161,5 +161,7 @@ class SummitEventType extends SilverstripeBaseModel
     public function getClassName(){
         return 'SummitEventType';
     }
+
+    const ClassName = 'EVENT_TYPE';
 
 }
