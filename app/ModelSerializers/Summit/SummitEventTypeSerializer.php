@@ -26,6 +26,7 @@ class SummitEventTypeSerializer extends SilverStripeSerializer
         'UseSponsors'          => 'use_sponsors:json_boolean',
         'AreSponsorsMandatory' => 'are_sponsors_mandatory:json_boolean',
         'AllowsAttachment'     => 'allows_attachment:json_boolean',
+        'IsDefault'            => 'is_default:json_boolean',
     ];
 
     /**

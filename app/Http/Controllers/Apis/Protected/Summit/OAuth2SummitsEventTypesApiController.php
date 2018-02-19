@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Model\ISummitEventTypeService;
 use Illuminate\Support\Facades\Request;
 use App\Models\Foundation\Summit\Events\SummitEventTypeConstants;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
@@ -21,6 +22,7 @@ use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;
 use models\exceptions\EntityNotFoundException;
+use ModelSerializers\SerializerRegistry;
 use utils\Filter;
 use utils\FilterElement;
 use utils\FilterParser;
@@ -38,17 +40,23 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
      */
     private $summit_repository;
 
+    /**
+     * @var ISummitEventTypeService
+     */
+    private $event_type_service;
 
     public function __construct
     (
         ISummitEventTypeRepository $repository,
         ISummitRepository $summit_repository,
+        ISummitEventTypeService $event_type_service,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
-        $this->repository        = $repository;
-        $this->summit_repository = $summit_repository;
+        $this->repository         = $repository;
+        $this->summit_repository  = $summit_repository;
+        $this->event_type_service = $event_type_service;
     }
 
     /**
@@ -173,4 +181,48 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
         }
     }
 
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function addEventTypeBySummit($summit_id){
+        try {
+
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = EventTypeValidationRulesFactory::build($data->all());
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $event_type = $this->event_type_service->addEventType($summit, $data->all());
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($event_type)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

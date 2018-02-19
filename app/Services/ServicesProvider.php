@@ -14,8 +14,10 @@
 use App\Services\Model\AttendeeService;
 use App\Services\Model\IAttendeeService;
 use App\Services\Model\IMemberService;
+use App\Services\Model\ISummitEventTypeService;
 use App\Services\Model\MemberService;
 use App\Services\Model\SummitPromoCodeService;
+use App\Services\SummitEventTypeService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
@@ -135,6 +137,12 @@ class ServicesProvider extends ServiceProvider
         (
             ISummitPromoCodeService::class,
             SummitPromoCodeService::class
+        );
+
+        App::singleton
+        (
+            ISummitEventTypeService::class,
+            SummitEventTypeService::class
         );
     }
 }

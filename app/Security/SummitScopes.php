@@ -35,5 +35,7 @@ final class SummitScopes
 
     const WritePromoCodeData = '%s/promo-codes/write';
 
+    const WriteEventTypeData = '%s/event-types/write';
+
     const WriteSummitSpeakerAssistanceData = '%s/summit-speaker-assistance/write';
 }

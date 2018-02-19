@@ -719,6 +719,16 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
+     * @param string $type
+     * @return bool
+     */
+    public function hasEventType($type){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('type', $type));
+        return $this->event_types->matching($criteria)->count() > 0;
+    }
+
+    /**
      * @param int $wifi_connection_id
      * @return SummitWIFIConnection|null
      */
@@ -728,7 +738,6 @@ class Summit extends SilverstripeBaseModel
         $wifi_conn = $this->wifi_connections->matching($criteria)->first();
         return $wifi_conn === false ? null:$wifi_conn;
     }
-
 
     /**
      * @return SummitTicketType[]
@@ -1496,5 +1505,15 @@ SQL;
     public function getCategoryDefaultTags()
     {
         return $this->category_default_tags->toArray();
+    }
+
+    /**
+     * @param SummitEventType $event_type
+     * @return $this
+     */
+    public function addEventType(SummitEventType $event_type){
+        $this->event_types->add($event_type);
+        $event_type->setSummit($this);
+        return $this;
     }
 }

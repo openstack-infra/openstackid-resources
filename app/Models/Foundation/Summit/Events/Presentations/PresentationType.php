@@ -201,4 +201,93 @@ SQL;
     }
 
     const ClassName = 'PRESENTATION_TYPE';
+
+    /**
+     * @param int $max_speakers
+     */
+    public function setMaxSpeakers($max_speakers)
+    {
+        $this->max_speakers = $max_speakers;
+    }
+
+    /**
+     * @param int $min_speakers
+     */
+    public function setMinSpeakers($min_speakers)
+    {
+        $this->min_speakers = $min_speakers;
+    }
+
+    /**
+     * @param int $max_moderators
+     */
+    public function setMaxModerators($max_moderators)
+    {
+        $this->max_moderators = $max_moderators;
+    }
+
+    /**
+     * @param int $min_moderators
+     */
+    public function setMinModerators($min_moderators)
+    {
+        $this->min_moderators = $min_moderators;
+    }
+
+    /**
+     * @param bool $use_speakers
+     */
+    public function setUseSpeakers($use_speakers)
+    {
+        $this->use_speakers = $use_speakers;
+    }
+
+    /**
+     * @param bool $are_speakers_mandatory
+     */
+    public function setAreSpeakersMandatory($are_speakers_mandatory)
+    {
+        $this->are_speakers_mandatory = $are_speakers_mandatory;
+    }
+
+    /**
+     * @param bool $use_moderator
+     */
+    public function setUseModerator($use_moderator)
+    {
+        $this->use_moderator = $use_moderator;
+    }
+
+    /**
+     * @param bool $is_moderator_mandatory
+     */
+    public function setIsModeratorMandatory($is_moderator_mandatory)
+    {
+        $this->is_moderator_mandatory = $is_moderator_mandatory;
+    }
+
+    /**
+     * @param bool $should_be_available_on_cfp
+     */
+    public function setShouldBeAvailableOnCfp($should_be_available_on_cfp)
+    {
+        $this->should_be_available_on_cfp = $should_be_available_on_cfp;
+    }
+
+    /**
+     * @param string $moderator_label
+     */
+    public function setModeratorLabel($moderator_label)
+    {
+        $this->moderator_label = $moderator_label;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->are_speakers_mandatory = false;
+        $this->use_speakers           = false;
+        $this->use_moderator          = false;
+        $this->is_moderator_mandatory = false;
+    }
 }

@@ -13,7 +13,6 @@
  **/
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEventTypeRepository")
  * @ORM\Table(name="SummitEventType")
@@ -60,6 +59,12 @@ class SummitEventType extends SilverstripeBaseModel
      * @var bool
      */
     protected $allows_attachment;
+
+    /**
+     * @ORM\Column(name="IsDefault", type="boolean")
+     * @var bool
+     */
+    protected $is_default;
 
     /**
      * @return string
@@ -163,5 +168,57 @@ class SummitEventType extends SilverstripeBaseModel
     }
 
     const ClassName = 'EVENT_TYPE';
+
+    /**
+     * @return boolean
+     */
+    public function isDefault()
+    {
+        return $this->is_default;
+    }
+
+    public function setAsDefault()
+    {
+        $this->is_default = true;
+    }
+
+    public function setAsNonDefault()
+    {
+        $this->is_default = false;
+    }
+
+    /**
+     * @param bool $use_sponsors
+     */
+    public function setUseSponsors($use_sponsors)
+    {
+        $this->use_sponsors = $use_sponsors;
+    }
+
+    /**
+     * @param bool $are_sponsors_mandatory
+     */
+    public function setAreSponsorsMandatory($are_sponsors_mandatory)
+    {
+        $this->are_sponsors_mandatory = $are_sponsors_mandatory;
+    }
+
+    /**
+     * @param bool $allows_attachment
+     */
+    public function setAllowsAttachment($allows_attachment)
+    {
+        $this->allows_attachment = $allows_attachment;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->is_default             = false;
+        $this->use_sponsors           = false;
+        $this->blackout_times         = false;
+        $this->are_sponsors_mandatory = false;
+        $this->allows_attachment      = false;
+    }
 
 }

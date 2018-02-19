@@ -229,6 +229,10 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
         }
     }
 
+    /**
+     * @param $summit_id
+     * @return \Illuminate\Http\Response|mixed
+     */
     public function getAllBySummitCSV($summit_id){
         $values = Input::all();
         $rules  = [

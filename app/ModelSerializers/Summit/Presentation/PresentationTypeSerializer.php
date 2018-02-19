@@ -18,8 +18,8 @@
  */
 class PresentationTypeSerializer extends SummitEventTypeSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
+
         'MaxSpeakers'          => 'max_speakers:json_int',
         'MinSpeakers'          => 'min_speakers:json_int',
         'MaxModerators'        => 'max_moderators:json_int',
@@ -27,9 +27,9 @@ class PresentationTypeSerializer extends SummitEventTypeSerializer
         'UseSpeakers'          => 'use_speakers:json_boolean',
         'AreSpeakersMandatory' => 'are_speakers_mandatory:json_boolean',
         'UseModerator'         => 'use_moderator:json_boolean',
-        'ModeratorMandatory'   => 'moderator_mandatory:json_boolean',
+        'ModeratorMandatory'   => 'is_moderator_mandatory:json_boolean',
         'ModeratorLabel'       => 'moderator_label:json_string',
-    );
+    ];
 
     /**
      * @param null $expand
@@ -38,7 +38,7 @@ class PresentationTypeSerializer extends SummitEventTypeSerializer
      * @param array $params
      * @return array
      */
-    public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
+    public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
         return $values;

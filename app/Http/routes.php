@@ -295,6 +295,7 @@ Route::group([
             // event types
             Route::group(array('prefix' => 'event-types'), function () {
                 Route::get('', 'OAuth2SummitsEventTypesApiController@getAllBySummit');
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsEventTypesApiController@addEventTypeBySummit']);
             });
 
             // external orders

@@ -537,7 +537,7 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             // event types
-            array(
+            [
                 'name' => 'get-event-types',
                 'route' => '/api/v1/summits/{id}/event-types',
                 'http_method' => 'GET',
@@ -545,7 +545,16 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+            ],
+            [
+                'name' => 'add-event-type',
+                'route' => '/api/v1/summits/{id}/event-types',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteEventTypeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
             //tracks
             array(
                 'name' => 'get-tracks',

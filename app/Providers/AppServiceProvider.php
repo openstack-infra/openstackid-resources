@@ -216,12 +216,37 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
+        Validator::extend('greater_than_field', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('greater_than_field', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be greather than %s", $attribute, $parameters[0]);
+            });
+            $data = $validator->getData();
+            if(is_null($value) || intval($value) == 0 ) return true;
+            if(isset($data[$parameters[0]])){
+                $compare_to = $data[$parameters[0]];
+                return intval($compare_to) < intval($value);
+            }
+            return true;
+        });
+
+
         Validator::extend('valid_epoch', function($attribute, $value, $parameters, $validator)
         {
             $validator->addReplacer('valid_epoch', function($message, $attribute, $rule, $parameters) use ($validator) {
                 return sprintf("%s should be a valid epoch value", $attribute);
             });
            return intval($value) > 0;
+        });
+
+        Validator::extend('hex_color', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('hex_color', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid hex color value", $attribute);
+            });
+            if(strlen($value) != 6) return false;
+            if(!ctype_xdigit($value)) return false;
+            return true;
         });
     }
 

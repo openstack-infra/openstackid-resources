@@ -78,4 +78,39 @@ final class OAuth2EventTypesApiTest extends ProtectedApiTest
         $event_types = json_decode($content);
         $this->assertTrue(!is_null($event_types));
     }
+
+    public function testAddEventType($summit_id = 23){
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $name       = str_random(16).'_eventtype';
+        $data = [
+            'name'       => $name,
+            'class_name' => \models\summit\SummitEventType::ClassName,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitsEventTypesApiController@addEventTypeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $event_type = json_decode($content);
+        $this->assertTrue(!is_null($event_type));
+        return $event_type;
+    }
+
 }
