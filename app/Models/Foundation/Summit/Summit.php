@@ -729,6 +729,17 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
+     * @param string $type
+     * @return SummitEventType|null
+     */
+    public function getEventTypeByType($type){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('type', $type));
+        $event_type = $this->event_types->matching($criteria)->first();
+        return $event_type === false ? null:$event_type;
+    }
+
+    /**
      * @param int $wifi_connection_id
      * @return SummitWIFIConnection|null
      */

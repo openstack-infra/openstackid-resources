@@ -15,7 +15,6 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitEventType;
-
 /**
  * Interface ISummitEventTypeService
  * @package App\Services\Model
@@ -30,5 +29,15 @@ interface ISummitEventTypeService
      * @throws ValidationException
      */
     public function addEventType(Summit $summit, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $event_type_id
+     * @param array $data
+     * @return SummitEventType
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateEventType(Summit $summit, $event_type_id, array $data);
 
 }

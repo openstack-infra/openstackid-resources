@@ -95,7 +95,8 @@ final class SummitEventTypeFactory
            break;
         }
 
-        $event_type->setType(trim($data['name']));
+        if(isset($data['name']))
+            $event_type->setType(trim($data['name']));
 
         if(isset($data['color']))
             $event_type->setColor(trim($data['color']));

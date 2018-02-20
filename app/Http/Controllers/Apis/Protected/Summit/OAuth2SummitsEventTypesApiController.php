@@ -225,4 +225,46 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @param $event_type_id
+     * @return mixed
+     */
+    public function updateEventTypeBySummit($summit_id, $event_type_id)
+    {
+        try {
+            if (!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = EventTypeValidationRulesFactory::build($data->all(), true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $event_type = $this->event_type_service->updateEventType($summit, $event_type_id, $data->all());
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($event_type)->serialize());
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

@@ -19,7 +19,6 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitEventType;
-
 /**
  * Class SummitEventTypeService
  * @package App\Services
@@ -73,6 +72,39 @@ final class SummitEventTypeService implements ISummitEventTypeService
 
             if(is_null($event_type))
                 throw new ValidationException(sprintf("class_name %s is invalid", $data['class_name']));
+
+            return $event_type;
+
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $event_type_id
+     * @param array $data
+     * @return SummitEventType
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateEventType(Summit $summit, $event_type_id, array $data)
+    {
+        return $this->tx_manager->transaction(function() use($summit, $event_type_id, $data){
+
+            $type = isset($data['name']) ? trim($data['name']) : null;
+
+            $event_type = $summit->getEventType($event_type_id);
+
+            if(is_null($event_type))
+                throw new EntityNotFoundException(sprintf("event type id %s does not belongs to summit id %s", $event_type_id, $summit->getId()));
+
+            if(!empty($type)) {
+                $old_event_type = $summit->getEventTypeByType($type);
+                if(!is_null($old_event_type) && $old_event_type->getId() != $event_type->getId()){
+                    throw new ValidationException(sprintf("name %s already belongs to another event type id %s", $type, $old_event_type->getId()));
+                }
+            }
+
+            $event_type = SummitEventTypeFactory::populate($event_type, $summit, $data);
 
             return $event_type;
 

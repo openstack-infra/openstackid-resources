@@ -293,9 +293,12 @@ Route::group([
             });
 
             // event types
-            Route::group(array('prefix' => 'event-types'), function () {
+            Route::group(['prefix' => 'event-types'], function () {
                 Route::get('', 'OAuth2SummitsEventTypesApiController@getAllBySummit');
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsEventTypesApiController@addEventTypeBySummit']);
+                Route::group(['prefix' => '{event_type_id}'], function () {
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsEventTypesApiController@updateEventTypeBySummit']);
+                });
             });
 
             // external orders
@@ -386,14 +389,14 @@ Route::group([
 ], function () {
 
     // summits
-    Route::group(array('prefix' => 'summits'), function () {
+    Route::group(['prefix' => 'summits'], function () {
 
-        Route::group(array('prefix' => '{id}'), function () {
+        Route::group(['prefix' => '{id}'], function () {
 
             // events
-            Route::group(array('prefix' => 'events'), function () {
+            Route::group(['prefix' => 'events'], function () {
 
-                Route::group(array('prefix' => '{event_id}'), function () {
+                Route::group(['prefix' => '{event_id}'], function () {
                    Route::post('/feedback', 'OAuth2SummitEventsApiController@addEventFeedbackByMember');
                    Route::put('/feedback', 'OAuth2SummitEventsApiController@updateEventFeedbackByMember');
                 });

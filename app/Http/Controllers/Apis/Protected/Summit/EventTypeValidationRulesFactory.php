@@ -22,16 +22,17 @@ final class EventTypeValidationRulesFactory
 {
     /**
      * @param array $data
+     * @param boolean $update
      * @return array
      * @throws ValidationException
      */
-    public static function build(array $data){
-        if(!isset($data['class_name']))
+    public static function build(array $data, $update = false){
+        if (!isset($data['class_name']))
             throw new ValidationException("class_name parameter is mandatory");
 
         $class_name = trim($data['class_name']);
 
-        if(!in_array($class_name, SummitEventTypeConstants::$valid_class_names)){
+        if (!in_array($class_name, SummitEventTypeConstants::$valid_class_names)) {
             throw new ValidationException(
                 sprintf
                 (
@@ -41,8 +42,14 @@ final class EventTypeValidationRulesFactory
             );
         }
 
+        $name_rule = 'optional|string';
+        if(!$update) {
+
+            $name_rule = 'required|string';
+        }
+
         $base_rules = [
-            'name'                   => 'required|string',
+            'name'                   => $name_rule,
             'color'                  => 'sometimes|hex_color',
             'black_out_times'        => 'sometimes|boolean',
             'use_sponsors'           => 'sometimes|boolean',
