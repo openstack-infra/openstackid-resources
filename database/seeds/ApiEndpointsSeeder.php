@@ -547,6 +547,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-event-types-csv',
+                'route' => '/api/v1/summits/{id}/event-types/csv',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'add-event-type',
                 'route' => '/api/v1/summits/{id}/event-types',
                 'http_method' => 'POST',

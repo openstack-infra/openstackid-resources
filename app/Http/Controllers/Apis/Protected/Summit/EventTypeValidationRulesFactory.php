@@ -63,15 +63,16 @@ final class EventTypeValidationRulesFactory
             case PresentationType::ClassName:
             {
                 $specific_rules = [
-                    'use_speakers'           => 'sometimes|boolean',
-                    'are_speakers_mandatory' => 'sometimes|boolean|required_with:use_speakers',
-                    'min_speakers'           => 'sometimes|integer|required_with:use_speakers',
-                    'max_speakers'           => 'sometimes|integer|required_with:use_speakers|greater_than_field:max_speakers',
-                    'use_moderator'          => 'sometimes|boolean',
-                    'is_moderator_mandatory' => 'sometimes|boolean|required_with:use_moderator',
-                    'min_moderators'         => 'sometimes|integer|required_with:use_moderator',
-                    'max_moderators'         => 'sometimes|integer|required_with:use_moderator|greater_than_field:min_moderators',
-                    'moderator_label'        => 'sometimes|string'
+                    'use_speakers'               => 'sometimes|boolean',
+                    'are_speakers_mandatory'     => 'sometimes|boolean|required_with:use_speakers',
+                    'min_speakers'               => 'sometimes|integer|required_with:use_speakers',
+                    'max_speakers'               => 'sometimes|integer|required_with:use_speakers|greater_than_field:max_speakers',
+                    'use_moderator'              => 'sometimes|boolean',
+                    'is_moderator_mandatory'     => 'sometimes|boolean|required_with:use_moderator',
+                    'min_moderators'             => 'sometimes|integer|required_with:use_moderator',
+                    'max_moderators'             => 'sometimes|integer|required_with:use_moderator|greater_than_field:min_moderators',
+                    'should_be_available_on_cfp' => 'sometimes|boolean',
+                    'moderator_label'            => 'sometimes|string'
                 ];
             }
             break;

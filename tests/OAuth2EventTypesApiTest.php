@@ -49,6 +49,36 @@ final class OAuth2EventTypesApiTest extends ProtectedApiTest
         return $event_types;
     }
 
+    public function testGetEventTypesByClassNameCSV(){
+        $params = [
+
+            'id'       => 23,
+            'page'     => 1,
+            'per_page' => 10,
+            'filter'   => 'class_name==EVENT_TYPE',
+            'order'    => '+name'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitsEventTypesApiController@getAllBySummitCSV",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $csv = $response->getContent();
+        $this->assertResponseStatus(200);
+        $this->assertTrue(!empty($csv));
+    }
+
     public function testGetEventTypesDefaultOnes(){
         $params = [
 

@@ -285,9 +285,10 @@ SQL;
     public function __construct()
     {
         parent::__construct();
-        $this->are_speakers_mandatory = false;
-        $this->use_speakers           = false;
-        $this->use_moderator          = false;
-        $this->is_moderator_mandatory = false;
+        $this->are_speakers_mandatory     = false;
+        $this->use_speakers               = false;
+        $this->use_moderator              = false;
+        $this->is_moderator_mandatory     = false;
+        $this->should_be_available_on_cfp = false;
     }
 }

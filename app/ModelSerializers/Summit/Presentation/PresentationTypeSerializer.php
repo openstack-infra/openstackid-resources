@@ -16,19 +16,20 @@
  * Class PresentationEventTypeSerializer
  * @package ModelSerializers
  */
-class PresentationTypeSerializer extends SummitEventTypeSerializer
+final class PresentationTypeSerializer extends SummitEventTypeSerializer
 {
     protected static $array_mappings = [
 
-        'MaxSpeakers'          => 'max_speakers:json_int',
-        'MinSpeakers'          => 'min_speakers:json_int',
-        'MaxModerators'        => 'max_moderators:json_int',
-        'MinModerators'        => 'min_moderators:json_int',
-        'UseSpeakers'          => 'use_speakers:json_boolean',
-        'AreSpeakersMandatory' => 'are_speakers_mandatory:json_boolean',
-        'UseModerator'         => 'use_moderator:json_boolean',
-        'ModeratorMandatory'   => 'is_moderator_mandatory:json_boolean',
-        'ModeratorLabel'       => 'moderator_label:json_string',
+        'MaxSpeakers'              => 'max_speakers:json_int',
+        'MinSpeakers'              => 'min_speakers:json_int',
+        'MaxModerators'            => 'max_moderators:json_int',
+        'MinModerators'            => 'min_moderators:json_int',
+        'UseSpeakers'              => 'use_speakers:json_boolean',
+        'AreSpeakersMandatory'     => 'are_speakers_mandatory:json_boolean',
+        'UseModerator'             => 'use_moderator:json_boolean',
+        'ModeratorMandatory'       => 'is_moderator_mandatory:json_boolean',
+        'ModeratorLabel'           => 'moderator_label:json_string',
+        'isShouldBeAvailableOnCfp' => 'should_be_available_on_cfp:json_boolean',
     ];
 
     /**

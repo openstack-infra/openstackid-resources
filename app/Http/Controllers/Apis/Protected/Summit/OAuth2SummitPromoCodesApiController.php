@@ -236,7 +236,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
     public function getAllBySummitCSV($summit_id){
         $values = Input::all();
         $rules  = [
-    ];
+        ];
 
         try {
 

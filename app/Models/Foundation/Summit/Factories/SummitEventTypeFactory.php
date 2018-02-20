@@ -90,6 +90,10 @@ final class SummitEventTypeFactory
                     if(isset($data['moderator_label'])) {
                         $event_type->setModeratorLabel(trim($data['moderator_label']));
                     }
+
+                    if(isset($data['should_be_available_on_cfp'])) {
+                        $event_type->setShouldBeAvailableOnCfp(boolval($data['should_be_available_on_cfp']));
+                    }
                 }
             }
            break;

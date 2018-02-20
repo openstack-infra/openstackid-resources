@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\BooleanCellFormatter;
+use App\Http\Utils\EpochCellFormatter;
 use App\Services\Model\ISummitEventTypeService;
 use Illuminate\Support\Facades\Request;
 use App\Models\Foundation\Summit\Events\SummitEventTypeConstants;
@@ -73,6 +75,7 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
         }
         return $valid;
     }
+
     /**
      * @param $summit_id
      * @return mixed
@@ -159,6 +162,125 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
                     [],
                     []
                 )
+            );
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getAllBySummitCSV($summit_id){
+        $values = Input::all();
+        $rules  = [
+        ];
+
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $validation = Validator::make($values, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException();
+                throw $ex->setMessages($validation->messages()->toArray());
+            }
+
+            // default values
+            $page     = 1;
+            $per_page = PHP_INT_MAX;
+
+            if (Input::has('page')) {
+                $page     = intval(Input::get('page'));
+                $per_page = intval(Input::get('per_page'));
+            }
+
+            $filter = null;
+
+            if (Input::has('filter')) {
+                $filter = FilterParser::parse(Input::get('filter'), [
+                    'name'                       => ['=@', '=='],
+                    'class_name'                 => ['=='],
+                    'is_default'                 => ['=='],
+                    'black_out_times'            => ['=='],
+                    'use_sponsors'               => ['=='],
+                    'are_sponsors_mandatory'     => ['=='],
+                    'allows_attachment'          => ['=='],
+                    'use_speakers'               => ['=='],
+                    'are_speakers_mandatory'     => ['=='],
+                    'use_moderator'              => ['=='],
+                    'is_moderator_mandatory'     => ['=='],
+                    'should_be_available_on_cfp' => ['=='],
+                ]);
+            }
+
+            $order = null;
+
+            if (Input::has('order'))
+            {
+                $order = OrderParser::parse(Input::get('order'), [
+
+                    'id',
+                    'name',
+                ]);
+            }
+
+            if(is_null($filter)) $filter = new Filter();
+
+            if($filter->hasFilter("class_name") && !$this->validateClassName($filter->getFilter("class_name"))){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "class_name filter has an invalid value ( valid values are %s",
+                        implode(", ", SummitEventTypeConstants::$valid_class_names)
+                    )
+                );
+            }
+
+            $data = $this->repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
+
+            $filename = "event-types-" . date('Ymd');
+            $list     =  $data->toArray();
+            return $this->export
+            (
+                'csv',
+                $filename,
+                $list['data'],
+                [
+                    'created'                    => new EpochCellFormatter,
+                    'last_edited'                => new EpochCellFormatter,
+                    'is_default'                 => new BooleanCellFormatter,
+                    'black_out_times'            => new BooleanCellFormatter,
+                    'use_sponsors'               => new BooleanCellFormatter,
+                    'are_sponsors_mandatory'     => new BooleanCellFormatter,
+                    'allows_attachment'          => new BooleanCellFormatter,
+                    'use_speakers'               => new BooleanCellFormatter,
+                    'are_speakers_mandatory'     => new BooleanCellFormatter,
+                    'use_moderator'              => new BooleanCellFormatter,
+                    'is_moderator_mandatory'     => new BooleanCellFormatter,
+                    'should_be_available_on_cfp' => new BooleanCellFormatter,
+                ]
             );
         }
         catch (ValidationException $ex1)
