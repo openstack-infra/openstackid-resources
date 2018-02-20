@@ -46,6 +46,71 @@ final class OAuth2EventTypesApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $event_types = json_decode($content);
         $this->assertTrue(!is_null($event_types));
+        return $event_types;
+    }
+
+    public function testGetEventTypesDefaultOnes(){
+        $params = [
+
+            'id'       => 23,
+            'page'     => 1,
+            'per_page' => 10,
+            'filter'   => 'is_default==1',
+            'order'    => '+name'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitsEventTypesApiController@getAllBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $event_types = json_decode($content);
+        $this->assertTrue(!is_null($event_types));
+        return $event_types;
+    }
+
+    public function testGetEventTypesNonDefaultOnes(){
+        $params = [
+
+            'id'       => 23,
+            'page'     => 1,
+            'per_page' => 10,
+            'filter'   => 'is_default==0',
+            'order'    => '+name'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitsEventTypesApiController@getAllBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $event_types = json_decode($content);
+        $this->assertTrue(!is_null($event_types));
+        return $event_types;
     }
 
     public function testGetEventTypesByClassNamePresentationType(){
@@ -151,5 +216,62 @@ final class OAuth2EventTypesApiTest extends ProtectedApiTest
         return $event_type;
     }
 
+    public function testDeleteDefaultOne($summit_id = 23){
+
+        $event_types = $this->testGetEventTypesDefaultOnes($summit_id);
+
+        $params = [
+            'id'            => $summit_id,
+            'event_type_id' => $event_types->data[0]->id,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitsEventTypesApiController@deleteEventTypeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(!empty($content));
+        $this->assertResponseStatus(412);
+    }
+
+    public function testDeleteNonDefaultOne($summit_id = 23){
+
+        $event_types = $this->testGetEventTypesNonDefaultOnes($summit_id);
+
+        $params = [
+            'id'            => $summit_id,
+            'event_type_id' => $event_types->data[0]->id,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitsEventTypesApiController@deleteEventTypeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(empty($content));
+        $this->assertResponseStatus(204);
+    }
 
 }

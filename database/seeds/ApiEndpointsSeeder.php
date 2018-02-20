@@ -564,6 +564,15 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSummitData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'delete-event-type',
+                'route' => '/api/v1/summits/{id}/event-types/{event_type_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteEventTypeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
             //tracks
             array(
                 'name' => 'get-tracks',

@@ -147,12 +147,12 @@ class Summit extends SilverstripeBaseModel
     private $time_zone_id;
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      */
     private $locations;
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      */
     private $events;
 
@@ -182,30 +182,30 @@ class Summit extends SilverstripeBaseModel
     private $logo;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitEventType", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEventType", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      */
     private $event_types;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategory", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategory", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      * @var PresentationCategory[]
      */
     private $presentation_categories;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitAttendee", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitAttendee", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      * @var SummitAttendee[]
      */
     private $attendees;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      * @var PresentationCategoryGroup[]
      */
     private $category_groups;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      */
     private $ticket_types;
 
@@ -908,7 +908,7 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitEntityEvent", mappedBy="summit", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEntityEvent", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      * @var SummitEntityEvent[]
      */
     private $entity_events;
@@ -1476,6 +1476,16 @@ SQL;
        $this->promo_codes->removeElement($promo_code);
        $promo_code->setSummit(null);
        return $this;
+    }
+
+    /**
+     * @param SummitEventType $event_type
+     * @return $this
+     */
+    public function removeEventType(SummitEventType $event_type){
+        $this->event_types->removeElement($event_type);
+        $event_type->setSummit(null);
+        return $this;
     }
 
     /**

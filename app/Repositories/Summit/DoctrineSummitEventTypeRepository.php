@@ -45,6 +45,7 @@ final class DoctrineSummitEventTypeRepository
         return [
             'name'                       => 'et.type:json_string',
             'black_out_times'            => 'et.black_out_times:json_boolean',
+            'is_default'                 => 'et.is_default:json_boolean',
             'use_sponsors'               => 'et.use_sponsors:json_boolean',
             'are_sponsors_mandatory'     => 'et.are_sponsors_mandatory:json_boolean',
             'allows_attachment'          => 'et.allows_attachment:json_boolean',

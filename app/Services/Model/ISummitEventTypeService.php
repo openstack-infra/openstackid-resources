@@ -40,4 +40,13 @@ interface ISummitEventTypeService
      */
     public function updateEventType(Summit $summit, $event_type_id, array $data);
 
+    /**
+     * @param Summit $summit
+     * @param int $event_type_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteEventType(Summit $summit, $event_type_id);
+
 }

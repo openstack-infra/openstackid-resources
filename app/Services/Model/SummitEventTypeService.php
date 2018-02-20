@@ -29,7 +29,7 @@ final class SummitEventTypeService implements ISummitEventTypeService
     /**
      * @var ITransactionService
      */
-    private $tx_manager;
+    private $tx_service;
 
     /**
      * @var ISummitEventTypeRepository
@@ -39,15 +39,15 @@ final class SummitEventTypeService implements ISummitEventTypeService
     /**
      * SummitEventTypeService constructor.
      * @param ISummitEventTypeRepository $repository
-     * @param ITransactionService $tx_manager
+     * @param ITransactionService $tx_service
      */
     public function __construct
     (
         ISummitEventTypeRepository $repository,
-        ITransactionService $tx_manager
+        ITransactionService $tx_service
     )
     {
-        $this->tx_manager = $tx_manager;
+        $this->tx_service = $tx_service;
         $this->repository = $repository;
     }
 
@@ -60,7 +60,7 @@ final class SummitEventTypeService implements ISummitEventTypeService
      */
     public function addEventType(Summit $summit, array $data)
     {
-        return $this->tx_manager->transaction(function() use($summit, $data){
+        return $this->tx_service->transaction(function() use($summit, $data){
 
             $type = trim($data['name']);
 
@@ -88,7 +88,7 @@ final class SummitEventTypeService implements ISummitEventTypeService
      */
     public function updateEventType(Summit $summit, $event_type_id, array $data)
     {
-        return $this->tx_manager->transaction(function() use($summit, $event_type_id, $data){
+        return $this->tx_service->transaction(function() use($summit, $event_type_id, $data){
 
             $type = isset($data['name']) ? trim($data['name']) : null;
 
@@ -107,6 +107,36 @@ final class SummitEventTypeService implements ISummitEventTypeService
             $event_type = SummitEventTypeFactory::populate($event_type, $summit, $data);
 
             return $event_type;
+
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $event_type_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteEventType(Summit $summit, $event_type_id)
+    {
+        return $this->tx_service->transaction(function() use($event_type_id, $summit){
+
+            $event_type = $summit->getEventType($event_type_id);
+
+            if(is_null($event_type))
+                throw new EntityNotFoundException
+                (
+                  sprintf("event type id %s does not belongs to summit id %s", $event_type_id, $summit->getId())
+                );
+
+            if ($event_type->isDefault())
+                throw new ValidationException
+                (
+                    sprintf("event type id %s is a default one and is not allowed to be deleted", $event_type_id)
+                );
+
+            $summit->removeEventType($event_type);
 
         });
     }
