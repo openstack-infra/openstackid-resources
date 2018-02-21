@@ -42,7 +42,7 @@ final class EventTypeValidationRulesFactory
             );
         }
 
-        $name_rule = 'optional|string';
+        $name_rule = 'sometimes|string';
         if(!$update) {
 
             $name_rule = 'required|string';
@@ -66,7 +66,7 @@ final class EventTypeValidationRulesFactory
                     'use_speakers'               => 'sometimes|boolean',
                     'are_speakers_mandatory'     => 'sometimes|boolean|required_with:use_speakers',
                     'min_speakers'               => 'sometimes|integer|required_with:use_speakers',
-                    'max_speakers'               => 'sometimes|integer|required_with:use_speakers|greater_than_field:max_speakers',
+                    'max_speakers'               => 'sometimes|integer|required_with:use_speakers|greater_than_field:min_speakers',
                     'use_moderator'              => 'sometimes|boolean',
                     'is_moderator_mandatory'     => 'sometimes|boolean|required_with:use_moderator',
                     'min_moderators'             => 'sometimes|integer|required_with:use_moderator',
