@@ -11,19 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
 /**
  * Class PresentationCategory
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitTrackRepository")
  * @ORM\Table(name="PresentationCategory")
  * @package models\summit
  */
 class PresentationCategory extends SilverstripeBaseModel
 {
+
+    use SummitOwned;
 
     /**
      * @ORM\Column(name="Title", type="string")
@@ -67,6 +67,17 @@ class PresentationCategory extends SilverstripeBaseModel
      */
     private $lightning_alternate_count;
 
+    /**
+     * @ORM\Column(name="VotingVisible", type="boolean")
+     * @var boolean
+     */
+    private $voting_visible;
+
+    /**
+     * @ORM\Column(name="ChairVisible", type="boolean")
+     * @var boolean
+     */
+    private $chair_visible;
 
     /**
      * @return string
@@ -114,24 +125,6 @@ class PresentationCategory extends SilverstripeBaseModel
     public function setTitle($title)
     {
         $this->title = $title;
-    }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Summit", inversedBy="presentation_categories")
-     * @ORM\JoinColumn(name="SummitID", referencedColumnName="ID")
-     * @var Summit
-     */
-    protected $summit;
-
-    public function setSummit($summit){
-        $this->summit = $summit;
-    }
-
-    /**
-     * @return Summit
-     */
-    public function getSummit(){
-        return $this->summit;
     }
 
     /**
@@ -217,4 +210,37 @@ class PresentationCategory extends SilverstripeBaseModel
     {
         $this->lightning_alternate_count = $lightning_alternate_count;
     }
+
+    /**
+     * @return bool
+     */
+    public function isVotingVisible()
+    {
+        return $this->voting_visible;
+    }
+
+    /**
+     * @param bool $voting_visible
+     */
+    public function setVotingVisible($voting_visible)
+    {
+        $this->voting_visible = $voting_visible;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isChairVisible()
+    {
+        return $this->chair_visible;
+    }
+
+    /**
+     * @param bool $chair_visible
+     */
+    public function setChairVisible($chair_visible)
+    {
+        $this->chair_visible = $chair_visible;
+    }
+
 }

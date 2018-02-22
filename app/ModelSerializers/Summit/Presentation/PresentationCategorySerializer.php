@@ -18,12 +18,19 @@
  */
 final class PresentationCategorySerializer extends SilverStripeSerializer
 {
-    protected static $array_mappings = array
-    (
-        'Title'       => 'name:json_string',
-        'Description' => 'description:json_string',
-        'Code'        => 'code:json_string',
-    );
+    protected static $array_mappings =
+    [
+        'Title'                   => 'name:json_string',
+        'Description'             => 'description:json_string',
+        'Code'                    => 'code:json_string',
+        'SessionCount'            => 'session_count:json_int',
+        'AlternateCount'          => 'alternate_count:json_int',
+        'LightningCount'          => 'lightning_count:json_int',
+        'LightningAlternateCount' => 'lightning_alternate_count:json_int',
+        'VotingVisible'           => 'voting_visible:json_boolean',
+        'ChairVisible'            => 'chair_visible:json_boolean',
+        'SummitId'                => 'summit_id:json_int',
+    ];
 
     /**
      * @param null $expand
@@ -32,11 +39,11 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
      * @param array $params
      * @return array
      */
-    public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
+    public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $category = $this->object;
         $values   = parent::serialize($expand, $fields, $relations, $params);
-        $groups   = array();
+        $groups   = [];
 
         foreach($category->getGroups() as $group){
             $groups[] = intval($group->getId());
@@ -48,7 +55,7 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
             foreach ($exp_expand as $relation) {
                 switch (trim($relation)) {
                     case 'track_groups': {
-                        $groups = array();
+                        $groups = [];
                         unset($values['track_groups']);
                         foreach ($category->getGroups() as $g) {
                             $groups[] = SerializerRegistry::getInstance()->getSerializer($g)->serialize(null, [], ['none']);

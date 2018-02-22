@@ -15,6 +15,7 @@ use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
+use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
@@ -26,6 +27,7 @@ use models\main\Group;
 use models\main\Organization;
 use models\summit\ISummitRegistrationPromoCodeRepository;
 use models\summit\ISummitTicketTypeRepository;
+use models\summit\PresentationCategory;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
@@ -279,6 +281,13 @@ final class RepositoriesProvider extends ServiceProvider
             IDefaultSummitEventTypeRepository::class,
             function(){
                 return  EntityManager::getRepository(DefaultSummitEventType::class);
+            }
+        );
+
+        App::singleton(
+            ISummitTrackRepository::class,
+            function(){
+                return  EntityManager::getRepository(PresentationCategory::class);
             }
         );
     }

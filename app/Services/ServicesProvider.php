@@ -15,8 +15,10 @@ use App\Services\Model\AttendeeService;
 use App\Services\Model\IAttendeeService;
 use App\Services\Model\IMemberService;
 use App\Services\Model\ISummitEventTypeService;
+use App\Services\Model\ISummitTrackService;
 use App\Services\Model\MemberService;
 use App\Services\Model\SummitPromoCodeService;
+use App\Services\Model\SummitTrackService;
 use App\Services\SummitEventTypeService;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -26,7 +28,6 @@ use ModelSerializers\ISerializerTypeSelector;
 use services\apis\EventbriteAPI;
 use services\apis\FireBaseGCMApi;
 use services\model\ISummitPromoCodeService;
-
 /***
  * Class ServicesProvider
  * @package services
@@ -143,6 +144,12 @@ class ServicesProvider extends ServiceProvider
         (
             ISummitEventTypeService::class,
             SummitEventTypeService::class
+        );
+
+        App::singleton
+        (
+            ISummitTrackService::class,
+            SummitTrackService::class
         );
     }
 }

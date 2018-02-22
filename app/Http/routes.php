@@ -12,6 +12,7 @@
 use Illuminate\Support\Facades\Config;
 
 // public api ( without AUTHZ [OAUTH2.0])
+
 Route::group([
     'namespace' => 'App\Http\Controllers',
     'prefix'     => 'api/public/v1',
@@ -31,10 +32,10 @@ Route::group([
     // summits
     Route::group(['prefix'=>'summits'], function() {
         Route::get('', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summit_response_lifetime', 600), 'uses' => 'OAuth2SummitApiController@getSummits']);
-        Route::group(array('prefix' => '{id}'), function () {
+        Route::group(['prefix' => '{id}'], function () {
             // locations
-            Route::group(array('prefix' => 'locations'), function () {
-                Route::group(array('prefix' => '{location_id}'), function () {
+            Route::group(['prefix' => 'locations'], function () {
+                Route::group(['prefix' => '{location_id}'], function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents');
                 });
@@ -306,7 +307,7 @@ Route::group([
             });
 
             // external orders
-            Route::group(array('prefix' => 'external-orders'), function () {
+            Route::group(['prefix' => 'external-orders'], function () {
                 Route::get('{external_order_id}', 'OAuth2SummitApiController@getExternalOrder');
                 Route::post('{external_order_id}/external-attendees/{external_attendee_id}/confirm', 'OAuth2SummitApiController@confirmExternalOrderAttendee');
             });
@@ -343,12 +344,16 @@ Route::group([
 
             // tracks
             Route::group(array('prefix' => 'tracks'), function () {
-                Route::get('', 'OAuth2SummitApiController@getTracks');
-                Route::get('{track_id}', 'OAuth2SummitApiController@getTrack');
+                Route::get('', 'OAuth2SummitTracksApiController@getAllBySummit');
+                Route::get('csv', 'OAuth2SummitTracksApiController@getAllBySummitCSV');
+                Route::group(['prefix' => '{track_id}'], function () {
+                    Route::get('', 'OAuth2SummitTracksApiController@getTrackBySummit');
+                });
             });
+
             // track groups
             Route::group(array('prefix' => 'track-groups'), function () {
-                Route::get('', 'OAuth2SummitApiController@getTracksGroups');
+                Route::get('', 'OAuth2SummitTracksApiController@getTracksGroups');
                 Route::get('{track_group_id}', 'OAuth2SummitApiController@getTrackGroup');
             });
 
@@ -370,7 +375,7 @@ Route::group([
     });
 
     // speakers
-    Route::group(array('prefix' => 'speakers'), function () {
+    Route::group(['prefix' => 'speakers'], function () {
         Route::get('', 'OAuth2SummitSpeakersApiController@getAll');
         Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeaker']);
         Route::put('merge/{speaker_from_id}/{speaker_to_id}', 'OAuth2SummitSpeakersApiController@merge');
