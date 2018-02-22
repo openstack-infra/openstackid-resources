@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
+use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use Illuminate\Support\Facades\App;
@@ -270,6 +272,13 @@ final class RepositoriesProvider extends ServiceProvider
             ISummitEventTypeRepository::class,
             function(){
                 return  EntityManager::getRepository(SummitEventType::class);
+            }
+        );
+
+        App::singleton(
+            IDefaultSummitEventTypeRepository::class,
+            function(){
+                return  EntityManager::getRepository(DefaultSummitEventType::class);
             }
         );
     }

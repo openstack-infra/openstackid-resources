@@ -1143,7 +1143,7 @@ SQL;
     static public function allowToSee(SummitEvent $summit_event, Member $member = null)
     {
 
-        if (SummitEventType::isPrivate($summit_event->getType()->getType())) {
+        if (SummitEventType::isPrivateType($summit_event->getType()->getType(), $summit_event->getSummitId())) {
             if (is_null($member))
                 return false;
 

@@ -123,11 +123,29 @@ class SummitEventType extends SilverstripeBaseModel
 
     /**
      * @param string $type
+     * @param int $summit_id
      * @return bool
      */
-    static public function isPrivate($type){
+    static public function isPrivateType($type, $summit_id){
         $private_types = [ISummitEventType::GroupsEvents];
         return in_array($type, $private_types);
+
+        try{
+            $sql = <<<SQL
+            SELECT COUNT(DISTINCT(SummitEventType.ID))
+            FROM SummitEventType
+            WHERE SummitEventType.SummitID = :summit_id 
+            AND SummitEventType.Type = :$type
+SQL;
+            $stmt = self::prepareRawSQLStatic($sql);
+            $stmt->execute(['summit_id' => $summit->getId(), 'type' => $type]);
+            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+            return count($res) > 0 ;
+        }
+        catch (\Exception $ex){
+
+        }
+        return false;
     }
 
     /**
@@ -168,6 +186,12 @@ class SummitEventType extends SilverstripeBaseModel
     }
 
     const ClassName = 'EVENT_TYPE';
+
+    /**
+     * @ORM\Column(name="IsPrivate", type="boolean")
+     * @var bool
+     */
+    protected $is_private;
 
     /**
      * @return boolean
@@ -219,6 +243,23 @@ class SummitEventType extends SilverstripeBaseModel
         $this->blackout_times         = false;
         $this->are_sponsors_mandatory = false;
         $this->allows_attachment      = false;
+        $this->is_private             = false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrivate()
+    {
+        return $this->is_private;
+    }
+
+    /**
+     * @param bool $is_private
+     */
+    public function setIsPrivate($is_private)
+    {
+        $this->is_private = $is_private;
     }
 
 }

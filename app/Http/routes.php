@@ -296,6 +296,7 @@ Route::group([
             Route::group(['prefix' => 'event-types'], function () {
                 Route::get('', 'OAuth2SummitsEventTypesApiController@getAllBySummit');
                 Route::get('csv', 'OAuth2SummitsEventTypesApiController@getAllBySummitCSV');
+                Route::post('seed-defaults', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsEventTypesApiController@seedDefaultEventTypesBySummit']);
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsEventTypesApiController@addEventTypeBySummit']);
                 Route::group(['prefix' => '{event_type_id}'], function () {
                     Route::get('', 'OAuth2SummitsEventTypesApiController@getEventTypeBySummit');

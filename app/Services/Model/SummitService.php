@@ -581,8 +581,9 @@ final class SummitService implements ISummitService
             return false;
         }
 
-        $old_is_private = SummitEventType::isPrivate($old_event_type->getType());
-        $new_is_private = SummitEventType::isPrivate($event_type->getType());
+        $old_is_private = SummitEventType::isPrivateType($old_event_type->getType(), $old_event_type->getSummitId());
+        $new_is_private = SummitEventType::isPrivateType($event_type->getType(), $event_type->getSummitId());
+
         if((!$old_is_private && $new_is_private) || ($old_is_private && !$new_is_private))
             return false;
 
@@ -660,7 +661,7 @@ final class SummitService implements ISummitService
 
             // new event
             if (is_null($event))
-                $event = SummitEventFactory::build($event_type);
+                $event = SummitEventFactory::build($event_type, $summit);
 
             // main data
 

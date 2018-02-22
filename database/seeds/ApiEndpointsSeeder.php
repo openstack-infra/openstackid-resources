@@ -574,6 +574,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'seed-default-event-types',
+                'route' => '/api/v1/summits/{id}/event-types/seed-defaults',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteEventTypeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'update-event-type',
                 'route' => '/api/v1/summits/{id}/event-types/{event_type_id}',
                 'http_method' => 'PUT',

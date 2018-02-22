@@ -31,6 +31,7 @@ use utils\FilterParser;
 use utils\OrderParser;
 use utils\PagingInfo;
 use Exception;
+use utils\PagingResponse;
 /**
  * Class OAuth2SummitsEventTypesApiController
  * @package App\Http\Controllers
@@ -47,6 +48,13 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
      */
     private $event_type_service;
 
+    /**
+     * OAuth2SummitsEventTypesApiController constructor.
+     * @param ISummitEventTypeRepository $repository
+     * @param ISummitRepository $summit_repository
+     * @param ISummitEventTypeService $event_type_service
+     * @param IResourceServerContext $resource_server_context
+     */
     public function __construct
     (
         ISummitEventTypeRepository $repository,
@@ -438,6 +446,44 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
             Log::warning($ex2);
             return $this->error404(array('message' => $ex2->getMessage()));
         } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function seedDefaultEventTypesBySummit($summit_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $event_types = $this->event_type_service->seedDefaultEventTypes($summit);
+
+            $response = new PagingResponse
+            (
+                count($event_types),
+                count($event_types),
+                1,
+                1,
+                $event_types
+            );
+
+            return $this->created($response->toArray());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

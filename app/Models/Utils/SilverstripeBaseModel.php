@@ -140,5 +140,12 @@ class SilverstripeBaseModel extends BaseEntity
         return Registry::getManager(self::EntityManager);
     }
 
+    /**
+     * @return EntityManager
+     */
+    protected static function getEMStatic(){
+        return Registry::getManager(self::EntityManager);
+    }
+
     const EntityManager = 'ss';
 }

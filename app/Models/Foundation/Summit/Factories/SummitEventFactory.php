@@ -1,4 +1,4 @@
-<?php
+<?php namespace models\summit;
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +12,6 @@
  * limitations under the License.
  **/
 
-namespace models\summit;
-
 /**
  * Class SummitEventFactory
  * @package models\summit
@@ -22,20 +20,23 @@ final class SummitEventFactory
 {
     /**
      * @param SummitEventType $type
+     * @param Summit $summit
      * @return SummitEvent
      */
-    static public function build(SummitEventType $type)
+    static public function build(SummitEventType $type, Summit $summit)
     {
         $event = new SummitEvent();
 
         if($type instanceof PresentationType)
             $event = new Presentation();
 
-        if(SummitEventType::isPrivate($type->getType()))
+        if(SummitEventType::isPrivateType($type->getType(), $summit->getId()))
             $event = new SummitGroupEvent();
 
         if($type->isAllowsAttachment())
             $event = new SummitEventWithFile();
+
+        $event->setSummit($summit);
 
         return $event;
     }

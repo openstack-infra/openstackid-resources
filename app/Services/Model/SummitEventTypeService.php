@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Factories\SummitEventTypeFactory;
+use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use App\Services\Model\ISummitEventTypeService;
 use libs\utils\ITransactionService;
@@ -37,18 +38,26 @@ final class SummitEventTypeService implements ISummitEventTypeService
     private $repository;
 
     /**
+     * @var IDefaultSummitEventTypeRepository
+     */
+    private $default_event_types_repository;
+
+    /**
      * SummitEventTypeService constructor.
      * @param ISummitEventTypeRepository $repository
+     * @param IDefaultSummitEventTypeRepository $default_event_types_repository
      * @param ITransactionService $tx_service
      */
     public function __construct
     (
         ISummitEventTypeRepository $repository,
+        IDefaultSummitEventTypeRepository $default_event_types_repository,
         ITransactionService $tx_service
     )
     {
-        $this->tx_service = $tx_service;
-        $this->repository = $repository;
+        $this->tx_service                     = $tx_service;
+        $this->repository                     = $repository;
+        $this->default_event_types_repository = $default_event_types_repository;
     }
 
     /**
@@ -138,6 +147,29 @@ final class SummitEventTypeService implements ISummitEventTypeService
 
             $summit->removeEventType($event_type);
 
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @return SummitEventType[]
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function seedDefaultEventTypes(Summit $summit)
+    {
+        return $this->tx_service->transaction(function() use($summit){
+            $added_types = [];
+            $default_types = $this->default_event_types_repository->getAll();
+            foreach ($default_types as $default_type){
+                $former_type = $summit->getEventTypeByType($default_type->getType());
+                if(!is_null($former_type)) continue;
+                $new_type = $default_type->buildType($summit);
+                $summit->addEventType($new_type);
+                $added_types[] = $new_type;
+            }
+
+            return $added_types;
         });
     }
 }
