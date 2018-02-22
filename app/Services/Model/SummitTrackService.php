@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Factories\PresentationCategoryFactory;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
@@ -53,7 +54,21 @@ final class SummitTrackService implements ISummitTrackService
      */
     public function addTrack(Summit $summit, array $data)
     {
-        // TODO: Implement addTrack() method.
+        return $this->tx_service->transaction(function() use($summit, $data){
+
+           $former_track =  $summit->getPresentationCategoryByCode($data['code']);
+           if(!is_null($former_track))
+               throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
+
+            $former_track =  $summit->getPresentationCategoryByTitle($data['title']);
+            if(!is_null($former_track))
+                throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['title'], $summit->getId()));
+
+            $track = PresentationCategoryFactory::build($summit, $data);
+
+            return $track;
+
+        });
     }
 
     /**

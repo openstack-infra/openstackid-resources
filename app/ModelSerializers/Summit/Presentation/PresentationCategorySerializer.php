@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use models\summit\PresentationCategory;
 /**
  * Class PresentationCategorySerializer
  * @package ModelSerializers
@@ -23,6 +23,7 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
         'Title'                   => 'name:json_string',
         'Description'             => 'description:json_string',
         'Code'                    => 'code:json_string',
+        'Slug'                    => 'slug:json_string',
         'SessionCount'            => 'session_count:json_int',
         'AlternateCount'          => 'alternate_count:json_int',
         'LightningCount'          => 'lightning_count:json_int',
@@ -42,13 +43,22 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
     public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $category = $this->object;
-        $values   = parent::serialize($expand, $fields, $relations, $params);
-        $groups   = [];
+        if(!$category instanceof PresentationCategory) return [];
+        $values      = parent::serialize($expand, $fields, $relations, $params);
+        $groups      = [];
+        $allowed_tag = [];
 
         foreach($category->getGroups() as $group){
             $groups[] = intval($group->getId());
         }
         $values['track_groups'] = $groups;
+
+        foreach($category->getAllowedTags() as $allowed_tag){
+            $allowed_tag[] = intval($allowed_tag->getTag()->getId());
+        }
+
+        $values['track_groups'] = $groups;
+        $values['allowed_tag']  = $allowed_tag;
 
         if (!empty($expand)) {
             $exp_expand = explode(',', $expand);
@@ -61,6 +71,17 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
                             $groups[] = SerializerRegistry::getInstance()->getSerializer($g)->serialize(null, [], ['none']);
                         }
                         $values['track_groups'] = $groups;
+                    }
+                    break;
+                }
+                switch (trim($relation)) {
+                    case 'allowed_tags': {
+                        $allowed_tag = [];
+                        unset($values['allowed_tags']);
+                        foreach ($category->getAllowedTags() as $allowed_tag) {
+                            $allowed_tag[] = SerializerRegistry::getInstance()->getSerializer($allowed_tag)->serialize(null, [], ['none']);
+                        }
+                        $values['allowed_tags'] = $allowed_tag;
                     }
                     break;
                 }

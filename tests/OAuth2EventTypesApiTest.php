@@ -143,6 +143,36 @@ final class OAuth2EventTypesApiTest extends ProtectedApiTest
         return $event_types;
     }
 
+    public function testGetEventTypeAll(){
+        $params = [
+            'id'       => 23,
+            'page'     => 1,
+            'per_page' => 10,
+            'order'    => '+name'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitsEventTypesApiController@getAllBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $event_types = json_decode($content);
+        $this->assertTrue(!is_null($event_types));
+        return $event_types;
+    }
+
     public function testGetEventTypesByClassNamePresentationType(){
         $params = [
 

@@ -1,6 +1,6 @@
-<?php namespace ModelSerializers;
+<?php namespace App\ModelSerializers\Summit\Presentation;
 /**
- * Copyright 2017 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,24 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use App\Models\Foundation\Summit\Events\Presentations\PresentationCategoryAllowedTag;
+use ModelSerializers\SilverStripeSerializer;
 /**
- * Class PresentationEventTypeSerializer
- * @package ModelSerializers
+ * Class PresentationCategoryAllowedTagSerializer
+ * @package App\ModelSerializers\Summit\Presentation
  */
-final class PresentationTypeSerializer extends SummitEventTypeSerializer
+final class PresentationCategoryAllowedTagSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-        'MaxSpeakers'              => 'max_speakers:json_int',
-        'MinSpeakers'              => 'min_speakers:json_int',
-        'MaxModerators'            => 'max_moderators:json_int',
-        'MinModerators'            => 'min_moderators:json_int',
-        'UseSpeakers'              => 'use_speakers:json_boolean',
-        'AreSpeakersMandatory'     => 'are_speakers_mandatory:json_boolean',
-        'UseModerator'             => 'use_moderator:json_boolean',
-        'ModeratorMandatory'       => 'is_moderator_mandatory:json_boolean',
-        'ModeratorLabel'           => 'moderator_label:json_string',
-        'ShouldBeAvailableOnCfp'   => 'should_be_available_on_cfp:json_boolean',
+        'Default' => 'is_default:json_boolean',
     ];
 
     /**
@@ -41,6 +33,10 @@ final class PresentationTypeSerializer extends SummitEventTypeSerializer
     public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
+        $allowed_tag =  $this->object;
+        if(!$allowed_tag instanceof PresentationCategoryAllowedTag) return [];
+        $values['tag'] = $allowed_tag->getTag()->getTag();
+        $values['id']  = $allowed_tag->getTag()->getId();
         return $values;
     }
 }

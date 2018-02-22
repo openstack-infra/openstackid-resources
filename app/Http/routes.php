@@ -343,16 +343,17 @@ Route::group([
             });
 
             // tracks
-            Route::group(array('prefix' => 'tracks'), function () {
+            Route::group(['prefix' => 'tracks'], function () {
                 Route::get('', 'OAuth2SummitTracksApiController@getAllBySummit');
                 Route::get('csv', 'OAuth2SummitTracksApiController@getAllBySummitCSV');
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@addTrackBySummit']);
                 Route::group(['prefix' => '{track_id}'], function () {
                     Route::get('', 'OAuth2SummitTracksApiController@getTrackBySummit');
                 });
             });
 
             // track groups
-            Route::group(array('prefix' => 'track-groups'), function () {
+            Route::group(['prefix' => 'track-groups'], function () {
                 Route::get('', 'OAuth2SummitTracksApiController@getTracksGroups');
                 Route::get('{track_group_id}', 'OAuth2SummitApiController@getTrackGroup');
             });

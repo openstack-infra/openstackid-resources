@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\SilverstripeBaseModel;
+use App\Models\Foundation\Summit\Events\Presentations\PresentationCategoryAllowedTag;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping AS ORM;
+use models\utils\SilverstripeBaseModel;
 use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Class PresentationCategory
@@ -42,6 +44,12 @@ class PresentationCategory extends SilverstripeBaseModel
      * @var string
      */
     private $code;
+
+    /**
+     * @ORM\Column(name="Slug", type="string")
+     * @var string
+     */
+    private $slug;
 
     /**
      * @ORM\Column(name="SessionCount", type="integer")
@@ -133,18 +141,47 @@ class PresentationCategory extends SilverstripeBaseModel
      */
     private $groups;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\Events\Presentations\PresentationCategoryAllowedTag", mappedBy="track", cascade={"persist"}, orphanRemoval=true)
+     * @var PresentationCategoryAllowedTag[]
+     */
+    protected $allowed_tags;
+
+
     public function __construct()
     {
         parent::__construct();
-        $this->groups = new ArrayCollection();
+
+        $this->groups                    = new ArrayCollection();
+        $this->allowed_tags              = new ArrayCollection();
+        $this->session_count             = 0;
+        $this->alternate_count           = 0;
+        $this->lightning_alternate_count = 0;
+        $this->lightning_count           = 0;
+        $this->chair_visible             = false;
+        $this->voting_visible            = false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
     }
 
     /**
      * @return PresentationCategoryGroup[]
      */
-    public function getGroups()
-    {
+    public function getGroups(){
         return $this->groups;
+    }
+
+    /**
+     * @return PresentationCategoryAllowedTag[]
+     */
+    public function getAllowedTags(){
+        return $this->allowed_tags;
     }
 
     /**
@@ -243,4 +280,13 @@ class PresentationCategory extends SilverstripeBaseModel
         $this->chair_visible = $chair_visible;
     }
 
+    /**
+     * @return $this
+     */
+    public function calculateSlug(){
+        if(empty($this->title)) return $this;
+        $clean_title = preg_replace ("/[^a-zA-Z0-9 ]/", "", $this->title);
+        $this->slug = preg_replace('/\s+/', '-', strtolower($clean_title));
+        return $this;
+    }
 }

@@ -37,5 +37,7 @@ final class SummitScopes
 
     const WriteEventTypeData = '%s/event-types/write';
 
+    const WriteTracksData    = '%s/tracks/write';
+
     const WriteSummitSpeakerAssistanceData = '%s/summit-speaker-assistance/write';
 }

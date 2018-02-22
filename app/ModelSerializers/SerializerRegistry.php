@@ -36,6 +36,7 @@ use App\ModelSerializers\Marketplace\SpokenLanguageSerializer;
 use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
+use App\ModelSerializers\Summit\Presentation\PresentationCategoryAllowedTagSerializer;
 use Libs\ModelSerializers\IModelSerializer;
 use models\summit\SummitRegistrationPromoCode;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
@@ -89,6 +90,7 @@ final class SerializerRegistry
         $this->registry['PresentationType']           = PresentationTypeSerializer::class;
         $this->registry['SummitTicketType']           = SummitTicketTypeSerializer::class;
         $this->registry['PresentationCategory']       = PresentationCategorySerializer::class;
+        $this->registry['PresentationCategoryAllowedTag'] = PresentationCategoryAllowedTagSerializer::class;
         $this->registry['PresentationCategoryGroup']  = PresentationCategoryGroupSerializer::class;
         $this->registry['PrivatePresentationCategoryGroup'] = PrivatePresentationCategoryGroupSerializer::class;
         $this->registry['Tag']                        = TagSerializer::class;

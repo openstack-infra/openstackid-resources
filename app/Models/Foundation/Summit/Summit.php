@@ -837,12 +837,44 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
+     * @param PresentationCategory $track
+     * @return $this
+     */
+    public function addPresentationCategory(PresentationCategory $track){
+        $this->presentation_categories->add($track);
+        $track->setSummit($this);
+        return $this;
+    }
+
+    /**
      * @param int $category_id
      * @return PresentationCategory
      */
     public function getPresentationCategory($category_id){
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($category_id)));
+        $category  = $this->presentation_categories->matching($criteria)->first();
+        return $category === false ? null:$category;
+    }
+
+    /**
+     * @param string $category_title
+     * @return PresentationCategory
+     */
+    public function getPresentationCategoryByTitle($category_title){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('title', intval($category_title)));
+        $category  = $this->presentation_categories->matching($criteria)->first();
+        return $category === false ? null:$category;
+    }
+
+    /**
+     * @param string $category_code
+     * @return PresentationCategory
+     */
+    public function getPresentationCategoryByCode($category_code){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('code', intval($category_code)));
         $category  = $this->presentation_categories->matching($criteria)->first();
         return $category === false ? null:$category;
     }

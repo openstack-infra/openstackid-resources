@@ -108,4 +108,39 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         $this->assertTrue(!empty($csv));
     }
+
+    public function testAddTrack($summit_id = 23){
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $name       = str_random(16).'_track';
+        $data = [
+            'title'       => $name,
+            'description' => 'test desc',
+            'code'        => 'SM',
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitTracksApiController@addTrackBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $track = json_decode($content);
+        $this->assertTrue(!is_null($track));
+        return $track;
+    }
 }

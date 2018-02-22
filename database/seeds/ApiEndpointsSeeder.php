@@ -610,7 +610,6 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
-
             [
                 'name' => 'get-tracks-csv',
                 'route' => '/api/v1/summits/{id}/tracks/csv',
@@ -627,6 +626,15 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-tracks',
+                'route' => '/api/v1/summits/{id}/tracks',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTracksData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
                 ],
             ],
             // track groups
@@ -945,7 +953,7 @@ class ApiEndpointsSeeder extends Seeder
 
         $this->seedApiEndpoints('tags', [
                 // members
-                array(
+                [
                     'name' => 'get-tags',
                     'route' => '/api/v1/tags',
                     'http_method' => 'GET',
@@ -954,7 +962,7 @@ class ApiEndpointsSeeder extends Seeder
                         sprintf(SummitScopes::ReadSummitData, $current_realm),
                         sprintf('%s/tags/read', $current_realm)
                     ],
-                )
+                ]
             ]
         );
     }
@@ -964,7 +972,7 @@ class ApiEndpointsSeeder extends Seeder
 
         $this->seedApiEndpoints('companies', [
                 // members
-                array(
+                [
                     'name' => 'get-companies',
                     'route' => '/api/v1/companies',
                     'http_method' => 'GET',
@@ -973,7 +981,7 @@ class ApiEndpointsSeeder extends Seeder
                         sprintf(SummitScopes::ReadSummitData, $current_realm),
                         sprintf('%s/companies/read', $current_realm)
                     ],
-                )
+                ]
             ]
         );
     }
@@ -983,7 +991,7 @@ class ApiEndpointsSeeder extends Seeder
 
         $this->seedApiEndpoints('groups', [
                 // members
-                array(
+                [
                     'name' => 'get-groups',
                     'route' => '/api/v1/groups',
                     'http_method' => 'GET',
@@ -992,7 +1000,7 @@ class ApiEndpointsSeeder extends Seeder
                         sprintf(SummitScopes::ReadSummitData, $current_realm),
                         sprintf('%s/groups/read', $current_realm)
                     ],
-                )
+                ]
             ]
         );
     }
