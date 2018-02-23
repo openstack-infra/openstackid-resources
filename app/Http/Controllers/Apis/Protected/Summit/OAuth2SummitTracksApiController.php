@@ -337,4 +337,60 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @param $track_id
+     * @return mixed
+     */
+    public function updateTrackBySummit($summit_id, $track_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = [
+                'title'                     => 'sometimes|string|max:50',
+                'description'               => 'sometimes|string|max:500',
+                'code'                      => 'sometimes|string|max:5',
+                'session_count'             => 'sometimes|integer',
+                'alternate_count'           => 'sometimes|integer',
+                'lightning_count'           => 'sometimes|integer',
+                'lightning_alternate_count' => 'sometimes|integer',
+                'voting_visible'            => 'sometimes|boolean',
+                'chair_visible'             => 'sometimes|boolean',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $track = $this->track_service->updateTrack($summit, $track_id, $data->all());
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($track)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

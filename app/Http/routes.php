@@ -349,6 +349,7 @@ Route::group([
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@addTrackBySummit']);
                 Route::group(['prefix' => '{track_id}'], function () {
                     Route::get('', 'OAuth2SummitTracksApiController@getTrackBySummit');
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@updateTrackBySummit']);
                 });
             });
 

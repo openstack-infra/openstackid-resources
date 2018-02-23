@@ -637,6 +637,15 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSummitData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'update-tracks',
+                'route' => '/api/v1/summits/{id}/tracks/{track_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTracksData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
             // track groups
             array(
                 'name' => 'get-track-groups',

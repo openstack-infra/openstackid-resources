@@ -1,4 +1,5 @@
 <?php namespace App\Services\Model;
+
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Events\TrackUpdated;
 use App\Models\Foundation\Summit\Factories\PresentationCategoryFactory;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
+use Illuminate\Support\Facades\Event;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\PresentationCategory;
 use models\summit\Summit;
+
 /**
  * Class SummitTrackService
  * @package App\Services\Model
@@ -54,14 +58,14 @@ final class SummitTrackService implements ISummitTrackService
      */
     public function addTrack(Summit $summit, array $data)
     {
-        return $this->tx_service->transaction(function() use($summit, $data){
+        return $this->tx_service->transaction(function () use ($summit, $data) {
 
-           $former_track =  $summit->getPresentationCategoryByCode($data['code']);
-           if(!is_null($former_track))
-               throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
+            $former_track = $summit->getPresentationCategoryByCode($data['code']);
+            if (!is_null($former_track))
+                throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
 
-            $former_track =  $summit->getPresentationCategoryByTitle($data['title']);
-            if(!is_null($former_track))
+            $former_track = $summit->getPresentationCategoryByTitle($data['title']);
+            if (!is_null($former_track))
                 throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['title'], $summit->getId()));
 
             $track = PresentationCategoryFactory::build($summit, $data);
@@ -81,7 +85,33 @@ final class SummitTrackService implements ISummitTrackService
      */
     public function updateTrack(Summit $summit, $track_id, array $data)
     {
-        // TODO: Implement updateTrack() method.
+        return $this->tx_service->transaction(function () use ($summit, $track_id, $data) {
+
+            $track = $summit->getPresentationCategory($track_id);
+
+            if (is_null($track))
+                throw new EntityNotFoundException
+                (
+                    sprintf("track id %s does not belong to summit id %s", $track_id, $summit->getId())
+                );
+
+            if (isset($data['code'])) {
+                $former_track = $summit->getPresentationCategoryByCode($data['code']);
+                if (!is_null($former_track) && $former_track->getId() != $track_id)
+                    throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
+            }
+
+            if (isset($data['title'])) {
+                $former_track = $summit->getPresentationCategoryByTitle($data['title']);
+                if (!is_null($former_track) && $former_track->getId() != $track_id)
+                    throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['title'], $summit->getId()));
+            }
+
+            return PresentationCategoryFactory::populate($track, $data);
+
+            Event::fire(new TrackUpdated($track));
+
+        });
     }
 
     /**

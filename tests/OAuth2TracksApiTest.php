@@ -17,6 +17,10 @@
  */
 final class OAuth2TracksApiTest extends ProtectedApiTest
 {
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
     public function testGetTracksByTitle($summit_id = 23){
         $params = [
 
@@ -50,6 +54,11 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         return $tracks;
     }
 
+    /**
+     * @param int $summit_id
+     * @param int $track_id
+     * @return mixed
+     */
     public function testGetTracksById($summit_id = 23, $track_id = 152){
         $params = [
 
@@ -79,6 +88,9 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         return $track;
     }
 
+    /**
+     * @param int $summit_id
+     */
     public function testGetTracksByTitleCSV($summit_id = 23){
         $params = [
 
@@ -109,6 +121,10 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         $this->assertTrue(!empty($csv));
     }
 
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
     public function testAddTrack($summit_id = 23){
         $params = [
             'id' => $summit_id,
@@ -141,6 +157,50 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
         $track = json_decode($content);
         $this->assertTrue(!is_null($track));
+        return $track;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testUpdateTrack($summit_id = 23){
+
+        $new_track = $this->testAddTrack($summit_id);
+
+        $params = [
+            'id'       => $summit_id,
+            'track_id' => $new_track->id
+        ];
+
+        $name       = str_random(16).'_track';
+        $data = [
+            'description' => 'test desc updated',
+            'code'        => 'SMX' ,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitTracksApiController@updateTrackBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $track = json_decode($content);
+        $this->assertTrue(!is_null($track));
+        $this->assertTrue(!empty($track->description) && $track->description == 'test desc updated');
+        $this->assertTrue(!empty($track->code) && $track->code == 'SMX');
         return $track;
     }
 }

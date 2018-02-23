@@ -30,6 +30,7 @@ use App\Factories\EntityEvents\PresentationSpeakerUpdatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventCreatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventDeletedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventUpdatedEntityEventFactory;
+use App\Factories\EntityEvents\TrackUpdatedEntityEventFactory;
 use App\Services\Utils\SCPFileUploader;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -132,6 +133,11 @@ final class EventServiceProvider extends ServiceProvider
         Event::listen(\App\Events\PresentationSpeakerDeleted::class, function($event)
         {
             EntityEventPersister::persist_list(PresentationSpeakerDeletedEntityEventFactory::build($event));
+        });
+
+        Event::listen(\App\Events\TrackUpdated::class, function($event)
+        {
+            EntityEventPersister::persist_list(TrackUpdatedEntityEventFactory::build($event));
         });
 
     }

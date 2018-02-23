@@ -14,6 +14,7 @@
 use App\Models\Foundation\Summit\Events\Presentations\PresentationCategoryAllowedTag;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\Common\Collections\ArrayCollection;
 /**
@@ -288,5 +289,31 @@ class PresentationCategory extends SilverstripeBaseModel
         $clean_title = preg_replace ("/[^a-zA-Z0-9 ]/", "", $this->title);
         $this->slug = preg_replace('/\s+/', '-', strtolower($clean_title));
         return $this;
+    }
+
+    /**
+     * @return SummitEvent[]
+     */
+    public function getRelatedPublishedSummitEvents(){
+        $query = <<<SQL
+SELECT SummitEvent.* 
+FROM SummitEvent 
+WHERE 
+SummitEvent.Published = 1
+AND SummitEvent.SummitID = :summit_id
+AND SummitEvent.CategoryID = :track_id
+SQL;
+
+        $rsm = new ResultSetMappingBuilder($this->getEM());
+        $rsm->addRootEntityFromClassMetadata(\models\summit\SummitEvent::class, 'e');
+
+        // build rsm here
+        $native_query = $this->getEM()->createNativeQuery($query, $rsm);
+
+        $native_query->setParameter("summit_id", $this->summit->getId());
+        $native_query->setParameter("track_id", $this->id);
+
+        return $native_query->getResult();
+
     }
 }
