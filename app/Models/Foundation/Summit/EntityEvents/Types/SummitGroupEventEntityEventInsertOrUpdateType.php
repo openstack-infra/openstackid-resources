@@ -35,8 +35,6 @@ final class SummitGroupEventEntityEventInsertOrUpdateType extends SummitEventEnt
         if (!$published_old && !$published_current) return;
         $entity = $this->getEntity();
 
-        if (!$entity instanceof SummitGroupEvent) return;
-
         $current_member = $this->process_ctx->getCurrentMember();
 
         if (is_null($current_member)) return;

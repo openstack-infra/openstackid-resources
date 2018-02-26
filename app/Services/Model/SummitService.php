@@ -215,9 +215,11 @@ final class SummitService implements ISummitService
             $this->tx_service->transaction(function () use ($summit, $member, $event_id, $check_rsvp) {
 
                 $event = $summit->getScheduleEvent($event_id);
+
                 if (is_null($event)) {
                     throw new EntityNotFoundException('event not found on summit!');
                 }
+
                 if(!Summit::allowToSee($event, $member))
                     throw new EntityNotFoundException('event not found on summit!');
 
@@ -581,8 +583,8 @@ final class SummitService implements ISummitService
             return false;
         }
 
-        $old_is_private = SummitEventType::isPrivateType($old_event_type->getType(), $old_event_type->getSummitId());
-        $new_is_private = SummitEventType::isPrivateType($event_type->getType(), $event_type->getSummitId());
+        $old_is_private = $old_event_type->isPrivate();
+        $new_is_private = $event_type->isPrivate();
 
         if((!$old_is_private && $new_is_private) || ($old_is_private && !$new_is_private))
             return false;

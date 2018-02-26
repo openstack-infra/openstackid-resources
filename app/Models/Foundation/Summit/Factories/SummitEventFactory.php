@@ -30,7 +30,7 @@ final class SummitEventFactory
         if($type instanceof PresentationType)
             $event = new Presentation();
 
-        if(SummitEventType::isPrivateType($type->getType(), $summit->getId()))
+        if($type->isPrivate())
             $event = new SummitGroupEvent();
 
         if($type->isAllowsAttachment())

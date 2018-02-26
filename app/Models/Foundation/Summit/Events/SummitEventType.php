@@ -122,33 +122,6 @@ class SummitEventType extends SilverstripeBaseModel
     }
 
     /**
-     * @param string $type
-     * @param int $summit_id
-     * @return bool
-     */
-    static public function isPrivateType($type, $summit_id){
-        $private_types = [ISummitEventType::GroupsEvents];
-        return in_array($type, $private_types);
-
-        try{
-            $sql = <<<SQL
-            SELECT COUNT(DISTINCT(SummitEventType.ID))
-            FROM SummitEventType
-            WHERE SummitEventType.SummitID = :summit_id 
-            AND SummitEventType.Type = :$type
-SQL;
-            $stmt = self::prepareRawSQLStatic($sql);
-            $stmt->execute(['summit_id' => $summit->getId(), 'type' => $type]);
-            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-            return count($res) > 0 ;
-        }
-        catch (\Exception $ex){
-
-        }
-        return false;
-    }
-
-    /**
      * @param Summit $summit
      * @param string $type
      * @return bool

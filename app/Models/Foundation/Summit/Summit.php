@@ -1,4 +1,5 @@
 <?php namespace models\summit;
+
 /**
  * Copyright 2015 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Doctrine\ORM\Mapping AS ORM;
-use Doctrine\ORM\Cache;
+use DateTime;
+use DateTimeZone;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
+use models\exceptions\ValidationException;
+use models\main\Company;
 use models\main\File;
 use models\main\Member;
 use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\Common\Collections\ArrayCollection;
-use DateTimeZone;
-use DateTime;
-use models\main\Company;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitRepository")
@@ -274,6 +274,7 @@ class Summit extends SilverstripeBaseModel
     {
         $this->dates_label = $dates_label;
     }
+
     /**
      * @return mixed
      */
@@ -425,8 +426,7 @@ class Summit extends SilverstripeBaseModel
     {
         try {
             return $this->type;
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
             return null;
         }
     }
@@ -442,11 +442,11 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return int
      */
-    public function getTypeId(){
+    public function getTypeId()
+    {
         try {
-            return !is_null($this->type)? $this->type->getId():0;
-        }
-        catch(\Exception $ex){
+            return !is_null($this->type) ? $this->type->getId() : 0;
+        } catch (\Exception $ex) {
             return 0;
         }
     }
@@ -454,19 +454,24 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return bool
      */
-    public function hasType(){
+    public function hasType()
+    {
         return $this->getTypeId() > 0;
     }
 
     /**
      * @return string
      */
-    public function getSummitExternalId(){ return $this->external_summit_id; }
+    public function getSummitExternalId()
+    {
+        return $this->external_summit_id;
+    }
 
     /**
      * @return bool
      */
-    public function isActive(){
+    public function isActive()
+    {
         return $this->active;
     }
 
@@ -494,29 +499,30 @@ class Summit extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->locations                                       = new ArrayCollection;
-        $this->events                                          = new ArrayCollection;
-        $this->event_types                                     = new ArrayCollection;
-        $this->ticket_types                                    = new ArrayCollection;
-        $this->presentation_categories                         = new ArrayCollection;
-        $this->category_groups                                 = new ArrayCollection;
-        $this->attendees                                       = new ArrayCollection;
-        $this->entity_events                                   = new ArrayCollection;
-        $this->wifi_connections                                = new ArrayCollection;
-        $this->promo_codes                                     = new ArrayCollection;
-        $this->speaker_assistances                             = new ArrayCollection;
-        $this->excluded_categories_for_accepted_presentations  = new ArrayCollection;
+        $this->locations = new ArrayCollection;
+        $this->events = new ArrayCollection;
+        $this->event_types = new ArrayCollection;
+        $this->ticket_types = new ArrayCollection;
+        $this->presentation_categories = new ArrayCollection;
+        $this->category_groups = new ArrayCollection;
+        $this->attendees = new ArrayCollection;
+        $this->entity_events = new ArrayCollection;
+        $this->wifi_connections = new ArrayCollection;
+        $this->promo_codes = new ArrayCollection;
+        $this->speaker_assistances = new ArrayCollection;
+        $this->excluded_categories_for_accepted_presentations = new ArrayCollection;
         $this->excluded_categories_for_alternate_presentations = new ArrayCollection;
-        $this->excluded_categories_for_rejected_presentations  = new ArrayCollection;
-        $this->excluded_categories_for_upload_slide_decks      = new ArrayCollection;
-        $this->category_default_tags                           = new ArrayCollection;
+        $this->excluded_categories_for_rejected_presentations = new ArrayCollection;
+        $this->excluded_categories_for_upload_slide_decks = new ArrayCollection;
+        $this->category_default_tags = new ArrayCollection;
     }
 
     /**
      * @param int $assistance_id
      * @return PresentationSpeakerSummitAssistanceConfirmationRequest|null
      */
-    public function getSpeakerAssistanceById($assistance_id){
+    public function getSpeakerAssistanceById($assistance_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($assistance_id)));
         $speaker_assistance = $this->speaker_assistances->matching($criteria)->first();
@@ -531,11 +537,10 @@ class Summit extends SilverstripeBaseModel
     {
         $summit_time_zone = $this->getTimeZone();
 
-        if(!is_null($summit_time_zone) && !empty($value))
-        {
-            $utc_timezone      = new DateTimeZone("UTC");
-            $timestamp         = $value->format('Y-m-d H:i:s');
-            $local_date        = new DateTime($timestamp, $summit_time_zone);
+        if (!is_null($summit_time_zone) && !empty($value)) {
+            $utc_timezone = new DateTimeZone("UTC");
+            $timestamp = $value->format('Y-m-d H:i:s');
+            $local_date = new DateTime($timestamp, $summit_time_zone);
             return $local_date->setTimezone($utc_timezone);
         }
         return null;
@@ -544,38 +549,40 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return DateTimeZone|null
      */
-    public function getTimeZone(){
-        $time_zone_id   = $this->time_zone_id;
-        if(empty($time_zone_id)) return null;
+    public function getTimeZone()
+    {
+        $time_zone_id = $this->time_zone_id;
+        if (empty($time_zone_id)) return null;
         $time_zone_list = timezone_identifiers_list();
-        if(isset($time_zone_list[$time_zone_id])){
-            $time_zone_name    = $time_zone_list[$time_zone_id];
+        if (isset($time_zone_list[$time_zone_id])) {
+            $time_zone_name = $time_zone_list[$time_zone_id];
             return new DateTimeZone($time_zone_name);
         }
         return null;
     }
+
     /**
      * @param DateTime $value
      * @return null|DateTime
      */
     public function convertDateFromUTC2TimeZone(DateTime $value)
     {
-        $time_zone_id   = $this->time_zone_id;
-        if(empty($time_zone_id)) return $value;
+        $time_zone_id = $this->time_zone_id;
+        if (empty($time_zone_id)) return $value;
         $time_zone_list = timezone_identifiers_list();
 
-        if(isset($time_zone_list[$time_zone_id]) && !empty($value))
-        {
-            $utc_timezone     = new DateTimeZone("UTC");
-            $time_zone_name   = $time_zone_list[$time_zone_id];
+        if (isset($time_zone_list[$time_zone_id]) && !empty($value)) {
+            $utc_timezone = new DateTimeZone("UTC");
+            $time_zone_name = $time_zone_list[$time_zone_id];
             $summit_time_zone = new DateTimeZone($time_zone_name);
-            $timestamp        = $value->format('Y-m-d H:i:s');
-            $utc_date         = new DateTime($timestamp, $utc_timezone);
+            $timestamp = $value->format('Y-m-d H:i:s');
+            $utc_date = new DateTime($timestamp, $utc_timezone);
 
             return $utc_date->setTimezone($summit_time_zone);
         }
         return null;
     }
+
     /**
      * @return DateTime
      */
@@ -595,7 +602,8 @@ class Summit extends SilverstripeBaseModel
     /**
      * @param SummitAbstractLocation $location
      */
-    public function addLocation(SummitAbstractLocation $location){
+    public function addLocation(SummitAbstractLocation $location)
+    {
         $this->locations->add($location);
         $location->setSummit($this);
     }
@@ -611,8 +619,9 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return SummitVenue[]
      */
-    public function getVenues(){
-        return $this->locations->filter(function($e){
+    public function getVenues()
+    {
+        return $this->locations->filter(function ($e) {
             return $e instanceof SummitVenue;
         });
     }
@@ -620,8 +629,9 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return SummitHotel[]
      */
-    public function getHotels(){
-        return $this->locations->filter(function($e){
+    public function getHotels()
+    {
+        return $this->locations->filter(function ($e) {
             return $e instanceof SummitHotel;
         });
     }
@@ -629,8 +639,9 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return SummitAirport[]
      */
-    public function getAirports(){
-        return $this->locations->filter(function($e){
+    public function getAirports()
+    {
+        return $this->locations->filter(function ($e) {
             return $e instanceof SummitAirport;
         });
     }
@@ -638,8 +649,9 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return SummitExternalLocation[]
      */
-    public function getExternalLocations(){
-        return $this->locations->filter(function($e){
+    public function getExternalLocations()
+    {
+        return $this->locations->filter(function ($e) {
             return $e->getClassName() == 'SummitExternalLocation';
         });
     }
@@ -647,14 +659,16 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return ArrayCollection
      */
-    public function getEvents(){
+    public function getEvents()
+    {
         return $this->events;
     }
 
     /**
      * @param SummitEvent $event
      */
-    public function addEvent(SummitEvent $event){
+    public function addEvent(SummitEvent $event)
+    {
         $this->events->add($event);
         $event->setSummit($this);
     }
@@ -670,18 +684,19 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return bool
      */
-    public function hasLogo(){
+    public function hasLogo()
+    {
         return $this->getLogoId() > 0;
     }
 
     /**
      * @return int
      */
-    public function getLogoId(){
-        try{
-            return !is_null($this->logo)?$this->logo->getId():0;
-        }
-        catch(\Exception $ex){
+    public function getLogoId()
+    {
+        try {
+            return !is_null($this->logo) ? $this->logo->getId() : 0;
+        } catch (\Exception $ex) {
             return 0;
         }
     }
@@ -715,14 +730,15 @@ class Summit extends SilverstripeBaseModel
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($event_type_id)));
         $event_type = $this->event_types->matching($criteria)->first();
-        return $event_type === false ? null:$event_type;
+        return $event_type === false ? null : $event_type;
     }
 
     /**
      * @param string $type
      * @return bool
      */
-    public function hasEventType($type){
+    public function hasEventType($type)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('type', $type));
         return $this->event_types->matching($criteria)->count() > 0;
@@ -732,22 +748,24 @@ class Summit extends SilverstripeBaseModel
      * @param string $type
      * @return SummitEventType|null
      */
-    public function getEventTypeByType($type){
+    public function getEventTypeByType($type)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('type', $type));
         $event_type = $this->event_types->matching($criteria)->first();
-        return $event_type === false ? null:$event_type;
+        return $event_type === false ? null : $event_type;
     }
 
     /**
      * @param int $wifi_connection_id
      * @return SummitWIFIConnection|null
      */
-    public function getWifiConnection($wifi_connection_id){
+    public function getWifiConnection($wifi_connection_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($wifi_connection_id)));
         $wifi_conn = $this->wifi_connections->matching($criteria)->first();
-        return $wifi_conn === false ? null:$wifi_conn;
+        return $wifi_conn === false ? null : $wifi_conn;
     }
 
     /**
@@ -762,22 +780,24 @@ class Summit extends SilverstripeBaseModel
      * @param int $ticket_type_id
      * @return SummitTicketType|null
      */
-    public function getTicketType($ticket_type_id){
+    public function getTicketType($ticket_type_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($ticket_type_id)));
-        $ticket_type  = $this->ticket_types->matching($criteria)->first();
-        return $ticket_type === false ? null:$ticket_type;
+        $ticket_type = $this->ticket_types->matching($criteria)->first();
+        return $ticket_type === false ? null : $ticket_type;
     }
 
     /**
      * @param string $ticket_type_external_id
      * @return SummitTicketType|null
      */
-    public function getTicketTypeByExternalId($ticket_type_external_id){
+    public function getTicketTypeByExternalId($ticket_type_external_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('external_id', $ticket_type_external_id));
-        $ticket_type  = $this->ticket_types->matching($criteria)->first();
-        return $ticket_type === false ? null:$ticket_type;
+        $ticket_type = $this->ticket_types->matching($criteria)->first();
+        return $ticket_type === false ? null : $ticket_type;
     }
 
     /**
@@ -789,32 +809,36 @@ class Summit extends SilverstripeBaseModel
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('published', 1));
         $criteria->andWhere(Criteria::expr()->eq('id', intval($event_id)));
-        $event  = $this->events->matching($criteria)->first();
-        return $event === false ? null:$event;
+        $event = $this->events->matching($criteria)->first();
+        return $event === false ? null : $event;
     }
 
     /**
      * @param int $event_id
      * @return bool
      */
-    public function isEventOnSchedule($event_id){
+    public function isEventOnSchedule($event_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('published', 1));
         $criteria->andWhere(Criteria::expr()->eq('id', intval($event_id)));
         return $this->events->matching($criteria)->count() > 0;
     }
 
-    public function getScheduleEvents(){
+    public function getScheduleEvents()
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('published', 1));
         $criteria->orderBy(["start_date" => Criteria::ASC, "end_date" => Criteria::ASC]);
         return $this->events->matching($criteria);
     }
 
-    public function getPresentations(){
-       $query = $this->createQuery("SELECT p from models\summit\Presentation p JOIN p.summit s WHERE s.id = :summit_id");
-       return $query->setParameter('summit_id', $this->getIdentifier())->getResult();
+    public function getPresentations()
+    {
+        $query = $this->createQuery("SELECT p from models\summit\Presentation p JOIN p.summit s WHERE s.id = :summit_id");
+        return $query->setParameter('summit_id', $this->getIdentifier())->getResult();
     }
+
     /**
      * @param int $event_id
      * @return null|SummitEvent
@@ -823,8 +847,8 @@ class Summit extends SilverstripeBaseModel
     {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($event_id)));
-        $event  = $this->events->matching($criteria)->first();
-        return $event === false ? null:$event;
+        $event = $this->events->matching($criteria)->first();
+        return $event === false ? null : $event;
     }
 
 
@@ -840,7 +864,8 @@ class Summit extends SilverstripeBaseModel
      * @param PresentationCategory $track
      * @return $this
      */
-    public function addPresentationCategory(PresentationCategory $track){
+    public function addPresentationCategory(PresentationCategory $track)
+    {
         $this->presentation_categories->add($track);
         $track->setSummit($this);
         return $this;
@@ -850,33 +875,36 @@ class Summit extends SilverstripeBaseModel
      * @param int $category_id
      * @return PresentationCategory
      */
-    public function getPresentationCategory($category_id){
+    public function getPresentationCategory($category_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($category_id)));
-        $category  = $this->presentation_categories->matching($criteria)->first();
-        return $category === false ? null:$category;
+        $category = $this->presentation_categories->matching($criteria)->first();
+        return $category === false ? null : $category;
     }
 
     /**
      * @param string $category_title
      * @return PresentationCategory
      */
-    public function getPresentationCategoryByTitle($category_title){
+    public function getPresentationCategoryByTitle($category_title)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('title', intval($category_title)));
-        $category  = $this->presentation_categories->matching($criteria)->first();
-        return $category === false ? null:$category;
+        $category = $this->presentation_categories->matching($criteria)->first();
+        return $category === false ? null : $category;
     }
 
     /**
      * @param string $category_code
      * @return PresentationCategory
      */
-    public function getPresentationCategoryByCode($category_code){
+    public function getPresentationCategoryByCode($category_code)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('code', trim($category_code)));
-        $category  = $this->presentation_categories->matching($criteria)->first();
-        return $category === false ? null:$category;
+        $category = $this->presentation_categories->matching($criteria)->first();
+        return $category === false ? null : $category;
     }
 
     /**
@@ -895,8 +923,8 @@ class Summit extends SilverstripeBaseModel
     {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($group_id)));
-        $group  = $this->category_groups->matching($criteria)->first();
-        return $group === false ? null:$group;
+        $group = $this->category_groups->matching($criteria)->first();
+        return $group === false ? null : $group;
     }
 
 
@@ -909,12 +937,12 @@ class Summit extends SilverstripeBaseModel
         $builder = $this->createQueryBuilder();
         $members = $builder
             ->select('a')
-            ->from('models\summit\SummitAttendee','a')
-            ->join('a.member','m')
-            ->join('a.summit','s')
+            ->from('models\summit\SummitAttendee', 'a')
+            ->join('a.member', 'm')
+            ->join('a.summit', 's')
             ->where('s.id = :summit_id and m.id = :member_id')
             ->setParameter('summit_id', $this->getId())
-            ->setParameter('member_id',  intval($member_id))
+            ->setParameter('member_id', intval($member_id))
             ->getQuery()->getResult();
         return count($members) > 0 ? $members[0] : null;
     }
@@ -923,7 +951,8 @@ class Summit extends SilverstripeBaseModel
      * @param Member $member
      * @return SummitAttendee|null
      */
-    public function getAttendeeByMember(Member $member){
+    public function getAttendeeByMember(Member $member)
+    {
         return $this->getAttendeeByMemberId($member->getId());
     }
 
@@ -936,7 +965,7 @@ class Summit extends SilverstripeBaseModel
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($attendee_id)));
         $attendee = $this->attendees->matching($criteria)->first();
-        return $attendee === false ? null:$attendee;
+        return $attendee === false ? null : $attendee;
     }
 
     /**
@@ -945,19 +974,19 @@ class Summit extends SilverstripeBaseModel
      */
     private $entity_events;
 
-     /**
+    /**
      * @param SummitEvent $summit_event
      * @return bool
      */
     public function isEventInsideSummitDuration(SummitEvent $summit_event)
     {
-        $event_start_date  = $summit_event->getLocalStartDate();
-        $event_end_date    = $summit_event->getLocalEndDate();
+        $event_start_date = $summit_event->getLocalStartDate();
+        $event_end_date = $summit_event->getLocalEndDate();
         $summit_start_date = $this->getLocalBeginDate();
-        $summit_end_date   = $this->getLocalEndDate();
+        $summit_end_date = $this->getLocalEndDate();
 
-        return  $event_start_date >= $summit_start_date && $event_start_date <= $summit_end_date &&
-        $event_end_date <= $summit_end_date && $event_end_date >= $event_start_date;
+        return $event_start_date >= $summit_start_date && $event_start_date <= $summit_end_date &&
+            $event_end_date <= $summit_end_date && $event_end_date >= $event_start_date;
     }
 
     /**
@@ -968,11 +997,11 @@ class Summit extends SilverstripeBaseModel
     {
         $query = $this->createQueryBuilder()
             ->select('distinct ps')
-            ->from('models\summit\PresentationSpeaker','ps')
-            ->join('ps.moderated_presentations','p')
-            ->join('p.summit','s')
+            ->from('models\summit\PresentationSpeaker', 'ps')
+            ->join('ps.moderated_presentations', 'p')
+            ->join('p.summit', 's')
             ->where("s.id = :summit_id");
-        if($filter_published_events)
+        if ($filter_published_events)
             $query = $query->andWhere("p.published = 1");
         return $query->setParameter('summit_id', $this->getId());
     }
@@ -981,15 +1010,16 @@ class Summit extends SilverstripeBaseModel
      * @param bool $filter_published_events
      * @return \Doctrine\ORM\QueryBuilder
      */
-    private function buildSpeakersQuery($filter_published_events = true){
+    private function buildSpeakersQuery($filter_published_events = true)
+    {
         $query = $this->createQueryBuilder()
             ->select('distinct ps')
-            ->from('models\summit\PresentationSpeaker','ps')
-            ->join('ps.presentations','p')
-            ->join('p.summit','s')
+            ->from('models\summit\PresentationSpeaker', 'ps')
+            ->join('ps.presentations', 'p')
+            ->join('p.summit', 's')
             ->where("s.id = :summit_id");
 
-        if($filter_published_events)
+        if ($filter_published_events)
             $query = $query->andWhere("p.published = 1");
         return $query->setParameter('summit_id', $this->getId());
     }
@@ -997,12 +1027,13 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return \Doctrine\ORM\QueryBuilder
      */
-    private function buildSpeakerSummitAttendanceQuery(){
+    private function buildSpeakerSummitAttendanceQuery()
+    {
         return $this->createQueryBuilder()
             ->select('distinct ps')
-            ->from('models\summit\PresentationSpeaker','ps')
-            ->join('ps.summit_assistances','a')
-            ->join('a.summit','s')
+            ->from('models\summit\PresentationSpeaker', 'ps')
+            ->join('ps.summit_assistances', 'a')
+            ->join('a.summit', 's')
             ->where("s.id = :summit_id")
             ->setParameter('summit_id', $this->getId());
     }
@@ -1010,20 +1041,21 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return PresentationSpeaker[]
      */
-    public function getSpeakers(){
+    public function getSpeakers()
+    {
         // moderators
         $moderators = $this->buildModeratorsQuery()->getQuery()->getResult();
         // get moderators ids to exclude from speakers
         $moderators_ids = array();
-        foreach($moderators as $m){
+        foreach ($moderators as $m) {
             $moderators_ids[] = $m->getId();
         }
 
         // speakers
         $sbuilder = $this->buildSpeakersQuery();
 
-        if(count($moderators_ids) > 0){
-            $moderators_ids = implode(', ',$moderators_ids);
+        if (count($moderators_ids) > 0) {
+            $moderators_ids = implode(', ', $moderators_ids);
             $sbuilder = $sbuilder->andWhere("ps.id not in ({$moderators_ids})");
         }
 
@@ -1036,7 +1068,8 @@ class Summit extends SilverstripeBaseModel
      * @param Member $member
      * @return PresentationSpeaker|null
      */
-    public function getSpeakerByMember(Member $member){
+    public function getSpeakerByMember(Member $member)
+    {
         return $this->getSpeakerByMemberId($member->getId());
     }
 
@@ -1045,33 +1078,34 @@ class Summit extends SilverstripeBaseModel
      * @param bool $filter_published_events
      * @return PresentationSpeaker|null
      */
-    public function getSpeakerByMemberId($member_id, $filter_published_events = true){
+    public function getSpeakerByMemberId($member_id, $filter_published_events = true)
+    {
         // moderators
         $moderator = $this->buildModeratorsQuery($filter_published_events)
-            ->join('ps.member','mb')
+            ->join('ps.member', 'mb')
             ->andWhere('mb.id = :member_id')
             ->setParameter('member_id', $member_id)
             ->getQuery()->getOneOrNullResult();
 
-        if(!is_null($moderator)) return $moderator;
+        if (!is_null($moderator)) return $moderator;
 
         // speakers
         $speaker = $this->buildSpeakersQuery($filter_published_events)
-            ->join('ps.member','mb')
+            ->join('ps.member', 'mb')
             ->andWhere('mb.id = :member_id')
             ->setParameter('member_id', $member_id)
             ->getQuery()->getOneOrNullResult();
 
-        if(!is_null($speaker)) return $speaker;
+        if (!is_null($speaker)) return $speaker;
 
         // assistance
         $speaker = $this->buildSpeakerSummitAttendanceQuery()
-            ->join('ps.member','mb')
+            ->join('ps.member', 'mb')
             ->andWhere('mb.id = :member_id')
             ->setParameter('member_id', $member_id)
             ->getQuery()->getOneOrNullResult();
 
-        if(!is_null($speaker)) return $speaker;
+        if (!is_null($speaker)) return $speaker;
 
         return null;
     }
@@ -1081,14 +1115,15 @@ class Summit extends SilverstripeBaseModel
      * @param bool $filter_published_events
      * @return PresentationSpeaker|null
      */
-    public function getSpeaker($speaker_id, $filter_published_events = true){
+    public function getSpeaker($speaker_id, $filter_published_events = true)
+    {
         // moderators
         $moderator = $this->buildModeratorsQuery($filter_published_events)
             ->andWhere('ps.id = :speaker_id')
             ->setParameter('speaker_id', $speaker_id)
             ->getQuery()->getOneOrNullResult();
 
-        if(!is_null($moderator)) return $moderator;
+        if (!is_null($moderator)) return $moderator;
 
         // speakers
         $speaker = $this->buildSpeakersQuery($filter_published_events)
@@ -1096,7 +1131,7 @@ class Summit extends SilverstripeBaseModel
             ->setParameter('speaker_id', $speaker_id)
             ->getQuery()->getOneOrNullResult();
 
-        if(!is_null($speaker)) return $speaker;
+        if (!is_null($speaker)) return $speaker;
 
         // attendance
         $speaker = $this->buildSpeakerSummitAttendanceQuery()
@@ -1104,7 +1139,7 @@ class Summit extends SilverstripeBaseModel
             ->setParameter('speaker_id', $speaker_id)
             ->getQuery()->getOneOrNullResult();
 
-        if(!is_null($speaker)) return $speaker;
+        if (!is_null($speaker)) return $speaker;
 
         return null;
     }
@@ -1112,13 +1147,14 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return Company[]
      */
-    public function getSponsors(){
+    public function getSponsors()
+    {
         $builder = $this->createQueryBuilder();
         return $builder
             ->select('distinct c')
-            ->from('models\main\Company','c')
-            ->join('c.sponsorships','sp')
-            ->join('sp.summit','s')
+            ->from('models\main\Company', 'c')
+            ->join('c.sponsorships', 'sp')
+            ->join('sp.summit', 's')
             ->where('s.id = :summit_id and sp.published = 1')
             ->setParameter('summit_id', $this->getId())->getQuery()->getResult();
     }
@@ -1126,7 +1162,8 @@ class Summit extends SilverstripeBaseModel
     /**
      * @return string
      */
-    public function getMainPage(){
+    public function getMainPage()
+    {
         try {
             $sql = <<<SQL
 SELECT URLSegment FROM SiteTree
@@ -1138,8 +1175,7 @@ SQL;
             $stmt->execute(['summit_id' => $this->id]);
             $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return count($res) > 0 ? $res[0] : '';
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
         return '';
@@ -1148,8 +1184,9 @@ SQL;
     /**
      * @return string
      */
-    public function getSchedulePage(){
-        try{
+    public function getSchedulePage()
+    {
+        try {
             $sql = <<<SQL
     SELECT URLSegment FROM SiteTree
     INNER JOIN
@@ -1160,8 +1197,7 @@ SQL;
             $stmt->execute(['summit_id' => $this->id]);
             $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return count($res) > 0 ? $res[0] : '';
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
         return '';
@@ -1171,33 +1207,37 @@ SQL;
      * @param SummitEvent $summit_event
      * @param Member|null $member
      * @return bool
+     * @throws ValidationException
      */
     static public function allowToSee(SummitEvent $summit_event, Member $member = null)
     {
 
-        if (SummitEventType::isPrivateType($summit_event->getType()->getType(), $summit_event->getSummitId())) {
-            if (is_null($member))
-                return false;
+        $event_type = $summit_event->getType();
 
-            if ($member->isAdmin()) return true;
+        if (is_null($event_type))
+            throw new ValidationException(sprintf("event type is null for event id %s", $summit_event->getId()));
 
-            // i am logged, check if i have permissions
-            if ($summit_event instanceof SummitGroupEvent) {
+        if (!$event_type->isPrivate()) return true;
 
-                $member_groups_code = [];
-                $event_groups_code  = [];
+        if (is_null($member)) return false;
 
-                foreach ($member->getGroups() as $member_group) {
-                    $member_groups_code[] = $member_group->getCode();
-                }
+        if ($member->isAdmin()) return true;
 
-                foreach ($summit_event->getGroups() as $event_group) {
-                    $event_groups_code[] = $event_group->getCode();
-                }
+        // i am logged, check if i have permissions
+        if ($summit_event instanceof SummitGroupEvent) {
 
-                return count(array_intersect($event_groups_code, $member_groups_code)) > 0;
+            $member_groups_code = [];
+            $event_groups_code  = [];
+
+            foreach ($member->getGroups() as $member_group) {
+                $member_groups_code[] = $member_group->getCode();
             }
-            return true;
+
+            foreach ($summit_event->getGroups() as $event_group) {
+                $event_groups_code[] = $event_group->getCode();
+            }
+
+            return count(array_intersect($event_groups_code, $member_groups_code)) > 0;
         }
         return true;
     }
@@ -1206,18 +1246,19 @@ SQL;
      * @param Member $member
      * @return SummitGroupEvent[]
      */
-    public function getGroupEventsFor(Member $member){
-        $builder =  $this->createQueryBuilder()
+    public function getGroupEventsFor(Member $member)
+    {
+        $builder = $this->createQueryBuilder()
             ->select('distinct eg')
-            ->from('models\summit\SummitGroupEvent','eg')
-            ->join('eg.groups','g')
-            ->join('eg.summit','s')
+            ->from('models\summit\SummitGroupEvent', 'eg')
+            ->join('eg.groups', 'g')
+            ->join('eg.summit', 's')
             ->where("s.id = :summit_id and eg.published = 1")
             ->setParameter('summit_id', $this->getId());
 
-        if(!$member->isAdmin()){
+        if (!$member->isAdmin()) {
             $groups_ids = $member->getGroupsIds();
-            if(count($groups_ids) == 0 ) return [];
+            if (count($groups_ids) == 0) return [];
             $groups_ids = implode(",", $groups_ids);
             $builder->andWhere("g.id in ({$groups_ids})");
         }
@@ -1228,20 +1269,22 @@ SQL;
     /**
      * @return string
      */
-    public function getSlug(){
-        $res  = "openstack-".$this->name.'-';
-        $res .= $this->begin_date->format('Y').'-summit';
-        $res  = strtolower(  preg_replace('/[^a-zA-Z0-9\-]/', '',$res));
+    public function getSlug()
+    {
+        $res = "openstack-" . $this->name . '-';
+        $res .= $this->begin_date->format('Y') . '-summit';
+        $res = strtolower(preg_replace('/[^a-zA-Z0-9\-]/', '', $res));
         return $res;
     }
 
     /**
      * @return int
      */
-    public function getPresentationVotesCount(){
+    public function getPresentationVotesCount()
+    {
 
 
-        try{
+        try {
             $sql = <<<SQL
             SELECT COUNT(DISTINCT(Vote.ID)) AS vote_count
             FROM PresentationVote AS Vote
@@ -1252,8 +1295,7 @@ SQL;
             $stmt->execute(['summit_id' => $this->id]);
             $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return count($res) > 0 ? $res[0] : 0;
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
         return 0;
@@ -1262,8 +1304,9 @@ SQL;
     /**
      * @return int
      */
-    public function getPresentationVotersCount(){
-        try{
+    public function getPresentationVotersCount()
+    {
+        try {
             $sql = <<<SQL
                 SELECT COUNT(DISTINCT(Vote.MemberID)) AS voter_count
             FROM PresentationVote AS Vote
@@ -1274,8 +1317,7 @@ SQL;
             $stmt->execute(['summit_id' => $this->id]);
             $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return count($res) > 0 ? $res[0] : 0;
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
         return 0;
@@ -1349,23 +1391,26 @@ SQL;
     /**
      * @return int
      */
-    public function getAttendeesCount(){
+    public function getAttendeesCount()
+    {
         return $this->attendees->count();
     }
 
     /**
      * @return int
      */
-    public function getSpeakersCount(){
+    public function getSpeakersCount()
+    {
         return count($this->getSpeakers());
     }
 
     /**
      * @return int
      */
-    public function getPresentationsSubmittedCount(){
+    public function getPresentationsSubmittedCount()
+    {
 
-        try{
+        try {
             $sql = <<<SQL
             SELECT COUNT(DISTINCT(SummitEvent.ID))
             FROM SummitEvent
@@ -1376,8 +1421,7 @@ SQL;
             $stmt->execute(['summit_id' => $this->id, 'status' => Presentation::STATUS_RECEIVED]);
             $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return count($res) > 0 ? $res[0] : 0;
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
         return 0;
@@ -1386,8 +1430,9 @@ SQL;
     /**
      * @return int
      */
-    public function getPublishedEventsCount(){
-        try{
+    public function getPublishedEventsCount()
+    {
+        try {
             $sql = <<<SQL
             SELECT COUNT(DISTINCT(SummitEvent.ID))
             FROM SummitEvent
@@ -1397,8 +1442,7 @@ SQL;
             $stmt->execute(['summit_id' => $this->id]);
             $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return count($res) > 0 ? $res[0] : 0;
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
         return 0;
@@ -1410,8 +1454,9 @@ SQL;
      * @param strign $type
      * @return int
      */
-    public function getSpeakerAnnouncementEmailCount($type){
-        try{
+    public function getSpeakerAnnouncementEmailCount($type)
+    {
+        try {
             $sql = <<<SQL
             SELECT COUNT(DISTINCT(SpeakerAnnouncementSummitEmail.ID))
             FROM SpeakerAnnouncementSummitEmail
@@ -1421,8 +1466,7 @@ SQL;
             $stmt->execute(['summit_id' => $this->id, 'type' => $type]);
             $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
             return count($res) > 0 ? $res[0] : 0;
-        }
-        catch (\Exception $ex){
+        } catch (\Exception $ex) {
 
         }
         return 0;
@@ -1431,49 +1475,56 @@ SQL;
     /**
      * @return int
      */
-    public function getSpeakerAnnouncementEmailAcceptedCount(){
+    public function getSpeakerAnnouncementEmailAcceptedCount()
+    {
         return $this->getSpeakerAnnouncementEmailCount('ACCEPTED');
     }
 
     /**
      * @return int
      */
-    public function getSpeakerAnnouncementEmailRejectedCount(){
+    public function getSpeakerAnnouncementEmailRejectedCount()
+    {
         return $this->getSpeakerAnnouncementEmailCount('REJECTED');
     }
 
     /**
      * @return int
      */
-    public function getSpeakerAnnouncementEmailAlternateCount(){
+    public function getSpeakerAnnouncementEmailAlternateCount()
+    {
         return $this->getSpeakerAnnouncementEmailCount('ALTERNATE');
     }
 
     /**
      * @return int
      */
-    public function getSpeakerAnnouncementEmailAcceptedAlternateCount(){
+    public function getSpeakerAnnouncementEmailAcceptedAlternateCount()
+    {
         return $this->getSpeakerAnnouncementEmailCount('ACCEPTED_ALTERNATE');
     }
 
     /**
      * @return int
      */
-    public function getSpeakerAnnouncementEmailAcceptedRejectedCount(){
+    public function getSpeakerAnnouncementEmailAcceptedRejectedCount()
+    {
         return $this->getSpeakerAnnouncementEmailCount('ACCEPTED_REJECTED');
     }
 
     /**
      * @return int
      */
-    public function getSpeakerAnnouncementEmailAlternateRejectedCount(){
+    public function getSpeakerAnnouncementEmailAlternateRejectedCount()
+    {
         return $this->getSpeakerAnnouncementEmailCount('ALTERNATE_REJECTED');
     }
 
     /**
      * @param SummitRegistrationPromoCode $promo_code
      */
-    public function addPromoCode(SummitRegistrationPromoCode $promo_code){
+    public function addPromoCode(SummitRegistrationPromoCode $promo_code)
+    {
         $this->promo_codes->add($promo_code);
         $promo_code->setSummit($this);
     }
@@ -1482,7 +1533,8 @@ SQL;
      * @param string $code
      * @return SummitRegistrationPromoCode|null
      */
-    public function getPromoCodeByCode($code){
+    public function getPromoCodeByCode($code)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('code', trim($code)));
         $promo_code = $this->promo_codes->matching($criteria)->first();
@@ -1493,7 +1545,8 @@ SQL;
      * @param int $promo_code_id
      * @return SummitRegistrationPromoCode|null
      */
-    public function getPromoCodeById($promo_code_id){
+    public function getPromoCodeById($promo_code_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', $promo_code_id));
         $promo_code = $this->promo_codes->matching($criteria)->first();
@@ -1504,17 +1557,19 @@ SQL;
      * @param SummitRegistrationPromoCode $promo_code
      * @return $this
      */
-    public function removePromoCode(SummitRegistrationPromoCode $promo_code){
-       $this->promo_codes->removeElement($promo_code);
-       $promo_code->setSummit(null);
-       return $this;
+    public function removePromoCode(SummitRegistrationPromoCode $promo_code)
+    {
+        $this->promo_codes->removeElement($promo_code);
+        $promo_code->setSummit(null);
+        return $this;
     }
 
     /**
      * @param SummitEventType $event_type
      * @return $this
      */
-    public function removeEventType(SummitEventType $event_type){
+    public function removeEventType(SummitEventType $event_type)
+    {
         $this->event_types->removeElement($event_type);
         $event_type->setSummit(null);
         return $this;
@@ -1564,7 +1619,8 @@ SQL;
      * @param SummitEventType $event_type
      * @return $this
      */
-    public function addEventType(SummitEventType $event_type){
+    public function addEventType(SummitEventType $event_type)
+    {
         $this->event_types->add($event_type);
         $event_type->setSummit($this);
         return $this;
