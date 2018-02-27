@@ -1,0 +1,94 @@
+<?php namespace App\Models\Foundation\Summit\Events\RSVP;
+/**
+ * Copyright 2018 OpenStack Foundation
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
+use models\main\Member;
+use models\summit\SummitOwned;
+use models\utils\SilverstripeBaseModel;
+use Doctrine\ORM\Mapping AS ORM;
+/**
+ * @ORM\Table(name="RSVPTemplate")
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineRSVPTemplateRepository")
+ * Class RSVPTemplate
+ * @package App\Models\Foundation\Summit\Events\RSVP
+ */
+class RSVPTemplate extends SilverstripeBaseModel
+{
+    use SummitOwned;
+
+    /**
+     * @ORM\Column(name="Title", type="string")
+     * @var string
+     */
+    private $title;
+
+    /**
+     * @ORM\Column(name="Enabled", type="boolean")
+     * @var bool
+     */
+    private $is_enabled;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\Member", fetch="LAZY")
+     * @ORM\JoinColumn(name="CreatedByID", referencedColumnName="ID")
+     * @var Member
+     */
+    private $created_by;
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled()
+    {
+        return $this->is_enabled;
+    }
+
+    /**
+     * @param bool $is_enabled
+     */
+    public function setIsEnabled($is_enabled)
+    {
+        $this->is_enabled = $is_enabled;
+    }
+
+    /**
+     * @return Member
+     */
+    public function getCreatedBy()
+    {
+        return $this->created_by;
+    }
+
+    /**
+     * @param Member $created_by
+     */
+    public function setCreatedBy(Member $created_by)
+    {
+        $this->created_by = $created_by;
+    }
+}

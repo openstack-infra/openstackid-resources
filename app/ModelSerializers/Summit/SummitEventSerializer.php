@@ -13,7 +13,6 @@
  **/
 use libs\utils\JsonUtils;
 use models\summit\SummitEvent;
-
 /**
  * Class SummitEventSerializer
  * @package ModelSerializers
@@ -36,12 +35,13 @@ class SummitEventSerializer extends SilverStripeSerializer
         'Published'        => 'is_published:json_boolean',
         'HeadCount'        => 'head_count:json_int',
         'RSVPLink'         => 'rsvp_link:json_string',
-        'IsExternalRSVP'   => 'rsvp_external:json_boolean',
+        'RSVPTemplateId'   => 'rsvp_template_id:json_int',
+        'ExternalRSVP'     => 'rsvp_external:json_boolean',
         'CategoryId'       => 'track_id:json_int',
     );
 
-    protected static $allowed_fields = array
-    (
+    protected static $allowed_fields = [
+
         'id',
         'title',
         'description',
@@ -59,7 +59,8 @@ class SummitEventSerializer extends SilverStripeSerializer
         'rsvp_link',
         'rsvp_external',
         'track_id',
-    );
+        'rsvp_template_id',
+    ];
 
     protected static $allowed_relations = array
     (
