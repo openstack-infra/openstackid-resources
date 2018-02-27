@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitAirport")
@@ -26,8 +24,10 @@ class SummitAirport extends SummitExternalLocation
      * @return string
      */
     public function getClassName(){
-        return 'SummitAirport';
+        return self::ClassName;
     }
+
+    const ClassName = 'SummitAirport';
 
     /**
      * @return string
@@ -49,4 +49,16 @@ class SummitAirport extends SummitExternalLocation
      * @ORM\Column(name="Type", type="string")
      */
     private $airport_type;
+
+    public static $metadata = [
+        'class_name'   => self::ClassName,
+        'airport_type' => 'string',
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(SummitExternalLocation::getMetadata(), self::$metadata);
+    }
 }

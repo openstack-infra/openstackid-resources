@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitExternalLocation")
@@ -26,11 +24,13 @@ class SummitExternalLocation extends SummitGeoLocatedLocation
     const Lounge = 'Lounge';
     const Other  = 'Other';
 
+    const ClassName = 'SummitExternalLocation';
+
     /**
      * @return string
      */
     public function getClassName(){
-        return 'SummitExternalLocation';
+        return self::ClassName;
     }
 
     /**
@@ -53,5 +53,17 @@ class SummitExternalLocation extends SummitGeoLocatedLocation
      * @ORM\Column(name="Capacity", type="integer")
      */
     protected $capacity;
+
+    public static $metadata = [
+        'class_name'   => self::ClassName,
+        'capacity'     => 'integer',
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(SummitGeoLocatedLocation::getMetadata(), self::$metadata);
+    }
 
 }

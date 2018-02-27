@@ -11,11 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitVenue")
@@ -24,13 +22,14 @@ use Doctrine\Common\Collections\ArrayCollection;
  */
 class SummitVenue extends SummitGeoLocatedLocation
 {
-
     /**
      * @return string
      */
     public function getClassName(){
-        return 'SummitVenue';
+        return self::ClassName;
     }
+
+    const ClassName = 'SummitVenue';
 
     public function __construct()
     {
@@ -107,6 +106,21 @@ class SummitVenue extends SummitGeoLocatedLocation
         $criteria->where(Criteria::expr()->eq('id', intval($floor_id)));
         $floor = $this->floors->matching($criteria)->first();
         return $floor === false ? null:$floor;
+    }
+
+
+    public static $metadata = [
+        'class_name' => self::ClassName,
+        'is_main'    => 'boolean',
+        'floors'     => 'array',
+        'rooms'      => 'array',
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(SummitGeoLocatedLocation::getMetadata(), self::$metadata);
     }
 
 }

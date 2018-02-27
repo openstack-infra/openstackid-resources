@@ -27,7 +27,7 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitLocationRepository")
  * @ORM\Table(name="SummitAbstractLocation")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
@@ -40,6 +40,40 @@ class SummitAbstractLocation extends SilverstripeBaseModel
     const TypeExternal = 'External';
     const TypeInternal = 'Internal';
     const TypeNone     = 'None';
+
+    /**
+     * @ORM\Column(name="Name", type="string")
+     */
+    protected $name;
+
+    /**
+     * @ORM\Column(name="Description", type="string")
+     */
+    protected $description;
+
+    /**
+     * @ORM\Column(name="LocationType", type="string")
+     */
+    protected $type;
+
+    /**
+     * @ORM\Column(name="Order", type="integer")
+     */
+    protected $order;
+
+    public static $metadata = [
+        'name'         => 'string',
+        'description'  => 'string',
+        'type'         => 'string',
+        'order'        => 'integer',
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return self::$metadata;
+    }
 
     public function __construct()
     {
@@ -119,28 +153,6 @@ class SummitAbstractLocation extends SilverstripeBaseModel
     }
 
     use SummitOwned;
-
-
-    /**
-     * @ORM\Column(name="Name", type="string")
-     */
-    protected $name;
-
-    /**
-     * @ORM\Column(name="Description", type="string")
-     */
-    protected $description;
-
-
-    /**
-     * @ORM\Column(name="LocationType", type="string")
-     */
-    protected $type;
-
-    /**
-     * @ORM\Column(name="Order", type="integer")
-     */
-    protected $order;
 
     /**
      * @return boolean

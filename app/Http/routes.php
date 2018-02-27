@@ -286,6 +286,8 @@ Route::group([
                 Route::get('/external-locations', 'OAuth2SummitLocationsApiController@getExternalLocations');
                 Route::get('/hotels', 'OAuth2SummitLocationsApiController@getHotels');
                 Route::get('/airports', 'OAuth2SummitLocationsApiController@getAirports');
+                Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@getMetadata']);
+
                 Route::group(array('prefix' => '{location_id}'), function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents')->where('location_id', 'tbd|[0-9]+');

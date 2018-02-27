@@ -17,6 +17,7 @@ use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
+use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
@@ -33,6 +34,7 @@ use models\summit\PresentationCategory;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
+use models\summit\SummitAbstractLocation;
 use models\summit\SummitEventType;
 use models\summit\SummitRegistrationPromoCode;
 use models\summit\SummitTicketType;
@@ -297,6 +299,13 @@ final class RepositoriesProvider extends ServiceProvider
             IRSVPTemplateRepository::class,
             function(){
                 return  EntityManager::getRepository(RSVPTemplate::class);
+            }
+        );
+
+        App::singleton(
+            ISummitLocationRepository::class,
+            function(){
+                return  EntityManager::getRepository(SummitAbstractLocation::class);
             }
         );
     }

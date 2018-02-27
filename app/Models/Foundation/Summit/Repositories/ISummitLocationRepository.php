@@ -1,4 +1,4 @@
-<?php namespace models\summit;
+<?php namespace App\Models\Foundation\Summit\Repositories;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\Summit;
 use models\utils\IBaseRepository;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
- * Interface ISummitRegistrationPromoCodeRepository
- * @package models\summit
+ * Interface ISummitLocationRepository
+ * @package App\Models\Foundation\Summit\Repositories
  */
-interface ISummitRegistrationPromoCodeRepository extends IBaseRepository
+interface ISummitLocationRepository extends IBaseRepository
 {
     /**
      * @param Summit $summit

@@ -464,7 +464,7 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
             ),
             // locations
-             array(
+             [
                  'name' => 'get-locations',
                  'route' => '/api/v1/summits/{id}/locations',
                  'http_method' => 'GET',
@@ -472,8 +472,17 @@ class ApiEndpointsSeeder extends Seeder
                      sprintf(SummitScopes::ReadSummitData, $current_realm),
                      sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                  ],
-             ),
-            array(
+             ],
+            [
+                'name' => 'get-locations-metadata',
+                'route' => '/api/v1/summits/{id}/locations/metadata',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-venues',
                 'route' => '/api/v1/summits/{id}/locations/venues',
                 'http_method' => 'GET',
@@ -481,8 +490,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-external-locations',
                 'route' => '/api/v1/summits/{id}/locations/external-locations',
                 'http_method' => 'GET',
@@ -490,8 +499,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-hotels',
                 'route' => '/api/v1/summits/{id}/locations/hotels',
                 'http_method' => 'GET',
@@ -499,8 +508,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-airports',
                 'route' => '/api/v1/summits/{id}/locations/airports',
                 'http_method' => 'GET',
@@ -508,8 +517,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-location',
                 'route' => '/api/v1/summits/{id}/locations/{location_id}',
                 'http_method' => 'GET',
@@ -517,8 +526,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-location-events',
                 'route' => '/api/v1/summits/{id}/locations/{location_id}/events',
                 'http_method' => 'GET',
@@ -526,8 +535,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-location-published-events',
                 'route' => '/api/v1/summits/{id}/locations/{location_id}/events/published',
                 'http_method' => 'GET',
@@ -535,7 +544,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+            ],
             // event types
             [
                 'name' => 'get-event-types',

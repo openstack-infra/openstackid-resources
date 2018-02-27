@@ -26,8 +26,10 @@ class SummitHotel extends SummitExternalLocation
      * @return string
      */
     public function getClassName(){
-        return 'SummitHotel';
+        return self::ClassName;
     }
+
+    const ClassName = 'SummitHotel';
 
     /**
      * @return string
@@ -90,5 +92,19 @@ class SummitHotel extends SummitExternalLocation
      * @ORM\Column(name="Type", type="string")
      */
     private $hotel_type;
+
+    public static $metadata = [
+        'class_name'    => self::ClassName,
+        'hotel_type'    => 'string',
+        'sold_out'      => 'boolean',
+        'booking_link'  => 'string',
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(SummitExternalLocation::getMetadata(), self::$metadata);
+    }
 
 }

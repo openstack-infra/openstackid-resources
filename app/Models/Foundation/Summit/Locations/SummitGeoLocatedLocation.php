@@ -98,6 +98,28 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
      */
     protected $images;
 
+    public static $metadata = [
+        'address1'         => 'string',
+        'address2'         => 'string',
+        'zip_code'         => 'string',
+        'city'             => 'string',
+        'state'            => 'string',
+        'country'          => 'string',
+        'website_url'      => 'string',
+        'lng'              => 'string',
+        'lat'              => 'string',
+        'display_on_site'  => 'boolean',
+        'details_page'     => 'boolean',
+        'location_message' => 'string',
+        'images'           => 'array',
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(SummitAbstractLocation::getMetadata(), self::$metadata);
+    }
 
     /**
      * @param SummitVenueRoom|null $room
