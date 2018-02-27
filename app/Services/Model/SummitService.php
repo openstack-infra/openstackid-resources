@@ -673,8 +673,25 @@ final class SummitService implements ISummitService
             if (isset($data['description']))
                 $event->setAbstract(html_entity_decode(trim($data['description'])));
 
+            if(isset($data['rsvp_link']) && isset($data['rsvp_template_id'])){
+                throw new ValidationException("rsvp_link and rsvp_template_id are both set, you need to especify only one");
+            }
+
             if (isset($data['rsvp_link']))
                 $event->setRsvpLink(html_entity_decode(trim($data['rsvp_link'])));
+
+            if (isset($data['rsvp_template_id'])) {
+
+                $rsvp_template = $summit->getRSVPTemplateById(intval($data['rsvp_template_id']));
+
+                if(is_null($rsvp_template))
+                    throw new EntityNotFoundException(sprintf('rsvp template id %s does not belongs to summit id %s', $data['rsvp_template_id'], $summit->getId()));
+
+                if(!$rsvp_template->isEnabled())
+                    throw new ValidationException(sprintf('rsvp template id %s is not enabled', $data['rsvp_template_id']));
+
+                $event->setRSVPTemplate($rsvp_template);
+            }
 
             if (isset($data['head_count']))
                 $event->setHeadCount(intval($data['head_count']));

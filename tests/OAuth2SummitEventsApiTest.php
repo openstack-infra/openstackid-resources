@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 
-class OAuth2SummitEventsApiTest extends ProtectedApiTest
+final class OAuth2SummitEventsApiTest extends ProtectedApiTest
 {
     public function testPostEvent($summit_id = 23, $location_id = 0, $type_id = 0, $track_id = 0, $start_date = 1477645200, $end_date = 1477647600)
     {
@@ -65,6 +65,114 @@ class OAuth2SummitEventsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
         $event = json_decode($content);
         $this->assertTrue($event->id > 0);
+        return $event;
+    }
+
+    public function testPostEventRSVPTemplateUnExistent($summit_id = 23, $location_id = 0, $type_id = 124, $track_id = 208, $start_date = 1477645200, $end_date = 1477647600)
+    {
+        $params = array
+        (
+            'id' => $summit_id,
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $data = array
+        (
+            'title'            => 'Neutron: tbd',
+            'description'      => 'TBD',
+            'allow_feedback'   => true,
+            'type_id'          => $type_id,
+            'tags'             => ['Neutron'],
+            'track_id'         => $track_id,
+            'rsvp_template_id' => 1,
+        );
+
+        if($start_date > 0){
+            $data['start_date'] = $start_date;
+        }
+
+        if($end_date > 0){
+            $data['end_date'] = $end_date;
+        }
+
+        if($location_id > 0){
+            $data['location_id'] = $location_id;
+        }
+
+        $response = $this->action
+        (
+            "POST",
+            "OAuth2SummitEventsApiController@addEvent",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+    }
+
+    public function testPostEventRSVPTemplate($summit_id = 23, $location_id = 0, $type_id = 124, $track_id = 208, $start_date = 0, $end_date = 0)
+    {
+        $params = array
+        (
+            'id' => $summit_id,
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $data = array
+        (
+            'title'            => 'Neutron: tbd',
+            'description'      => 'TBD',
+            'allow_feedback'   => true,
+            'type_id'          => $type_id,
+            'tags'             => ['Neutron'],
+            'track_id'         => $track_id,
+            'rsvp_template_id' => 12,
+        );
+
+        if($start_date > 0){
+            $data['start_date'] = $start_date;
+        }
+
+        if($end_date > 0){
+            $data['end_date'] = $end_date;
+        }
+
+        if($location_id > 0){
+            $data['location_id'] = $location_id;
+        }
+
+        $response = $this->action
+        (
+            "POST",
+            "OAuth2SummitEventsApiController@addEvent",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $event = json_decode($content);
+        $this->assertTrue($event->id > 0);
+        $this->assertTrue(!$event->rsvp_external);
         return $event;
     }
 

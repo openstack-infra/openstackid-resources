@@ -1,5 +1,4 @@
 <?php namespace models\summit;
-
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,12 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\main\Member;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="RSVP")
@@ -46,7 +43,6 @@ class RSVP extends SilverstripeBaseModel
      * @var SummitEvent
      */
     private $event;
-
 
     /**
      * @ORM\Column(name="SeatType", type="string")

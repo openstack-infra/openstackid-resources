@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -22,7 +23,7 @@ use models\main\File;
 use models\main\Member;
 use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
-
+use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitRepository")
  * @ORM\Table(name="Summit")
@@ -155,6 +156,11 @@ class Summit extends SilverstripeBaseModel
      * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
      */
     private $events;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     */
+    private $rsvp_templates;
 
     /**
      * @ORM\OneToMany(targetEntity="SummitWIFIConnection", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
@@ -515,6 +521,7 @@ class Summit extends SilverstripeBaseModel
         $this->excluded_categories_for_rejected_presentations = new ArrayCollection;
         $this->excluded_categories_for_upload_slide_decks = new ArrayCollection;
         $this->category_default_tags = new ArrayCollection;
+        $this->rsvp_templates = new ArrayCollection;
     }
 
     /**
@@ -1624,5 +1631,16 @@ SQL;
         $this->event_types->add($event_type);
         $event_type->setSummit($this);
         return $this;
+    }
+
+    /**
+     * @param int $rsvp_template_id
+     * @return RSVPTemplate|null
+     */
+    public function getRSVPTemplateById($rsvp_template_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($rsvp_template_id)));
+        $rsvp_template = $this->rsvp_templates->matching($criteria)->first();
+        return $rsvp_template === false ? null : $rsvp_template;
     }
 }

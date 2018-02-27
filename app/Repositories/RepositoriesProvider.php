@@ -12,8 +12,10 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
+use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
 use Illuminate\Support\Facades\App;
@@ -288,6 +290,13 @@ final class RepositoriesProvider extends ServiceProvider
             ISummitTrackRepository::class,
             function(){
                 return  EntityManager::getRepository(PresentationCategory::class);
+            }
+        );
+
+        App::singleton(
+            IRSVPTemplateRepository::class,
+            function(){
+                return  EntityManager::getRepository(RSVPTemplate::class);
             }
         );
     }

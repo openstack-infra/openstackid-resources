@@ -330,8 +330,8 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             if(!Request::isJson()) return $this->error403();
             $data = Input::json();
 
-            $rules = array
-            (
+            $rules = [
+
                 'title'              => 'required|string|max:100',
                 'description'        => 'required|string',
                 'type_id'            => 'required|integer',
@@ -340,6 +340,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'end_date'           => 'sometimes|required_with:start_date|date_format:U|after:start_date',
                 'track_id'           => 'required|integer',
                 'rsvp_link'          => 'sometimes|url',
+                'rsvp_template_id'   => 'sometimes|integer',
                 'head_count'         => 'sometimes|integer',
                 'social_description' => 'sometimes|string|max:100',
                 'allow_feedback'     => 'sometimes|boolean',
@@ -353,7 +354,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'moderator_speaker_id'      =>  'sometimes|integer',
                 // group event
                 'groups'                    =>  'sometimes|int_array',
-            );
+            ];
 
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($data->all(), $rules);
@@ -412,6 +413,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'title'                     => 'sometimes|string|max:100',
                 'description'               => 'sometimes|string',
                 'rsvp_link'                 => 'sometimes|url',
+                'rsvp_template_id'          => 'sometimes|integer',
                 'head_count'                => 'sometimes|integer',
                 'social_description'        => 'sometimes|string|max:100',
                 'location_id'               => 'sometimes|integer',

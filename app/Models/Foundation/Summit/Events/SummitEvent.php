@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use Doctrine\ORM\Mapping AS ORM;
 use App\Events\SummitEventCreated;
 use App\Events\SummitEventDeleted;
@@ -106,10 +107,11 @@ class SummitEvent extends SilverstripeBaseModel
     protected $head_count;
 
     /**
-     * @ORM\Column(name="RSVPTemplateID", type="integer")
-     * @var int
+     * @ORM\ManyToOne(targetEntity="App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate", fetch="EXTRA_LAZY")
+     * @ORM\JoinColumn(name="RSVPTemplateID", referencedColumnName="ID")
+     * @var RSVPTemplate
      */
-    protected $rsvp_template_id;
+    protected $rsvp_template;
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\RSVP", mappedBy="event", cascade={"persist"})
@@ -318,9 +320,9 @@ class SummitEvent extends SilverstripeBaseModel
     /**
      * @return string
      */
-    public function getRsvpLink()
+    public function getRSVPLink()
     {
-        if($this->rsvp_template_id > 0){
+        if($this->hasRSVPTemplate()){
 
             $summit         = $this->getSummit();
             $main_page      = $summit->getMainPage();
@@ -341,22 +343,51 @@ class SummitEvent extends SilverstripeBaseModel
     /**
      * @return bool
      */
+    public function hasRSVPTemplate(){
+        return $this->getRSVPTemplateId() > 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRSVPTemplateId(){
+        try{
+            return !is_null($this->rsvp_template) ? $this->rsvp_template->getId() : 0;
+        }
+        catch (\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return RSVPTemplate
+     */
+    public function getRSVPTemplate()
+    {
+        return $this->rsvp_template;
+    }
+
+    /**
+     * @param RSVPTemplate $rsvp_template
+     */
+    public function setRSVPTemplate(RSVPTemplate $rsvp_template)
+    {
+        $this->rsvp_template = $rsvp_template;
+        $this->rsvp_link     = '';
+    }
+
+    /**
+     * @return bool
+     */
     public function hasRSVP(){
-        return !empty($this->rsvp_link) || $this->rsvp_template_id > 0;
+        return !empty($this->rsvp_link) || $this->hasRSVPTemplate();
     }
 
     /**
      * @return bool
      */
     public function isExternalRSVP(){
-        return !empty($this->rsvp_link) && $this->rsvp_template_id == 0;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getIsExternalRSVP(){
-        return $this->isExternalRSVP();
+        return !empty($this->rsvp_link) && !$this->hasRSVPTemplate();
     }
 
     public function getSlug(){
@@ -367,9 +398,10 @@ class SummitEvent extends SilverstripeBaseModel
     /**
      * @param string $rsvp_link
      */
-    public function setRsvpLink($rsvp_link)
+    public function setRSVPLink($rsvp_link)
     {
-        $this->rsvp_link = $rsvp_link;
+        $this->rsvp_link     = $rsvp_link;
+        $this->rsvp_template = null;
     }
 
     /**
