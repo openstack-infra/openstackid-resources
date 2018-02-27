@@ -36,9 +36,7 @@ use App\ModelSerializers\Marketplace\SpokenLanguageSerializer;
 use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
-use App\ModelSerializers\Summit\Presentation\PresentationCategoryAllowedTagSerializer;
 use Libs\ModelSerializers\IModelSerializer;
-use models\summit\SummitRegistrationPromoCode;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
 use ModelSerializers\ChatTeams\ChatTeamPushNotificationMessageSerializer;
@@ -51,7 +49,6 @@ use ModelSerializers\Locations\SummitVenueFloorSerializer;
 use ModelSerializers\Locations\SummitVenueRoomSerializer;
 use ModelSerializers\Locations\SummitVenueSerializer;
 use App\ModelSerializers\Marketplace\ApplianceSerializer;
-use ModelSerializers\SummitScheduleEmptySpotSerializer;
 /**
  * Class SerializerRegistry
  * @package ModelSerializers
@@ -90,7 +87,6 @@ final class SerializerRegistry
         $this->registry['PresentationType']           = PresentationTypeSerializer::class;
         $this->registry['SummitTicketType']           = SummitTicketTypeSerializer::class;
         $this->registry['PresentationCategory']       = PresentationCategorySerializer::class;
-        $this->registry['PresentationCategoryAllowedTag'] = PresentationCategoryAllowedTagSerializer::class;
         $this->registry['PresentationCategoryGroup']  = PresentationCategoryGroupSerializer::class;
         $this->registry['PrivatePresentationCategoryGroup'] = PrivatePresentationCategoryGroupSerializer::class;
         $this->registry['Tag']                        = TagSerializer::class;

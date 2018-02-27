@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\Summit\Events\Presentations\PresentationCategoryAllowedTag;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
@@ -143,11 +142,13 @@ class PresentationCategory extends SilverstripeBaseModel
     private $groups;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\Events\Presentations\PresentationCategoryAllowedTag", mappedBy="track", cascade={"persist"}, orphanRemoval=true)
-     * @var PresentationCategoryAllowedTag[]
+     * @ORM\ManyToMany(targetEntity="models\main\Tag", cascade={"persist"})
+     * @ORM\JoinTable(name="PresentationCategory_AllowedTags",
+     *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="TagID", referencedColumnName="ID")}
+     *      )
      */
     protected $allowed_tags;
-
 
     public function __construct()
     {
@@ -179,7 +180,7 @@ class PresentationCategory extends SilverstripeBaseModel
     }
 
     /**
-     * @return PresentationCategoryAllowedTag[]
+     * @return Tag[]
      */
     public function getAllowedTags(){
         return $this->allowed_tags;
@@ -296,24 +297,21 @@ class PresentationCategory extends SilverstripeBaseModel
      */
     public function getRelatedPublishedSummitEvents(){
         $query = <<<SQL
-SELECT SummitEvent.* 
-FROM SummitEvent 
+SELECT e  
+FROM  models\summit\SummitEvent e
 WHERE 
-SummitEvent.Published = 1
-AND SummitEvent.SummitID = :summit_id
-AND SummitEvent.CategoryID = :track_id
+e.published = 1
+AND e.summit = :summit
+AND e.category = :track
 SQL;
 
-        $rsm = new ResultSetMappingBuilder($this->getEM());
-        $rsm->addRootEntityFromClassMetadata(\models\summit\SummitEvent::class, 'e');
+        $native_query = $this->getEM()->createQuery($query);
 
-        // build rsm here
-        $native_query = $this->getEM()->createNativeQuery($query, $rsm);
+        $native_query->setParameter("summit", $this->summit);
+        $native_query->setParameter("track", $this);
 
-        $native_query->setParameter("summit_id", $this->summit->getId());
-        $native_query->setParameter("track_id", $this->id);
+        $res =  $native_query->getResult();
 
-        return $native_query->getResult();
-
+        return $res;
     }
 }

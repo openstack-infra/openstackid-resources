@@ -47,6 +47,6 @@ interface ISummitTrackService
      * @throws EntityNotFoundException
      * @throws ValidationException
      */
-    public function deleteEventType(Summit $summit, $track_id);
+    public function deleteTrack(Summit $summit, $track_id);
 
 }

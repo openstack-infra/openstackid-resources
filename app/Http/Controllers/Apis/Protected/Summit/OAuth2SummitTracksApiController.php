@@ -393,4 +393,33 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @param $track_id
+     * @return mixed
+     */
+    public function deleteTrackBySummit($summit_id, $track_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->track_service->deleteTrack($summit, $track_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

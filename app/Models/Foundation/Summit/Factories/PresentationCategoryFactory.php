@@ -40,7 +40,7 @@ final class PresentationCategoryFactory
         if(isset($data['title']))
             $track->setTitle(trim($data['title']));
 
-        if(isset($data['code']))
+        if(isset($data['code']) && !empty($data['code']))
             $track->setCode(trim($data['code']));
 
         if(isset($data['description']))

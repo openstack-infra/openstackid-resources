@@ -629,7 +629,7 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'add-tracks',
+                'name' => 'add-track',
                 'route' => '/api/v1/summits/{id}/tracks',
                 'http_method' => 'POST',
                 'scopes' => [
@@ -638,9 +638,18 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'update-tracks',
+                'name' => 'update-track',
                 'route' => '/api/v1/summits/{id}/tracks/{track_id}',
                 'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTracksData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-track',
+                'route' => '/api/v1/summits/{id}/tracks/{track_id}',
+                'http_method' => 'DELETE',
                 'scopes' => [
                     sprintf(SummitScopes::WriteTracksData, $current_realm),
                     sprintf(SummitScopes::WriteSummitData, $current_realm)

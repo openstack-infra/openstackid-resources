@@ -60,9 +60,11 @@ final class SummitTrackService implements ISummitTrackService
     {
         return $this->tx_service->transaction(function () use ($summit, $data) {
 
-            $former_track = $summit->getPresentationCategoryByCode($data['code']);
-            if (!is_null($former_track))
-                throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
+            if (!empty($data['code'])) {
+                $former_track = $summit->getPresentationCategoryByCode(trim($data['code']));
+                if (!is_null($former_track))
+                    throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
+            }
 
             $former_track = $summit->getPresentationCategoryByTitle($data['title']);
             if (!is_null($former_track))
@@ -95,7 +97,7 @@ final class SummitTrackService implements ISummitTrackService
                     sprintf("track id %s does not belong to summit id %s", $track_id, $summit->getId())
                 );
 
-            if (isset($data['code'])) {
+            if (isset($data['code']) && !empty($data['code'])) {
                 $former_track = $summit->getPresentationCategoryByCode($data['code']);
                 if (!is_null($former_track) && $former_track->getId() != $track_id)
                     throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
@@ -121,8 +123,28 @@ final class SummitTrackService implements ISummitTrackService
      * @throws EntityNotFoundException
      * @throws ValidationException
      */
-    public function deleteEventType(Summit $summit, $track_id)
+    public function deleteTrack(Summit $summit, $track_id)
     {
-        // TODO: Implement deleteEventType() method.
+        return $this->tx_service->transaction(function () use ($summit, $track_id) {
+
+            $track = $summit->getPresentationCategory($track_id);
+
+            if (is_null($track))
+                throw new EntityNotFoundException
+                (
+                    sprintf("track id %s does not belong to summit id %s", $track_id, $summit->getId())
+                );
+
+            $summit_events = $track->getRelatedPublishedSummitEvents();
+
+            if(count($summit_events) > 0){
+                throw new ValidationException
+                (
+                    sprintf("track id %s could not be deleted bc its assigned to published events on summit id %s", $track_id, $summit->getId())
+                );
+            }
+
+            $this->repository->delete($track);
+        });
     }
 }

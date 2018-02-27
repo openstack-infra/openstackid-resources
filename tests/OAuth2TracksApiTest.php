@@ -29,7 +29,7 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
             'per_page' => 10,
             'filter'   => 'title=@con',
             'order'    => '+code',
-            'expand'   => 'track_groups'
+            'expand'   => 'track_groups,allowed_tags'
         ];
 
         $headers = [
@@ -134,7 +134,7 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         $data = [
             'title'       => $name,
             'description' => 'test desc',
-            'code'        => 'SM',
+            'code'        => '',
         ];
 
         $headers = [
@@ -202,5 +202,63 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         $this->assertTrue(!empty($track->description) && $track->description == 'test desc updated');
         $this->assertTrue(!empty($track->code) && $track->code == 'SMX');
         return $track;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testDeleteNewTrack($summit_id = 23){
+
+        $new_track = $this->testAddTrack($summit_id);
+
+        $params = [
+            'id'       => $summit_id,
+            'track_id' => $new_track->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitTracksApiController@deleteTrackBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
+
+    public function testDeleteOldTrack($summit_id = 23){
+
+        $params = [
+            'id'       => $summit_id,
+            'track_id' => 155
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitTracksApiController@deleteTrackBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
     }
 }

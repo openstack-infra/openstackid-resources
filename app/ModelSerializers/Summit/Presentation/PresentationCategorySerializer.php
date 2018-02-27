@@ -53,8 +53,8 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
         }
         $values['track_groups'] = $groups;
 
-        foreach($category->getAllowedTags() as $allowed_tag){
-            $allowed_tag[] = intval($allowed_tag->getTag()->getId());
+        foreach($category->getAllowedTags() as $tag){
+            $allowed_tag[] = $tag->getId();
         }
 
         $values['track_groups'] = $groups;
@@ -78,8 +78,8 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
                     case 'allowed_tags': {
                         $allowed_tag = [];
                         unset($values['allowed_tags']);
-                        foreach ($category->getAllowedTags() as $allowed_tag) {
-                            $allowed_tag[] = SerializerRegistry::getInstance()->getSerializer($allowed_tag)->serialize(null, [], ['none']);
+                        foreach ($category->getAllowedTags() as $tag) {
+                            $allowed_tag[] = SerializerRegistry::getInstance()->getSerializer($tag)->serialize(null, [], ['none']);
                         }
                         $values['allowed_tags'] = $allowed_tag;
                     }
