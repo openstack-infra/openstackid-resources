@@ -64,7 +64,7 @@ class SummitAbstractLocation extends SilverstripeBaseModel
     public static $metadata = [
         'name'         => 'string',
         'description'  => 'string',
-        'type'         => 'string',
+        'type'         => [ self::TypeExternal, self::TypeInternal],
         'order'        => 'integer',
     ];
 

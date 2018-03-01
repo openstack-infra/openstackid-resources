@@ -74,11 +74,11 @@ final class SummitLocationFactory
      * @return SummitGeoLocatedLocation
      */
     private static function populateSummitGeoLocatedLocation(SummitGeoLocatedLocation $location, array $data){
-        if(isset($data['address1']))
-            $location->setAddress1(trim($data['address1']));
+        if(isset($data['address_1']))
+            $location->setAddress1(trim($data['address_1']));
 
-        if(isset($data['address2']))
-            $location->setAddress2(trim($data['address2']));
+        if(isset($data['address_2']))
+            $location->setAddress2(trim($data['address_2']));
 
         if(isset($data['zip_code']))
             $location->setZipCode(trim($data['zip_code']));

@@ -29,8 +29,8 @@ final class SummitGeoLocatedLocationValidationRulesFactory
 
         if($update) {
              return array_merge([
-                'address1'         => 'sometimes|string',
-                'address2'         => 'sometimes|string',
+                'address_1'        => 'sometimes|string',
+                'address_2'        => 'sometimes|string',
                 'zip_code'         => 'sometimes|string',
                 'city'             => 'string|required_with:address1',
                 'state'            => 'string|required_with:address1',
@@ -45,8 +45,8 @@ final class SummitGeoLocatedLocationValidationRulesFactory
         }
 
         return array_merge([
-                'address1'         => 'string|required_without:lng,lat',
-                'address2'         => 'sometimes|string',
+                'address_1'        => 'string|required_without:lng,lat',
+                'address_2'        => 'sometimes|string',
                 'zip_code'         => 'sometimes|string',
                 'city'             => 'string|required_without:lng,lat',
                 'state'            => 'string|required_without:lng,lat',
