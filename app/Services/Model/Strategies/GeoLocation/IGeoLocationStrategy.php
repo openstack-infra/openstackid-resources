@@ -1,6 +1,6 @@
-<?php namespace factories;
+<?php namespace App\Services\Model\Strategies\GeoLocation;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,23 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\App;
-use models\summit\factories\IPresentationVideoFactory;
+use App\Services\Apis\IGeoCodingAPI;
+use models\summit\SummitGeoLocatedLocation;
 /**
- * Class FactoriesProvider
- * @package factories
+ * Interface IGeoLocationStrategy
+ * @package App\Services\Model\Strategies\GeoLocation
  */
-final class FactoriesProvider extends ServiceProvider
+interface IGeoLocationStrategy
 {
-    protected $defer = false;
-
-    public function boot()
-    {
-    }
-
-    public function register()
-    {
-        App::singleton(IPresentationVideoFactory::class, PresentationVideoFactory::class);
-    }
+    /**
+     * @param SummitGeoLocatedLocation $location
+     * @param IGeoCodingAPI $geo_coding_api
+     * @return SummitGeoLocatedLocation
+     */
+    public function doGeoLocation(SummitGeoLocatedLocation $location, IGeoCodingAPI $geo_coding_api);
 }

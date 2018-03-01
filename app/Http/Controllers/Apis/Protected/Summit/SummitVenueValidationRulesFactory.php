@@ -1,6 +1,6 @@
-<?php namespace factories;
+<?php namespace App\Http\Controllers;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,23 +11,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\App;
-use models\summit\factories\IPresentationVideoFactory;
+
 /**
- * Class FactoriesProvider
- * @package factories
+ * Class SummitVenueValidationRulesFactory
+ * @package App\Http\Controllers
  */
-final class FactoriesProvider extends ServiceProvider
+final class SummitVenueValidationRulesFactory
 {
-    protected $defer = false;
-
-    public function boot()
-    {
-    }
-
-    public function register()
-    {
-        App::singleton(IPresentationVideoFactory::class, PresentationVideoFactory::class);
+    /**
+     * @param array $data
+     * @param bool $update
+     * @return array
+     */
+    public static function build(array $data, $update = false){
+        $rules        = SummitGeoLocatedLocationValidationRulesFactory::build($data, $update);
+        $venues_rules = ['is_main' => 'sometimes|boolean'];
+        return array_merge($venues_rules, $rules);
     }
 }

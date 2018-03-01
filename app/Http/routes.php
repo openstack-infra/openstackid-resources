@@ -279,16 +279,21 @@ Route::group([
             });
 
             // locations
-            Route::group(array('prefix' => 'locations'), function () {
+            Route::group(['prefix' => 'locations'], function () {
 
                 Route::get('', 'OAuth2SummitLocationsApiController@getLocations');
-                Route::get('/venues', 'OAuth2SummitLocationsApiController@getVenues');
-                Route::get('/external-locations', 'OAuth2SummitLocationsApiController@getExternalLocations');
-                Route::get('/hotels', 'OAuth2SummitLocationsApiController@getHotels');
-                Route::get('/airports', 'OAuth2SummitLocationsApiController@getAirports');
+                Route::post('', 'OAuth2SummitLocationsApiController@addLocation');
+                Route::get('venues', 'OAuth2SummitLocationsApiController@getVenues');
+                Route::get('external-locations', 'OAuth2SummitLocationsApiController@getExternalLocations');
+                Route::get('hotels', 'OAuth2SummitLocationsApiController@getHotels');
+                Route::get('airports', 'OAuth2SummitLocationsApiController@getAirports');
                 Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@getMetadata']);
+                Route::post('venues', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenue']);
+                Route::post('external-locations', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addExternalLocation']);
+                Route::post('hotels', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addHotel']);
+                Route::post('airports', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addAirport']);
 
-                Route::group(array('prefix' => '{location_id}'), function () {
+                Route::group(['prefix' => '{location_id}'], function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents')->where('location_id', 'tbd|[0-9]+');
                     Route::get('/events','OAuth2SummitLocationsApiController@getLocationEvents')->where('location_id', 'tbd|[0-9]+');

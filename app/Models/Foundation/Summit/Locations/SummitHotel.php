@@ -22,6 +22,10 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class SummitHotel extends SummitExternalLocation
 {
+
+    const HotelTypePrimary   = "Primary";
+    const HotelTypeAlternate = "Alternate";
+
     /**
      * @return string
      */
@@ -95,7 +99,7 @@ class SummitHotel extends SummitExternalLocation
 
     public static $metadata = [
         'class_name'    => self::ClassName,
-        'hotel_type'    => 'string',
+        'hotel_type'    => [self::HotelTypePrimary, self::HotelTypeAlternate],
         'sold_out'      => 'boolean',
         'booking_link'  => 'string',
     ];
@@ -105,6 +109,13 @@ class SummitHotel extends SummitExternalLocation
      */
     public static function getMetadata(){
         return array_merge(SummitExternalLocation::getMetadata(), self::$metadata);
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->sold_out = false;
+        $this->type = self::HotelTypePrimary;
     }
 
 }

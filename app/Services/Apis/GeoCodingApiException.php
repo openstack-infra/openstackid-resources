@@ -1,6 +1,6 @@
-<?php namespace factories;
+<?php namespace App\Services\Apis;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,23 +11,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\App;
-use models\summit\factories\IPresentationVideoFactory;
-/**
- * Class FactoriesProvider
- * @package factories
- */
-final class FactoriesProvider extends ServiceProvider
-{
-    protected $defer = false;
 
-    public function boot()
+/**
+ * Class GeoCodingApiException
+ * @package App\Services\Apis
+ */
+final class GeoCodingApiException extends \Exception
+{
+    private $status;
+
+    /**
+     * GeoCodingApiException constructor.
+     * @param $status
+     */
+    public function __construct($status)
     {
+        parent::__construct($status);
+        $this->status = $status;
     }
 
-    public function register()
+    /**
+     * @return string
+     */
+    public function getStatus()
     {
-        App::singleton(IPresentationVideoFactory::class, PresentationVideoFactory::class);
+        return $this->status;
     }
 }

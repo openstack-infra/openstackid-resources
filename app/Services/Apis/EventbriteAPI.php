@@ -15,7 +15,6 @@ use GuzzleHttp\Client;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
-
 /**
  * Class EventbriteAPI
  * @package services\apis

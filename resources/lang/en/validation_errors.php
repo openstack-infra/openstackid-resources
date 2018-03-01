@@ -26,4 +26,9 @@ return [
     'send_speaker_summit_assistance_announcement_mail_code_already_redeemed' => 'promo code :promo_code already redeemed.',
     'send_speaker_summit_assistance_announcement_mail_invalid_mail_type' => 'mail type :mail_type is not valid.',
     'send_speaker_summit_assistance_promo_code_not_set' => 'speaker :speaker_id has not set a promo code for summit :summit_id, please set one manually.',
+    'LocationService.addLocation.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
+    'LocationService.addLocation.InvalidClassName' => 'invalid class name',
+    'LocationService.addLocation.InvalidAddressOrCoordinates' => 'was passed a non-existent address',
+    'LocationService.addLocation.OverQuotaLimit' => 'geocode api over rate limit, try again later',
+    'LocationService.addLocation.geoCodingGenericError' => 'geocode api generic error'
 ];

@@ -66,4 +66,10 @@ class SummitExternalLocation extends SummitGeoLocatedLocation
         return array_merge(SummitGeoLocatedLocation::getMetadata(), self::$metadata);
     }
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->type     = self::TypeExternal;
+        $this->capacity = 0;
+    }
 }

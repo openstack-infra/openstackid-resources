@@ -34,8 +34,10 @@ class SummitVenue extends SummitGeoLocatedLocation
     public function __construct()
     {
         parent::__construct();
-        $this->rooms  = new ArrayCollection();
-        $this->floors = new ArrayCollection();
+        $this->is_main = false;
+        $this->type    = self::TypeInternal;
+        $this->rooms   = new ArrayCollection();
+        $this->floors  = new ArrayCollection();
     }
 
     /**

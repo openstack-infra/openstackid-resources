@@ -57,7 +57,7 @@ class SummitAbstractLocation extends SilverstripeBaseModel
     protected $type;
 
     /**
-     * @ORM\Column(name="Order", type="integer")
+     * @ORM\Column(name="`Order`", type="integer")
      */
     protected $order;
 

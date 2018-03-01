@@ -20,6 +20,9 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class SummitAirport extends SummitExternalLocation
 {
+    const AirportTypeInternational = 'International';
+    const AirportTypeDomestic      = 'Domestic';
+
     /**
      * @return string
      */
@@ -52,7 +55,7 @@ class SummitAirport extends SummitExternalLocation
 
     public static $metadata = [
         'class_name'   => self::ClassName,
-        'airport_type' => 'string',
+        'airport_type' => [self::AirportTypeInternational, self::AirportTypeDomestic],
     ];
 
     /**
@@ -60,5 +63,11 @@ class SummitAirport extends SummitExternalLocation
      */
     public static function getMetadata(){
         return array_merge(SummitExternalLocation::getMetadata(), self::$metadata);
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->airport_type = self::AirportTypeInternational;
     }
 }

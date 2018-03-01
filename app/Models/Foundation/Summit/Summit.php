@@ -608,11 +608,24 @@ class Summit extends SilverstripeBaseModel
 
     /**
      * @param SummitAbstractLocation $location
+     * @return $this
      */
     public function addLocation(SummitAbstractLocation $location)
     {
         $this->locations->add($location);
         $location->setSummit($this);
+        $location->setOrder($this->getLocationMaxOrder() + 1);
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    private function getLocationMaxOrder(){
+        $criteria = Criteria::create();
+        $criteria->orderBy(['order' => 'DESC']);
+        $location = $this->locations->matching($criteria)->first();
+        return $location === false ? 0 : $location->getOrder();
     }
 
     /**
@@ -631,6 +644,18 @@ class Summit extends SilverstripeBaseModel
         return $this->locations->filter(function ($e) {
             return $e instanceof SummitVenue;
         });
+    }
+
+    /**
+     * @param string $name
+     * @return SummitAbstractLocation|null
+     */
+    public function getLocationByName($name){
+
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('name', trim($name)));
+        $location = $this->locations->matching($criteria)->first();
+        return $location === false ? null : $location;
     }
 
     /**

@@ -24,4 +24,5 @@ return array
     'firebase_gcm_server_key'          => env('FIREBASE_GCM_SERVER_KEY', ''),
     'ss_encrypt_key'                   => env('SS_ENCRYPT_KEY', ''),
     'ss_encrypt_cypher'                => env('SS_ENCRYPT_CYPHER', ''),
+    'google_geocoding_api_key'         => env('GOOGLE_GEO_CODING_API_KEY', ''),
 );

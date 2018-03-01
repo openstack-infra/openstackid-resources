@@ -11,11 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Apis\GoogleGeoCodingAPI;
+use App\Services\Apis\IGeoCodingAPI;
 use App\Services\Model\AttendeeService;
 use App\Services\Model\IAttendeeService;
+use App\Services\Model\ILocationService;
 use App\Services\Model\IMemberService;
 use App\Services\Model\ISummitEventTypeService;
 use App\Services\Model\ISummitTrackService;
+use App\Services\Model\LocationService;
 use App\Services\Model\MemberService;
 use App\Services\Model\SummitPromoCodeService;
 use App\Services\Model\SummitTrackService;
@@ -27,12 +31,23 @@ use ModelSerializers\BaseSerializerTypeSelector;
 use ModelSerializers\ISerializerTypeSelector;
 use services\apis\EventbriteAPI;
 use services\apis\FireBaseGCMApi;
+use services\apis\IEventbriteAPI;
+use services\apis\IPushNotificationApi;
+use services\model\IPresentationService;
+use services\model\ISpeakerService;
 use services\model\ISummitPromoCodeService;
+use libs\utils\ICacheService;
+use services\model\ISummitService;
+use services\model\PresentationService;
+use services\model\SpeakerService;
+use services\model\SummitService;
+use services\utils\RedisCacheService;
+
 /***
  * Class ServicesProvider
  * @package services
  */
-class ServicesProvider extends ServiceProvider
+final class ServicesProvider extends ServiceProvider
 {
     protected $defer = false;
 
@@ -42,7 +57,7 @@ class ServicesProvider extends ServiceProvider
 
     public function register()
     {
-        App::singleton('libs\utils\ICacheService', 'services\utils\RedisCacheService');
+        App::singleton(ICacheService::class, RedisCacheService::class);
 
         App::singleton(\libs\utils\ITransactionService::class, function(){
             return new \services\utils\DoctrineTransactionService('ss');
@@ -65,21 +80,21 @@ class ServicesProvider extends ServiceProvider
 
         App::singleton(ISerializerTypeSelector::class, BaseSerializerTypeSelector::class);
 
-        App::singleton('services\model\ISummitService', 'services\model\SummitService');
+        App::singleton(ISummitService::class, SummitService::class);
 
-        App::singleton('services\model\ISpeakerService', 'services\model\SpeakerService');
+        App::singleton(ISpeakerService::class, SpeakerService::class);
 
-        App::singleton('services\model\IPresentationService', 'services\model\PresentationService');
+        App::singleton(IPresentationService::class, PresentationService::class);
 
         App::singleton('services\model\IChatTeamService', 'services\model\ChatTeamService');
 
-        App::singleton('services\apis\IEventbriteAPI',   function(){
+        App::singleton(IEventbriteAPI::class,   function(){
             $api = new EventbriteAPI();
             $api->setCredentials(array('token' => Config::get("server.eventbrite_oauth2_personal_token", null)));
             return $api;
         });
 
-        App::singleton('services\apis\IPushNotificationApi',   function(){
+        App::singleton(IPushNotificationApi::class,   function(){
             $api = new FireBaseGCMApi(Config::get("server.firebase_gcm_server_key", null));
             return $api;
         });
@@ -151,5 +166,18 @@ class ServicesProvider extends ServiceProvider
             ISummitTrackService::class,
             SummitTrackService::class
         );
+
+        App::singleton
+        (
+            ILocationService::class,
+            LocationService::class
+        );
+
+        App::singleton(IGeoCodingAPI::class,   function(){
+            return new GoogleGeoCodingAPI
+            (
+                Config::get("server.google_geocoding_api_key", null)
+            );
+        });
     }
 }

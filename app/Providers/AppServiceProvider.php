@@ -248,6 +248,28 @@ class AppServiceProvider extends ServiceProvider
             if(!ctype_xdigit($value)) return false;
             return true;
         });
+
+
+        Validator::extend('geo_latitude', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('geo_latitude', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid coordinate value  (-90.00,+90.00)", $attribute);
+            });
+
+            $value = floatval($value);
+            return  !($value < -90.00 || $value > 90.00);
+
+        });
+
+        Validator::extend('geo_longitude', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('geo_longitude', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be a valid coordinate value (-180.00,+180.00)", $attribute);
+            });
+
+            $value = floatval($value);
+            return  !($value < -180.00 || $value > 180.00);
+        });
     }
 
     /**

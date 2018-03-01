@@ -378,4 +378,208 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $events = json_decode($content);
         $this->assertTrue(!is_null($events));
     }
+
+    public function testAddLocationWithoutClassName($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $name       = str_random(16).'_location';
+        $data = [
+            'name'       => $name,
+            'description' => 'test location',
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+    }
+
+
+    public function testAddLocationVenue($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $name       = str_random(16).'_location';
+
+        $data = [
+            'name'        => $name,
+            'address1'    => 'Nazar 612',
+            'city'        => 'Lanus',
+            'state'       => 'Buenos Aires',
+            'country'     => 'Argentina',
+            'class_name'  => \models\summit\SummitVenue::ClassName,
+            'description' => 'test location',
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+        $location = json_decode($content);
+        $this->assertTrue(!is_null($location));
+        return $location;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testAddLocationVenueLatLng($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $name       = str_random(16).'_location';
+
+        $data = [
+            'name'        => $name,
+            'lat'         => '-34.6994795',
+            'lng'         => '-58.3920795',
+            'class_name'  => \models\summit\SummitVenue::ClassName,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+        $location = json_decode($content);
+        $this->assertTrue(!is_null($location));
+        return $location;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testAddLocationVenueLatLngInvalid($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $name       = str_random(16).'_location';
+
+        $data = [
+            'name'        => $name,
+            'lat'         => '-134.6994795',
+            'lng'         => '-658.3920795',
+            'class_name'  => \models\summit\SummitVenue::ClassName,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testAddLocationHotelLatLng($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $name       = str_random(16).'_hotel';
+
+        $data = [
+            'name'        => $name,
+            'address1'    => 'H. de Malvinas 1724',
+            'city'        => 'Lanus Este',
+            'state'       => 'Buenos Aires',
+            'country'     => 'Argentina',
+            'zip_code'    => '1824',
+            'class_name'  => \models\summit\SummitHotel::ClassName,
+            'hotel_type'  => \models\summit\SummitHotel::HotelTypePrimary,
+            'capacity'    => 200
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $location = json_decode($content);
+        $this->assertTrue(!is_null($location));
+        return $location;
+    }
 }

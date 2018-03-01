@@ -344,6 +344,8 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
     public function __construct()
     {
         parent::__construct();
+        $this->details_page    = false;
+        $this->display_on_site = false;
         $this->images = new ArrayCollection();
     }
 
@@ -389,4 +391,5 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
             )->first();
         return $res === false ? null : $res;
     }
+
 }

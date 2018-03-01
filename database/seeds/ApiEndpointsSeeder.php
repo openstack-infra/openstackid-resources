@@ -464,7 +464,7 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
             ),
             // locations
-             [
+            [
                  'name' => 'get-locations',
                  'route' => '/api/v1/summits/{id}/locations',
                  'http_method' => 'GET',
@@ -472,7 +472,16 @@ class ApiEndpointsSeeder extends Seeder
                      sprintf(SummitScopes::ReadSummitData, $current_realm),
                      sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                  ],
-             ],
+            ],
+            [
+                'name' => 'add-location',
+                'route' => '/api/v1/summits/{id}/locations',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
             [
                 'name' => 'get-locations-metadata',
                 'route' => '/api/v1/summits/{id}/locations/metadata',
@@ -492,12 +501,30 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'add-venue',
+                'route' => '/api/v1/summits/{id}/locations/venues',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-external-locations',
                 'route' => '/api/v1/summits/{id}/locations/external-locations',
                 'http_method' => 'GET',
                 'scopes' => [
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-external-location',
+                'route' => '/api/v1/summits/{id}/locations/external-locations',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
                 ],
             ],
             [
@@ -510,12 +537,30 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'add-hotel',
+                'route' => '/api/v1/summits/{id}/locations/hotels',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-airports',
                 'route' => '/api/v1/summits/{id}/locations/airports',
                 'http_method' => 'GET',
                 'scopes' => [
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-airport',
+                'route' => '/api/v1/summits/{id}/locations/airports',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
                 ],
             ],
             [
