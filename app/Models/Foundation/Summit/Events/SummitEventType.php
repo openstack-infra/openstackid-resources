@@ -235,4 +235,50 @@ class SummitEventType extends SilverstripeBaseModel
         $this->is_private = $is_private;
     }
 
+    /**
+     * @return SummitEvent[]
+     */
+    public function getRelatedPublishedSummitEvents(){
+        $query = <<<SQL
+SELECT e  
+FROM  models\summit\SummitEvent e
+WHERE 
+e.published = 1
+AND e.summit = :summit
+AND e.type = :type
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this->summit);
+        $native_query->setParameter("type", $this);
+
+        $res =  $native_query->getResult();
+
+        return $res;
+    }
+
+    /**
+     * @return int[]
+     */
+    public function getRelatedPublishedSummitEventsIds(){
+        $query = <<<SQL
+SELECT e.id  
+FROM  models\summit\SummitEvent e
+WHERE 
+e.published = 1
+AND e.summit = :summit
+AND e.type = :type
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this->summit);
+        $native_query->setParameter("type", $this);
+
+        $res =  $native_query->getResult();
+
+        return $res;
+    }
+
 }

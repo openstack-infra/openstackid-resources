@@ -11,37 +11,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\summit\CalendarSync\WorkQueue\AdminSummitEventActionSyncWorkRequest;
+
+use models\summit\CalendarSync\WorkQueue\AdminSummitLocationActionSyncWorkRequest;
+
 
 /**
- * Class AdminSummitEventActionSyncWorkRequestPersister
+ * Class AdminSummitLocationActionSyncWorkRequestPersister
  * @package App\EntityPersisters
  */
-class AdminSummitEventActionSyncWorkRequestPersister extends BasePersister
+final class AdminSummitLocationActionSyncWorkRequestPersister extends BasePersister
 {
-    public static function persist(AdminSummitEventActionSyncWorkRequest $request){
+    /**
+     * @param AdminSummitLocationActionSyncWorkRequest $request
+     */
+    public static function persist(AdminSummitLocationActionSyncWorkRequest $request){
 
         $sql = <<<SQL
 INSERT INTO AbstractCalendarSyncWorkRequest 
 (`Type`, IsProcessed, ProcessedDate, Created, LastEdited, ClassName)
-VALUES (:Type, 0, NULL, NOW(), NOW(), 'AdminSummitEventActionSyncWorkRequest');
+VALUES (:Type, 0, NULL, NOW(), NOW(), 'AdminSummitLocationActionSyncWorkRequest');
 INSERT INTO AdminScheduleSummitActionSyncWorkRequest (ID, CreatedByID) VALUES (LAST_INSERT_ID(), :CreatedByID)
-INSERT INTO AdminSummitEventActionSyncWorkRequest (ID, SummitEventID) VALUES (LAST_INSERT_ID(), :SummitEventID);
+INSERT INTO AdminSummitLocationActionSyncWorkRequest (ID, LocationID) VALUES (LAST_INSERT_ID(), :LocationID);
 SQL;
 
         $bindings = [
             'Type'          => $request->getType(),
             'CreatedByID'   => $request->getCreatedById(),
-            'SummitEventID' => $request->getSummitEventId(),
+            'LocationID'    => $request->getLocationId(),
         ];
 
         $types = [
             'Type'          => 'string',
             'CreatedByID'   => 'integer',
-            'SummitEventID' => 'integer',
+            'LocationID'    => 'integer',
         ];
 
         self::insert($sql, $bindings, $types);
-
     }
 }

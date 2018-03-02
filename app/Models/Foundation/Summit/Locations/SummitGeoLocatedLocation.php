@@ -11,12 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitGeoLocatedLocation")
@@ -99,8 +97,8 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
     protected $images;
 
     public static $metadata = [
-        'address1'         => 'string',
-        'address2'         => 'string',
+        'address_1'        => 'string',
+        'address_2'        => 'string',
         'zip_code'         => 'string',
         'city'             => 'string',
         'state'            => 'string',

@@ -40,4 +40,13 @@ interface ILocationService
      * @throws ValidationException
      */
     public function updateLocation(Summit $summit, $location_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @return SummitAbstractLocation
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteLocation(Summit $summit, $location_id);
 }

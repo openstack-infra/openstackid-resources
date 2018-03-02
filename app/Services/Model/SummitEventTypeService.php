@@ -145,6 +145,15 @@ final class SummitEventTypeService implements ISummitEventTypeService
                     sprintf("event type id %s is a default one and is not allowed to be deleted", $event_type_id)
                 );
 
+            $summit_events = $event_type->getRelatedPublishedSummitEventsIds();
+
+            if(count($summit_events) > 0){
+                throw new ValidationException
+                (
+                    sprintf("event type id %s could not be deleted bc its assigned to published events on summit id %s", $event_type_id, $summit->getId())
+                );
+            }
+
             $summit->removeEventType($event_type);
 
         });

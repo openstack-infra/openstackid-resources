@@ -13,6 +13,8 @@
  **/
 
 use App\Events\SummitEventDeleted;
+use models\main\IMemberRepository;
+use models\oauth2\IResourceServerContext;
 use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\AdminSummitEventActionSyncWorkRequest;
 use Illuminate\Support\Facades\App;
@@ -30,8 +32,8 @@ final class SummitEventDeletedCalendarSyncWorkRequestFactory
     public static function build(SummitEventDeleted $event){
         $args                    = $event->getArgs();
         $params                  = $args->getParams();
-        $resource_server_context = App::make(\models\oauth2\IResourceServerContext::class);
-        $member_repository       = App::make(\models\main\IMemberRepository::class);
+        $resource_server_context = App::make(IResourceServerContext::class);
+        $member_repository       = App::make(IMemberRepository::class);
         $owner_id                = $resource_server_context->getCurrentUserExternalId();
         if($owner_id > 0){
             $member = $member_repository->getById($owner_id);

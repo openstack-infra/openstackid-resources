@@ -39,6 +39,19 @@ extends AdminScheduleSummitActionSyncWorkRequest
     }
 
     /**
+     * @return int
+     */
+    public function getLocationId()
+    {
+        try{
+            return is_null($this->location) ? 0 : $this->location->getId();
+        }
+        catch (\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
      * @param SummitAbstractLocation $location
      */
     public function setLocation($location)

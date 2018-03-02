@@ -27,7 +27,6 @@ final class PresentationCategoryFactory
     public static function build(Summit $summit, array $data){
         $track = new PresentationCategory();
         self::populate($track, $data);
-        $summit->addPresentationCategory($track);
         return $track;
     }
 

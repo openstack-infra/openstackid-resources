@@ -581,6 +581,16 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 );
             }
 
+            if(!in_array($payload["class_name"], SummitLocationConstants::$valid_class_names) ){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "class_name has an invalid value ( valid values are %s",
+                        implode(", ", SummitLocationConstants::$valid_class_names)
+                    )
+                );
+            }
+
             $location = $this->location_service->addLocation($summit, $payload);
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($location)->serialize());
@@ -803,6 +813,16 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 );
             }
 
+            if(!in_array($payload["class_name"], SummitLocationConstants::$valid_class_names) ){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "class_name has an invalid value ( valid values are %s",
+                        implode(", ", SummitLocationConstants::$valid_class_names)
+                    )
+                );
+            }
+
             $location = $this->location_service->updateLocation($summit, $location_id, $payload);
 
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($location)->serialize());
@@ -990,6 +1010,40 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $location = $this->location_service->updateLocation($summit, $external_location_id, $payload);
 
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($location)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * Delete Location Endpoints
+     */
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @return mixed
+     */
+    public function deleteLocation($summit_id, $location_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->location_service->deleteLocation($summit, $location_id);
+
+            return $this->deleted();
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);

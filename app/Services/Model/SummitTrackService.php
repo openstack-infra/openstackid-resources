@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Events\TrackDeleted;
+use App\Events\TrackInserted;
 use App\Events\TrackUpdated;
 use App\Models\Foundation\Summit\Factories\PresentationCategoryFactory;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
@@ -21,7 +23,6 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\PresentationCategory;
 use models\summit\Summit;
-
 /**
  * Class SummitTrackService
  * @package App\Services\Model
@@ -58,7 +59,7 @@ final class SummitTrackService implements ISummitTrackService
      */
     public function addTrack(Summit $summit, array $data)
     {
-        return $this->tx_service->transaction(function () use ($summit, $data) {
+        $track =  $this->tx_service->transaction(function () use ($summit, $data) {
 
             if (!empty($data['code'])) {
                 $former_track = $summit->getPresentationCategoryByCode(trim($data['code']));
@@ -72,9 +73,13 @@ final class SummitTrackService implements ISummitTrackService
 
             $track = PresentationCategoryFactory::build($summit, $data);
 
-            return $track;
+            $summit->addPresentationCategory($track);
 
         });
+
+        Event::fire(new TrackInserted($track->getSummitId(), $track->getId()));
+
+        return $track;
     }
 
     /**
@@ -109,9 +114,12 @@ final class SummitTrackService implements ISummitTrackService
                     throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['title'], $summit->getId()));
             }
 
-            return PresentationCategoryFactory::populate($track, $data);
 
-            Event::fire(new TrackUpdated($track));
+            $track = PresentationCategoryFactory::populate($track, $data);
+
+            Event::fire(new TrackUpdated($track->getSummitId(), $track->getId()));
+
+            return $track;
 
         });
     }
@@ -135,7 +143,7 @@ final class SummitTrackService implements ISummitTrackService
                     sprintf("track id %s does not belong to summit id %s", $track_id, $summit->getId())
                 );
 
-            $summit_events = $track->getRelatedPublishedSummitEvents();
+            $summit_events = $track->getRelatedPublishedSummitEventsIds();
 
             if(count($summit_events) > 0){
                 throw new ValidationException
@@ -143,6 +151,8 @@ final class SummitTrackService implements ISummitTrackService
                     sprintf("track id %s could not be deleted bc its assigned to published events on summit id %s", $track_id, $summit->getId())
                 );
             }
+
+            Event::fire(new TrackDeleted($track->getSummitId(), $track->getId()));
 
             $this->repository->delete($track);
         });

@@ -1707,4 +1707,38 @@ SQL;
         }
 
     }
+
+    /**
+     * @param SummitAbstractLocation $location
+     * @return int[]
+     */
+    public function getScheduleEventsIdsPerLocation(SummitAbstractLocation $location){
+        $query = <<<SQL
+SELECT e.id  
+FROM  models\summit\SummitEvent e
+WHERE 
+e.published = 1
+AND e.summit = :summit
+AND e.location = :location
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this);
+        $native_query->setParameter("location", $location);
+
+        $res =  $native_query->getResult();
+
+        return $res;
+    }
+
+    /**
+     * @param SummitAbstractLocation $location
+     * @return $this
+     */
+    public function removeLocation(SummitAbstractLocation $location){
+        $this->locations->removeElement($location);
+        $location->setSummit(null);
+        return $this;
+    }
 }

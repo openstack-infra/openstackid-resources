@@ -12,11 +12,14 @@
  * limitations under the License.
  **/
 use App\EntityPersisters\AdminSummitEventActionSyncWorkRequestPersister;
+use App\EntityPersisters\AdminSummitLocationActionSyncWorkRequestPersister;
 use App\EntityPersisters\AssetSyncRequestPersister;
 use App\EntityPersisters\EntityEventPersister;
 use App\Factories\AssetsSyncRequest\FileCreatedAssetSyncRequestFactory;
+use App\Factories\CalendarAdminActionSyncWorkRequest\AdminSummitLocationActionSyncWorkRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventDeletedCalendarSyncWorkRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventUpdatedCalendarSyncWorkRequestFactory;
+use App\Factories\EntityEvents\LocationActionEntityEventFactory;
 use App\Factories\EntityEvents\MyFavoritesAddEntityEventFactory;
 use App\Factories\EntityEvents\MyFavoritesRemoveEntityEventFactory;
 use App\Factories\EntityEvents\MyScheduleAddEntityEventFactory;
@@ -30,7 +33,7 @@ use App\Factories\EntityEvents\PresentationSpeakerUpdatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventCreatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventDeletedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventUpdatedEntityEventFactory;
-use App\Factories\EntityEvents\TrackUpdatedEntityEventFactory;
+use App\Factories\EntityEvents\TrackActionEntityEventFactory;
 use App\Services\Utils\SCPFileUploader;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -135,9 +138,52 @@ final class EventServiceProvider extends ServiceProvider
             EntityEventPersister::persist_list(PresentationSpeakerDeletedEntityEventFactory::build($event));
         });
 
+        // tracks
+
+        Event::listen(\App\Events\TrackInserted::class, function($event)
+        {
+            EntityEventPersister::persist(TrackActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
         Event::listen(\App\Events\TrackUpdated::class, function($event)
         {
-            EntityEventPersister::persist_list(TrackUpdatedEntityEventFactory::build($event));
+            EntityEventPersister::persist(TrackActionEntityEventFactory::build($event, 'UPDATE'));
+        });
+
+        Event::listen(\App\Events\TrackDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(TrackActionEntityEventFactory::build($event, 'DELETE'));
+        });
+
+        // locations events
+
+        Event::listen(\App\Events\LocationInserted::class, function($event)
+        {
+            EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
+        Event::listen(\App\Events\LocationUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'UPDATE'));
+            $published_events = $event->getRelatedEventIds();
+            if(count($published_events) > 0){
+                AdminSummitLocationActionSyncWorkRequestPersister::persist
+                (
+                    AdminSummitLocationActionSyncWorkRequestFactory::build($event, 'UPDATE')
+                );
+            }
+        });
+
+        Event::listen(\App\Events\LocationDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'DELETE'));
+            $published_events = $event->getRelatedEventIds();
+            if(count($published_events) > 0){
+                AdminSummitLocationActionSyncWorkRequestPersister::persist
+                (
+                    AdminSummitLocationActionSyncWorkRequestFactory::build($event, 'REMOVE')
+                );
+            }
         });
 
     }

@@ -620,4 +620,75 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertTrue($location->order == $new_order);
         return $location;
     }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testUpdateExistentLocation($summit_id = 23){
+
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => 292
+        ];
+
+        $data = [
+            'class_name'  => \models\summit\SummitVenue::ClassName,
+            'name' => 'Sydney Convention and Exhibition Centre Update!'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitLocationsApiController@updateLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $location = json_decode($content);
+        $this->assertTrue(!is_null($location));
+        $this->assertTrue($location->order == $new_order);
+        return $location;
+    }
+
+    /**
+     * @param int $summit_id
+     */
+    public function testDeleteNewlyCreatedHotel($summit_id = 24){
+
+        $hotel = $this->testAddLocationHotelAddress($summit_id);
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $hotel->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitLocationsApiController@deleteLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
+
 }

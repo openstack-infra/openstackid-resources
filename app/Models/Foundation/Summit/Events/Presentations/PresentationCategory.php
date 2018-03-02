@@ -314,4 +314,27 @@ SQL;
 
         return $res;
     }
+
+    /**
+     * @return int[]
+     */
+    public function getRelatedPublishedSummitEventsIds(){
+        $query = <<<SQL
+SELECT e.id  
+FROM  models\summit\SummitEvent e
+WHERE 
+e.published = 1
+AND e.summit = :summit
+AND e.category = :track
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this->summit);
+        $native_query->setParameter("track", $this);
+
+        $res =  $native_query->getResult();
+
+        return $res;
+    }
 }

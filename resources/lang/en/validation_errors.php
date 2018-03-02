@@ -33,4 +33,5 @@ return [
     'LocationService.addLocation.geoCodingGenericError' => 'geocode api generic error',
     'LocationService.updateLocation.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
     'LocationService.updateLocation.LocationNotFoundOnSummit' => 'location :location_id not found on summit :summit_id',
+    'LocationService.updateLocation.ClassNameMissMatch' => 'location :location_id on summit :summit_id does not belongs to class name :class_name',
 ];

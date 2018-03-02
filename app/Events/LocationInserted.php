@@ -11,10 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
 /**
- * Class TrackUpdated
+ * Class LocationInserted
  * @package App\Events
  */
-final class TrackUpdated extends TrackAction {
+final class LocationInserted extends LocationAction
+{
 
 }
