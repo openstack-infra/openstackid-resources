@@ -24,17 +24,18 @@ final class SummitAbstractLocationValidationRulesFactory
      * @return array
      */
     public static function build(array $data, $update = false){
-        $name_rule = 'required|string|max:255';
 
         if($update){
-            $name_rule = 'sometimes|string|max:255';
+            return [
+                'name'        => 'sometimes|string|max:255',
+                'description' => 'sometimes|string',
+                'order'       => 'sometimes|integer|min:1'
+            ];
         }
 
-        $rules = [
-            'name'        => $name_rule,
+        return [
+            'name'        => 'required|string|max:255',
             'description' => 'sometimes|string',
         ];
-
-        return $rules;
     }
 }

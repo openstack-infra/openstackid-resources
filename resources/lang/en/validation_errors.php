@@ -30,5 +30,7 @@ return [
     'LocationService.addLocation.InvalidClassName' => 'invalid class name',
     'LocationService.addLocation.InvalidAddressOrCoordinates' => 'was passed a non-existent address',
     'LocationService.addLocation.OverQuotaLimit' => 'geocode api over rate limit, try again later',
-    'LocationService.addLocation.geoCodingGenericError' => 'geocode api generic error'
+    'LocationService.addLocation.geoCodingGenericError' => 'geocode api generic error',
+    'LocationService.updateLocation.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
+    'LocationService.updateLocation.LocationNotFoundOnSummit' => 'location :location_id not found on summit :summit_id',
 ];

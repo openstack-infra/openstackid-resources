@@ -282,19 +282,44 @@ Route::group([
             Route::group(['prefix' => 'locations'], function () {
 
                 Route::get('', 'OAuth2SummitLocationsApiController@getLocations');
-                Route::post('', 'OAuth2SummitLocationsApiController@addLocation');
-                Route::get('venues', 'OAuth2SummitLocationsApiController@getVenues');
-                Route::get('external-locations', 'OAuth2SummitLocationsApiController@getExternalLocations');
-                Route::get('hotels', 'OAuth2SummitLocationsApiController@getHotels');
-                Route::get('airports', 'OAuth2SummitLocationsApiController@getAirports');
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addLocation']);
                 Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@getMetadata']);
-                Route::post('venues', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenue']);
-                Route::post('external-locations', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addExternalLocation']);
-                Route::post('hotels', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addHotel']);
-                Route::post('airports', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addAirport']);
+
+                Route::group(['prefix' => 'venues'], function () {
+                    Route::get('', 'OAuth2SummitLocationsApiController@getVenues');
+                    Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenue']);
+                    Route::group(['prefix' => '{venue_id}'], function () {
+                        Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateVenue']);
+                    });
+                });
+
+                Route::group(['prefix' => 'airports'], function () {
+                    Route::get('', 'OAuth2SummitLocationsApiController@getAirports');
+                    Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addAirport']);
+                    Route::group(['prefix' => '{airport_id}'], function () {
+                        Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateAirport']);
+                    });
+                });
+
+                Route::group(['prefix' => 'hotels'], function () {
+                    Route::get('', 'OAuth2SummitLocationsApiController@getHotels');
+                    Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addExternalLocation']);
+                    Route::group(['prefix' => '{hotel_id}'], function () {
+                        Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateExternalLocation']);
+                    });
+                });
+
+                Route::group(['prefix' => 'external-locations'], function () {
+                    Route::get('', 'OAuth2SummitLocationsApiController@getExternalLocations');
+                    Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addHotel']);
+                    Route::group(['prefix' => '{external_location_id}'], function () {
+                        Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateHotel']);
+                    });
+                });
 
                 Route::group(['prefix' => '{location_id}'], function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateLocation']);
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents')->where('location_id', 'tbd|[0-9]+');
                     Route::get('/events','OAuth2SummitLocationsApiController@getLocationEvents')->where('location_id', 'tbd|[0-9]+');
                 });

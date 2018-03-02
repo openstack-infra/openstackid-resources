@@ -1668,4 +1668,43 @@ SQL;
         $rsvp_template = $this->rsvp_templates->matching($criteria)->first();
         return $rsvp_template === false ? null : $rsvp_template;
     }
+
+    /**
+     * @param SummitAbstractLocation $location
+     * @param int $new_order
+     * @throws ValidationException
+     */
+    public function recalculateLocationOrder(SummitAbstractLocation $location, $new_order){
+
+        $former_order = $location->getOrder();
+        $criteria     = Criteria::create();
+        $criteria->orderBy(['order'=> 'ASC']);
+        $locations = $this->locations->matching($criteria)->toArray();
+        $max_order = count($locations);
+
+        $filtered_locations = [];
+
+        foreach($locations as $l){
+            if($l instanceof SummitVenue || $l instanceof SummitHotel || $l instanceof SummitAirport || $l instanceof SummitExternalLocation)
+            $filtered_locations[] = $l;
+        }
+        if($new_order > $max_order)
+            throw new ValidationException(sprintf("max order is %s", $max_order));
+
+        unset($filtered_locations[$former_order - 1]);
+
+        $filtered_locations = array_merge
+        (
+            array_slice($filtered_locations, 0, $new_order -1 , true) ,
+            [$location] ,
+            array_slice($filtered_locations, $new_order -1 , count($filtered_locations) - $new_order - 1, true)
+        );
+
+        $order = 1;
+        foreach($filtered_locations as $l){
+            $l->setOrder($order);
+            $order++;
+        }
+
+    }
 }

@@ -21,14 +21,18 @@ class SummitGeoLocatedLocationSerializer extends SummitAbstractLocationSerialize
 {
     protected static $array_mappings = array
     (
-        'Address1'     => 'address_1:json_string',
-        'Address2'     => 'address_2:json_string',
-        'ZipCode'      => 'zip_code',
-        'City'         => 'city:json_string',
-        'State'        => 'state:json_string',
-        'Country'      => 'country:json_string',
-        'Lng'          => 'lng',
-        'Lat'          => 'lat',
+        'Address1'        => 'address_1:json_string',
+        'Address2'        => 'address_2:json_string',
+        'ZipCode'         => 'zip_code',
+        'City'            => 'city:json_string',
+        'State'           => 'state:json_string',
+        'Country'         => 'country:json_string',
+        'Lng'             => 'lng',
+        'Lat'             => 'lat',
+        'WebsiteUrl'      => 'website_url:json_string',
+        'DisplayOnSite'   => 'display_on_site:json_boolean',
+        'DetailsPage'     => 'details_page:json_boolean',
+        'LocationMessage' => 'location_message:json_string',
     );
 
     /**

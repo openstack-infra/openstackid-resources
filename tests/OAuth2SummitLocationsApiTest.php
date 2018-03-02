@@ -540,7 +540,7 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
      * @param int $summit_id
      * @return mixed
      */
-    public function testAddLocationHotelLatLng($summit_id = 24){
+    public function testAddLocationHotelAddress($summit_id = 24){
 
         $params = [
             'id' => $summit_id,
@@ -550,10 +550,10 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
 
         $data = [
             'name'        => $name,
-            'address1'    => 'H. de Malvinas 1724',
+            'address_1'   => 'H. de Malvinas 1724',
             'city'        => 'Lanus Este',
             'state'       => 'Buenos Aires',
-            'country'     => 'Argentina',
+            'country'     => 'AR',
             'zip_code'    => '1824',
             'class_name'  => \models\summit\SummitHotel::ClassName,
             'hotel_type'  => \models\summit\SummitHotel::HotelTypePrimary,
@@ -580,6 +580,44 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
         $location = json_decode($content);
         $this->assertTrue(!is_null($location));
+        return $location;
+    }
+
+    public function testUpdateLocationHotelOrder($summit_id = 24){
+
+        $hotel = $this->testAddLocationHotelAddress($summit_id);
+        $new_order = 9;
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $hotel->id
+        ];
+
+        $data = [
+            'order' => $new_order,
+            'class_name'  => \models\summit\SummitHotel::ClassName,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitLocationsApiController@updateLocation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $location = json_decode($content);
+        $this->assertTrue(!is_null($location));
+        $this->assertTrue($location->order == $new_order);
         return $location;
     }
 }

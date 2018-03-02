@@ -201,4 +201,25 @@ final class SummitLocationFactory
 
         return $airport;
     }
+
+    /**
+     * @param SummitAbstractLocation $location
+     * @param array $data
+     * @return SummitAbstractLocation
+     */
+    public static function populate(SummitAbstractLocation $location, array $data){
+        if($location instanceof SummitVenue){
+            return self::populateSummitVenue($location, $data);
+        }
+        if($location instanceof SummitHotel){
+            return self::populateSummitHotel($location, $data);
+        }
+        if($location instanceof SummitAirport){
+            return self::populateSummitAirport($location, $data);
+        }
+        if($location instanceof SummitExternalLocation){
+            return self::populateSummitExternalLocation($location, $data);
+        }
+        return $location;
+    }
 }

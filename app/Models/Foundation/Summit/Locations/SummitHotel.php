@@ -114,8 +114,8 @@ class SummitHotel extends SummitExternalLocation
     public function __construct()
     {
         parent::__construct();
-        $this->sold_out = false;
-        $this->type = self::HotelTypePrimary;
+        $this->sold_out   = false;
+        $this->hotel_type = self::HotelTypePrimary;
     }
 
 }

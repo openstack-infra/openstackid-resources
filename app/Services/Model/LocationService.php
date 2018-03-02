@@ -133,4 +133,84 @@ final class LocationService implements ILocationService
             return $location;
        });
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param array $data
+     * @return SummitAbstractLocation
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateLocation(Summit $summit, $location_id, array $data)
+    {
+        return $this->tx_service->transaction(function() use($summit, $location_id, $data){
+
+            if(isset($data['name'])) {
+                $old_location = $summit->getLocationByName(trim($data['name']));
+
+                if (!is_null($old_location) && $old_location->getId() != $location_id) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.LocationService.updateLocation.LocationNameAlreadyExists',
+                            [
+                                'summit_id' => $summit->getId()
+                            ]
+                        )
+                    );
+                }
+            }
+
+            $location = $summit->getLocation($location_id);
+            if(is_null($location)){
+                throw new EntityNotFoundException(
+                    trans
+                    (
+                        'validation_errors.LocationService.updateLocation.LocationNotFoundOnSummit',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $location = SummitLocationFactory::populate($location, $data);
+
+            if($location instanceof SummitGeoLocatedLocation && (isset($data['address_1']) || isset($data['lat']))) {
+                try {
+                    $geo_location_strategy = GeoLocationStrategyFactory::build($location);
+                    $geo_location_strategy->doGeoLocation($location, $this->geo_coding_api);
+                }
+                catch (GeoCodingApiException $ex1){
+                    Log::warning($ex1->getMessage());
+                    $validation_msg = trans('validation_errors.LocationService.addLocation.geoCodingGenericError');
+                    switch ($ex1->getStatus()){
+                        case IGeoCodingAPI::ResponseStatusZeroResults: {
+                            $validation_msg = trans('validation_errors.LocationService.addLocation.InvalidAddressOrCoordinates');
+                        }
+                            break;
+                        case IGeoCodingAPI::ResponseStatusOverQueryLimit: {
+                            $validation_msg = trans('validation_errors.LocationService.addLocation.OverQuotaLimit');
+                        }
+                            break;
+                    }
+                    throw new ValidationException($validation_msg);
+                }
+                catch(\Exception $ex){
+                    Log::warning($ex->getMessage());
+                    throw $ex;
+                }
+            }
+
+            if(isset($data['order']) && intval($data['order']) != $location->getOrder()){
+                // request to update order
+                $summit->recalculateLocationOrder($location, intval($data['order']));
+            }
+
+            return $location;
+        });
+    }
 }

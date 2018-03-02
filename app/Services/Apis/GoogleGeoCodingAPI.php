@@ -195,7 +195,7 @@ final class GoogleGeoCodingAPI implements IGeoCodingAPI
                       break;
                   }
                   if($comp_type == 'country'){
-                      $components['country'] = $component['long_name'];
+                      $components['country'] = $component['short_name'];
                       break;
                   }
                   if($comp_type == 'postal_code'){
