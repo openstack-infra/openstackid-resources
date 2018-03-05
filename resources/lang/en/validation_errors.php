@@ -26,6 +26,7 @@ return [
     'send_speaker_summit_assistance_announcement_mail_code_already_redeemed' => 'promo code :promo_code already redeemed.',
     'send_speaker_summit_assistance_announcement_mail_invalid_mail_type' => 'mail type :mail_type is not valid.',
     'send_speaker_summit_assistance_promo_code_not_set' => 'speaker :speaker_id has not set a promo code for summit :summit_id, please set one manually.',
+    // LocationService
     'LocationService.addLocation.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
     'LocationService.addLocation.InvalidClassName' => 'invalid class name',
     'LocationService.addLocation.InvalidAddressOrCoordinates' => 'was passed a non-existent address',
@@ -34,7 +35,8 @@ return [
     'LocationService.updateLocation.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
     'LocationService.updateLocation.LocationNotFoundOnSummit' => 'location :location_id not found on summit :summit_id',
     'LocationService.updateLocation.ClassNameMissMatch' => 'location :location_id on summit :summit_id does not belongs to class name :class_name',
-    'LocationService.addVenueFloor.VenueNotFound' => 'venue :venue_id not found on summit :summit_id',
     'LocationService.addVenueFloor.FloorNameAlreadyExists' => 'floor name :floor_name already belongs to another floor on venue :venue_id',
     'LocationService.addVenueFloor.FloorNumberAlreadyExists' => 'floor number :floor_number already belongs to another floor on venue :venue_id',
+    'LocationService.updateVenueFloor.FloorNameAlreadyExists' => 'floor name :floor_name already belongs to another floor on venue :venue_id',
+    'LocationService.updateVenueFloor.FloorNumberAlreadyExists' => 'floor number :floor_number already belongs to another floor on venue :venue_id',
 ];

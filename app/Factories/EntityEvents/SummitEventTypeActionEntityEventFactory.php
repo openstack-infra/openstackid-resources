@@ -1,5 +1,4 @@
 <?php namespace App\Factories\EntityEvents;
-
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +11,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Events\TrackAction;
-use Illuminate\Support\Facades\App;
+
+use App\Events\SummitEventTypeAction;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;
-use models\summit\PresentationCategory;
 use models\summit\SummitEntityEvent;
+
 /**
- * Class TrackActionEntityEventFactory
+ * Class SummitEventTypeActionEntityEventFactory
  * @package App\Factories\EntityEvents
  */
-final class TrackActionEntityEventFactory
+final class SummitEventTypeActionEntityEventFactory
 {
     /**
-     * @param TrackAction $event
+     * @param SummitEventTypeAction $event
      * @param string $type
      * @return SummitEntityEvent
      */
-    public static function build(TrackAction $event, $type = 'UPDATE')
+    public static function build(SummitEventTypeAction $event, $type = 'UPDATE')
     {
         $resource_server_context = App::make(IResourceServerContext::class);
         $member_repository       = App::make(IMemberRepository::class);
@@ -42,8 +41,8 @@ final class TrackActionEntityEventFactory
 
 
         $entity_event = new SummitEntityEvent;
-        $entity_event->setEntityClassName('PresentationCategory');
-        $entity_event->setEntityId($event->getTrackId());
+        $entity_event->setEntityClassName($event->getClassName());
+        $entity_event->setEntityId($event->getEventTypeId());
         $entity_event->setType($type);
 
         if ($owner_id > 0) {

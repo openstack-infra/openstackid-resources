@@ -293,8 +293,11 @@ Route::group([
 
                         Route::group(['prefix' => 'floors'], function () {
                             Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenueFloor']);
+                            Route::group(['prefix' => '{floor_id}'], function () {
+                                Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateVenueFloor']);
+                                Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@deleteVenueFloor']);
+                            });
                         });
-
                     });
                 });
 

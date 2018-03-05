@@ -691,17 +691,23 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(204);
     }
 
-    public function testAddVenueFloor($summit_id = 23, $venue_id = 292){
+    /**
+     * @param int $summit_id
+     * @param int $venue_id
+     * @param int $number
+     * @return mixed
+     */
+    public function testAddVenueFloor($summit_id = 23, $venue_id = 292, $number = 0){
 
         $params = [
             'id'       => $summit_id,
             'venue_id' => $venue_id
         ];
-
+        $name       = str_random(16).'_floor';
         $data = [
-           'name' => 'test floor',
+           'name'        => $name,
            'description' => 'test floor',
-           'number' => -1
+           'number'      => $number
         ];
 
         $headers = [
@@ -712,6 +718,43 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $response = $this->action(
             "POST",
             "OAuth2SummitLocationsApiController@addVenueFloor",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $floor = json_decode($content);
+        $this->assertTrue(!is_null($floor));
+        return $floor;
+    }
+
+    public function testUpdateVenueFloor($summit_id = 23, $venue_id = 292){
+
+        $floor = $this->testAddVenueFloor($summit_id, $venue_id, 50);
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+            'floor_id' => $floor->id
+        ];
+
+        $data = [
+            'name' => 'test floor update',
+            'description' => 'test floor update',
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitLocationsApiController@updateVenueFloor",
             $params,
             [],
             [],

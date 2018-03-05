@@ -11,10 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Events\SummitEventTypeDeleted;
+use App\Events\SummitEventTypeInserted;
+use App\Events\SummitEventTypeUpdated;
 use App\Models\Foundation\Summit\Factories\SummitEventTypeFactory;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use App\Services\Model\ISummitEventTypeService;
+use Illuminate\Support\Facades\Event;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
@@ -69,7 +73,7 @@ final class SummitEventTypeService implements ISummitEventTypeService
      */
     public function addEventType(Summit $summit, array $data)
     {
-        return $this->tx_service->transaction(function() use($summit, $data){
+        $event_type =  $this->tx_service->transaction(function() use($summit, $data){
 
             $type = trim($data['name']);
 
@@ -85,6 +89,18 @@ final class SummitEventTypeService implements ISummitEventTypeService
             return $event_type;
 
         });
+
+        Event::fire
+        (
+            new SummitEventTypeInserted
+            (
+                $event_type->getId(),
+                $event_type->getClassName(),
+                $event_type->getSummitId()
+            )
+        );
+
+        return $event_type;
     }
 
     /**
@@ -114,6 +130,16 @@ final class SummitEventTypeService implements ISummitEventTypeService
             }
 
             $event_type = SummitEventTypeFactory::populate($event_type, $summit, $data);
+
+            Event::fire
+            (
+                new SummitEventTypeUpdated
+                (
+                    $event_type->getId(),
+                    $event_type->getClassName(),
+                    $event_type->getSummitId()
+                )
+            );
 
             return $event_type;
 
@@ -154,6 +180,16 @@ final class SummitEventTypeService implements ISummitEventTypeService
                 );
             }
 
+            Event::fire
+            (
+                new SummitEventTypeDeleted
+                (
+                    $event_type->getId(),
+                    $event_type->getClassName(),
+                    $event_type->getSummitId()
+                )
+            );
+
             $summit->removeEventType($event_type);
 
         });
@@ -167,7 +203,7 @@ final class SummitEventTypeService implements ISummitEventTypeService
      */
     public function seedDefaultEventTypes(Summit $summit)
     {
-        return $this->tx_service->transaction(function() use($summit){
+        $added_types =  $this->tx_service->transaction(function() use($summit){
             $added_types = [];
             $default_types = $this->default_event_types_repository->getAll();
             foreach ($default_types as $default_type){
@@ -180,5 +216,19 @@ final class SummitEventTypeService implements ISummitEventTypeService
 
             return $added_types;
         });
+
+        foreach ($added_types as $event_type){
+            Event::fire
+            (
+                new SummitEventTypeInserted
+                (
+                    $event_type->getId(),
+                    $event_type->getClassName(),
+                    $event_type->getSummitId()
+                )
+            );
+        }
+
+        return $added_types;
     }
 }

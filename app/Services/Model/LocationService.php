@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Events\FloorInserted;
+use App\Events\FloorUpdated;
 use App\Events\LocationDeleted;
 use App\Events\LocationInserted;
 use App\Events\LocationUpdated;
@@ -310,16 +312,16 @@ final class LocationService implements ILocationService
      */
     public function addVenueFloor(Summit $summit, $venue_id, array $data)
     {
-        return $this->tx_service->transaction(function () use ($summit, $venue_id, $data) {
+        $floor = $this->tx_service->transaction(function () use ($summit, $venue_id, $data) {
 
             $venue = $summit->getLocation($venue_id);
 
             if(is_null($venue)){
-                throw new ValidationException
+                throw new EntityNotFoundException
                 (
                     trans
                     (
-                        'validation_errors.LocationService.addVenueFloor.VenueNotFound',
+                        'not_found_errors.LocationService.addVenueFloor.VenueNotFound',
                         [
                             'summit_id' => $summit->getId(),
                             'venue_id'  => $venue_id,
@@ -379,6 +381,18 @@ final class LocationService implements ILocationService
 
             return $floor;
         });
+
+        Event::fire
+        (
+            new FloorInserted
+            (
+                $floor->getVenue()->getSummitId(),
+                $floor->getVenueId(),
+                $floor->getId()
+            )
+        );
+
+        return $floor;
     }
 
     /**
@@ -393,7 +407,100 @@ final class LocationService implements ILocationService
     public function updateVenueFloor(Summit $summit, $venue_id, $floor_id, array $data)
     {
         return $this->tx_service->transaction(function () use ($summit, $venue_id, $floor_id, $data) {
+            $venue = $summit->getLocation($venue_id);
 
+            if(is_null($venue)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateVenueFloor.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$venue instanceof SummitVenue){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.updateVenueFloor.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            if(isset($data['name'])) {
+                $former_floor = $venue->getFloorByName(trim($data['name']));
+
+                if (!is_null($former_floor) && $former_floor->getId() != $floor_id) {
+                    throw new ValidationException(
+                        trans
+                        (
+                            'validation_errors.LocationService.addVenueFloor.FloorNameAlreadyExists',
+                            [
+                                'venue_id' => $venue_id,
+                                'floor_name' => trim($data['name'])
+                            ]
+                        )
+                    );
+                }
+            }
+
+            if(isset($data['number'])) {
+                $former_floor = $venue->getFloorByNumber(intval($data['number']));
+
+                if (!is_null($former_floor) && $former_floor->getId() != $floor_id) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.LocationService.addVenueFloor.FloorNumberAlreadyExists',
+                            [
+                                'venue_id' => $venue_id,
+                                'floor_number' => intval($data['number'])
+                            ]
+                        )
+                    );
+                }
+
+            }
+
+            $floor = $venue->getFloor($floor_id);
+            if(is_null($floor)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateVenueFloor.FloorNotFound',
+                        [
+                            'floor_id' => $floor_id,
+                            'venue_id' => $venue_id
+                        ]
+                    )
+                );
+            }
+
+            $floor = SummitVenueFloorFactory::populate($floor, $data);
+
+            Event::fire
+            (
+                new FloorUpdated
+                (
+                    $floor->getVenue()->getSummitId(),
+                    $floor->getVenueId(),
+                    $floor->getId()
+                )
+            );
+
+            return $floor;
         });
     }
 

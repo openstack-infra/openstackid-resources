@@ -1,5 +1,4 @@
 <?php namespace App\Factories\EntityEvents;
-
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,38 +11,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Events\TrackAction;
+use App\Events\FloorAction;
 use Illuminate\Support\Facades\App;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;
-use models\summit\PresentationCategory;
 use models\summit\SummitEntityEvent;
+use models\summit\SummitVenueFloor;
 /**
- * Class TrackActionEntityEventFactory
+ * Class FloorActionEntityEventFactory
  * @package App\Factories\EntityEvents
  */
-final class TrackActionEntityEventFactory
+final class FloorActionEntityEventFactory
 {
     /**
-     * @param TrackAction $event
+     * @param FloorAction $event
      * @param string $type
      * @return SummitEntityEvent
      */
-    public static function build(TrackAction $event, $type = 'UPDATE')
+    public static function build(FloorAction $event, $type = 'UPDATE')
     {
         $resource_server_context = App::make(IResourceServerContext::class);
         $member_repository       = App::make(IMemberRepository::class);
         $summit_repository       = App::make(ISummitRepository::class);
         $summit                  = $summit_repository->getById($event->getSummitId());
+        $owner_id                = $resource_server_context->getCurrentUserExternalId();
 
-        $owner_id = $resource_server_context->getCurrentUserExternalId();
         if (is_null($owner_id)) $owner_id = 0;
 
-
         $entity_event = new SummitEntityEvent;
-        $entity_event->setEntityClassName('PresentationCategory');
-        $entity_event->setEntityId($event->getTrackId());
+        $entity_event->setEntityClassName('SummitVenueFloor');
+        $entity_event->setEntityId($event->getFloorId());
         $entity_event->setType($type);
 
         if ($owner_id > 0) {
@@ -52,7 +50,9 @@ final class TrackActionEntityEventFactory
         }
 
         $entity_event->setSummit($summit);
-        $entity_event->setMetadata('');
+        $entity_event->setMetadata(json_encode([
+            'venue_id' => $event->getVenueId()
+        ]));
 
         return $entity_event;
     }

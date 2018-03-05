@@ -19,6 +19,7 @@ use App\Factories\AssetsSyncRequest\FileCreatedAssetSyncRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\AdminSummitLocationActionSyncWorkRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventDeletedCalendarSyncWorkRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventUpdatedCalendarSyncWorkRequestFactory;
+use App\Factories\EntityEvents\FloorActionEntityEventFactory;
 use App\Factories\EntityEvents\LocationActionEntityEventFactory;
 use App\Factories\EntityEvents\MyFavoritesAddEntityEventFactory;
 use App\Factories\EntityEvents\MyFavoritesRemoveEntityEventFactory;
@@ -32,6 +33,7 @@ use App\Factories\EntityEvents\PresentationSpeakerDeletedEntityEventFactory;
 use App\Factories\EntityEvents\PresentationSpeakerUpdatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventCreatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventDeletedEntityEventFactory;
+use App\Factories\EntityEvents\SummitEventTypeActionEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventUpdatedEntityEventFactory;
 use App\Factories\EntityEvents\TrackActionEntityEventFactory;
 use App\Services\Utils\SCPFileUploader;
@@ -138,6 +140,23 @@ final class EventServiceProvider extends ServiceProvider
             EntityEventPersister::persist_list(PresentationSpeakerDeletedEntityEventFactory::build($event));
         });
 
+        // event types
+
+        Event::listen(\App\Events\SummitEventTypeInserted::class, function($event)
+        {
+            EntityEventPersister::persist(SummitEventTypeActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
+        Event::listen(\App\Events\SummitEventTypeUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(SummitEventTypeActionEntityEventFactory::build($event, 'UPDATE'));
+        });
+
+        Event::listen(\App\Events\SummitEventTypeDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(SummitEventTypeActionEntityEventFactory::build($event, 'DELETE'));
+        });
+
         // tracks
 
         Event::listen(\App\Events\TrackInserted::class, function($event)
@@ -184,6 +203,22 @@ final class EventServiceProvider extends ServiceProvider
                     AdminSummitLocationActionSyncWorkRequestFactory::build($event, 'REMOVE')
                 );
             }
+        });
+
+        Event::listen(\App\Events\FloorInserted::class, function($event)
+        {
+            EntityEventPersister::persist(FloorActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
+        Event::listen(\App\Events\FloorUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(FloorActionEntityEventFactory::build($event, 'UPDATE'));
+
+        });
+
+        Event::listen(\App\Events\FloorDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(FloorActionEntityEventFactory::build($event, 'DELETE'));
         });
 
     }
