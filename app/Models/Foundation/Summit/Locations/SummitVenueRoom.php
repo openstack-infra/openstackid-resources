@@ -26,11 +26,44 @@ use Doctrine\ORM\Mapping AS ORM;
 class SummitVenueRoom extends SummitAbstractLocation
 {
     /**
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitVenue", inversedBy="rooms")
+     * @ORM\JoinColumn(name="VenueID", referencedColumnName="ID")
+     * @var SummitVenue
+     */
+    private $venue;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitVenueFloor", inversedBy="rooms")
+     * @ORM\JoinColumn(name="FloorID", referencedColumnName="ID")
+     * @var SummitVenueFloor
+     */
+    private $floor;
+
+    /**
+     * @ORM\Column(name="Capacity", type="integer")
+     * @var int
+     */
+    private $capacity;
+
+    /**
+     * @ORM\Column(name="OverrideBlackouts", type="boolean")
+     * @var bool
+     */
+    private $override_blackouts;
+
+    /**
+     * @ORM\OneToMany(targetEntity="RoomMetricType", mappedBy="room", cascade={"persist"})
+     */
+    private $metrics;
+
+    /**
      * @return string
      */
     public function getClassName(){
-        return 'SummitVenueRoom';
+        return self::ClassName;
     }
+
+    const ClassName = 'SummitVenueRoom';
 
     /**
      * @return SummitVenue
@@ -45,7 +78,7 @@ class SummitVenueRoom extends SummitAbstractLocation
      */
     public function getVenueId(){
         try{
-            return $this->venue->getId();
+            return is_null($this->venue) ? 0 : $this->venue->getId();
         }
         catch(\Exception $ex){
             return 0;
@@ -72,7 +105,7 @@ class SummitVenueRoom extends SummitAbstractLocation
      */
     public function getFloorId(){
         try{
-            return $this->floor->getId();
+            return is_null($this->floor) ? 0 : $this->floor->getId();
         }
         catch(\Exception $ex){
             return 0;
@@ -117,36 +150,7 @@ class SummitVenueRoom extends SummitAbstractLocation
     {
         $this->override_blackouts = $override_blackouts;
     }
-    /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitVenue", inversedBy="rooms")
-     * @ORM\JoinColumn(name="VenueID", referencedColumnName="ID")
-     * @var SummitVenue
-     */
-    private $venue;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitVenueFloor", inversedBy="rooms")
-     * @ORM\JoinColumn(name="FloorID", referencedColumnName="ID")
-     * @var SummitVenueFloor
-     */
-    private $floor;
-
-    /**
-     * @ORM\Column(name="Capacity", type="integer")
-     * @var int
-     */
-    private $capacity;
-
-    /**
-     * @ORM\Column(name="OverrideBlackouts", type="boolean")
-     * @var bool
-     */
-    private $override_blackouts;
-
-    /**
-     * @ORM\OneToMany(targetEntity="RoomMetricType", mappedBy="room", cascade={"persist"})
-     */
-    private $metrics;
 
     /**
      * @return ArrayCollection
@@ -169,7 +173,11 @@ class SummitVenueRoom extends SummitAbstractLocation
      */
     public function __construct()
     {
-        $this->metrics = new ArrayCollection();
+        parent::__construct();
+        $this->metrics            = new ArrayCollection();
+        $this->override_blackouts = false;
+        $this->capacity           = 0;
+        $this->type               = self::TypeInternal;
     }
 
     /**

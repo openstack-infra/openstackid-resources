@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\SummitVenueRoom;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
@@ -80,4 +81,14 @@ interface ILocationService
      * @throws ValidationException
      */
     public function deleteVenueFloor(Summit $summit, $venue_id, $floor_id);
+
+    /**
+     * @param Summit $summit
+     * @param $venue_id
+     * @param array $data
+     * @return SummitVenueRoom
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addVenueRoom(Summit $summit, $venue_id, array $data);
 }

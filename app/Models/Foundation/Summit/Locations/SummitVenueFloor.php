@@ -172,4 +172,13 @@ class SummitVenueFloor extends SilverstripeBaseModel
         $this->image = $image;
     }
 
+    /**
+     * @param SummitVenueRoom $room
+     */
+    public function addRoom(SummitVenueRoom $room){
+        $this->rooms->add($room);
+        $room->setFloor($this);
+    }
+
+
 }

@@ -16,6 +16,7 @@ use models\summit\SummitAirport;
 use models\summit\SummitExternalLocation;
 use models\summit\SummitHotel;
 use models\summit\SummitVenue;
+use models\summit\SummitVenueRoom;
 /**
  * Class SummitLocationValidationRulesFactory
  * @package App\Http\Controllers
@@ -48,6 +49,9 @@ final class SummitLocationValidationRulesFactory
             break;
             case SummitExternalLocation::ClassName: {
                 return SummitExternalLocationValidationRulesFactory::build($data, $update);
+            }
+            case SummitVenueRoom::ClassName: {
+                return SummitVenueRoomValidationRulesFactory::build($data, $update);
             }
             break;
             default:{

@@ -18,6 +18,7 @@ use App\Events\FloorUpdated;
 use App\Events\LocationDeleted;
 use App\Events\LocationInserted;
 use App\Events\LocationUpdated;
+use App\Events\SummitVenueRoomInserted;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
 use App\Models\Foundation\Summit\Factories\SummitVenueFloorFactory;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
@@ -34,6 +35,8 @@ use models\summit\SummitAbstractLocation;
 use models\summit\SummitGeoLocatedLocation;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueFloor;
+use models\summit\SummitVenueRoom;
+
 /**
  * Class LocationService
  * @package App\Services\Model
@@ -574,5 +577,117 @@ final class LocationService implements ILocationService
 
             $venue->removeFloor($floor);
         });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param $venue_id
+     * @param array $data
+     * @return SummitVenueRoom
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addVenueRoom(Summit $summit, $venue_id, array $data)
+    {
+        $room =  $this->tx_service->transaction(function () use ($summit, $venue_id, $data) {
+
+            if (isset($data['name'])) {
+                $old_location = $summit->getLocationByName(trim($data['name']));
+
+                if (!is_null($old_location)) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.LocationService.addVenueRoom.LocationNameAlreadyExists',
+                            [
+                                'summit_id' => $summit->getId()
+                            ]
+                        )
+                    );
+                }
+            }
+
+            $venue = $summit->getLocation($venue_id);
+
+            if(is_null($venue)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.addVenueRoom.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$venue instanceof SummitVenue){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.addVenueRoom.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            $data['class_name'] = SummitVenueRoom::ClassName;
+            $room               = SummitLocationFactory::build($data);
+
+            if (is_null($room)) {
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.addVenueRoom.InvalidClassName'
+                    )
+                );
+            }
+
+            if(isset($data['floor_id'])){
+                $floor_id = intval($data['floor_id']);
+                $floor = $venue->getFloor($floor_id);
+
+                if(is_null($floor)){
+                    throw new EntityNotFoundException
+                    (
+                        trans
+                        (
+                            'not_found_errors.LocationService.addVenueRoom.FloorNotFound',
+                            [
+                                'floor_id' => $floor_id,
+                                'venue_id' => $venue_id
+                            ]
+                        )
+                    );
+                }
+
+                $floor->addRoom($room);
+            }
+
+            $summit->addLocation($room);
+            $venue->addRoom($room);
+
+            return $room;
+        });
+
+        Event::fire
+        (
+            new SummitVenueRoomInserted
+            (
+                $room->getSummitId(),
+                $room->getId(),
+                $room->getClassName()
+            )
+        );
+
+        return $room;
     }
 }

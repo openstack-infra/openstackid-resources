@@ -812,4 +812,95 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $this->assertResponseStatus(204);
     }
+
+    /**
+     * @param int $summit_id
+     * @param int $venue_id
+     * @return mixed
+     */
+    public function testAddVenueRoom($summit_id = 23, $venue_id = 292){
+
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+        ];
+
+        $name       = str_random(16).'_room';
+
+        $data = [
+            'name'        => $name,
+            'description' => 'test room',
+        ];
+
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addVenueRoom",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $room = json_decode($content);
+        $this->assertTrue(!is_null($room));
+        return $room;
+    }
+
+
+    /**
+     * @param int $summit_id
+     * @param int $venue_id
+     * @return mixed
+     */
+    public function testAddVenueRoomWithFloor($summit_id = 23, $venue_id = 292){
+
+        $floor = $this->testAddVenueFloor($summit_id, $venue_id, rand(0,1000));
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+            'floor_id' => $floor->id
+        ];
+
+        $name       = str_random(16).'_room';
+
+        $data = [
+            'name'        => $name,
+            'description' => 'test room',
+        ];
+
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addVenueFloorRoom",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $room = json_decode($content);
+        $this->assertTrue(!is_null($room));
+        return $room;
+    }
 }

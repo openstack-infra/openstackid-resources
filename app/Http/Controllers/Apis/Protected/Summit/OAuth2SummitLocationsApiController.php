@@ -31,6 +31,7 @@ use models\summit\SummitAirport;
 use models\summit\SummitExternalLocation;
 use models\summit\SummitHotel;
 use models\summit\SummitVenue;
+use models\summit\SummitVenueRoom;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
 use utils\Filter;
@@ -794,7 +795,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            $payload['class_name'] = SummitAirport::ClassName;
             $rules = [
                 'name'        => 'required|string|max:50',
                 'number'      => 'required|integer',
@@ -815,6 +815,96 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $floor = $this->location_service->addVenueFloor($summit, $venue_id, $payload);
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($floor)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $venue_id
+     * @return mixed
+     */
+    public function addVenueRoom($summit_id, $venue_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $payload = Input::json()->all();
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $payload['class_name'] = SummitVenueRoom::ClassName;
+            $rules = SummitLocationValidationRulesFactory::build($payload);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $room = $this->location_service->addVenueRoom($summit, $venue_id, $payload);
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($room)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $venue_id
+     * @return mixed
+     */
+    public function addVenueFloorRoom($summit_id, $venue_id, $floor_id){
+        try {
+            if(!Request::isJson()) return $this->error403();
+            $payload = Input::json()->all();
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $payload['class_name'] = SummitVenueRoom::ClassName;
+            $rules = SummitLocationValidationRulesFactory::build($payload);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $payload['floor_id'] = intval($floor_id);
+
+            $room = $this->location_service->addVenueRoom($summit, $venue_id, $payload);
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($room)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);

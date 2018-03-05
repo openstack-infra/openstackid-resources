@@ -31,12 +31,14 @@ final class AdminSummitLocationActionSyncWorkRequestFactory
         $resource_server_context         = App::make(IResourceServerContext::class);
         $member_repository               = App::make(IMemberRepository::class);
         $location_repository             = App::make(ISummitLocationRepository::class);
+
         $owner_id                        = $resource_server_context->getCurrentUserExternalId();
         if(is_null($owner_id)) $owner_id = 0;
 
-        $request = new AdminSummitLocationActionSyncWorkRequest();
-        $location    = $location_repository->getById($event->getLocationId());
-        $request->setLocationId($location);
+        $request  = new AdminSummitLocationActionSyncWorkRequest();
+        $location = $location_repository->getById($event->getLocationId());
+
+        $request->setLocation($location);
 
         $request->Type = $type;
         if($owner_id > 0){

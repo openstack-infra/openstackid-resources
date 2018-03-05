@@ -181,6 +181,11 @@ final class EventServiceProvider extends ServiceProvider
             EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'INSERT'));
         });
 
+        Event::listen(\App\Events\SummitVenueRoomInserted::class, function($event)
+        {
+            EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
         Event::listen(\App\Events\LocationUpdated::class, function($event)
         {
             EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'UPDATE'));

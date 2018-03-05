@@ -18,6 +18,8 @@ use models\summit\SummitExternalLocation;
 use models\summit\SummitGeoLocatedLocation;
 use models\summit\SummitHotel;
 use models\summit\SummitVenue;
+use models\summit\SummitVenueRoom;
+
 /**
  * Class SummitLocationFactory
  * @package App\Models\Foundation\Summit\Factories
@@ -47,6 +49,9 @@ final class SummitLocationFactory
                 break;
             case SummitAirport::ClassName :{
                 $location = self::populateSummitAirport(new SummitAirport, $data);
+            }
+            case SummitVenueRoom::ClassName :{
+                $location = self::populateSummitVenueRoom(new SummitVenueRoom, $data);
             }
             break;
         }
@@ -202,6 +207,19 @@ final class SummitLocationFactory
         return $airport;
     }
 
+    public static function populateSummitVenueRoom(SummitVenueRoom $room, array $data){
+
+        self::populateSummitAbstractLocation($room, $data);
+
+        if(isset($data['capacity']))
+            $room->setCapacity(intval($data['capacity']));
+
+        if(isset($data['override_blackouts']))
+            $room->setOverrideBlackouts(boolval($data['override_blackouts']));
+
+        return $room;
+    }
+
     /**
      * @param SummitAbstractLocation $location
      * @param array $data
@@ -219,6 +237,9 @@ final class SummitLocationFactory
         }
         if($location instanceof SummitExternalLocation){
             return self::populateSummitExternalLocation($location, $data);
+        }
+        if($location instanceof SummitVenueRoom){
+            return self::populateSummitVenueRoom($location, $data);
         }
         return $location;
     }
