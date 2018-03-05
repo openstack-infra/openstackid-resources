@@ -47,13 +47,13 @@ class SummitVenue extends SummitGeoLocatedLocation
     private $is_main;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitVenueRoom", mappedBy="venue", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitVenueRoom", mappedBy="venue", cascade={"persist"}, orphanRemoval=true)
      * @var SummitVenueRoom[]
      */
     private $rooms;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitVenueFloor", mappedBy="venue", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitVenueFloor", mappedBy="venue", cascade={"persist"}, orphanRemoval=true)
      * @var SummitVenueFloor[]
      */
     private $floors;
@@ -61,6 +61,11 @@ class SummitVenue extends SummitGeoLocatedLocation
     public function addFloor(SummitVenueFloor $floor){
         $this->floors->add($floor);
         $floor->setVenue($this);
+    }
+
+    public function addRoom(SummitVenueRoom $room){
+        $this->rooms->add($room);
+        $room->setVenue($this);
     }
 
     /**
@@ -150,6 +155,16 @@ class SummitVenue extends SummitGeoLocatedLocation
         $criteria->where(Criteria::expr()->eq('number', intval($floor_number)));
         $floor = $this->floors->matching($criteria)->first();
         return $floor === false ? null:$floor;
+    }
+
+    /**
+     * @param SummitVenueFloor $floor
+     * @return $this
+     */
+    public function removeFloor(SummitVenueFloor $floor){
+        $this->floors->removeElement($floor);
+        $floor->setVenue(null);
+        return $this;
     }
 
 }

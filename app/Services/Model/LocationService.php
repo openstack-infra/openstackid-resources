@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Events\FloorDeleted;
 use App\Events\FloorInserted;
 use App\Events\FloorUpdated;
 use App\Events\LocationDeleted;
@@ -335,7 +336,7 @@ final class LocationService implements ILocationService
                 (
                     trans
                     (
-                        'validation_errors.LocationService.addVenueFloor.VenueNotFound',
+                        'not_found_errors.LocationService.addVenueFloor.VenueNotFound',
                         [
                             'summit_id' => $summit->getId(),
                             'venue_id'  => $venue_id,
@@ -407,6 +408,7 @@ final class LocationService implements ILocationService
     public function updateVenueFloor(Summit $summit, $venue_id, $floor_id, array $data)
     {
         return $this->tx_service->transaction(function () use ($summit, $venue_id, $floor_id, $data) {
+
             $venue = $summit->getLocation($venue_id);
 
             if(is_null($venue)){
@@ -428,7 +430,7 @@ final class LocationService implements ILocationService
                 (
                     trans
                     (
-                        'validation_errors.LocationService.updateVenueFloor.VenueNotFound',
+                        'not_found_errors.LocationService.updateVenueFloor.VenueNotFound',
                         [
                             'summit_id' => $summit->getId(),
                             'venue_id'  => $venue_id,
@@ -516,6 +518,61 @@ final class LocationService implements ILocationService
     {
         return $this->tx_service->transaction(function () use ($summit, $venue_id, $floor_id) {
 
+            $venue = $summit->getLocation($venue_id);
+
+            if(is_null($venue)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteVenueFloor.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$venue instanceof SummitVenue){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteVenueFloor.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            $floor = $venue->getFloor($floor_id);
+
+            if(is_null($floor)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteVenueFloor.FloorNotFound',
+                        [
+                            'floor_id' => $floor_id,
+                            'venue_id' => $venue_id
+                        ]
+                    )
+                );
+            }
+
+            Event::fire(new FloorDeleted
+                (
+                    $floor->getVenue()->getSummitId(),
+                    $floor->getVenueId(),
+                    $floor->getId()
+                )
+            );
+
+            $venue->removeFloor($floor);
         });
     }
 }

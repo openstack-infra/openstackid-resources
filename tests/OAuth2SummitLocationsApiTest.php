@@ -697,12 +697,16 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
      * @param int $number
      * @return mixed
      */
-    public function testAddVenueFloor($summit_id = 23, $venue_id = 292, $number = 0){
+    public function testAddVenueFloor($summit_id = 23, $venue_id = 292, $number = null){
 
         $params = [
             'id'       => $summit_id,
             'venue_id' => $venue_id
         ];
+
+        if(is_null($number))
+            $number = rand(0,1000);
+
         $name       = str_random(16).'_floor';
         $data = [
            'name'        => $name,
@@ -733,9 +737,14 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         return $floor;
     }
 
+    /**
+     * @param int $summit_id
+     * @param int $venue_id
+     * @return mixed
+     */
     public function testUpdateVenueFloor($summit_id = 23, $venue_id = 292){
 
-        $floor = $this->testAddVenueFloor($summit_id, $venue_id, 50);
+        $floor = $this->testAddVenueFloor($summit_id, $venue_id, rand(0,1000));
         $params = [
             'id'       => $summit_id,
             'venue_id' => $venue_id,
@@ -768,5 +777,39 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $floor = json_decode($content);
         $this->assertTrue(!is_null($floor));
         return $floor;
+    }
+
+    /**
+     * @param int $summit_id
+     * @param int $venue_id
+     */
+    public function testDeleteVenueFloor($summit_id = 23, $venue_id = 292){
+
+        $floor = $this->testAddVenueFloor($summit_id, $venue_id, rand(0,1000));
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+            'floor_id' => $floor->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitLocationsApiController@deleteVenueFloor",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
     }
 }

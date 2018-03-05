@@ -181,4 +181,21 @@ class SummitVenueRoom extends SummitAbstractLocation
         $criteria = Criteria::create()->where(Criteria::expr()->eq("id", $type_id));
         return $this->metrics->matching($criteria)->first();
     }
+
+    /**
+     * @param SummitVenue $venue
+     */
+    public function setVenue(SummitVenue $venue)
+    {
+        $this->venue = $venue;
+    }
+
+    /**
+     * @param SummitVenueFloor $floor
+     */
+    public function setFloor(SummitVenueFloor $floor)
+    {
+        $this->floor = $floor;
+    }
+
 }

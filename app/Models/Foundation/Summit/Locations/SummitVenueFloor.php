@@ -54,7 +54,7 @@ class SummitVenueFloor extends SilverstripeBaseModel
     private $rooms;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER", cascade={"persist", "remove"})
      * @ORM\JoinColumn(name="ImageID", referencedColumnName="ID")
      * @var File
      */

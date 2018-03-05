@@ -1160,6 +1160,27 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     }
 
     public function deleteVenueFloor($summit_id, $venue_id, $floor_id){
+        try {
 
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->location_service->deleteVenueFloor($summit, $venue_id, $floor_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 }
