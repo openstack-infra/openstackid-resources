@@ -691,4 +691,39 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(204);
     }
 
+    public function testAddVenueFloor($summit_id = 23, $venue_id = 292){
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id
+        ];
+
+        $data = [
+           'name' => 'test floor',
+           'description' => 'test floor',
+           'number' => -1
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addVenueFloor",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $floor = json_decode($content);
+        $this->assertTrue(!is_null($floor));
+        return $floor;
+    }
 }

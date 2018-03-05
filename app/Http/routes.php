@@ -290,6 +290,11 @@ Route::group([
                     Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenue']);
                     Route::group(['prefix' => '{venue_id}'], function () {
                         Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateVenue']);
+
+                        Route::group(['prefix' => 'floors'], function () {
+                            Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenueFloor']);
+                        });
+
                     });
                 });
 

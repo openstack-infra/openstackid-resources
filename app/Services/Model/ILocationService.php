@@ -15,7 +15,7 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitAbstractLocation;
-use models\summit\SummitVenue;
+use models\summit\SummitVenueFloor;
 /**
  * Interface ILocationService
  * @package App\Services\Model
@@ -49,4 +49,35 @@ interface ILocationService
      * @throws ValidationException
      */
     public function deleteLocation(Summit $summit, $location_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param array $data
+     * @return SummitVenueFloor
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addVenueFloor(Summit $summit, $venue_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $floor_id
+     * @param array $data
+     * @return SummitVenueFloor
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateVenueFloor(Summit $summit, $venue_id, $floor_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $floor_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteVenueFloor(Summit $summit, $venue_id, $floor_id);
 }

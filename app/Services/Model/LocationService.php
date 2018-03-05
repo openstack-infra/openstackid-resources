@@ -16,6 +16,7 @@ use App\Events\LocationDeleted;
 use App\Events\LocationInserted;
 use App\Events\LocationUpdated;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
+use App\Models\Foundation\Summit\Factories\SummitVenueFloorFactory;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Services\Apis\GeoCodingApiException;
 use App\Services\Apis\IGeoCodingAPI;
@@ -28,7 +29,8 @@ use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitAbstractLocation;
 use models\summit\SummitGeoLocatedLocation;
-
+use models\summit\SummitVenue;
+use models\summit\SummitVenueFloor;
 /**
  * Class LocationService
  * @package App\Services\Model
@@ -295,6 +297,118 @@ final class LocationService implements ILocationService
             );
 
             $summit->removeLocation($location);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param array $data
+     * @return SummitVenueFloor
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addVenueFloor(Summit $summit, $venue_id, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $venue_id, $data) {
+
+            $venue = $summit->getLocation($venue_id);
+
+            if(is_null($venue)){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.addVenueFloor.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$venue instanceof SummitVenue){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.addVenueFloor.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            $former_floor = $venue->getFloorByName(trim($data['name']));
+
+            if(!is_null($former_floor)){
+                throw new ValidationException(
+                    trans
+                    (
+                        'validation_errors.LocationService.addVenueFloor.FloorNameAlreadyExists',
+                        [
+                            'venue_id'    => $venue_id,
+                            'floor_name'  => trim($data['name'])
+                        ]
+                    )
+                );
+            }
+
+            $former_floor = $venue->getFloorByNumber(intval($data['number']));
+
+            if(!is_null($former_floor)){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.addVenueFloor.FloorNumberAlreadyExists',
+                        [
+                            'venue_id'     => $venue_id,
+                            'floor_number' => intval($data['number'])
+                        ]
+                    )
+                );
+            }
+
+            $floor = SummitVenueFloorFactory::build($data);
+
+            $venue->addFloor($floor);
+
+            return $floor;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $floor_id
+     * @param array $data
+     * @return SummitVenueFloor
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateVenueFloor(Summit $summit, $venue_id, $floor_id, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $venue_id, $floor_id, $data) {
+
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $floor_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteVenueFloor(Summit $summit, $venue_id, $floor_id)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $venue_id, $floor_id) {
+
         });
     }
 }

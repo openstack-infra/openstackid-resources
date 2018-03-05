@@ -11,13 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query;
 use models\main\File;
 use models\utils\SilverstripeBaseModel;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitVenueFloor")
@@ -27,13 +25,6 @@ use models\utils\SilverstripeBaseModel;
 class SummitVenueFloor extends SilverstripeBaseModel
 {
     /**
-     * @return string
-     */
-    public function getClassName(){
-        return 'SummitVenueFloor';
-    }
-
-    /**
      * @ORM\Column(name="Name", type="string")
      */
     private $name;
@@ -42,6 +33,39 @@ class SummitVenueFloor extends SilverstripeBaseModel
      * @ORM\Column(name="Description", type="string")
      */
     private $description;
+
+    /**
+     * @ORM\Column(name="Number", type="integer")
+     */
+    private $number;
+
+    /**
+     *
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitVenue", inversedBy="floors")
+     * @ORM\JoinColumn(name="VenueID", referencedColumnName="ID")
+     * @var SummitVenue
+     */
+    private $venue;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitVenueRoom", mappedBy="floor", cascade={"persist"})
+     * @var SummitVenueRoom[]
+     */
+    private $rooms;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
+     * @ORM\JoinColumn(name="ImageID", referencedColumnName="ID")
+     * @var File
+     */
+    private $image;
+
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return 'SummitVenueFloor';
+    }
 
     /**
      * @return string
@@ -112,38 +136,12 @@ class SummitVenueFloor extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\Column(name="Number", type="integer")
-     */
-    private $number;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
-     * @ORM\JoinColumn(name="ImageID", referencedColumnName="ID")
-     * @var File
-     */
-    private $image;
-
-    /**
      * @return File
      */
     public function getImage()
     {
         return $this->image;
     }
-
-    /**
-     *
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitVenue", inversedBy="floors")
-     * @ORM\JoinColumn(name="VenueID", referencedColumnName="ID")
-     * @var SummitVenue
-     */
-    private $venue;
-
-    /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitVenueRoom", mappedBy="floor", cascade={"persist"})
-     * @var SummitVenueRoom[]
-     */
-    private $rooms;
 
     /**
      * @return SummitVenueRoom[]
@@ -156,6 +154,22 @@ class SummitVenueFloor extends SilverstripeBaseModel
     {
         parent::__construct();
         $this->rooms = new ArrayCollection();
+    }
+
+    /**
+     * @param SummitVenue $venue
+     */
+    public function setVenue($venue)
+    {
+        $this->venue = $venue;
+    }
+
+    /**
+     * @param File $image
+     */
+    public function setImage($image)
+    {
+        $this->image = $image;
     }
 
 }

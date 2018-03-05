@@ -58,6 +58,11 @@ class SummitVenue extends SummitGeoLocatedLocation
      */
     private $floors;
 
+    public function addFloor(SummitVenueFloor $floor){
+        $this->floors->add($floor);
+        $floor->setVenue($this);
+    }
+
     /**
      * @return bool
      */
@@ -123,6 +128,28 @@ class SummitVenue extends SummitGeoLocatedLocation
      */
     public static function getMetadata(){
         return array_merge(SummitGeoLocatedLocation::getMetadata(), self::$metadata);
+    }
+
+    /**
+     * @param string $floor_name
+     * @return SummitVenueFloor|null
+     */
+    public function getFloorByName($floor_name){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('name', trim($floor_name)));
+        $floor = $this->floors->matching($criteria)->first();
+        return $floor === false ? null:$floor;
+    }
+
+    /**
+     * @param int $floor_number
+     * @return SummitVenueFloor|null
+     */
+    public function getFloorByNumber($floor_number){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('number', intval($floor_number)));
+        $floor = $this->floors->matching($criteria)->first();
+        return $floor === false ? null:$floor;
     }
 
 }

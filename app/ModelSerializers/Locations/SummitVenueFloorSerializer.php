@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\SummitVenueFloor;
 use ModelSerializers\SerializerRegistry;
 use ModelSerializers\SilverStripeSerializer;
 use Illuminate\Support\Facades\Config;
@@ -39,17 +40,21 @@ final class SummitVenueFloorSerializer extends SilverStripeSerializer
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
         $floor  = $this->object;
+
+        if(!$floor instanceof SummitVenueFloor) return [];
+
         // floor image
         $values['image']= ($floor->getImage() !== null) ?
             Config::get("server.assets_base_url", 'https://www.openstack.org/').$floor->getImage()->getFilename()
             : null;
         // rooms
-        $rooms = [];
+        $rooms        = [];
         $expand_rooms = !empty($expand) && strstr('rooms',$expand) !== false;
+
         foreach($floor->getRooms() as $room)
         {
 
-            $rooms[] = $expand_rooms ?SerializerRegistry::getInstance()->getSerializer($room)->serialize($expand, $fields, $relations, $params) :
+            $rooms[] = $expand_rooms ? SerializerRegistry::getInstance()->getSerializer($room)->serialize($expand, $fields, $relations, $params) :
                 intval($room->getId());
 
         }

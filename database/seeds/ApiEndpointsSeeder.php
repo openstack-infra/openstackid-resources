@@ -537,6 +537,33 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'add-venue-floor',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-venue-floor',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-venue-floor',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-external-locations',
                 'route' => '/api/v1/summits/{id}/locations/external-locations',
                 'http_method' => 'GET',

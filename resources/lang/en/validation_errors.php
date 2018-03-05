@@ -34,4 +34,7 @@ return [
     'LocationService.updateLocation.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
     'LocationService.updateLocation.LocationNotFoundOnSummit' => 'location :location_id not found on summit :summit_id',
     'LocationService.updateLocation.ClassNameMissMatch' => 'location :location_id on summit :summit_id does not belongs to class name :class_name',
+    'LocationService.addVenueFloor.VenueNotFound' => 'venue :venue_id not found on summit :summit_id',
+    'LocationService.addVenueFloor.FloorNameAlreadyExists' => 'floor name :floor_name already belongs to another floor on venue :venue_id',
+    'LocationService.addVenueFloor.FloorNumberAlreadyExists' => 'floor number :floor_number already belongs to another floor on venue :venue_id',
 ];
