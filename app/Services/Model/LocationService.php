@@ -19,6 +19,7 @@ use App\Events\LocationDeleted;
 use App\Events\LocationInserted;
 use App\Events\LocationUpdated;
 use App\Events\SummitVenueRoomInserted;
+use App\Events\SummitVenueRoomUpdated;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
 use App\Models\Foundation\Summit\Factories\SummitVenueFloorFactory;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
@@ -36,7 +37,6 @@ use models\summit\SummitGeoLocatedLocation;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueFloor;
 use models\summit\SummitVenueRoom;
-
 /**
  * Class LocationService
  * @package App\Services\Model
@@ -125,11 +125,11 @@ final class LocationService implements ILocationService
                         case IGeoCodingAPI::ResponseStatusZeroResults: {
                             $validation_msg = trans('validation_errors.LocationService.addLocation.InvalidAddressOrCoordinates');
                         }
-                            break;
+                        break;
                         case IGeoCodingAPI::ResponseStatusOverQueryLimit: {
                             $validation_msg = trans('validation_errors.LocationService.addLocation.OverQuotaLimit');
                         }
-                            break;
+                        break;
                     }
                     throw new ValidationException($validation_msg);
                 } catch (\Exception $ex) {
@@ -201,7 +201,7 @@ final class LocationService implements ILocationService
             }
 
             if ($location->getClassName() != $data['class_name']) {
-                throw new EntityNotFoundException(
+                throw new ValidationException(
                     trans
                     (
                         'validation_errors.LocationService.updateLocation.ClassNameMissMatch',
@@ -335,7 +335,7 @@ final class LocationService implements ILocationService
             }
 
             if(!$venue instanceof SummitVenue){
-                throw new ValidationException
+                throw new EntityNotFoundException
                 (
                     trans
                     (
@@ -429,7 +429,7 @@ final class LocationService implements ILocationService
             }
 
             if(!$venue instanceof SummitVenue){
-                throw new ValidationException
+                throw new EntityNotFoundException
                 (
                     trans
                     (
@@ -538,7 +538,7 @@ final class LocationService implements ILocationService
             }
 
             if(!$venue instanceof SummitVenue){
-                throw new ValidationException
+                throw new EntityNotFoundException
                 (
                     trans
                     (
@@ -625,7 +625,7 @@ final class LocationService implements ILocationService
             }
 
             if(!$venue instanceof SummitVenue){
-                throw new ValidationException
+                throw new EntityNotFoundException
                 (
                     trans
                     (
@@ -689,5 +689,165 @@ final class LocationService implements ILocationService
         );
 
         return $room;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $room_id
+     * @param array $data
+     * @return SummitVenueRoom
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateVenueRoom(Summit $summit, $venue_id, $room_id, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $venue_id, $room_id, $data) {
+
+            if (isset($data['name'])) {
+                $old_location = $summit->getLocationByName(trim($data['name']));
+
+                if (!is_null($old_location)) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.LocationService.updateVenueRoom.LocationNameAlreadyExists',
+                            [
+                                'summit_id' => $summit->getId()
+                            ]
+                        )
+                    );
+                }
+            }
+
+            $venue = $summit->getLocation($venue_id);
+
+            if(is_null($venue)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateVenueRoom.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$venue instanceof SummitVenue){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateVenueRoom.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            $room = $summit->getLocation($room_id);
+            if (is_null($room)) {
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateVenueRoom.RoomNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                            'room_id'   => $room_id,
+                        ]
+                    )
+                );
+            }
+
+            if (!$room instanceof SummitVenueRoom) {
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateVenueRoom.RoomNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                            'room_id'   => $room_id,
+                        ]
+                    )
+                );
+            }
+            $old_floor_id = $room->getFloorId();
+            $new_floor_id = $room->getFloorId();
+            $room         = SummitLocationFactory::populate($room, $data);
+            $floor        = null;
+            if(isset($data['floor_id'])){
+                $new_floor_id = intval($data['floor_id']);
+                $floor        = $venue->getFloor($new_floor_id);
+
+                if(is_null($floor)){
+                    throw new EntityNotFoundException
+                    (
+                        trans
+                        (
+                            'not_found_errors.LocationService.updateVenueRoom.FloorNotFound',
+                            [
+                                'floor_id' => $new_floor_id,
+                                'venue_id' => $venue_id
+                            ]
+                        )
+                    );
+                }
+
+                $floor->addRoom($room);
+            }
+
+            $summit->addLocation($room);
+            $venue->addRoom($room);
+
+            // request to update order
+            if (isset($data['order']) && intval($data['order']) != $room->getOrder()) {
+
+                if(!is_null($floor)){
+                    $floor->recalculateRoomsOrder($room, intval($data['order']));
+                }
+                else
+                {
+                    $venue->recalculateRoomsOrder($room, intval($data['order']));
+                }
+            }
+
+            Event::fire
+            (
+                new SummitVenueRoomUpdated
+                (
+                    $room->getSummitId(),
+                    $room->getId(),
+                    $summit->getScheduleEventsIdsPerLocation($room),
+                    $old_floor_id,
+                    $new_floor_id
+                )
+            );
+
+            return $room;
+        });
+
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $room_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteVenueRoom(Summit $summit, $venue_id, $room_id)
+    {
+        // TODO: Implement deleteVenueRoom() method.
     }
 }

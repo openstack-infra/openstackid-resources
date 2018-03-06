@@ -31,6 +31,7 @@ final class SummitVenueRoomValidationRulesFactory
             return array_merge([
                 'capacity'           => 'sometimes|integer:min:0',
                 'override_blackouts' => 'sometimes|boolean',
+                'floor_id'           => 'sometimes|integer',
             ], $rules);
         }
 

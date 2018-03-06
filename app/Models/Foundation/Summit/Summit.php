@@ -1679,15 +1679,16 @@ SQL;
         $former_order = $location->getOrder();
         $criteria     = Criteria::create();
         $criteria->orderBy(['order'=> 'ASC']);
-        $locations = $this->locations->matching($criteria)->toArray();
-        $max_order = count($locations);
-
         $filtered_locations = [];
 
-        foreach($locations as $l){
+        foreach($this->locations->matching($criteria)->toArray() as $l){
             if($l instanceof SummitVenue || $l instanceof SummitHotel || $l instanceof SummitAirport || $l instanceof SummitExternalLocation)
-            $filtered_locations[] = $l;
+                $filtered_locations[] = $l;
         }
+
+        $filtered_locations = array_slice($filtered_locations,0, count($filtered_locations), false);
+        $max_order          = count($filtered_locations);
+
         if($new_order > $max_order)
             throw new ValidationException(sprintf("max order is %s", $max_order));
 
@@ -1697,7 +1698,7 @@ SQL;
         (
             array_slice($filtered_locations, 0, $new_order -1 , true) ,
             [$location] ,
-            array_slice($filtered_locations, $new_order -1 , count($filtered_locations) - $new_order - 1, true)
+            array_slice($filtered_locations, $new_order -1 , count($filtered_locations), true)
         );
 
         $order = 1;
@@ -1705,7 +1706,6 @@ SQL;
             $l->setOrder($order);
             $order++;
         }
-
     }
 
     /**

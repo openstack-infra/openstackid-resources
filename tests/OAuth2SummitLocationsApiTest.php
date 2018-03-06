@@ -820,7 +820,6 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
      */
     public function testAddVenueRoom($summit_id = 23, $venue_id = 292){
 
-
         $params = [
             'id'       => $summit_id,
             'venue_id' => $venue_id,
@@ -832,7 +831,6 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
             'name'        => $name,
             'description' => 'test room',
         ];
-
 
         $headers = [
             "HTTP_Authorization" => " Bearer " . $this->access_token,
@@ -889,6 +887,49 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $response = $this->action(
             "POST",
             "OAuth2SummitLocationsApiController@addVenueFloorRoom",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $room = json_decode($content);
+        $this->assertTrue(!is_null($room));
+        return $room;
+    }
+
+    /**
+     * @param int $summit_id
+     * @param int $venue_id
+     * @return mixed
+     */
+    public function testUpdateVenueRoomWithFloor($summit_id = 23, $venue_id = 292){
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+            'floor_id' => 22,
+            'room_id'  => 307
+        ];
+
+        $data = [
+            'description' => 'Pyrmont Theatre',
+            'order'       => 2,
+            'capacity'    => 1000,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitLocationsApiController@updateVenueFloorRoom",
             $params,
             [],
             [],

@@ -25,6 +25,7 @@ final class AdminSummitLocationActionSyncWorkRequestFactory
 {
     /**
      * @param LocationAction $event
+     * @param string $type
      * @return AdminSummitLocationActionSyncWorkRequest
      */
     public static function build(LocationAction $event, $type){
@@ -40,7 +41,8 @@ final class AdminSummitLocationActionSyncWorkRequestFactory
 
         $request->setLocation($location);
 
-        $request->Type = $type;
+        $request->setType($type);
+
         if($owner_id > 0){
             $member = $member_repository->getById($owner_id);
             $request->setCreatedBy($member);

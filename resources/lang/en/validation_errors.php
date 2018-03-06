@@ -41,4 +41,5 @@ return [
     'LocationService.updateVenueFloor.FloorNumberAlreadyExists' => 'floor number :floor_number already belongs to another floor on venue :venue_id',
     'LocationService.addVenueRoom.InvalidClassName' => 'invalid class name',
     'LocationService.addVenueRoom.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
+    'LocationService.updateVenueRoom.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
 ];

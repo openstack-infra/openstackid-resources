@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Events\LocationAction;
+use App\Events\SummitVenueRoomUpdated;
 use Illuminate\Support\Facades\App;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
@@ -48,8 +49,20 @@ final class LocationActionEntityEventFactory
             $entity_event->setOwner($member);
         }
 
+        $metadata = '';
+
+        if($event instanceof SummitVenueRoomUpdated){
+            $old_floor_id = $event->getOldFloorId();
+            $new_floor_id = $event->getNewFloorId();
+
+            if($old_floor_id != $new_floor_id){
+                $metadata = json_encode( ['floor_old' => $old_floor_id, 'floor_new' => $new_floor_id]);
+            }
+        }
+
         $entity_event->setSummit($summit);
-        $entity_event->setMetadata('');
+        $entity_event->setMetadata($metadata);
+
         return $entity_event;
     }
 }

@@ -91,4 +91,25 @@ interface ILocationService
      * @throws ValidationException
      */
     public function addVenueRoom(Summit $summit, $venue_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $room_id
+     * @param array $payload
+     * @return SummitVenueRoom
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateVenueRoom(Summit $summit, $venue_id, $room_id, array $payload);
+
+    /**
+     * @param Summit $summit
+     * @param int $venue_id
+     * @param int $room_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteVenueRoom(Summit $summit, $venue_id, $room_id);
 }

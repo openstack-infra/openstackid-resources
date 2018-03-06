@@ -11,10 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\summit\CalendarSync\WorkQueue\AdminSummitLocationActionSyncWorkRequest;
-
-
 /**
  * Class AdminSummitLocationActionSyncWorkRequestPersister
  * @package App\EntityPersisters
@@ -30,8 +27,6 @@ final class AdminSummitLocationActionSyncWorkRequestPersister extends BasePersis
 INSERT INTO AbstractCalendarSyncWorkRequest 
 (`Type`, IsProcessed, ProcessedDate, Created, LastEdited, ClassName)
 VALUES (:Type, 0, NULL, NOW(), NOW(), 'AdminSummitLocationActionSyncWorkRequest');
-INSERT INTO AdminScheduleSummitActionSyncWorkRequest (ID, CreatedByID) VALUES (LAST_INSERT_ID(), :CreatedByID)
-INSERT INTO AdminSummitLocationActionSyncWorkRequest (ID, LocationID) VALUES (LAST_INSERT_ID(), :LocationID);
 SQL;
 
         $bindings = [
@@ -47,5 +42,17 @@ SQL;
         ];
 
         self::insert($sql, $bindings, $types);
+
+        $sql = <<<SQL
+INSERT INTO AdminScheduleSummitActionSyncWorkRequest (ID, CreatedByID) VALUES (LAST_INSERT_ID(), :CreatedByID)
+SQL;
+        self::insert($sql, $bindings, $types);
+
+        $sql = <<<SQL
+INSERT INTO AdminSummitLocationActionSyncWorkRequest (ID, LocationID) VALUES (LAST_INSERT_ID(), :LocationID);
+SQL;
+
+        self::insert($sql, $bindings, $types);
+
     }
 }

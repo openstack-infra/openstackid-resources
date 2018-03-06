@@ -555,9 +555,27 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'update-venue-room',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/rooms/{room_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'add-venue-floor-room',
                 'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}/rooms',
                 'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-venue-floor-room',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}/rooms/{room_id}',
+                'http_method' => 'PUT',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteLocationsData, $current_realm)

@@ -17,16 +17,17 @@ use models\summit\CalendarSync\WorkQueue\AdminSummitEventActionSyncWorkRequest;
  * Class AdminSummitEventActionSyncWorkRequestPersister
  * @package App\EntityPersisters
  */
-class AdminSummitEventActionSyncWorkRequestPersister extends BasePersister
+final class AdminSummitEventActionSyncWorkRequestPersister extends BasePersister
 {
+    /**
+     * @param AdminSummitEventActionSyncWorkRequest $request
+     */
     public static function persist(AdminSummitEventActionSyncWorkRequest $request){
 
         $sql = <<<SQL
 INSERT INTO AbstractCalendarSyncWorkRequest 
 (`Type`, IsProcessed, ProcessedDate, Created, LastEdited, ClassName)
 VALUES (:Type, 0, NULL, NOW(), NOW(), 'AdminSummitEventActionSyncWorkRequest');
-INSERT INTO AdminScheduleSummitActionSyncWorkRequest (ID, CreatedByID) VALUES (LAST_INSERT_ID(), :CreatedByID)
-INSERT INTO AdminSummitEventActionSyncWorkRequest (ID, SummitEventID) VALUES (LAST_INSERT_ID(), :SummitEventID);
 SQL;
 
         $bindings = [
@@ -41,6 +42,16 @@ SQL;
             'SummitEventID' => 'integer',
         ];
 
+        self::insert($sql, $bindings, $types);
+
+        $sql = <<<SQL
+INSERT INTO AdminScheduleSummitActionSyncWorkRequest (ID, CreatedByID) VALUES (LAST_INSERT_ID(), :CreatedByID)
+SQL;
+        self::insert($sql, $bindings, $types);
+
+        $sql = <<<SQL
+INSERT INTO AdminSummitEventActionSyncWorkRequest (ID, SummitEventID) VALUES (LAST_INSERT_ID(), :SummitEventID);
+SQL;
         self::insert($sql, $bindings, $types);
 
     }

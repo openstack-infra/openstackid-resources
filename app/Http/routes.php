@@ -294,6 +294,9 @@ Route::group([
 
                         Route::group(['prefix' => 'rooms'], function () {
                             Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenueRoom']);
+                            Route::group(['prefix' => '{room_id}'], function () {
+                                Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateVenueRoom']);
+                            });
                         });
 
                         Route::group(['prefix' => 'floors'], function () {
@@ -304,7 +307,7 @@ Route::group([
                                 Route::group(['prefix' => 'rooms'], function () {
                                     Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenueFloorRoom']);
                                     Route::group(['prefix' => '{room_id}'], function () {
-
+                                        Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateVenueFloorRoom']);
                                     });
                                 });
                             });

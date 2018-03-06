@@ -176,12 +176,25 @@ final class EventServiceProvider extends ServiceProvider
 
         // locations events
 
-        Event::listen(\App\Events\LocationInserted::class, function($event)
+
+        Event::listen(\App\Events\SummitVenueRoomInserted::class, function($event)
         {
             EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'INSERT'));
         });
 
-        Event::listen(\App\Events\SummitVenueRoomInserted::class, function($event)
+        Event::listen(\App\Events\SummitVenueRoomUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'UPDATE'));
+            $published_events = $event->getRelatedEventIds();
+            if(count($published_events) > 0){
+                AdminSummitLocationActionSyncWorkRequestPersister::persist
+                (
+                    AdminSummitLocationActionSyncWorkRequestFactory::build($event, 'UPDATE')
+                );
+            }
+        });
+
+        Event::listen(\App\Events\LocationInserted::class, function($event)
         {
             EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'INSERT'));
         });
