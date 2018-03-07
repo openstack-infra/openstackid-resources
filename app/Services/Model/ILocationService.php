@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use models\summit\SummitVenueRoom;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
@@ -106,11 +107,42 @@ interface ILocationService
      * @param Summit $summit
      * @param int $venue_id
      * @param int $room_id
-     * @param array $payload
+     * @param array $data
      * @return SummitVenueRoom
      * @throws EntityNotFoundException
      * @throws ValidationException
      */
-    public function updateVenueRoom(Summit $summit, $venue_id, $room_id, array $payload);
+    public function updateVenueRoom(Summit $summit, $venue_id, $room_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param array $data
+     * @return SummitLocationBanner
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addLocationBanner(Summit $summit, $location_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $banner_id
+     * @param array $data
+     * @return SummitLocationBanner
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateLocationBanner(Summit $summit, $location_id, $banner_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $banner_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteLocationBanner(Summit $summit, $location_id, $banner_id);
 
 }

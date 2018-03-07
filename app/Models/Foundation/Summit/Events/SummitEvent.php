@@ -684,8 +684,8 @@ class SummitEvent extends SilverstripeBaseModel
                 sprintf
                 (
                     'start/end datetime must be between summit start/end datetime! (%s - %s)',
-                    $summit->getLocalBeginDate(),
-                    $summit->getLocalEndDate()
+                    $summit->getLocalBeginDate()->format('Y-m-d H:i:s'),
+                    $summit->getLocalEndDate()->format('Y-m-d H:i:s')
                 )
             );
 

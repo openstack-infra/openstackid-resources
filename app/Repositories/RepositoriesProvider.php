@@ -13,10 +13,12 @@
  **/
 use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
+use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
+use App\Models\Foundation\Summit\Repositories\ISummitLocationBannerRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
 use Illuminate\Support\Facades\App;
@@ -27,6 +29,7 @@ use models\main\Company;
 use models\main\EmailCreationRequest;
 use models\main\File;
 use models\main\Group;
+use models\main\IOrganizationRepository;
 use models\main\Organization;
 use models\summit\ISummitRegistrationPromoCodeRepository;
 use models\summit\ISummitTicketTypeRepository;
@@ -255,7 +258,7 @@ final class RepositoriesProvider extends ServiceProvider
             });
 
         App::singleton(
-            'models\main\IOrganizationRepository',
+            IOrganizationRepository::class,
             function(){
                 return  EntityManager::getRepository(Organization::class);
             });
@@ -306,6 +309,13 @@ final class RepositoriesProvider extends ServiceProvider
             ISummitLocationRepository::class,
             function(){
                 return  EntityManager::getRepository(SummitAbstractLocation::class);
+            }
+        );
+
+        App::singleton(
+            ISummitLocationBannerRepository::class,
+            function(){
+                return  EntityManager::getRepository(SummitLocationBanner::class);
             }
         );
     }

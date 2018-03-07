@@ -26,4 +26,7 @@ return [
     'LocationService.addVenueRoom.VenueNotFound' => 'venue :venue_id not found on summit :summit_id',
     'LocationService.updateVenueRoom.FloorNotFound' => 'floor :floor_id does not belongs to venue :venue_id',
     'LocationService.updateVenueRoom.VenueNotFound' => 'venue :venue_id not found on summit :summit_id',
+    'LocationService.addLocationBanner.LocationNotFound' => 'location :location_id not found on summit :summit_id',
+    'LocationService.deleteLocationBanner.LocationNotFound' => 'location :location_id not found on summit :summit_id',
+    'LocationService.deleteLocationBanner.BannerNotFound'=> 'banner :banner_id not found on location :location_id',
 ];

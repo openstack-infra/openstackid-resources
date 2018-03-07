@@ -21,8 +21,11 @@ use App\Events\LocationUpdated;
 use App\Events\SummitVenueRoomDeleted;
 use App\Events\SummitVenueRoomInserted;
 use App\Events\SummitVenueRoomUpdated;
+use App\Models\Foundation\Summit\Factories\SummitLocationBannerFactory;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
 use App\Models\Foundation\Summit\Factories\SummitVenueFloorFactory;
+use App\Models\Foundation\Summit\Locations\Banners\ScheduledSummitLocationBanner;
+use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Services\Apis\GeoCodingApiException;
 use App\Services\Apis\IGeoCodingAPI;
@@ -943,6 +946,115 @@ final class LocationService implements ILocationService
                     $summit->getScheduleEventsIdsPerLocation($room)
                 )
             );
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param array $data
+     * @return SummitLocationBanner
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addLocationBanner(Summit $summit, $location_id, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $location_id, $data) {
+
+            $location = $summit->getLocation($location_id);
+
+            if(is_null($location)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.addLocationBanner.LocationNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'location_id'  => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $banner = SummitLocationBannerFactory::build($summit, $location, $data);
+
+            if (is_null($banner)) {
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.addLocationBanner.InvalidClassName'
+                    )
+                );
+            }
+
+            $location->addBanner($banner);
+
+            return $banner;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $banner_id
+     * @param array $data
+     * @return SummitLocationBanner
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateLocationBanner(Summit $summit, $location_id, $banner_id, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $location_id, $banner_id, $data) {
+
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $banner_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteLocationBanner(Summit $summit, $location_id, $banner_id)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $location_id, $banner_id) {
+            $location = $summit->getLocation($location_id);
+
+            if(is_null($location)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationBanner.LocationNotFound',
+                        [
+                            'summit_id'    => $summit->getId(),
+                            'location_id'  => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $banner = $location->getBannerById($banner_id);
+
+            if(is_null($banner)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationBanner.BannerNotFound',
+                        [
+                            'location_id'  => $location_id,
+                            'banner_id'    => $banner_id,
+                        ]
+                    )
+                );
+            }
+
+            $location->removeBanner($banner);
         });
     }
 }

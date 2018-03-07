@@ -1023,13 +1023,21 @@ class Summit extends SilverstripeBaseModel
      */
     public function isEventInsideSummitDuration(SummitEvent $summit_event)
     {
-        $event_start_date = $summit_event->getLocalStartDate();
-        $event_end_date = $summit_event->getLocalEndDate();
+        return $this->isTimeFrameInsideSummitDuration($summit_event->getLocalStartDate(), $summit_event->getLocalEndDate());
+    }
+
+    /**
+     * @param DateTime $start_date
+     * @param DateTime $end_date
+     * @return bool
+     */
+    public function isTimeFrameInsideSummitDuration(DateTime $start_date, DateTime $end_date )
+    {
         $summit_start_date = $this->getLocalBeginDate();
         $summit_end_date = $this->getLocalEndDate();
 
-        return $event_start_date >= $summit_start_date && $event_start_date <= $summit_end_date &&
-            $event_end_date <= $summit_end_date && $event_end_date >= $event_start_date;
+        return $start_date >= $summit_start_date && $start_date <= $summit_end_date &&
+            $end_date <= $summit_end_date && $end_date >= $start_date;
     }
 
     /**

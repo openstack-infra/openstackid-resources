@@ -348,6 +348,15 @@ Route::group([
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@deleteLocation']);
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents')->where('location_id', 'tbd|[0-9]+');
                     Route::get('/events','OAuth2SummitLocationsApiController@getLocationEvents')->where('location_id', 'tbd|[0-9]+');
+                    // location banners
+                    Route::group(['prefix' => 'banners'], function () {
+                        Route::get('', 'OAuth2SummitLocationsApiController@getLocationBanners');
+                        Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addLocationBanner']);
+                        Route::group(['prefix' => '{banner_id}'], function () {
+                            Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateLocationBanner']);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@deleteLocationBanner']);
+                        });
+                    });
                 });
             });
 

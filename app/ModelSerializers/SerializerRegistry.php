@@ -36,6 +36,8 @@ use App\ModelSerializers\Marketplace\SpokenLanguageSerializer;
 use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
+use App\ModelSerializers\Summit\ScheduledSummitLocationBannerSerializer;
+use App\ModelSerializers\Summit\SummitLocationBannerSerializer;
 use Libs\ModelSerializers\IModelSerializer;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
@@ -128,14 +130,15 @@ final class SerializerRegistry
         $this->registry['SponsorSummitRegistrationPromoCode'] = SponsorSummitRegistrationPromoCodeSerializer::class;
         $this->registry['PresentationSpeakerSummitAssistanceConfirmationRequest'] = PresentationSpeakerSummitAssistanceConfirmationRequestSerializer::class;
         // locations
-        $this->registry['SummitVenue']                = SummitVenueSerializer::class;
-        $this->registry['SummitVenueRoom']            = SummitVenueRoomSerializer::class;
-        $this->registry['SummitVenueFloor']           = SummitVenueFloorSerializer::class;
-        $this->registry['SummitExternalLocation']     = SummitExternalLocationSerializer::class;
-        $this->registry['SummitHotel']                = SummitHotelSerializer::class;
-        $this->registry['SummitAirport']              = SummitAirportSerializer::class;
-        $this->registry['SummitLocationImage']        = SummitLocationImageSerializer::class;
-
+        $this->registry['SummitVenue']                   = SummitVenueSerializer::class;
+        $this->registry['SummitVenueRoom']               = SummitVenueRoomSerializer::class;
+        $this->registry['SummitVenueFloor']              = SummitVenueFloorSerializer::class;
+        $this->registry['SummitExternalLocation']        = SummitExternalLocationSerializer::class;
+        $this->registry['SummitHotel']                   = SummitHotelSerializer::class;
+        $this->registry['SummitAirport']                 = SummitAirportSerializer::class;
+        $this->registry['SummitLocationImage']           = SummitLocationImageSerializer::class;
+        $this->registry['SummitLocationBanner']          = SummitLocationBannerSerializer::class;
+        $this->registry['ScheduledSummitLocationBanner'] = ScheduledSummitLocationBannerSerializer::class;
         // member
         $this->registry['Member']                          = [
             self::SerializerType_Public  => PublicMemberSerializer::class,

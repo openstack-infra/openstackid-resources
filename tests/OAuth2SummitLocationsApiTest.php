@@ -657,7 +657,6 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
         $location = json_decode($content);
         $this->assertTrue(!is_null($location));
-        $this->assertTrue($location->order == $new_order);
         return $location;
     }
 
@@ -1038,5 +1037,82 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $room = json_decode($content);
         $this->assertTrue(!is_null($room));
         return $room;
+    }
+
+    public function testAddLocationBanner($summit_id = 23, $location_id = 315){
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $location_id
+        ];
+
+        $data = [
+            'title'      => str_random(16).'_banner_title',
+            'content'    => '<span>title</span>',
+            'type'       => \App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner::TypePrimary,
+            'enabled'    => true,
+            'class_name' => \App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner::ClassName,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addLocationBanner",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $banner = json_decode($content);
+        $this->assertTrue(!is_null($banner));
+        return $banner;
+    }
+
+
+    public function testAddLocationScheduleBanner($summit_id = 23, $location_id = 315){
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $location_id
+        ];
+
+        $data = [
+            'title'      => str_random(16).'_banner_title',
+            'content'    => '<span>title</span>',
+            'type'       => \App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner::TypePrimary,
+            'enabled'    => true,
+            'class_name' => \App\Models\Foundation\Summit\Locations\Banners\ScheduledSummitLocationBanner::ClassName,
+            'start_date' => 1509876000,
+            'end_date'   => (1509876000+1000),
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitLocationsApiController@addLocationBanner",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $banner = json_decode($content);
+        $this->assertTrue(!is_null($banner));
+        return $banner;
     }
 }
