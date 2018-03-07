@@ -152,6 +152,17 @@ class SummitVenueFloor extends SilverstripeBaseModel
         return $this->rooms;
     }
 
+    /**
+     * @param int $room_id
+     * @return SummitVenueRoom
+     */
+    public function getRoom($room_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($room_id)));
+        $room = $this->rooms->matching($criteria)->first();
+        return $room === false ? null : $room;
+    }
+
     public function __construct()
     {
         parent::__construct();

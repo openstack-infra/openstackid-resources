@@ -27,6 +27,7 @@ use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
+use models\summit\Summit;
 use models\summit\SummitAirport;
 use models\summit\SummitExternalLocation;
 use models\summit\SummitHotel;
@@ -389,6 +390,11 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             if (is_null($location)) {
                 return $this->error404();
             }
+
+            if (!Summit::isPrimaryLocation($location)) {
+                return $this->error404();
+            }
+
             return $this->ok(SerializerRegistry::getInstance()->getSerializer($location)->serialize($expand,[], $relations));
         } catch (Exception $ex) {
             Log::error($ex);
@@ -550,6 +556,161 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         (
             $this->location_repository->getMetadata($summit)
         );
+    }
+
+    /**
+     * @param $summit_id
+     * @param $venue_id
+     * @param $floor_id
+     * @return mixed
+     */
+    public function getVenueFloor($summit_id, $venue_id, $floor_id){
+        try {
+
+            $expand    = Request::input('expand', '');
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+
+            $summit    = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $venue = $summit->getLocation($venue_id);
+
+            if (is_null($venue)) {
+                return $this->error404();
+            }
+
+            if (!$venue instanceof SummitVenue) {
+                return $this->error404();
+            }
+
+            $floor = $venue->getFloor($floor_id);
+
+            if (is_null($floor)) {
+                return $this->error404();
+            }
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($floor)->serialize($expand,[], $relations));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $venue_id
+     * @param $room_id
+     * @return mixed
+     */
+    public function getVenueRoom($summit_id, $venue_id, $room_id){
+        try {
+
+            $expand    = Request::input('expand', '');
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+
+            $summit    = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $venue = $summit->getLocation($venue_id);
+
+            if (is_null($venue)) {
+                return $this->error404();
+            }
+
+            if (!$venue instanceof SummitVenue) {
+                return $this->error404();
+            }
+
+
+            $room = $venue->getRoom($room_id);
+
+            if (is_null($room)) {
+                return $this->error404();
+            }
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($room)->serialize($expand,[], $relations));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $venue_id
+     * @param $floor_id
+     * @param $room_id
+     * @return mixed
+     */
+    public function getVenueFloorRoom($summit_id, $venue_id, $floor_id, $room_id){
+        try {
+
+            $expand    = Request::input('expand', '');
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+
+            $summit    = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $venue = $summit->getLocation($venue_id);
+
+            if (is_null($venue)) {
+                return $this->error404();
+            }
+
+            if (!$venue instanceof SummitVenue) {
+                return $this->error404();
+            }
+
+            $floor = $venue->getFloor($floor_id);
+
+            if (is_null($floor)) {
+                return $this->error404();
+            }
+
+            $room = $floor->getRoom($room_id);
+
+            if (is_null($room)) {
+                return $this->error404();
+            }
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($room)->serialize($expand,[], $relations));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 
     /***

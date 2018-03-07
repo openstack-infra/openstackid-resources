@@ -136,7 +136,8 @@ final class AdminActionsCalendarSyncProcessingService
                             foreach ($page_response->getItems() as $schedule_event){
                                 if(!$schedule_event instanceof ScheduleCalendarSyncInfo) continue;
                                 $work_request = new MemberEventScheduleSummitActionSyncWorkRequest();
-                                $work_request->setType($request->getType());
+                                // always is update no matter what
+                                $work_request->setType(AbstractCalendarSyncWorkRequest::TypeUpdate);
                                 $work_request->setCalendarSyncInfo($schedule_event->getCalendarSyncInfo());
                                 $work_request->setOwner($schedule_event->getMember());
                                 $work_request->setSummitEventId($schedule_event->getSummitEvent()->getId());

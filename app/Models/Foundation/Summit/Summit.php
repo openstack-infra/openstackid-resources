@@ -746,6 +746,17 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
+     * @param SummitAbstractLocation $location
+     * @return bool
+     */
+    static public function isPrimaryLocation(SummitAbstractLocation $location){
+        return ($location instanceof SummitVenue
+            || $location instanceof SummitHotel
+            || $location instanceof SummitAirport
+            || $location instanceof SummitExternalLocation);
+    }
+
+    /**
      * @return SummitEventType[]
      */
     public function getEventTypes()
@@ -1682,7 +1693,7 @@ SQL;
         $filtered_locations = [];
 
         foreach($this->locations->matching($criteria)->toArray() as $l){
-            if($l instanceof SummitVenue || $l instanceof SummitHotel || $l instanceof SummitAirport || $l instanceof SummitExternalLocation)
+            if(Summit::isPrimaryLocation($l))
                 $filtered_locations[] = $l;
         }
 

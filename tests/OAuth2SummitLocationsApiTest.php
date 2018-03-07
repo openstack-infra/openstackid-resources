@@ -976,4 +976,67 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $this->assertResponseStatus(204);
     }
+
+    public function testGetFloorById($summit_id = 23, $venue_id = 292, $floor_id = 23){
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+            'floor_id' => $floor_id,
+            'expand'   => 'rooms'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitLocationsApiController@getVenueFloor",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $floor = json_decode($content);
+        $this->assertTrue(!is_null($floor));
+        return $floor;
+    }
+
+    public function testGetVenueFloorRoomById($summit_id = 23, $venue_id = 292, $floor_id = 23, $room_id = 309){
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+            'floor_id' => $floor_id,
+            'room_id'  => $room_id,
+            'expand'   => 'floor,venue'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitLocationsApiController@getVenueFloorRoom",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $room = json_decode($content);
+        $this->assertTrue(!is_null($room));
+        return $room;
+    }
 }

@@ -536,6 +536,16 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteLocationsData, $current_realm)
                 ],
             ],
+            // floors
+            [
+                'name' => 'get-venue-floor',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
             [
                 'name' => 'add-venue-floor',
                 'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors',
@@ -543,6 +553,34 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [
                     sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-venue-floor',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-venue-floor',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            // rooms
+            [
+                'name' => 'get-venue-room',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/rooms/{room_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
             [
@@ -572,6 +610,16 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteLocationsData, $current_realm)
                 ],
             ],
+            // floor rooms
+            [
+                'name' => 'get-venue-floor-room',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}/rooms/{room_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
             [
                 'name' => 'add-venue-floor-room',
                 'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}/rooms',
@@ -590,24 +638,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteLocationsData, $current_realm)
                 ],
             ],
-            [
-                'name' => 'update-venue-floor',
-                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}',
-                'http_method' => 'PUT',
-                'scopes' => [
-                    sprintf(SummitScopes::WriteSummitData, $current_realm),
-                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
-                ],
-            ],
-            [
-                'name' => 'delete-venue-floor',
-                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}',
-                'http_method' => 'DELETE',
-                'scopes' => [
-                    sprintf(SummitScopes::WriteSummitData, $current_realm),
-                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
-                ],
-            ],
+            // external locations
             [
                 'name' => 'get-external-locations',
                 'route' => '/api/v1/summits/{id}/locations/external-locations',

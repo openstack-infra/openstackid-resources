@@ -204,6 +204,19 @@ final class LocationService implements ILocationService
                 );
             }
 
+            if(!Summit::isPrimaryLocation($location)){
+                 throw new EntityNotFoundException(
+                    trans
+                    (
+                        'validation_errors.LocationService.updateLocation.LocationNotFoundOnSummit',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
             if ($location->getClassName() != $data['class_name']) {
                 throw new ValidationException(
                     trans
@@ -297,11 +310,7 @@ final class LocationService implements ILocationService
                     )
                 );
             }
-
-            if (!($location instanceof SummitVenue
-                || $location instanceof SummitHotel
-                || $location instanceof SummitAirport
-                || $location instanceof SummitExternalLocation)) {
+            if(!Summit::isPrimaryLocation($location)){
                 throw new EntityNotFoundException(
                     trans
                     (
