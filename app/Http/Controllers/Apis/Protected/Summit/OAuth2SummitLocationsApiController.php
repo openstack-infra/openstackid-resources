@@ -14,6 +14,7 @@
 use App\Http\Utils\PagingConstants;
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBannerConstants;
 use App\Models\Foundation\Summit\Locations\SummitLocationConstants;
+use App\Models\Foundation\Summit\Repositories\ISummitLocationBannerRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Services\Model\ILocationService;
 use Exception;
@@ -81,12 +82,18 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     private $location_service;
 
     /**
+     * @var ISummitLocationBannerRepository
+     */
+    private $location_banners_repository;
+
+    /**
      * OAuth2SummitLocationsApiController constructor.
      * @param ISummitRepository $summit_repository
      * @param ISummitEventRepository $event_repository
      * @param ISpeakerRepository $speaker_repository
      * @param IEventFeedbackRepository $event_feedback_repository
      * @param ISummitLocationRepository $location_repository
+     * @param ISummitLocationBannerRepository $location_banners_repository
      * @param ISummitService $summit_service
      * @param ILocationService $location_service
      * @param IResourceServerContext $resource_server_context
@@ -98,18 +105,20 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
         ISummitLocationRepository $location_repository,
+        ISummitLocationBannerRepository $location_banners_repository,
         ISummitService $summit_service,
         ILocationService $location_service,
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
-        $this->repository                = $summit_repository;
-        $this->speaker_repository        = $speaker_repository;
-        $this->event_repository          = $event_repository;
-        $this->event_feedback_repository = $event_feedback_repository;
-        $this->location_repository       = $location_repository;
-        $this->location_service          = $location_service;
-        $this->summit_service            = $summit_service;
+        $this->repository                  = $summit_repository;
+        $this->speaker_repository          = $speaker_repository;
+        $this->event_repository            = $event_repository;
+        $this->event_feedback_repository   = $event_feedback_repository;
+        $this->location_repository         = $location_repository;
+        $this->location_banners_repository = $location_banners_repository;
+        $this->location_service            = $location_service;
+        $this->summit_service              = $summit_service;
     }
 
     /**
@@ -123,6 +132,21 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         $valid = true;
         foreach($filter_element[0] as $elem){
             $valid = $valid && in_array($elem->getValue(), SummitLocationConstants::$valid_class_names);
+        }
+        return $valid;
+    }
+
+    /**
+     * @param $filter_element
+     * @return bool
+     */
+    private function validateBannerClassName($filter_element){
+        if($filter_element instanceof FilterElement){
+            return in_array($filter_element->getValue(), SummitLocationBannerConstants::$valid_class_names);
+        }
+        $valid = true;
+        foreach($filter_element[0] as $elem){
+            $valid = $valid && in_array($elem->getValue(), SummitLocationBannerConstants::$valid_class_names);
         }
         return $valid;
     }
@@ -1559,6 +1583,114 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     /**
      *  Location Banners Endpoints
      */
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @return mixed
+     */
+    public function getLocationBanners($summit_id, $location_id){
+        $values = Input::all();
+        $rules  = [
+            'page'     => 'integer|min:1',
+            'per_page' => sprintf('required_with:page|integer|min:%s|max:%s', PagingConstants::MinPageSize, PagingConstants::MaxPageSize),
+        ];
+
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $location = $summit->getLocation($location_id);
+            if (is_null($location)) return $this->error404();
+
+            $validation = Validator::make($values, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException();
+                throw $ex->setMessages($validation->messages()->toArray());
+            }
+
+            // default values
+            $page     = 1;
+            $per_page = PagingConstants::DefaultPageSize;
+
+            if (Input::has('page')) {
+                $page     = intval(Input::get('page'));
+                $per_page = intval(Input::get('per_page'));
+            }
+
+            $filter = null;
+
+            if (Input::has('filter')) {
+                $filter = FilterParser::parse(Input::get('filter'), [
+                    'class_name'  => ['=='],
+                    'title'       => ['==', '=@'],
+                    'content'     => ['=@'],
+                    'type'        => ['=='],
+                    'enabled'     => ['=='],
+                    'start_date'  => ['>', '<', '<=', '>=', '=='],
+                    'end_date'    => ['>', '<', '<=', '>=', '=='],
+                ]);
+            }
+
+            $order = null;
+
+            if (Input::has('order'))
+            {
+                $order = OrderParser::parse(Input::get('order'), [
+                    'id',
+                    'title',
+                    'start_date',
+                    'end_date'
+                ]);
+            }
+
+            if(is_null($filter)) $filter = new Filter();
+
+            if($filter->hasFilter("class_name") && !$this->validateBannerClassName($filter->getFilter("class_name"))){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "class_name filter has an invalid value ( valid values are %s",
+                        implode(", ", SummitLocationBannerConstants::$valid_class_names)
+                    )
+                );
+            }
+
+            $data = $this->location_banners_repository->getBySummitLocation($location, new PagingInfo($page, $per_page), $filter, $order);
+
+            return $this->ok
+            (
+                $data->toArray
+                (
+                    Request::input('expand', ''),
+                    [],
+                    [],
+                    []
+                )
+            );
+        }
+        catch (ValidationException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error412(array( $ex1->getMessage()));
+        }
+        catch (EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 
     /**
      * @param $summit_id

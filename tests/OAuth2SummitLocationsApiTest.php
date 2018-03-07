@@ -1115,4 +1115,73 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($banner));
         return $banner;
     }
+
+    public function testGetLocationBanners($summit_id = 23, $location_id = 315)
+    {
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $location_id,
+            'page'        => 1,
+            'per_page'    => 5,
+            'order'       => '-id'
+        ];
+
+        $headers =
+            [
+                "HTTP_Authorization" => " Bearer " . $this->access_token,
+                "CONTENT_TYPE"       => "application/json"
+            ];
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getLocationBanners",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $banners = json_decode($content);
+        $this->assertTrue(!is_null($banners));
+    }
+
+    public function testGetLocationBannersFilterByClassName($summit_id = 23, $location_id = 315)
+    {
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $location_id,
+            'page'        => 1,
+            'per_page'    => 5,
+            'order'       => '-id',
+            'filter'      => 'class_name=='.\App\Models\Foundation\Summit\Locations\Banners\ScheduledSummitLocationBanner::ClassName
+        ];
+
+        $headers =
+            [
+                "HTTP_Authorization" => " Bearer " . $this->access_token,
+                "CONTENT_TYPE"       => "application/json"
+            ];
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getLocationBanners",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $banners = json_decode($content);
+        $this->assertTrue(!is_null($banners));
+    }
 }
