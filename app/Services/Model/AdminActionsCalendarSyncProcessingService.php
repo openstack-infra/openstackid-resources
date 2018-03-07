@@ -126,18 +126,17 @@ final class AdminActionsCalendarSyncProcessingService
                     }
 
                     if($request instanceof AdminSummitLocationActionSyncWorkRequest){
-                        $location = $request->getLocation();
-                        $page     = 1;
+                        $location_id = $request->getLocationId();
+                        $page        = 1;
 
                         do{
-                            $page_response = $this->schedule_sync_repository->getAllBySummitLocation($location, new PagingInfo($page, 1000));
+                            $page_response = $this->schedule_sync_repository->getAllBySummitLocation($location_id, new PagingInfo($page, 1000));
                             $has_more      = count($page_response->getItems()) > 0;
                             if(!$has_more) continue;
                             foreach ($page_response->getItems() as $schedule_event){
                                 if(!$schedule_event instanceof ScheduleCalendarSyncInfo) continue;
                                 $work_request = new MemberEventScheduleSummitActionSyncWorkRequest();
-                                // always is update no matter what
-                                $work_request->setType(AbstractCalendarSyncWorkRequest::TypeUpdate);
+                                $work_request->setType($request->getType());
                                 $work_request->setCalendarSyncInfo($schedule_event->getCalendarSyncInfo());
                                 $work_request->setOwner($schedule_event->getMember());
                                 $work_request->setSummitEventId($schedule_event->getSummitEvent()->getId());

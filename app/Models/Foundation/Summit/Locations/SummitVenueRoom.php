@@ -191,11 +191,19 @@ class SummitVenueRoom extends SummitAbstractLocation
     }
 
     /**
-     * @param SummitVenue $venue
+     * @param SummitVenue|null $venue
      */
     public function setVenue(SummitVenue $venue)
     {
         $this->venue = $venue;
+    }
+
+    public function clearVenue(){
+        $this->venue = null;
+    }
+
+    public function clearFloor(){
+        $this->floor = null;
     }
 
     /**

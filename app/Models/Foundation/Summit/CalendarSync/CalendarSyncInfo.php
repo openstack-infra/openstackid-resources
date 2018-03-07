@@ -80,7 +80,7 @@ class CalendarSyncInfo extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="calendars_sync")
-     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID", onDelete="CASCADE")
      * @var Member
      */
     protected $owner;

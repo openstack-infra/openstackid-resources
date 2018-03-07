@@ -961,7 +961,6 @@ final class SummitService implements ISummitService
      */
     public function unPublishEvent(Summit $summit, $event_id)
     {
-
         return $this->tx_service->transaction(function () use ($summit, $event_id) {
 
             $event = $this->event_repository->getById($event_id);
@@ -973,8 +972,7 @@ final class SummitService implements ISummitService
                 throw new ValidationException(sprintf("event %s does not belongs to summit id %s", $event_id, $summit->getIdentifier()));
 
             $event->unPublish();
-            $this->event_repository->add($event);
-            $this->event_repository->cleanupScheduleAndFavoritesForEvent($event_id);
+
             return $event;
         });
     }
@@ -998,8 +996,6 @@ final class SummitService implements ISummitService
                 throw new ValidationException(sprintf("event %s does not belongs to summit id %s", $event_id, $summit->getIdentifier()));
 
             $this->event_repository->delete($event);
-            // clean up summit attendees schedule
-            $this->event_repository->cleanupScheduleAndFavoritesForEvent($event_id);
 
             return true;
         });

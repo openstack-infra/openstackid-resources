@@ -23,19 +23,26 @@ final class AdminSummitLocationActionSyncWorkRequest
 extends AdminScheduleSummitActionSyncWorkRequest
 {
     const SubType = 'ADMIN_LOCATION';
+
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitAbstractLocation", cascade={"persist"})
-     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
-     * @var SummitAbstractLocation
+     * @ORM\Column(name="LocationID", type="integer")
+     * @var int
      */
-    private $location;
+    private $location_id;
 
     /**
      * @return SummitAbstractLocation
      */
     public function getLocation()
     {
-        return $this->location;
+        $id = $this->location_id;
+        try {
+            $location = $this->getEM()->find(SummitAbstractLocation::class, $id);
+        }
+        catch(\Exception $ex){
+            return null;
+        }
+        return $location;
     }
 
     /**
@@ -43,19 +50,14 @@ extends AdminScheduleSummitActionSyncWorkRequest
      */
     public function getLocationId()
     {
-        try{
-            return is_null($this->location) ? 0 : $this->location->getId();
-        }
-        catch (\Exception $ex){
-            return 0;
-        }
+        return $this->location_id;
     }
 
     /**
-     * @param SummitAbstractLocation $location
+     * @param int $location_id
      */
-    public function setLocation($location)
+    public function setLocationId($location_id)
     {
-        $this->location = $location;
+        $this->location_id = $location_id;
     }
 }

@@ -108,7 +108,7 @@ class SummitEvent extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="RSVPTemplateID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="RSVPTemplateID", referencedColumnName="ID", onDelete="SET NULL")
      * @var RSVPTemplate
      */
     protected $rsvp_template;
@@ -121,21 +121,21 @@ class SummitEvent extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="PresentationCategory", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="CategoryID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="CategoryID", referencedColumnName="ID", onDelete="SET NULL")
      * @var PresentationCategory
      */
     protected $category = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="SummitEventType", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="TypeID", referencedColumnName="ID", onDelete="SET NULL")
      * @var SummitEventType
      */
     protected $type;
 
     /**
      * @ORM\ManyToOne(targetEntity="SummitAbstractLocation", fetch="EXTRA_LAZY")
-     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID", onDelete="SET NULL")
      * @var SummitAbstractLocation
      */
     protected $location = null;
@@ -143,8 +143,8 @@ class SummitEvent extends SilverstripeBaseModel
     /**
      * @ORM\ManyToMany(targetEntity="models\main\Company", inversedBy="sponsorships", fetch="EXTRA_LAZY")
      * @ORM\JoinTable(name="SummitEvent_Sponsors",
-     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="CompanyID", referencedColumnName="ID")}
+     *      joinColumns={@ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="CompanyID", referencedColumnName="ID", onDelete="CASCADE")}
      *      )
      */
     protected $sponsors;

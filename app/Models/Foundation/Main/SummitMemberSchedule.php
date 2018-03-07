@@ -26,14 +26,14 @@ final class SummitMemberSchedule extends BaseEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="Member", inversedBy="schedule")
-     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="MemberID", referencedColumnName="ID", onDelete="CASCADE")
      * @var Member
      */
     private $member;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent")
-     * @ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="SummitEventID", referencedColumnName="ID", onDelete="CASCADE")
      * @var SummitEvent
      */
     private $event;

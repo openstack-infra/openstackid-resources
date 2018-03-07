@@ -11,13 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping AS ORM;
 use models\main\Member;
 use models\summit\SummitAbstractLocation;
 use models\summit\SummitEvent;
+use models\summit\SummitVenueRoom;
 use models\utils\SilverstripeBaseModel;
-
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineScheduleCalendarSyncInfoRepository")
  * @ORM\Table(name="ScheduleCalendarSyncInfo")
@@ -28,7 +27,7 @@ class ScheduleCalendarSyncInfo extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="schedule_sync_info")
-     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID", nullable=true )
+     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID", nullable=true, onDelete="CASCADE")
      * @var Member
      */
     private $member;
@@ -79,11 +78,10 @@ class ScheduleCalendarSyncInfo extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitAbstractLocation")
-     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
-     * @var SummitAbstractLocation
+     * @ORM\Column(name="LocationID", type="integer")
+     * @var int
      */
-    private $location;
+    private $location_id;
 
     /**
      * @ORM\Column(name="ExternalId", type="string")
@@ -243,19 +241,26 @@ class ScheduleCalendarSyncInfo extends SilverstripeBaseModel
     }
 
     /**
-     * @return mixed
+     * @return SummitAbstractLocation
      */
     public function getLocation()
     {
-        return $this->location;
+        $id = $this->location_id;
+        try {
+            $location = $this->getEM()->find(SummitAbstractLocation::class, $id);
+        }
+        catch(\Exception $ex){
+            return null;
+        }
+        return $location;
     }
 
     /**
-     * @param mixed $location
+     * @param int location_id
      */
-    public function setLocation($location)
+    public function setLocationId($location_id)
     {
-        $this->location = $location;
+        $this->location_id = $location_id;
     }
 
     /**

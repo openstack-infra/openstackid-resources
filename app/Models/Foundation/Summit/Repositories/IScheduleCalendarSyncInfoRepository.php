@@ -11,11 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\utils\IBaseRepository;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
  * Interface IScheduleCalendarSyncInfoRepository
  * @package models\summit
@@ -30,10 +28,10 @@ interface IScheduleCalendarSyncInfoRepository extends IBaseRepository
     public function getAllBySummitEvent($summit_event_id, PagingInfo $paging_info);
 
     /**
-     * @param SummitAbstractLocation $location
+     * @param int $location_id
      * @param PagingInfo $paging_info
      * @return PagingResponse
      */
-    public function getAllBySummitLocation(SummitAbstractLocation $location, PagingInfo $paging_info);
+    public function getAllBySummitLocation($location_id, PagingInfo $paging_info);
 
 }

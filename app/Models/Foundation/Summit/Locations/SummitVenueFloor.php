@@ -159,11 +159,15 @@ class SummitVenueFloor extends SilverstripeBaseModel
     }
 
     /**
-     * @param SummitVenue $venue
+     * @param SummitVenue|null $venue
      */
     public function setVenue($venue)
     {
         $this->venue = $venue;
+    }
+
+    public function clearVenue(){
+        $this->venue = null;
     }
 
     /**
@@ -180,6 +184,14 @@ class SummitVenueFloor extends SilverstripeBaseModel
     public function addRoom(SummitVenueRoom $room){
         $this->rooms->add($room);
         $room->setFloor($this);
+    }
+
+    /**
+     * @param SummitVenueRoom $room
+     */
+    public function removeRoom(SummitVenueRoom $room){
+        $this->rooms->removeElement($room);
+        $room->clearFloor();
     }
 
     /**

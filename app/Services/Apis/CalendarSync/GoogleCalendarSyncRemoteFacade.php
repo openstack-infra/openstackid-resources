@@ -107,7 +107,7 @@ final class GoogleCalendarSyncRemoteFacade
             // relationships
             $sync_info->setSummitEventId($summit_event->getId());
             $sync_info->setCalendarSyncInfo($this->sync_calendar_info);
-            $sync_info->setLocation($summit_event->getLocation());
+            $sync_info->setLocationId($summit_event->getLocationId());
             return $sync_info;
         }
         catch(Google_Service_Exception $ex1){
@@ -236,7 +236,7 @@ final class GoogleCalendarSyncRemoteFacade
             // primitives
             $schedule_sync_info->setEtag($updated_event->getEtag());
             // relationships
-            $schedule_sync_info->setLocation($summit_event->getLocation());
+            $schedule_sync_info->setLocationId($summit_event->getLocationId());
 
             return true;
         }

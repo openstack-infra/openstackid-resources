@@ -73,7 +73,7 @@ class SummitEventFeedback extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="feedback")
-     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="OwnerID", referencedColumnName="ID", onDelete="CASCADE")
      * @var Member
      */
     private $owner;
@@ -95,7 +95,7 @@ class SummitEventFeedback extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent", inversedBy="feedback", fetch="LAZY")
-     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID", onDelete="CASCADE")
      * @var SummitEvent
      */
     private $event;

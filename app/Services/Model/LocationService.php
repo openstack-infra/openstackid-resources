@@ -18,6 +18,7 @@ use App\Events\FloorUpdated;
 use App\Events\LocationDeleted;
 use App\Events\LocationInserted;
 use App\Events\LocationUpdated;
+use App\Events\SummitVenueRoomDeleted;
 use App\Events\SummitVenueRoomInserted;
 use App\Events\SummitVenueRoomUpdated;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
@@ -33,7 +34,10 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitAbstractLocation;
+use models\summit\SummitAirport;
+use models\summit\SummitExternalLocation;
 use models\summit\SummitGeoLocatedLocation;
+use models\summit\SummitHotel;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueFloor;
 use models\summit\SummitVenueRoom;
@@ -282,6 +286,22 @@ final class LocationService implements ILocationService
             $location = $summit->getLocation($location_id);
 
             if (is_null($location)) {
+                throw new EntityNotFoundException(
+                    trans
+                    (
+                        'validation_errors.LocationService.deleteLocation.LocationNotFoundOnSummit',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if (!($location instanceof SummitVenue
+                || $location instanceof SummitHotel
+                || $location instanceof SummitAirport
+                || $location instanceof SummitExternalLocation)) {
                 throw new EntityNotFoundException(
                     trans
                     (
@@ -848,6 +868,72 @@ final class LocationService implements ILocationService
      */
     public function deleteVenueRoom(Summit $summit, $venue_id, $room_id)
     {
-        // TODO: Implement deleteVenueRoom() method.
+        return $this->tx_service->transaction(function () use ($summit, $venue_id, $room_id) {
+
+            $venue = $summit->getLocation($venue_id);
+
+            if(is_null($venue)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteVenueRoom.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$venue instanceof SummitVenue){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteVenueRoom.VenueNotFound',
+                        [
+                            'summit_id' => $summit->getId(),
+                            'venue_id'  => $venue_id,
+                        ]
+                    )
+                );
+            }
+
+            $room = $venue->getRoom($room_id);
+
+            if(is_null($room)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteVenueRoom.RoomNotFound',
+                        [
+                            'room_id' => $room_id,
+                            'venue_id' => $venue_id
+                        ]
+                    )
+                );
+            }
+
+            $venue->removeRoom($room);
+
+            if($room->hasFloor())
+            {
+                $floor = $room->getFloor();
+                $floor->removeRoom($room);
+            }
+
+            Event::fire
+            (
+                new SummitVenueRoomDeleted
+                (
+                    $room->getSummitId(),
+                    $room->getId(),
+                    'SummitVenueRoom',
+                    $summit->getScheduleEventsIdsPerLocation($room)
+                )
+            );
+        });
     }
 }

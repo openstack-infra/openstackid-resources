@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\summit\CalendarSync\CalendarSyncInfo;
 use models\summit\CalendarSync\CalendarSyncInfoOAuth2;
 use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
@@ -164,7 +163,7 @@ final class OutlookCalendarSyncRemoteFacade
             // relationships
             $sync_info->setSummitEventId($summit_event->getId());
             $sync_info->setCalendarSyncInfo($this->sync_calendar_info);
-            $sync_info->setLocation($summit_event->getLocation());
+            $sync_info->setLocationId($summit_event->getLocationId());
             return $sync_info;
         }
         catch (Exception $ex){
@@ -214,7 +213,7 @@ final class OutlookCalendarSyncRemoteFacade
             // primitives
             $schedule_sync_info->setEtag($updated_event->getEtag());
             // relationships
-            $schedule_sync_info->setLocation($summit_event->getLocation());
+            $schedule_sync_info->setLocationId($summit_event->getLocationId());
             return true;
         }
         catch (Exception $ex){

@@ -194,6 +194,18 @@ final class EventServiceProvider extends ServiceProvider
             }
         });
 
+        Event::listen(\App\Events\SummitVenueRoomDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'DELETE'));
+            $published_events = $event->getRelatedEventIds();
+            if(count($published_events) > 0){
+                AdminSummitLocationActionSyncWorkRequestPersister::persist
+                (
+                    AdminSummitLocationActionSyncWorkRequestFactory::build($event, 'REMOVE')
+                );
+            }
+        });
+
         Event::listen(\App\Events\LocationInserted::class, function($event)
         {
             EntityEventPersister::persist(LocationActionEntityEventFactory::build($event, 'INSERT'));

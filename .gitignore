@@ -26,3 +26,4 @@ storage/*
 *.log
 routes.txt
 /storage/logs/
+/ss.sql

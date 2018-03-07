@@ -944,4 +944,36 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($room));
         return $room;
     }
+
+    /**
+     * @param int $summit_id
+     * @param int $venue_id
+     * @return mixed
+     */
+    public function testDeleteExistentRoom($summit_id = 23, $venue_id = 292, $room_id = 307){
+
+        $params = [
+            'id'       => $summit_id,
+            'venue_id' => $venue_id,
+            'room_id'  => 333
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitLocationsApiController@deleteVenueRoom",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
 }

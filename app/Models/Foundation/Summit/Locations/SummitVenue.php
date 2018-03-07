@@ -183,7 +183,7 @@ class SummitVenue extends SummitGeoLocatedLocation
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('name', trim($floor_name)));
         $floor = $this->floors->matching($criteria)->first();
-        return $floor === false ? null:$floor;
+        return $floor === false ? null : $floor;
     }
 
     /**
@@ -203,8 +203,17 @@ class SummitVenue extends SummitGeoLocatedLocation
      */
     public function removeFloor(SummitVenueFloor $floor){
         $this->floors->removeElement($floor);
-        $floor->setVenue(null);
+        $floor->clearVenue();
         return $this;
     }
 
+    /**
+     * @param SummitVenueRoom $room
+     * @return $this
+     */
+    public function removeRoom(SummitVenueRoom $room){
+        $this->rooms->removeElement($room);
+        $room->clearVenue();
+        return $this;
+    }
 }

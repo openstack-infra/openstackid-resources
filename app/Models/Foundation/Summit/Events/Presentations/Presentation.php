@@ -111,7 +111,7 @@ class Presentation extends SummitEvent
 
     /**
      * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="moderated_presentations")
-     * @ORM\JoinColumn(name="ModeratorID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="ModeratorID", referencedColumnName="ID", onDelete="SET NULL")
      * @var PresentationSpeaker
      */
     private $moderator;
@@ -126,10 +126,10 @@ class Presentation extends SummitEvent
      * @ORM\ManyToMany(targetEntity="models\summit\PresentationSpeaker", inversedBy="presentations")
      * @ORM\JoinTable(name="Presentation_Speakers",
      *  joinColumns={
-     *     @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID")
+     *     @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID", onDelete="CASCADE")
      * },
      * inverseJoinColumns={
-     *      @ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")
+     *      @ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID",  onDelete="CASCADE")
      *
      * }
      * )

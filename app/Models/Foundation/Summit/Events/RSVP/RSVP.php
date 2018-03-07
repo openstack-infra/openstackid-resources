@@ -32,14 +32,14 @@ class RSVP extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\Member", inversedBy="rsvp", fetch="LAZY")
-     * @ORM\JoinColumn(name="SubmittedByID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="SubmittedByID", referencedColumnName="ID", onDelete="CASCADE")
      * @var Member
      */
     private $owner;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent", inversedBy="rsvp", fetch="LAZY")
-     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID", onDelete="CASCADE")
      * @var SummitEvent
      */
     private $event;

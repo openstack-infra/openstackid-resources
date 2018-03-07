@@ -12,18 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use models\summit\IScheduleCalendarSyncInfoRepository;
-use models\summit\SummitAbstractLocation;
-use models\summit\SummitEvent;
 use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
 use models\summit\SummitEventFeedback;
 use App\Repositories\SilverStripeDoctrineRepository;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
  * Class DoctrineScheduleCalendarSyncInfoRepository
  * @package App\Repositories\Summit
@@ -72,21 +68,21 @@ final class DoctrineScheduleCalendarSyncInfoRepository
     }
 
     /**
-     * @param SummitAbstractLocation $location
+     * @param int $location_id
      * @param PagingInfo $paging_info
      * @return PagingResponse
      */
-    public function getAllBySummitLocation(SummitAbstractLocation $location, PagingInfo $paging_info)
+    public function getAllBySummitLocation($location_id, PagingInfo $paging_info)
     {
         $query  = $this->getEntityManager()
             ->createQueryBuilder()
             ->select("si")
             ->from(ScheduleCalendarSyncInfo::class, "si")
-            ->join('si.location', 'l', Join::WITH, " l.id = :location_id")
-            ->join('si.calendar_sync_info', 'ci', Join::WITH, " ci.revoked = :crendential_status")
+            ->join('si.calendar_sync_info', 'ci', Join::WITH, " ci.revoked = :credential_status")
+            ->where("si.location_id = :location_id")
             ->orderBy('si.id', 'ASC')
-            ->setParameter('location_id', $location->getId())
-            ->setParameter('crendential_status',false);
+            ->setParameter('location_id', $location_id)
+            ->setParameter('credential_status',false);
 
         $query= $query
             ->setFirstResult($paging_info->getOffset())
@@ -114,6 +110,6 @@ final class DoctrineScheduleCalendarSyncInfoRepository
      */
     protected function getBaseEntity()
     {
-       return SummitEventFeedback::class;
+       return ScheduleCalendarSyncInfo::class;
     }
 }

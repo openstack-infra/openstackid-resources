@@ -39,7 +39,7 @@ implements ICalendarSyncWorkRequestQueueManager
             $event_id = $request->getSummitEventId();
         }
         if($request instanceof AdminSummitLocationActionSyncWorkRequest){
-            $location_id = $request->getLocation()->getId();
+            $location_id = $request->getLocationId();
         }
         return $this->generateKey($request->getType(), $event_id, $location_id);
     }

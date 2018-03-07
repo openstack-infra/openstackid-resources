@@ -26,7 +26,7 @@ class RSVPAnswer extends SilverstripeBaseModel
 {
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\RSVP", inversedBy="answers", fetch="LAZY")
-     * @ORM\JoinColumn(name="RSVPID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="RSVPID", referencedColumnName="ID", onDelete="CASCADE")
      * @var SummitAttendee
      */
     private $rsvp;

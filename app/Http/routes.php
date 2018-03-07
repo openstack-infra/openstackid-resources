@@ -296,6 +296,7 @@ Route::group([
                             Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenueRoom']);
                             Route::group(['prefix' => '{room_id}'], function () {
                                 Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateVenueRoom']);
+                                Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@deleteVenueRoom']);
                             });
                         });
 

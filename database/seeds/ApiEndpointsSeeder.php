@@ -564,6 +564,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'delete-venue-room',
+                'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/rooms/{room_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'add-venue-floor-room',
                 'route' => '/api/v1/summits/{id}/locations/venues/{venue_id}/floors/{floor_id}/rooms',
                 'http_method' => 'POST',

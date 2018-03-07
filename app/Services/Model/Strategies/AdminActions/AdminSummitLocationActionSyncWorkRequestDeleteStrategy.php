@@ -57,8 +57,7 @@ final class AdminSummitLocationActionSyncWorkRequestDeleteStrategy
     public function process(AbstractCalendarSyncWorkRequest $request)
     {
         if(!$request instanceof AdminSummitLocationActionSyncWorkRequest) return null;
-        $location = $request->getLocation();
-        $pending_requests = $this->queue_manager->getSummitLocationRequestFor($location->getId());
+        $pending_requests = $this->queue_manager->getSummitLocationRequestFor($request->getLocationId());
         if(count($pending_requests) > 0 ){
             // delete all former and pending  ...
             foreach ($pending_requests as $pending_request) {
