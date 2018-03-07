@@ -542,7 +542,7 @@ final class SummitService implements ISummitService
                 (
                     sprintf
                     (
-                        "event should last at lest %s minutes  - current duration %s",
+                        "event should last at least %s minutes  - current duration %s",
                         self::MIN_EVENT_MINUTES,
                         $minutes
                     )

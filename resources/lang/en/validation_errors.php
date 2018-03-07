@@ -42,4 +42,5 @@ return [
     'LocationService.addVenueRoom.InvalidClassName' => 'invalid class name',
     'LocationService.addVenueRoom.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
     'LocationService.updateVenueRoom.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
+    'LocationService.addLocationBanner.InvalidClassName' => 'invalid class name',
 ];

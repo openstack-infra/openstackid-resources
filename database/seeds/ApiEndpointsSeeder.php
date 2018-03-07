@@ -509,6 +509,47 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
+            // banners
+            [
+                'name' => 'get-location-banners',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/banners',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-location-banner',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/banners',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationBannersData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-location-banner',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/banners/{banner_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationBannersData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-location-banner',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/banners/{banner_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationBannersData, $current_realm)
+                ],
+            ],
+            // venues
             [
                 'name' => 'get-venues',
                 'route' => '/api/v1/summits/{id}/locations/venues',

@@ -41,5 +41,7 @@ final class SummitScopes
 
     const WriteLocationsData    = '%s/locations/write';
 
+    const WriteLocationBannersData = '%s/locations/banners/write';
+
     const WriteSummitSpeakerAssistanceData = '%s/summit-speaker-assistance/write';
 }

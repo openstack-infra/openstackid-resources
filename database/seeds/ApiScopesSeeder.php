@@ -118,11 +118,21 @@ final class ApiScopesSeeder extends Seeder
                 'short_description' => 'Write Attendees Data',
                 'description' => 'Grants write access for Attendees Data',
             ),
-            array(
+            [
                 'name' => sprintf(SummitScopes::WritePromoCodeData, $current_realm),
                 'short_description' => 'Write Promo Codes Data',
                 'description' => 'Grants write access for Promo Codes Data',
-            ),
+            ],
+            [
+                'name' => sprintf(SummitScopes::WriteLocationsData, $current_realm),
+                'short_description' => 'Write Summit Locations Data',
+                'description' => 'Grants write access for Summit Locations Data',
+            ],
+            [
+                'name' => sprintf(SummitScopes::WriteLocationBannersData, $current_realm),
+                'short_description' => 'Write Summit Location Banners Data',
+                'description' => 'Grants write access for Summit Location Banners Data',
+            ],
         ];
 
         foreach ($scopes as $scope_info) {

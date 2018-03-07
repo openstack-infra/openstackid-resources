@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Http\Utils\PagingConstants;
+use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBannerConstants;
 use App\Models\Foundation\Summit\Locations\SummitLocationConstants;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Services\Model\ILocationService;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
+use libs\utils\HTMLCleaner;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
@@ -1538,6 +1540,66 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $this->location_service->deleteVenueRoom($summit, $venue_id, $room_id);
 
             return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     *  Location Banners Endpoints
+     */
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @return mixed
+     */
+    public function addLocationBanner($summit_id, $location_id){
+        try {
+
+            if(!Request::isJson()) return $this->error403();
+            $payload = Input::json()->all();
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitLocationBannerValidationRulesFactory::build($payload);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            if(!in_array($payload["class_name"], SummitLocationBannerConstants::$valid_class_names) ){
+                throw new ValidationException(
+                    sprintf
+                    (
+                        "class_name has an invalid value ( valid values are %s",
+                        implode(", ", SummitLocationBannerConstants::$valid_class_names)
+                    )
+                );
+            }
+
+            $banner = $this->location_service->addLocationBanner($summit, $location_id, HTMLCleaner::cleanData($payload, ['title', 'content']));
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($banner)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
