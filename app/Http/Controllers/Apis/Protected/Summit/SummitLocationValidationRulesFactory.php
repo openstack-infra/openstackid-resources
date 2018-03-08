@@ -36,7 +36,7 @@ final class SummitLocationValidationRulesFactory
             throw new ValidationException('class_name is required');
 
         $base_rules = [
-          'class_name' => sprintf('required|in:%s',  implode(", ", SummitLocationConstants::$valid_class_names))
+          'class_name' => sprintf('required|in:%s',  implode(",", SummitLocationConstants::$valid_class_names))
         ];
 
         switch($data['class_name']){
@@ -64,6 +64,7 @@ final class SummitLocationValidationRulesFactory
             }
             break;
         }
+
         return [];
     }
 }

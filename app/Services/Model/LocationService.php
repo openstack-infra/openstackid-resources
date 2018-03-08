@@ -1008,6 +1008,41 @@ final class LocationService implements ILocationService
     {
         return $this->tx_service->transaction(function () use ($summit, $location_id, $banner_id, $data) {
 
+            $location = $summit->getLocation($location_id);
+
+            if(is_null($location)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateLocationBanner.LocationNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $banner = $location->getBannerById($banner_id);
+
+            if(is_null($banner)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.updateLocationBanner.BannerNotFound',
+                        [
+                            'location_id'  => $location_id,
+                            'banner_id'    => $banner_id,
+                        ]
+                    )
+                );
+            }
+
+            $banner = SummitLocationBannerFactory::populate($summit, $location, $data, $banner);
+            $location->validateBanner($banner);
+            return $banner;
         });
     }
 

@@ -178,15 +178,14 @@ class SummitAbstractLocation extends SilverstripeBaseModel
 
     /**
      * @param SummitLocationBanner $banner
-     * @return $this
      * @throws ValidationException
      */
-    public function addBanner(SummitLocationBanner $banner){
+    public function validateBanner(SummitLocationBanner $banner){
 
         if($banner->getClassName() == SummitLocationBanner::ClassName){
             // only one static banner could exist at the same time
             foreach ($this->banners as $old_banner){
-                if($old_banner->getClassName() == SummitLocationBanner::ClassName && $old_banner->isEnabled()){
+                if($old_banner->getClassName() == SummitLocationBanner::ClassName && $old_banner->isEnabled() && $old_banner->getId() != $banner->getId()){
                     throw new ValidationException
                     (
                         sprintf
@@ -197,12 +196,12 @@ class SummitAbstractLocation extends SilverstripeBaseModel
         }
 
         if($banner instanceof ScheduledSummitLocationBanner){
-            // dont overlap enabled ones
+            // do not overlap enabled ones
             $new_start = $banner->getLocalStartDate();
             $new_end   = $banner->getLocalEndDate();
 
             foreach ($this->banners as $old_banner){
-                if($old_banner instanceof ScheduledSummitLocationBanner && $old_banner->isEnabled()){
+                if($old_banner instanceof ScheduledSummitLocationBanner && $old_banner->isEnabled() && $old_banner->getId() != $banner->getId()){
                     $old_start = $old_banner->getLocalStartDate();
                     $old_end   = $old_banner->getLocalEndDate();
                     // (StartA <= EndB)  and  (EndA >= StartB)
@@ -225,6 +224,15 @@ class SummitAbstractLocation extends SilverstripeBaseModel
             }
         }
 
+    }
+    /**
+     * @param SummitLocationBanner $banner
+     * @return $this
+     * @throws ValidationException
+     */
+    public function addBanner(SummitLocationBanner $banner){
+
+        $this->validateBanner($banner);
         $this->banners->add($banner);
         $banner->setLocation($this);
         return $this;

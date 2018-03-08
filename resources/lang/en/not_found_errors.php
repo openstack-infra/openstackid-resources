@@ -29,4 +29,6 @@ return [
     'LocationService.addLocationBanner.LocationNotFound' => 'location :location_id not found on summit :summit_id',
     'LocationService.deleteLocationBanner.LocationNotFound' => 'location :location_id not found on summit :summit_id',
     'LocationService.deleteLocationBanner.BannerNotFound'=> 'banner :banner_id not found on location :location_id',
+    'LocationService.updateLocationBanner.LocationNotFound' => 'location :location_id not found on summit :summit_id',
+    'LocationService.updateLocationBanner.BannerNotFound'=> 'banner :banner_id not found on location :location_id',
 ];

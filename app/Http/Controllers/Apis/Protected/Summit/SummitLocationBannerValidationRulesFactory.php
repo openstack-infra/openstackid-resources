@@ -33,7 +33,7 @@ final class SummitLocationBannerValidationRulesFactory
             throw new ValidationException('class_name is not set');
 
         $base_rules = [
-            'class_name' => sprintf('required|in%s',  implode(", ", SummitLocationBannerConstants::$valid_class_names)),
+            'class_name' => sprintf('required|in:%s',  implode(",", SummitLocationBannerConstants::$valid_class_names)),
             'title'      => 'required|string',
             'content'    => 'required|string',
             'type'       => sprintf('required|in:%s', implode(",", SummitLocationBannerConstants::$valid_types)),
@@ -42,7 +42,7 @@ final class SummitLocationBannerValidationRulesFactory
 
         if($update){
             $base_rules = [
-                'class_name' => sprintf('required|in%s',  implode(", ", SummitLocationBannerConstants::$valid_class_names)),
+                'class_name' => sprintf('required|in:%s',  implode(",", SummitLocationBannerConstants::$valid_class_names)),
                 'title'      => 'sometimes|string',
                 'content'    => 'sometimes|string',
                 'type'       => sprintf('sometimes|in:%s', implode(",", SummitLocationBannerConstants::$valid_types)),
