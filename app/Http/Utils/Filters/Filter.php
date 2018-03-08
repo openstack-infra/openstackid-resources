@@ -15,6 +15,8 @@
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\QueryBuilder;
+use Illuminate\Support\Facades\Validator;
+use models\exceptions\ValidationException;
 
 /**
  * Class Filter
@@ -25,12 +27,12 @@ final class Filter
     /**
      * @var array
      */
-    private $filters = array();
+    private $filters = [];
 
     /**
      * @var array
      */
-    private $bindings = array();
+    private $bindings = [];
 
     public function __construct(array $filters = [])
     {
@@ -98,7 +100,7 @@ final class Filter
      */
     public function getFlatFilter($field)
     {
-        $res = array();
+        $res = [];
         foreach ($this->filters as $filter) {
 
             if ($filter instanceof FilterElement && $filter->getField() === $field) {
@@ -115,6 +117,55 @@ final class Filter
             }
         }
         return $res;
+    }
+
+    /**
+     * @return array
+     */
+    public function getFiltersKeyValues(){
+        $res = [];
+        foreach ($this->filters as $filter) {
+
+            if ($filter instanceof FilterElement) {
+                $res[$filter->getField()] = $filter->getValue();
+            }
+            else if (is_array($filter)) {
+                // OR
+                foreach ($filter as $e) {
+                    if ($e instanceof FilterElement) {
+                        if(!isset($res[$e->getField()])) $res[$e->getField()] = [];
+                        $res[$e->getField()][] = $e->getValue();
+                    }
+                }
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * @param array $rules
+     * @param array $messages
+     * @throws ValidationException
+     */
+    public function validate(array $rules, array $messages){
+        $filter_key_values = $this->getFiltersKeyValues();
+        foreach($rules as $field => $rule) {
+            if(!isset($filter_key_values[$field])) continue;
+            $values = $filter_key_values[$field];
+            if(!is_array($values)) $values = [$values];
+            foreach ($values as $val) {
+                $validation = Validator::make
+                (
+                    [$field => $val],
+                    [$field => $rule],
+                    $messages
+                );
+                if ($validation->fails()) {
+                    $ex = new ValidationException();
+                    throw $ex->setMessages($validation->messages()->toArray());
+                }
+            }
+        }
     }
 
     /**

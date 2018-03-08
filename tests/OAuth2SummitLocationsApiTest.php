@@ -1148,6 +1148,8 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
 
         $banners = json_decode($content);
         $this->assertTrue(!is_null($banners));
+
+        return $banners;
     }
 
     public function testGetLocationBannersFilterByClassName($summit_id = 23, $location_id = 315)
@@ -1183,5 +1185,68 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
 
         $banners = json_decode($content);
         $this->assertTrue(!is_null($banners));
+    }
+
+    public function testGetLocationBannersFilterByInvalidClassName($summit_id = 23, $location_id = 315)
+    {
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $location_id,
+            'page'        => 1,
+            'per_page'    => 5,
+            'order'       => '-id',
+            'filter'      => 'class_name==test,class_name==test2'
+        ];
+
+        $headers =
+            [
+                "HTTP_Authorization" => " Bearer " . $this->access_token,
+                "CONTENT_TYPE"       => "application/json"
+            ];
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getLocationBanners",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $banners = json_decode($content);
+        $this->assertTrue(!is_null($banners));
+    }
+
+    public function testDeleteLocationBanner($summit_id = 23, $location_id = 315){
+        $banners = $this->testGetLocationBanners($summit_id, $location_id);
+
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $location_id,
+            'banner_id'   => $banners->data[0]->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitLocationsApiController@deleteLocationBanner",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
     }
 }

@@ -122,36 +122,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     }
 
     /**
-     * @param $filter_element
-     * @return bool
-     */
-    private function validateClassName($filter_element){
-        if($filter_element instanceof FilterElement){
-            return in_array($filter_element->getValue(), SummitLocationConstants::$valid_class_names);
-        }
-        $valid = true;
-        foreach($filter_element[0] as $elem){
-            $valid = $valid && in_array($elem->getValue(), SummitLocationConstants::$valid_class_names);
-        }
-        return $valid;
-    }
-
-    /**
-     * @param $filter_element
-     * @return bool
-     */
-    private function validateBannerClassName($filter_element){
-        if($filter_element instanceof FilterElement){
-            return in_array($filter_element->getValue(), SummitLocationBannerConstants::$valid_class_names);
-        }
-        $valid = true;
-        foreach($filter_element[0] as $elem){
-            $valid = $valid && in_array($elem->getValue(), SummitLocationBannerConstants::$valid_class_names);
-        }
-        return $valid;
-    }
-
-    /**
      * @param $summit_id
      * @return mixed
      */
@@ -202,6 +172,27 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                     'is_main'     => ['=='],
                 ]);
             }
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'class_name'  => sprintf('sometimes|in:%s',implode(',', SummitLocationConstants::$valid_class_names)),
+                'name'        => 'sometimes|string',
+                'description' => 'sometimes|string',
+                'address_1'   => 'sometimes|string',
+                'address_2'   => 'sometimes|string',
+                'zip_code'    => 'sometimes|string',
+                'city'        => 'sometimes|string',
+                'state'       => 'sometimes|string',
+                'country'     => 'sometimes|string',
+                'sold_out'    => 'sometimes|boolean',
+                'is_main'     => 'sometimes|boolean',
+            ], [
+                'class_name.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", SummitLocationConstants::$valid_class_names)
+                )
+            ]);
 
             $order = null;
 
@@ -212,18 +203,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                     'name',
                     'order'
                 ]);
-            }
-
-            if(is_null($filter)) $filter = new Filter();
-
-            if($filter->hasFilter("class_name") && !$this->validateClassName($filter->getFilter("class_name"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name filter has an invalid value ( valid values are %s",
-                        implode(", ", SummitLocationConstants::$valid_class_names)
-                    )
-                );
             }
 
             $data = $this->location_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
@@ -277,7 +256,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             {
                 $locations[] = SerializerRegistry::getInstance()->getSerializer($location)->serialize();
             }
-
 
             $response    = new PagingResponse
             (
@@ -769,16 +747,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 );
             }
 
-            if(!in_array($payload["class_name"], SummitLocationConstants::$valid_class_names) ){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name has an invalid value ( valid values are %s",
-                        implode(", ", SummitLocationConstants::$valid_class_names)
-                    )
-                );
-            }
-
             $location = $this->location_service->addLocation($summit, $payload);
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($location)->serialize());
@@ -1136,16 +1104,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 return $this->error412
                 (
                     $messages
-                );
-            }
-
-            if(!in_array($payload["class_name"], SummitLocationConstants::$valid_class_names) ){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name has an invalid value ( valid values are %s",
-                        implode(", ", SummitLocationConstants::$valid_class_names)
-                    )
                 );
             }
 
@@ -1634,6 +1592,24 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 ]);
             }
 
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'class_name' => sprintf('sometimes|in:%s',implode(',', SummitLocationBannerConstants::$valid_class_names)),
+                'title'      => 'sometimes|string',
+                'content'    => 'sometimes|string',
+                'type'       => sprintf('sometimes|in:%s',implode(',', SummitLocationBannerConstants::$valid_types)),
+                'enabled'    => 'sometimes|boolean',
+                'start_date' => 'sometimes|date_format:U',
+                'end_date'   => 'sometimes|date_format:U',
+            ], [
+                'class_name.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", SummitLocationBannerConstants::$valid_class_names)
+                )
+            ]);
+
             $order = null;
 
             if (Input::has('order'))
@@ -1644,18 +1620,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                     'start_date',
                     'end_date'
                 ]);
-            }
-
-            if(is_null($filter)) $filter = new Filter();
-
-            if($filter->hasFilter("class_name") && !$this->validateBannerClassName($filter->getFilter("class_name"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name filter has an invalid value ( valid values are %s",
-                        implode(", ", SummitLocationBannerConstants::$valid_class_names)
-                    )
-                );
             }
 
             $data = $this->location_banners_repository->getBySummitLocation($location, new PagingInfo($page, $per_page), $filter, $order);
@@ -1708,7 +1672,14 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
 
             $rules = SummitLocationBannerValidationRulesFactory::build($payload);
             // Creates a Validator instance and validates the data.
-            $validation = Validator::make($payload, $rules);
+            $messages =  [
+                'class_name.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", SummitLocationBannerConstants::$valid_class_names)
+                )
+            ];
+            $validation = Validator::make($payload, $rules, $messages);
 
             if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
@@ -1719,17 +1690,15 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 );
             }
 
-            if(!in_array($payload["class_name"], SummitLocationBannerConstants::$valid_class_names) ){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name has an invalid value ( valid values are %s",
-                        implode(", ", SummitLocationBannerConstants::$valid_class_names)
-                    )
-                );
-            }
-
-            $banner = $this->location_service->addLocationBanner($summit, $location_id, HTMLCleaner::cleanData($payload, ['title', 'content']));
+            $banner = $this->location_service->addLocationBanner
+            (
+                $summit,
+                $location_id,
+                HTMLCleaner::cleanData
+                (
+                    $payload, ['title', 'content']
+                )
+            );
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($banner)->serialize());
         }
@@ -1746,5 +1715,40 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             Log::error($ex);
             return $this->error500($ex);
         }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @param $banner_id
+     * @return mixed
+     */
+    public function deleteLocationBanner($summit_id, $location_id, $banner_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->location_service->deleteLocationBanner($summit, $location_id, $banner_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function updateLocationBanner($summit, $location_id, $banner_id){
+
     }
 }

@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Locations\SummitLocationConstants;
 use models\exceptions\ValidationException;
 use models\summit\SummitAirport;
 use models\summit\SummitExternalLocation;
@@ -32,26 +33,30 @@ final class SummitLocationValidationRulesFactory
     public static function build(array $data, $update = false){
 
         if(!isset($data['class_name']))
-            throw new ValidationException('class_name is not set');
+            throw new ValidationException('class_name is required');
+
+        $base_rules = [
+          'class_name' => sprintf('required|in:%s',  implode(", ", SummitLocationConstants::$valid_class_names))
+        ];
 
         switch($data['class_name']){
             case SummitVenue::ClassName: {
-                return SummitVenueValidationRulesFactory::build($data, $update);
+                return array_merge($base_rules, SummitVenueValidationRulesFactory::build($data, $update));
             }
             break;
             case SummitAirport::ClassName: {
-                return SummitAirportValidationRulesFactory::build($data, $update);
+                return array_merge($base_rules, SummitAirportValidationRulesFactory::build($data, $update));
             }
             break;
             case SummitHotel::ClassName: {
-                return SummitHotelValidationRulesFactory::build($data, $update);
+                return array_merge($base_rules, SummitHotelValidationRulesFactory::build($data, $update));
             }
             break;
             case SummitExternalLocation::ClassName: {
-                return SummitExternalLocationValidationRulesFactory::build($data, $update);
+                return array_merge(SummitExternalLocationValidationRulesFactory::build($data, $update));
             }
             case SummitVenueRoom::ClassName: {
-                return SummitVenueRoomValidationRulesFactory::build($data, $update);
+                return array_merge(SummitVenueRoomValidationRulesFactory::build($data, $update));
             }
             break;
             default:{
