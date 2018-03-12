@@ -170,4 +170,14 @@ interface ILocationService
      */
     public function updateLocationMap(Summit $summit, $location_id, $map_id, array $metadata, UploadedFile $file);
 
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $map_id
+     * @return SummitAbstractLocation
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteLocationMap(Summit $summit, $location_id, $map_id);
+
 }

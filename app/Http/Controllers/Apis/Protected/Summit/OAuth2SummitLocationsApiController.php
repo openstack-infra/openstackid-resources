@@ -949,12 +949,14 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     /**
      * @param $summit_id
      * @param $location_id
+     * @param $map_id
      * @return mixed
      */
-    public function deleteLocationMap($summit_id, $location_id){
+    public function deleteLocationMap($summit_id, $location_id, $map_id){
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
+            $this->location_service->deleteLocationMap($summit, $location_id, $map_id);
             return $this->deleted();
         }
         catch (EntityNotFoundException $ex1) {

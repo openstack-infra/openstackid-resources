@@ -420,6 +420,16 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
     }
 
     /**
+     * @param SummitLocationImage $map
+     * @return $this
+     */
+    public function removeMap(SummitLocationImage $map){
+        $this->images->removeElement($map);
+        $map->ClearLocation();
+        return $this;
+    }
+
+    /**
      * @param SummitLocationImage $image
      */
     public function addImage(SummitLocationImage $image){

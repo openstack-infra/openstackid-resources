@@ -1,5 +1,6 @@
 <?php namespace App\Factories\EntityEvents;
 use App\Events\LocationImageAction;
+use Illuminate\Support\Facades\App;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;

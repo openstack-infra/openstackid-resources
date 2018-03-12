@@ -45,14 +45,14 @@ class SummitLocationImage extends SilverstripeBaseModel
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
-     * @ORM\JoinColumn(name="PictureID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="PictureID", referencedColumnName="ID", onDelete="CASCADE")
      * @var File
      */
     protected $picture;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\SummitGeoLocatedLocation", inversedBy="images")
-     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID", onDelete="CASCADE")
      * @var SummitGeoLocatedLocation
      */
     protected $location;
@@ -149,7 +149,6 @@ class SummitLocationImage extends SilverstripeBaseModel
         $this->location = $location;
     }
 
-
     /**
      * @return string
      */
@@ -183,5 +182,13 @@ class SummitLocationImage extends SilverstripeBaseModel
         catch(\Exception $ex){
             return 0;
         }
+    }
+
+    public function clearLocation(){
+        $this->location = null;
+    }
+
+    public function clearPicture(){
+        $this->picture = null;
     }
 }

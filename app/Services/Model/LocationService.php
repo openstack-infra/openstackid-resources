@@ -16,6 +16,7 @@ use App\Events\FloorDeleted;
 use App\Events\FloorInserted;
 use App\Events\FloorUpdated;
 use App\Events\LocationDeleted;
+use App\Events\LocationImageDeleted;
 use App\Events\LocationImageInserted;
 use App\Events\LocationImageUpdated;
 use App\Events\LocationInserted;
@@ -1189,7 +1190,7 @@ final class LocationService implements ILocationService
             (
                 $map->getId(),
                 $map->getLocationId(),
-                $map->getLocation()->getSumitId(),
+                $map->getLocation()->getSummitId(),
                 $map->getClassName()
             )
         );
@@ -1297,11 +1298,86 @@ final class LocationService implements ILocationService
                 (
                     $map->getId(),
                     $map->getLocationId(),
-                    $map->getLocation()->getSumitId(),
+                    $map->getLocation()->getSummitId(),
                     $map->getClassName()
                 )
             );
+
             return $map;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $map_id
+     * @return SummitAbstractLocation
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteLocationMap(Summit $summit, $location_id, $map_id)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $location_id, $map_id) {
+
+            $location = $summit->getLocation($location_id);
+
+            if(is_null($location)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationMap.LocationNotFound',
+                        [
+                            'summit_id'    => $summit->getId(),
+                            'location_id'  => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$location instanceof SummitGeoLocatedLocation){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationMap.LocationNotFound',
+                        [
+                            'summit_id'    => $summit->getId(),
+                            'location_id'  => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $map = $location->getMap($map_id);
+
+            if(is_null($map)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationMap.MapNotFound',
+                        [
+                            'location_id'  => $location_id,
+                            'banner_id'    => $map_id,
+                        ]
+                    )
+                );
+            }
+
+            Event::fire
+            (
+                new LocationImageDeleted
+                (
+                    $map->getId(),
+                    $map->getLocationId(),
+                    $map->getLocation()->getSummitId(),
+                    $map->getClassName()
+                )
+            );
+
+            $location->removeMap($map);
+
         });
     }
 }

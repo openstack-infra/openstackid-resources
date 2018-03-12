@@ -1282,4 +1282,31 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $this->assertResponseStatus(204);
     }
+
+    public function testDeleteLocationMap($summit_id = 22, $location_id = 214, $map_id=30){
+
+        $params = [
+            'id'          => $summit_id,
+            'location_id' => $location_id,
+            'map_id'      => $map_id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitLocationsApiController@deleteLocationMap",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
 }
