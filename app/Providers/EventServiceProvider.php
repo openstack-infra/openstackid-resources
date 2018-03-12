@@ -21,6 +21,7 @@ use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventDeletedCalendarS
 use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventUpdatedCalendarSyncWorkRequestFactory;
 use App\Factories\EntityEvents\FloorActionEntityEventFactory;
 use App\Factories\EntityEvents\LocationActionEntityEventFactory;
+use App\Factories\EntityEvents\LocationImageActionEntityEventFactory;
 use App\Factories\EntityEvents\MyFavoritesAddEntityEventFactory;
 use App\Factories\EntityEvents\MyFavoritesRemoveEntityEventFactory;
 use App\Factories\EntityEvents\MyScheduleAddEntityEventFactory;
@@ -249,6 +250,23 @@ final class EventServiceProvider extends ServiceProvider
         Event::listen(\App\Events\FloorDeleted::class, function($event)
         {
             EntityEventPersister::persist(FloorActionEntityEventFactory::build($event, 'DELETE'));
+        });
+
+        // location images
+
+        Event::listen(\App\Events\LocationImageInserted::class, function($event)
+        {
+            EntityEventPersister::persist(LocationImageActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
+        Event::listen(\App\Events\LocationImageUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(LocationImageActionEntityEventFactory::build($event, 'UPDATE'));
+        });
+
+        Event::listen(\App\Events\LocationImageDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(LocationImageActionEntityEventFactory::build($event, 'DELETE'));
         });
 
     }

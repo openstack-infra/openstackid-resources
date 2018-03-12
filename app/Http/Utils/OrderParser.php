@@ -29,7 +29,7 @@ final class OrderParser
     public static function parse($orders, $allowed_fields = [])
     {
         $res    = [];
-        $orders = explode(',', $orders);
+        $orders = explode(',', trim($orders));
         //default ordering is asc
         foreach($orders as $field)
         {

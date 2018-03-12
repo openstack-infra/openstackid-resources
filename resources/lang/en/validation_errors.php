@@ -43,4 +43,6 @@ return [
     'LocationService.addVenueRoom.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
     'LocationService.updateVenueRoom.LocationNameAlreadyExists' => 'there is already another location with same name for summit :summit_id',
     'LocationService.addLocationBanner.InvalidClassName' => 'invalid class name',
+    'LocationService.addLocationMap.FileNotAllowedExtension' => 'file extension is not allowed (:allowed_extensions)',
+    'LocationService.addLocationMap.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
 ];

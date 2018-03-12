@@ -50,6 +50,39 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($locations));
     }
 
+    public function testGetSummitLocationsOrderByName($summit_id = 22)
+    {
+        $params = [
+            'id'       => $summit_id,
+            'page'     => 1,
+            'per_page' => 5,
+            'order'    => 'name-'
+        ];
+
+        $headers =
+            [
+                "HTTP_Authorization" => " Bearer " . $this->access_token,
+                "CONTENT_TYPE"       => "application/json"
+            ];
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitLocationsApiController@getLocations",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $locations = json_decode($content);
+        $this->assertTrue(!is_null($locations));
+    }
+
     public function testGetCurrentSummitLocationsMetadata($summit_id = 23)
     {
         $params = [

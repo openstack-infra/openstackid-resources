@@ -283,8 +283,8 @@ Route::group([
 
                 Route::get('', 'OAuth2SummitLocationsApiController@getLocations');
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addLocation']);
-                Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@getMetadata']);
 
+                Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@getMetadata']);
                 Route::group(['prefix' => 'venues'], function () {
 
                     Route::get('', 'OAuth2SummitLocationsApiController@getVenues');
@@ -344,6 +344,16 @@ Route::group([
 
                 Route::group(['prefix' => '{location_id}'], function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
+
+                    // locations maps
+                    Route::group(['prefix' => 'maps'], function () {
+                        Route::post('', 'OAuth2SummitLocationsApiController@addLocationMap');
+                        Route::group(['prefix' => '{map_id}'], function () {
+                            Route::put('', 'OAuth2SummitLocationsApiController@updateLocationMap');
+                            Route::delete('', 'OAuth2SummitLocationsApiController@deleteLocationMap');
+                        });
+                    });
+
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateLocation']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@deleteLocation']);
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents')->where('location_id', 'tbd|[0-9]+');

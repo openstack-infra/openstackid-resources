@@ -509,6 +509,34 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
+            // maps
+            [
+                'name' => 'add-location-map',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/maps',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-location-map',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/maps/{map_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-location-map',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/maps/{map_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
             // banners
             [
                 'name' => 'get-location-banners',

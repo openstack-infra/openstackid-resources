@@ -11,11 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\main\File;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitLocationImage")
@@ -23,6 +21,42 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class SummitLocationImage extends SilverstripeBaseModel
 {
+    const TypeMap   = 'SummitLocationMap';
+    const TypeImage = 'SummitLocationImage';
+    /**
+     * @ORM\Column(name="Name", type="string")
+     */
+    protected $name;
+
+    /**
+     * @ORM\Column(name="Description", type="string")
+     */
+    protected $description;
+
+    /**
+     * @ORM\Column(name="Order", type="integer")
+     */
+    protected $order;
+
+    /**
+     * @ORM\Column(name="ClassName", type="string")
+     */
+    protected $class_name;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
+     * @ORM\JoinColumn(name="PictureID", referencedColumnName="ID")
+     * @var File
+     */
+    protected $picture;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitGeoLocatedLocation", inversedBy="images")
+     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
+     * @var SummitGeoLocatedLocation
+     */
+    protected $location;
+
     /**
      * @return string
      */
@@ -115,25 +149,6 @@ class SummitLocationImage extends SilverstripeBaseModel
         $this->location = $location;
     }
 
-    /**
-     * @ORM\Column(name="Name", type="string")
-     */
-    protected $name;
-
-    /**
-     * @ORM\Column(name="Description", type="string")
-     */
-    protected $description;
-
-    /**
-     * @ORM\Column(name="Order", type="integer")
-     */
-    protected $order;
-
-    /**
-     * @ORM\Column(name="ClassName", type="string")
-     */
-    protected $class_name;
 
     /**
      * @return string
@@ -150,20 +165,6 @@ class SummitLocationImage extends SilverstripeBaseModel
     {
         $this->class_name = $class_name;
     }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
-     * @ORM\JoinColumn(name="PictureID", referencedColumnName="ID")
-     * @var File
-     */
-    protected $picture;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitGeoLocatedLocation", inversedBy="images")
-     * @ORM\JoinColumn(name="LocationID", referencedColumnName="ID")
-     * @var SummitGeoLocatedLocation
-     */
-    protected $location;
 
     /**
      * @return bool

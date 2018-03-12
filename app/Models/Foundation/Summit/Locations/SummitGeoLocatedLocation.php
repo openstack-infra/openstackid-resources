@@ -15,6 +15,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\ORM\Mapping AS ORM;
+use models\exceptions\ValidationException;
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitGeoLocatedLocation")
@@ -344,7 +346,7 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
         parent::__construct();
         $this->details_page    = false;
         $this->display_on_site = false;
-        $this->images = new ArrayCollection();
+        $this->images          = new ArrayCollection;
     }
 
     /**
@@ -356,7 +358,7 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
             ->matching
             (
                 Criteria::create()
-                ->where(Criteria::expr()->eq("class_name", "SummitLocationMap"))
+                ->where(Criteria::expr()->eq("class_name", SummitLocationImage::TypeMap))
                 ->orderBy(array("order" => Criteria::ASC))
             );
     }
@@ -371,7 +373,7 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
             ->matching
             (
                 Criteria::create()
-                    ->where(Criteria::expr()->eq("class_name", "SummitLocationImage"))
+                    ->where(Criteria::expr()->eq("class_name", SummitLocationImage::TypeImage))
                     ->orderBy(array("order" => Criteria::ASC))
             );
     }
@@ -388,6 +390,65 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
 
             )->first();
         return $res === false ? null : $res;
+    }
+
+    /**
+     * @param SummitLocationImage $map
+     */
+    public function addMap(SummitLocationImage $map){
+        $maps  = $this->getMaps();
+        $maps_count = count($maps);
+        $new_order = $maps_count > 0 ? $maps_count + 1 : 1;
+        $map->setOrder($new_order);
+        $this->images->add($map);
+        $map->setLocation($this);
+    }
+
+    /**
+     * @param SummitLocationImage $image
+     */
+    public function addImage(SummitLocationImage $image){
+        $images       = $this->getImages();
+        $images_count = count($images);
+        $new_order = $images_count > 0 ? $images_count + 1 : 1;
+        $image->setOrder($new_order);
+        $this->images->add($image);
+        $image->setLocation($this);
+    }
+
+    /**
+     * @param SummitLocationImage $map
+     * @param $new_order
+     * @throws ValidationException
+     */
+    public function recalculateMapOrder(SummitLocationImage $map, $new_order){
+        $maps         = $this->getMaps();
+        $maps         = array_slice($maps,0, count($maps), false);
+        $max_order    = count($maps);
+        $former_order =  1;
+        
+        foreach ($maps as $m){
+            if($m->getId() == $map->getId()) break;
+            $former_order++;
+        }
+
+        if($new_order > $max_order)
+            throw new ValidationException(sprintf("max order is %s", $max_order));
+
+        unset($maps[$former_order - 1]);
+
+        $maps = array_merge
+        (
+            array_slice($maps, 0, $new_order -1 , true) ,
+            [$map] ,
+            array_slice($maps, $new_order -1 , count($maps), true)
+        );
+
+        $order = 1;
+        foreach($maps as $m){
+            $m->setOrder($order);
+            $order++;
+        }
     }
 
 }

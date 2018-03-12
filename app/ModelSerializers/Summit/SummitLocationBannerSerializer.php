@@ -12,9 +12,8 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
+use ModelSerializers\SerializerRegistry;
 use ModelSerializers\SilverStripeSerializer;
-
-
 /**
  * Class SummitLocationBannerSerializer
  * @package App\ModelSerializers\Summit
@@ -38,11 +37,25 @@ class SummitLocationBannerSerializer extends SilverStripeSerializer
      * @param array $params
      * @return array
      */
-    public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
+    public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
         $banner  = $this->object;
         if(!$banner instanceof SummitLocationBanner) return [];
+
+        if (!empty($expand)) {
+            foreach (explode(',', $expand) as $relation) {
+                switch (trim($relation)) {
+                    case 'location': {
+                        if($banner->hasLocation()){
+                            unset($values['location_id']);
+                            $values['location'] = SerializerRegistry::getInstance()->getSerializer($banner->getLocation())->serialize();
+                        }
+                    }
+                    break;
+                }
+            }
+        }
         return $values;
     }
 }

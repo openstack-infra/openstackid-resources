@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\SummitGeoLocatedLocation;
 use ModelSerializers\SerializerRegistry;
 
 /**
@@ -46,16 +47,17 @@ class SummitGeoLocatedLocationSerializer extends SummitAbstractLocationSerialize
     {
         $values   = parent::serialize($expand, $fields, $relations);
         $location = $this->object;
-
-        $maps   = array();
+        if(!$location instanceof SummitGeoLocatedLocation) return [];
+        // maps
+        $maps   = [];
         foreach($location->getMaps() as $image)
         {
             if(!$image->hasPicture()) continue;
             $maps[] = SerializerRegistry::getInstance()->getSerializer($image)->serialize();
         }
         $values['maps'] = $maps;
-
-        $images   = array();
+        // images
+        $images   = [];
         foreach($location->getImages() as $image)
         {
             if(!$image->hasPicture()) continue;

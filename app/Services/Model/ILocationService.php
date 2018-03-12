@@ -12,12 +12,14 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
+use models\summit\SummitLocationImage;
 use models\summit\SummitVenueRoom;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 use models\summit\SummitAbstractLocation;
 use models\summit\SummitVenueFloor;
+use Illuminate\Http\UploadedFile;
 /**
  * Interface ILocationService
  * @package App\Services\Model
@@ -144,5 +146,16 @@ interface ILocationService
      * @throws ValidationException
      */
     public function deleteLocationBanner(Summit $summit, $location_id, $banner_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param array $metadata
+     * @param $file
+     * @return SummitLocationImage
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addLocationMap(Summit $summit, $location_id, array $metadata, UploadedFile $file);
 
 }

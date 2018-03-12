@@ -16,13 +16,16 @@ use App\Events\FloorDeleted;
 use App\Events\FloorInserted;
 use App\Events\FloorUpdated;
 use App\Events\LocationDeleted;
+use App\Events\LocationImageInserted;
 use App\Events\LocationInserted;
 use App\Events\LocationUpdated;
 use App\Events\SummitVenueRoomDeleted;
 use App\Events\SummitVenueRoomInserted;
 use App\Events\SummitVenueRoomUpdated;
+use App\Http\Utils\FileUploader;
 use App\Models\Foundation\Summit\Factories\SummitLocationBannerFactory;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
+use App\Models\Foundation\Summit\Factories\SummitLocationImageFactory;
 use App\Models\Foundation\Summit\Factories\SummitVenueFloorFactory;
 use App\Models\Foundation\Summit\Locations\Banners\ScheduledSummitLocationBanner;
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
@@ -30,17 +33,21 @@ use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Services\Apis\GeoCodingApiException;
 use App\Services\Apis\IGeoCodingAPI;
 use App\Services\Model\Strategies\GeoLocation\GeoLocationStrategyFactory;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\IFolderRepository;
 use models\summit\Summit;
 use models\summit\SummitAbstractLocation;
 use models\summit\SummitAirport;
 use models\summit\SummitExternalLocation;
 use models\summit\SummitGeoLocatedLocation;
 use models\summit\SummitHotel;
+use models\summit\SummitLocationImage;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueFloor;
 use models\summit\SummitVenueRoom;
@@ -56,6 +63,11 @@ final class LocationService implements ILocationService
     private $location_repository;
 
     /**
+     * @var IFolderRepository
+     */
+    private $folder_repository;
+
+    /**
      * @var ITransactionService
      */
     private $tx_service;
@@ -68,19 +80,22 @@ final class LocationService implements ILocationService
     /**
      * LocationService constructor.
      * @param ISummitLocationRepository $location_repository
+     * @param IFolderRepository $folder_repository
      * @param IGeoCodingAPI $geo_coding_api
      * @param ITransactionService $tx_service
      */
     public function __construct
     (
         ISummitLocationRepository $location_repository,
+        IFolderRepository $folder_repository,
         IGeoCodingAPI $geo_coding_api,
         ITransactionService $tx_service
     )
     {
         $this->location_repository = $location_repository;
-        $this->geo_coding_api = $geo_coding_api;
-        $this->tx_service = $tx_service;
+        $this->geo_coding_api      = $geo_coding_api;
+        $this->tx_service          = $tx_service;
+        $this->folder_repository   = $folder_repository;
     }
 
     /**
@@ -1091,5 +1106,93 @@ final class LocationService implements ILocationService
 
             $location->removeBanner($banner);
         });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param array $metadata
+     * @param $file
+     * @return SummitLocationImage
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addLocationMap(Summit $summit, $location_id, array $metadata, UploadedFile $file)
+    {
+        $map = $this->tx_service->transaction(function () use ($summit, $location_id, $metadata, $file) {
+            $max_file_size      = config('file_upload.max_file_upload_size') ;
+            $allowed_extensions = ['png','jpg','jpeg','gif','pdf'];
+            $location           = $summit->getLocation($location_id);
+
+            if (is_null($location)) {
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.addLocationMap.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$location instanceof SummitGeoLocatedLocation){
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.addLocationMap.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!in_array($file->extension(), $allowed_extensions)){
+                throw new ValidationException
+                (
+                    trans(
+                        'validation_errors.LocationService.addLocationMap.FileNotAllowedExtension',
+                        [
+                            'allowed_extensions' => implode(", ", $allowed_extensions),
+                        ]
+                    )
+                );
+            }
+
+            if($file->getSize() > $max_file_size)
+            {
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.addLocationMap.FileMaxSize',
+                        [
+                            'max_file_size' => (($max_file_size/1024)/1024)
+                        ]
+                    )
+                );
+            }
+
+            $uploader = new FileUploader($this->folder_repository);
+            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/maps/', $location->getSummitId(), $location->getId()), true);
+            $map      = SummitLocationImageFactory::buildMap($metadata);
+            $map->setPicture($pic);
+            $location->addMap($map);
+            return $map;
+        });
+
+        Event::fire
+        (
+            new LocationImageInserted
+            (
+                $map->getId(),
+                $map->getLocationId(),
+                $map->getLocation()->getSumitId(),
+                $map->getClassName()
+            )
+        );
+
+        return $map;
     }
 }

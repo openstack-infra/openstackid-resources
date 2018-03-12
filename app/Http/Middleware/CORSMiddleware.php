@@ -33,7 +33,7 @@ class CORSMiddleware
 
 	const CORS_IP_BLACKLIST_PREFIX = 'CORS_IP_BLACKLIST_PREFIX:';
 
-	private $headers = array();
+	private $headers = [];
 
 	/**
 	 * A header is said to be a simple header if the header field name is an ASCII case-insensitive match for Accept,
@@ -42,12 +42,12 @@ class CORSMiddleware
 	 * application/x-www-form-urlencoded, multipart/form-data, or text/plain.
 	 */
 
-	protected static $simple_headers = array(
+	protected static $simple_headers = [
 		'accept',
 		'accept-language',
 		'content-language',
 		'origin',
-	);
+	];
 
 	protected static $simple_content_header_values = [
 		'application/x-www-form-urlencode',
@@ -175,7 +175,7 @@ class CORSMiddleware
 				case CORSRequestPreflightType::COMPLEX_REQUEST:
 				{
 					$cache_id  = $this->generatePreflightCacheKey($request);
-;					// ----Step 2a: Check if the current request has an entry into the preflighted requests Cache
+					// ----Step 2a: Check if the current request has an entry into the preflighted requests Cache
 					$data = $this->cache_service->getHash($cache_id, CORSRequestPreflightData::$cache_attributes);
 					if (!count($data))
 					{
