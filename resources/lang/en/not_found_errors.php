@@ -32,4 +32,5 @@ return [
     'LocationService.updateLocationBanner.LocationNotFound' => 'location :location_id not found on summit :summit_id',
     'LocationService.updateLocationBanner.BannerNotFound'=> 'banner :banner_id not found on location :location_id',
     'LocationService.addLocationMap.LocationNotFound' => 'location :location_id not found on summit :summit_id',
+    'LocationService.addLocationMap.MapNotFound' => 'map :map_id does not belongs to location :location_id',
 ];

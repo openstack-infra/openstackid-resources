@@ -347,10 +347,11 @@ Route::group([
 
                     // locations maps
                     Route::group(['prefix' => 'maps'], function () {
-                        Route::post('', 'OAuth2SummitLocationsApiController@addLocationMap');
+                        Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addLocationMap']);
                         Route::group(['prefix' => '{map_id}'], function () {
-                            Route::put('', 'OAuth2SummitLocationsApiController@updateLocationMap');
-                            Route::delete('', 'OAuth2SummitLocationsApiController@deleteLocationMap');
+                            Route::get('', 'OAuth2SummitLocationsApiController@getLocationMap');
+                            Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateLocationMap']);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@deleteLocationMap']);
                         });
                     });
 

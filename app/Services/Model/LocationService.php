@@ -17,6 +17,7 @@ use App\Events\FloorInserted;
 use App\Events\FloorUpdated;
 use App\Events\LocationDeleted;
 use App\Events\LocationImageInserted;
+use App\Events\LocationImageUpdated;
 use App\Events\LocationInserted;
 use App\Events\LocationUpdated;
 use App\Events\SummitVenueRoomDeleted;
@@ -1194,5 +1195,113 @@ final class LocationService implements ILocationService
         );
 
         return $map;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $map_id
+     * @param array $metadata
+     * @param $file
+     * @return SummitLocationImage
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateLocationMap(Summit $summit, $location_id, $map_id, array $metadata, UploadedFile $file)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $location_id, $map_id, $metadata, $file) {
+            $max_file_size      = config('file_upload.max_file_upload_size') ;
+            $allowed_extensions = ['png','jpg','jpeg','gif','pdf'];
+            $location           = $summit->getLocation($location_id);
+
+            if (is_null($location)) {
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.addLocationMap.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$location instanceof SummitGeoLocatedLocation){
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.addLocationMap.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $map = $location->getMap($map_id);
+
+            if (is_null($map)) {
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.addLocationMap.MapNotFound',
+                        [
+                            'map_id'      => $map_id,
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!is_null($file)) {
+                if (!in_array($file->extension(), $allowed_extensions)) {
+                    throw new ValidationException
+                    (
+                        trans(
+                            'validation_errors.LocationService.addLocationMap.FileNotAllowedExtension',
+                            [
+                                'allowed_extensions' => implode(", ", $allowed_extensions),
+                            ]
+                        )
+                    );
+                }
+
+                if ($file->getSize() > $max_file_size) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.LocationService.addLocationMap.FileMaxSize',
+                            [
+                                'max_file_size' => (($max_file_size / 1024) / 1024)
+                            ]
+                        )
+                    );
+                }
+
+                $uploader = new FileUploader($this->folder_repository);
+                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/maps/', $location->getSummitId(), $location->getId()), true);
+                $map->setPicture($pic);
+            }
+
+            $map = SummitLocationImageFactory::populate($map, $metadata);
+
+            if (isset($metadata['order']) && intval($metadata['order']) != $map->getOrder()) {
+                // request to update order
+                $location->recalculateMapOrder($map, intval($metadata['order']));
+            }
+
+            Event::fire
+            (
+                new LocationImageUpdated
+                (
+                    $map->getId(),
+                    $map->getLocationId(),
+                    $map->getLocation()->getSumitId(),
+                    $map->getClassName()
+                )
+            );
+            return $map;
+        });
     }
 }

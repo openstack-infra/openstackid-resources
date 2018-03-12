@@ -529,6 +529,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-location-map',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/maps/{map_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'delete-location-map',
                 'route' => '/api/v1/summits/{id}/locations/{location_id}/maps/{map_id}',
                 'http_method' => 'DELETE',

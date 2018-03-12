@@ -359,7 +359,7 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
             (
                 Criteria::create()
                 ->where(Criteria::expr()->eq("class_name", SummitLocationImage::TypeMap))
-                ->orderBy(array("order" => Criteria::ASC))
+                ->orderBy(["order" => Criteria::ASC])
             );
     }
 
@@ -391,6 +391,21 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
             )->first();
         return $res === false ? null : $res;
     }
+
+    /**
+     * @param int $map_id
+     * @return SummitLocationImage
+     */
+    public function getMap($map_id){
+        $res = $this->images
+            ->matching
+            (
+                Criteria::create()->where(Criteria::expr()->eq("id", $map_id))->andWhere(Criteria::expr()->eq("class_name", SummitLocationImage::TypeMap))
+
+            )->first();
+        return $res === false ? null : $res;
+    }
+
 
     /**
      * @param SummitLocationImage $map
