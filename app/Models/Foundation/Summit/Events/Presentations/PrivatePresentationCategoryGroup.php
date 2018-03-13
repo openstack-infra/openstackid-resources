@@ -44,7 +44,7 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     protected $max_submission_allowed_per_user;
 
     /**
-     * @ORM\ManyToMany(targetEntity="models\main\Group", inversedBy="groups")
+     * @ORM\ManyToMany(targetEntity="models\main\Group")
      * @ORM\JoinTable(name="PrivatePresentationCategoryGroup_AllowedGroups",
      *      joinColumns={@ORM\JoinColumn(name="PrivatePresentationCategoryGroupID", referencedColumnName="ID")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="GroupID", referencedColumnName="ID")}

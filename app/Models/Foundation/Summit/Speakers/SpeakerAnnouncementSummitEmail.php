@@ -51,7 +51,7 @@ class SpeakerAnnouncementSummitEmail extends SilverstripeBaseModel
     Use SummitOwned;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\PresentationSpeaker")
+     * @ORM\ManyToOne(targetEntity="models\summit\PresentationSpeaker", inversedBy="announcement_summit_emails")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
      * @var PresentationSpeaker
      */
@@ -104,7 +104,5 @@ class SpeakerAnnouncementSummitEmail extends SilverstripeBaseModel
     {
         $this->speaker = $speaker;
     }
-
-
 
 }

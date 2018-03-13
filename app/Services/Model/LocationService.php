@@ -756,7 +756,7 @@ final class LocationService implements ILocationService
             if (isset($data['name'])) {
                 $old_location = $summit->getLocationByName(trim($data['name']));
 
-                if (!is_null($old_location)) {
+                if (!is_null($old_location) && $old_location->getId() != $room_id) {
                     throw new ValidationException
                     (
                         trans
@@ -1057,7 +1057,7 @@ final class LocationService implements ILocationService
                 );
             }
 
-            $banner = SummitLocationBannerFactory::populate($summit, $location, $data, $banner);
+            $banner = SummitLocationBannerFactory::populate($summit, $location, $banner, $data);
             $location->validateBanner($banner);
             return $banner;
         });

@@ -14,6 +14,12 @@
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Repositories\SilverStripeDoctrineRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use models\summit\Summit;
+use utils\Filter;
+use utils\Order;
+use utils\PagingInfo;
+use utils\PagingResponse;
 /**
  * Class DoctrineRSVPTemplateRepository
  * @package App\Repositories\Summit
@@ -29,5 +35,81 @@ final class DoctrineRSVPTemplateRepository
     protected function getBaseEntity()
     {
         return RSVPTemplate::class;
+    }
+
+    protected function getFilterMappings()
+    {
+        return [
+            'title'          => 't.title:json_string',
+            'is_enabled'     => 't.is_enabled:json_boolean',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderMappings()
+    {
+        return [
+            'id'    => 't.id',
+            'title' => 't.title',
+        ];
+    }
+
+    /**
+     * @param Summit $summit
+     * @param PagingInfo $paging_info
+     * @param Filter|null $filter
+     * @param Order|null $order
+     * @return mixed
+     */
+    public function getBySummit
+    (
+        Summit $summit,
+        PagingInfo $paging_info,
+        Filter $filter = null,
+        Order $order   = null
+    )
+    {
+        $query  =   $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("t")
+            ->from(RSVPTemplate::class, "t")
+            ->leftJoin('t.summit', 's')
+            ->leftJoin('t.created_by', 'o')
+            ->where("s.id = :summit_id");
+
+        $query->setParameter("summit_id", $summit->getId());
+
+        if(!is_null($filter)){
+            $filter->apply2Query($query, $this->getFilterMappings());
+        }
+
+        if (!is_null($order)) {
+            $order->apply2Query($query, $this->getOrderMappings());
+        } else {
+            //default order
+            $query = $query->addOrderBy("t.id",'ASC');
+        }
+
+        $query = $query
+            ->setFirstResult($paging_info->getOffset())
+            ->setMaxResults($paging_info->getPerPage());
+
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+        $total     = $paginator->count();
+        $data      = [];
+
+        foreach($paginator as $entity)
+            $data[] = $entity;
+
+        return new PagingResponse
+        (
+            $total,
+            $paging_info->getPerPage(),
+            $paging_info->getCurrentPage(),
+            $paging_info->getLastPage($total),
+            $data
+        );
     }
 }

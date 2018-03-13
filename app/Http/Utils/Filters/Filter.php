@@ -147,7 +147,7 @@ final class Filter
      * @param array $messages
      * @throws ValidationException
      */
-    public function validate(array $rules, array $messages){
+    public function validate(array $rules, array $messages = []){
         $filter_key_values = $this->getFiltersKeyValues();
         foreach($rules as $field => $rule) {
             if(!isset($filter_key_values[$field])) continue;

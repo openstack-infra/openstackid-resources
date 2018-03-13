@@ -201,7 +201,10 @@ class SummitAbstractLocation extends SilverstripeBaseModel
             $new_end   = $banner->getLocalEndDate();
 
             foreach ($this->banners as $old_banner){
-                if($old_banner instanceof ScheduledSummitLocationBanner && $old_banner->isEnabled() && $old_banner->getId() != $banner->getId()){
+                if($old_banner instanceof ScheduledSummitLocationBanner
+                    && $old_banner->isEnabled()
+                    && $old_banner->getId() != $banner->getId()
+                    && $old_banner->getType() == $banner->getType()){
                     $old_start = $old_banner->getLocalStartDate();
                     $old_end   = $old_banner->getLocalEndDate();
                     // (StartA <= EndB)  and  (EndA >= StartB)

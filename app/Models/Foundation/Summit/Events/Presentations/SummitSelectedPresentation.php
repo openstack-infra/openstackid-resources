@@ -42,14 +42,14 @@ class SummitSelectedPresentation extends SilverstripeBaseModel
     private $order;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SummitSelectedPresentationList")
+     * @ORM\ManyToOne(targetEntity="SummitSelectedPresentationList", inversedBy="selected_presentations")
      * @ORM\JoinColumn(name="SummitSelectedPresentationListID", referencedColumnName="ID")
      * @var SummitSelectedPresentationList
      */
     private $list;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Presentation")
+     * @ORM\ManyToOne(targetEntity="Presentation", inversedBy="selected_presentations")
      * @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID")
      * @var Presentation
      */

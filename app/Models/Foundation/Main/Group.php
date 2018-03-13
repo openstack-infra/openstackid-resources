@@ -15,7 +15,6 @@
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
-
 /**
  * @ORM\Entity(repositoryClass="repositories\main\DoctrineGroupRepository")
  * @ORM\Table(name="`Group`")

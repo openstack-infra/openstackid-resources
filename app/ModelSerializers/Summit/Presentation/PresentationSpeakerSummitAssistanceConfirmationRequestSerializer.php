@@ -11,9 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
-
 /**
  * Class PresentationSpeakerSummitAssistanceConfirmationRequestSerializer
  * @package ModelSerializers

@@ -1,4 +1,4 @@
-<?php namespace ModelSerializers;
+<?php namespace App\Models\Foundation\Summit\Events\RSVP;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,17 +11,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Doctrine\ORM\Mapping AS ORM;
 /**
- * Class RSVPSerializer
- * @package ModelSerializers
+ * @ORM\Table(name="RSVPCheckBoxListQuestionTemplate")
+ * @ORM\Entity
+ * Class RSVPCheckBoxListQuestionTemplate
+ * @package App\Models\Foundation\Summit\Events\RSVP
  */
-final class RSVPSerializer extends SilverStripeSerializer
+class RSVPCheckBoxListQuestionTemplate extends RSVPMultiValueQuestionTemplate
 {
-    protected static $array_mappings = array
-    (
-        'OwnerId'   => 'owner_id:json_int',
-        'EventId'   => 'event_id:json_int',
-        'SeatType'  => 'seat_type:json_string',
-        'Created'   => 'created:datetime_epoch',
-    );
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return 'RSVPCheckBoxListQuestionTemplate';
+    }
 }

@@ -35,7 +35,6 @@ final class DoctrineFolderRepository
       select * from File where ClassName = 'Folder' AND 
       Name = :folder_name
 SQL;
-
         // build rsm here
         $rsm = new ResultSetMappingBuilder($this->_em);
         $rsm->addRootEntityFromClassMetadata(\models\main\File::class, 'f');
@@ -43,7 +42,7 @@ SQL;
 
         $native_query->setParameter("folder_name", $folder_name);
 
-        return $native_query->getSingleResult();
+        return $native_query->getOneOrNullResult();
     }
 
     /**

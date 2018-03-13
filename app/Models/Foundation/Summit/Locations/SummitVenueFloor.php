@@ -166,7 +166,7 @@ class SummitVenueFloor extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->rooms = new ArrayCollection();
+        $this->rooms = new ArrayCollection;
     }
 
     /**

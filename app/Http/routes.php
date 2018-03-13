@@ -164,6 +164,11 @@ Route::group([
 
         Route::group(array('prefix' => '{id}'), function () {
 
+            // rsvp templates
+            Route::group(array('prefix' => 'rsvp-templates'), function () {
+                Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getAllBySummit']);
+            });
+
             Route::get('', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summit_response_lifetime', 1200), 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
 
             Route::get('entity-events', 'OAuth2SummitApiController@getSummitEntityEvents');
@@ -295,6 +300,7 @@ Route::group([
                         Route::group(['prefix' => 'rooms'], function () {
                             Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@addVenueRoom']);
                             Route::group(['prefix' => '{room_id}'], function () {
+                                Route::get('', 'OAuth2SummitLocationsApiController@getVenueRoom');
                                 Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@updateVenueRoom']);
                                 Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitLocationsApiController@deleteVenueRoom']);
                             });

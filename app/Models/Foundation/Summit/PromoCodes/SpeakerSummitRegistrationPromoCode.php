@@ -30,7 +30,7 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
     protected $type;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker")
+     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="promo_codes")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
      * @var PresentationSpeaker
      */

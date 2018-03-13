@@ -13,6 +13,7 @@
  **/
 use App\Http\Utils\BooleanCellFormatter;
 use App\Http\Utils\EpochCellFormatter;
+use App\Http\Utils\PagingConstants;
 use App\Models\Foundation\Summit\PromoCodes\PromoCodesConstants;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -82,36 +83,6 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
     }
 
     /**
-     * @param $filter_element
-     * @return bool
-     */
-    private function validateClassName($filter_element){
-        if($filter_element instanceof FilterElement){
-            return in_array($filter_element->getValue(), PromoCodesConstants::$valid_class_names);
-        }
-        $valid = true;
-        foreach($filter_element[0] as $elem){
-            $valid = $valid && in_array($elem->getValue(), PromoCodesConstants::$valid_class_names);
-        }
-        return $valid;
-    }
-
-    /**
-     * @param $filter_element
-     * @return bool
-     */
-    private function validateTypes($filter_element){
-        if($filter_element instanceof FilterElement){
-            return in_array($filter_element->getValue(), PromoCodesConstants::getValidTypes());
-        }
-        $valid = true;
-        foreach($filter_element[0] as $elem){
-            $valid = $valid && in_array($elem->getValue(), PromoCodesConstants::getValidTypes());
-        }
-        return $valid;
-    }
-
-    /**
      * @param $summit_id
      * @return mixed
      */
@@ -120,7 +91,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
         $rules  = [
 
             'page'     => 'integer|min:1',
-            'per_page' => 'required_with:page|integer|min:5|max:100',
+            'per_page' => sprintf('required_with:page|integer|min:%s|max:%s', PagingConstants::MinPageSize, PagingConstants::MaxPageSize),
         ];
 
         try {
@@ -137,7 +108,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
 
             // default values
             $page     = 1;
-            $per_page = 5;
+            $per_page = PagingConstants::DefaultPageSize;;
 
             if (Input::has('page')) {
                 $page     = intval(Input::get('page'));
@@ -162,6 +133,32 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                 ]);
             }
 
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'class_name'    => sprintf('sometimes|in:%s',implode(',', PromoCodesConstants::$valid_class_names)),
+                'code'          => 'sometimes|string',
+                'creator'       => 'sometimes|string',
+                'creator_email' => 'sometimes|string',
+                'owner'         => 'sometimes|string',
+                'owner_email'   => 'sometimes|string',
+                'speaker'       => 'sometimes|string',
+                'speaker_email' => 'sometimes|string',
+                'sponsor'       => 'sometimes|string',
+                'type'          => sprintf('sometimes|in:%s',implode(',', PromoCodesConstants::getValidTypes())),
+            ], [
+                'class_name.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", PromoCodesConstants::$valid_class_names)
+                ),
+                'type.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", PromoCodesConstants::getValidTypes())
+                )
+            ]);
+
             $order = null;
 
             if (Input::has('order'))
@@ -171,28 +168,6 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                     'id',
                     'code',
                 ]);
-            }
-
-            if(is_null($filter)) $filter = new Filter();
-
-            if($filter->hasFilter("class_name") && !$this->validateClassName($filter->getFilter("class_name"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name filter has an invalid value ( valid values are %s",
-                        implode(", ", PromoCodesConstants::$valid_class_names)
-                    )
-                );
-            }
-
-            if($filter->hasFilter("type") && !$this->validateTypes($filter->getFilter("type"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "type filter has an invalid value ( valid values are %s",
-                        implode(", ", PromoCodesConstants::getValidTypes())
-                    )
-                );
             }
 
             $data      = $this->promo_code_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
@@ -257,7 +232,6 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
 
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'), [
-
                     'code'          => ['=@', '=='],
                     'creator'       => ['=@', '=='],
                     'creator_email' => ['=@', '=='],
@@ -271,6 +245,32 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                 ]);
             }
 
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'class_name'    => sprintf('sometimes|in:%s',implode(',', PromoCodesConstants::$valid_class_names)),
+                'code'          => 'sometimes|string',
+                'creator'       => 'sometimes|string',
+                'creator_email' => 'sometimes|string',
+                'owner'         => 'sometimes|string',
+                'owner_email'   => 'sometimes|string',
+                'speaker'       => 'sometimes|string',
+                'speaker_email' => 'sometimes|string',
+                'sponsor'       => 'sometimes|string',
+                'type'          => sprintf('sometimes|in:%s',implode(',', PromoCodesConstants::getValidTypes())),
+            ], [
+                'class_name.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", PromoCodesConstants::$valid_class_names)
+                ),
+                'type.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", PromoCodesConstants::getValidTypes())
+                )
+            ]);
+
             $order = null;
 
             if (Input::has('order'))
@@ -280,28 +280,6 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                     'id',
                     'code',
                 ]);
-            }
-
-            if(is_null($filter)) $filter = new Filter();
-
-            if($filter->hasFilter("class_name") && !$this->validateClassName($filter->getFilter("class_name"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name filter has an invalid value ( valid values are %s",
-                        implode(", ", PromoCodesConstants::$valid_class_names)
-                    )
-                );
-            }
-
-            if($filter->hasFilter("type") && !$this->validateTypes($filter->getFilter("type"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "type filter has an invalid value ( valid values are %s",
-                        implode(", ", PromoCodesConstants::getValidTypes())
-                    )
-                );
             }
 
             $data     = $this->promo_code_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);

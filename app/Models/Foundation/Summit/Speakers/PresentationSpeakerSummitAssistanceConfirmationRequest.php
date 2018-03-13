@@ -53,7 +53,7 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
     private $confirmation_date;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker")
+     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="summit_assistances")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
      * @var PresentationSpeaker
      */

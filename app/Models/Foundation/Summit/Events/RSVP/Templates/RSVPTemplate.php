@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use models\main\Member;
 use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
@@ -43,6 +45,12 @@ class RSVPTemplate extends SilverstripeBaseModel
      * @var Member
      */
     private $created_by;
+
+    /**
+     * @ORM\OneToMany(targetEntity="RSVPQuestionTemplate", mappedBy="template", cascade={"persist"}, orphanRemoval=true)
+     * @var RSVPQuestionTemplate[]
+     */
+    private $questions;
 
     /**
      * @return string
@@ -91,4 +99,48 @@ class RSVPTemplate extends SilverstripeBaseModel
     {
         $this->created_by = $created_by;
     }
+
+    /**
+     * @return int
+     */
+    public function getCreatedById(){
+        try{
+            return is_null($this->created_by) ? 0 : $this->created_by->getId();
+        }
+        catch (\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasCreatedBy(){
+        return $this->getCreatedById() > 0;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->questions = new ArrayCollection;
+    }
+
+    /**
+     * @return RSVPQuestionTemplate[]
+     */
+    public function getQuestions()
+    {
+        $criteria = Criteria::create();
+        $criteria->orderBy(['order'=> 'ASC']);
+        return $this->questions->matching($criteria);
+    }
+
+    /**
+     * @param mixed $questions
+     */
+    public function setQuestions($questions)
+    {
+        $this->questions = $questions;
+    }
+
 }

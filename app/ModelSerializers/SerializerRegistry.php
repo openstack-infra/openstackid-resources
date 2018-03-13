@@ -36,6 +36,10 @@ use App\ModelSerializers\Marketplace\SpokenLanguageSerializer;
 use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
+use App\ModelSerializers\Summit\RSVP\Templates\RSVPMultiValueQuestionTemplateSerializer;
+use App\ModelSerializers\Summit\RSVP\Templates\RSVPQuestionValueTemplateSerializer;
+use App\ModelSerializers\Summit\RSVP\Templates\RSVPSingleValueTemplateQuestionSerializer;
+use App\ModelSerializers\Summit\RSVPTemplateSerializer;
 use App\ModelSerializers\Summit\ScheduledSummitLocationBannerSerializer;
 use App\ModelSerializers\Summit\SummitLocationBannerSerializer;
 use Libs\ModelSerializers\IModelSerializer;
@@ -107,7 +111,22 @@ final class SerializerRegistry
                 self::SerializerType_Private =>  AdminPresentationSpeakerSerializer::class
             ];
 
+        // RSVP
         $this->registry['RSVP']                       = RSVPSerializer::class;
+        $this->registry['RSVPTemplate']               = RSVPTemplateSerializer::class;
+        $this->registry['RSVPQuestionValueTemplate']  = RSVPQuestionValueTemplateSerializer::class;
+
+        $this->registry['RSVPSingleValueTemplateQuestion']     = RSVPSingleValueTemplateQuestionSerializer::class;
+        $this->registry['RSVPTextBoxQuestionTemplate']         = RSVPSingleValueTemplateQuestionSerializer::class;
+        $this->registry['RSVPTextAreaQuestionTemplate']        = RSVPSingleValueTemplateQuestionSerializer::class;
+        $this->registry['RSVPMemberEmailQuestionTemplate']     = RSVPSingleValueTemplateQuestionSerializer::class;
+        $this->registry['RSVPMemberFirstNameQuestionTemplate'] = RSVPSingleValueTemplateQuestionSerializer::class;
+        $this->registry['RSVPMemberLastNameQuestionTemplate']  = RSVPSingleValueTemplateQuestionSerializer::class;
+        $this->registry['RSVPMemberLastNameQuestionTemplate']  = RSVPSingleValueTemplateQuestionSerializer::class;
+
+        $this->registry['RSVPCheckBoxListQuestionTemplate']    = RSVPMultiValueQuestionTemplateSerializer::class;
+        $this->registry['RSVPRadioButtonListQuestionTemplate'] = RSVPMultiValueQuestionTemplateSerializer::class;
+
         $this->registry['SpeakerExpertise']           = SpeakerExpertiseSerializer::class;
         $this->registry['SpeakerLanguage']            = SpeakerLanguageSerializer::class;
         $this->registry['SpeakerTravelPreference']    = SpeakerTravelPreferenceSerializer::class;

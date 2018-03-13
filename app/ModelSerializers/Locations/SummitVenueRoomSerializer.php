@@ -19,12 +19,12 @@ use ModelSerializers\SerializerRegistry;
  */
 final class SummitVenueRoomSerializer extends SummitAbstractLocationSerializer
 {
-    protected static $array_mappings = array
-    (
-        'VenueId'      => 'venue_id:json_int',
-        'FloorId'      => 'floor_id:json_int',
-        'Capacity'     => 'capacity:json_int',
-    );
+    protected static $array_mappings = [
+        'VenueId'           => 'venue_id:json_int',
+        'FloorId'           => 'floor_id:json_int',
+        'Capacity'          => 'capacity:json_int',
+        'OverrideBlackouts' => 'override_blackouts:json_boolean',
+    ];
 
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
     {
