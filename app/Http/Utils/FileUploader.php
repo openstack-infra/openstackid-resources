@@ -12,12 +12,12 @@
  * limitations under the License.
  **/
 use App\Events\FileCreated;
+use App\Services\Model\IFolderService;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use models\main\File;
 use models\main\IFolderRepository;
-
 /**
  * Class FileUploader
  * @package App\Http\Utils
@@ -25,12 +25,16 @@ use models\main\IFolderRepository;
 final class FileUploader
 {
     /**
-     * @var IFolderRepository
+     * @var IFolderService
      */
-    private $folder_repository;
+    private $folder_service;
 
-    public function __construct(IFolderRepository $folder_repository){
-        $this->folder_repository = $folder_repository;
+    /**
+     * FileUploader constructor.
+     * @param IFolderService $folder_service
+     */
+    public function __construct(IFolderService $folder_service){
+        $this->folder_service = $folder_service;
     }
 
     /**
@@ -42,7 +46,8 @@ final class FileUploader
     public function build(UploadedFile $file, $folder_name, $is_image = false){
         $attachment = new File();
         $local_path = Storage::putFileAs(sprintf('/public/%s', $folder_name), $file, $file->getClientOriginalName());
-        $folder     = $this->folder_repository->getFolderByName($folder_name);
+        $folder     = $this->folder_service->findOrMake($folder_name);
+
         $attachment->setParent($folder);
         $attachment->setName($file->getClientOriginalName());
         $attachment->setFilename(sprintf("assets/%s/%s",$folder_name, $file->getClientOriginalName()));

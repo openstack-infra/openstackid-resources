@@ -17,6 +17,11 @@
  */
 final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
 {
+    public function testGetFolder(){
+        $service = \Illuminate\Support\Facades\App::make(\App\Services\Model\IFolderService::class);
+        $folder  =    $service->findOrMake('summits/1/locations/292/maps');
+    }
+
     public function testGetCurrentSummitLocations($summit_id = 23)
     {
         $params = [

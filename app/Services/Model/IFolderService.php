@@ -1,6 +1,6 @@
-<?php namespace models\main;
+<?php namespace App\Services\Model;
 /**
- * Copyright 2017 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,30 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IBaseRepository;
+use models\main\File;
 /**
- * Interface IFolderRepository
- * @package models\main
+ * Interface IFolderService
+ * @package App\Services\Model
  */
-interface IFolderRepository extends IBaseRepository
+interface IFolderService
 {
     /**
-     * @param string $folder_name
+     * @param $string $folder_name
      * @return File
      */
-    public function getFolderByName($folder_name);
-
-    /**
-     * @param string $file_name
-     * @return File
-     */
-    public function getFolderByFileName($file_name);
-
-    /**
-     * @param string $folder_name
-     * @param File $parent
-     * @return File
-     */
-    public function getFolderByNameAndParent($folder_name, File $parent);
-
+    public function findOrMake($folder_name);
 }

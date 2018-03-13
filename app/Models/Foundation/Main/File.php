@@ -181,10 +181,16 @@ class File extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->class_name = 'File';
+        $this->class_name     = 'File';
+        $this->show_in_search = true;
     }
 
     public function setImage(){
         $this->class_name = 'Image';
     }
+
+    public function setFolder(){
+        $this->class_name = 'Folder';
+    }
+
 }

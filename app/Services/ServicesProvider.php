@@ -14,7 +14,9 @@
 use App\Services\Apis\GoogleGeoCodingAPI;
 use App\Services\Apis\IGeoCodingAPI;
 use App\Services\Model\AttendeeService;
+use App\Services\Model\FolderService;
 use App\Services\Model\IAttendeeService;
+use App\Services\Model\IFolderService;
 use App\Services\Model\ILocationService;
 use App\Services\Model\IMemberService;
 use App\Services\Model\ISummitEventTypeService;
@@ -171,6 +173,12 @@ final class ServicesProvider extends ServiceProvider
         (
             ILocationService::class,
             LocationService::class
+        );
+
+        App::singleton
+        (
+            IFolderService::class,
+            FolderService::class
         );
 
         App::singleton(IGeoCodingAPI::class,   function(){

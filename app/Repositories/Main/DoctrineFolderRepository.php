@@ -46,10 +46,53 @@ SQL;
     }
 
     /**
+     * @param string $file_name
+     * @return File
+     */
+    public function getFolderByFileName($file_name)
+    {
+
+        $query = <<<SQL
+      select * from File where ClassName = 'Folder' AND 
+      FileName = :file_name
+SQL;
+        // build rsm here
+        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm->addRootEntityFromClassMetadata(\models\main\File::class, 'f');
+        $native_query = $this->_em->createNativeQuery($query, $rsm);
+
+        $native_query->setParameter("file_name", $file_name);
+
+        return $native_query->getOneOrNullResult();
+    }
+
+    /**
      * @return string
      */
     protected function getBaseEntity()
     {
         return File::class;
+    }
+
+    /**
+     * @param string $folder_name
+     * @param File $parent
+     * @return File
+     */
+    public function getFolderByNameAndParent($folder_name, File $parent)
+    {
+        $query = <<<SQL
+      select * from File where ClassName = 'Folder' AND 
+      Name = :folder_name and ParentID = :parent_id
+SQL;
+        // build rsm here
+        $rsm = new ResultSetMappingBuilder($this->_em);
+        $rsm->addRootEntityFromClassMetadata(\models\main\File::class, 'f');
+        $native_query = $this->_em->createNativeQuery($query, $rsm);
+
+        $native_query->setParameter("folder_name", $folder_name);
+        $native_query->setParameter("parent_id", $parent->getId());
+
+        return $native_query->getOneOrNullResult();
     }
 }

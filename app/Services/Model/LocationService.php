@@ -29,14 +29,12 @@ use App\Models\Foundation\Summit\Factories\SummitLocationBannerFactory;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
 use App\Models\Foundation\Summit\Factories\SummitLocationImageFactory;
 use App\Models\Foundation\Summit\Factories\SummitVenueFloorFactory;
-use App\Models\Foundation\Summit\Locations\Banners\ScheduledSummitLocationBanner;
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Services\Apis\GeoCodingApiException;
 use App\Services\Apis\IGeoCodingAPI;
 use App\Services\Model\Strategies\GeoLocation\GeoLocationStrategyFactory;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use libs\utils\ITransactionService;
@@ -45,10 +43,7 @@ use models\exceptions\ValidationException;
 use models\main\IFolderRepository;
 use models\summit\Summit;
 use models\summit\SummitAbstractLocation;
-use models\summit\SummitAirport;
-use models\summit\SummitExternalLocation;
 use models\summit\SummitGeoLocatedLocation;
-use models\summit\SummitHotel;
 use models\summit\SummitLocationImage;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueFloor;
@@ -65,11 +60,6 @@ final class LocationService implements ILocationService
     private $location_repository;
 
     /**
-     * @var IFolderRepository
-     */
-    private $folder_repository;
-
-    /**
      * @var ITransactionService
      */
     private $tx_service;
@@ -80,24 +70,29 @@ final class LocationService implements ILocationService
     private $geo_coding_api;
 
     /**
+     * @var IFolderService
+     */
+    private $folder_service;
+
+    /**
      * LocationService constructor.
      * @param ISummitLocationRepository $location_repository
-     * @param IFolderRepository $folder_repository
      * @param IGeoCodingAPI $geo_coding_api
+     * @param IFolderService $folder_service
      * @param ITransactionService $tx_service
      */
     public function __construct
     (
         ISummitLocationRepository $location_repository,
-        IFolderRepository $folder_repository,
         IGeoCodingAPI $geo_coding_api,
+        IFolderService $folder_service,
         ITransactionService $tx_service
     )
     {
         $this->location_repository = $location_repository;
         $this->geo_coding_api      = $geo_coding_api;
+        $this->folder_service      = $folder_service;
         $this->tx_service          = $tx_service;
-        $this->folder_repository   = $folder_repository;
     }
 
     /**
@@ -1176,7 +1171,7 @@ final class LocationService implements ILocationService
                 );
             }
 
-            $uploader = new FileUploader($this->folder_repository);
+            $uploader = new FileUploader($this->folder_service);
             $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/maps/', $location->getSummitId(), $location->getId()), true);
             $map      = SummitLocationImageFactory::buildMap($metadata);
             $map->setPicture($pic);
@@ -1280,7 +1275,7 @@ final class LocationService implements ILocationService
                     );
                 }
 
-                $uploader = new FileUploader($this->folder_repository);
+                $uploader = new FileUploader($this->folder_service);
                 $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/maps/', $location->getSummitId(), $location->getId()), true);
                 $map->setPicture($pic);
             }

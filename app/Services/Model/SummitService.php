@@ -17,6 +17,7 @@ use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use App\Http\Utils\FileUploader;
 use App\Models\Utils\IntervalParser;
+use App\Services\Model\IFolderService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\UploadedFile;
@@ -25,7 +26,6 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\File;
 use models\main\ICompanyRepository;
-use models\main\IFolderRepository;
 use models\main\IGroupRepository;
 use models\main\IMemberRepository;
 use models\main\ITagRepository;
@@ -135,9 +135,9 @@ final class SummitService implements ISummitService
     private $calendar_sync_work_request_repository;
 
     /**
-     * @var IFolderRepository
+     * @var IFolderService
      */
-    private $folder_repository;
+    private $folder_service;
 
     /**
      * @var ICompanyRepository
@@ -161,7 +161,7 @@ final class SummitService implements ISummitService
      * @param IRSVPRepository $rsvp_repository
      * @param IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository
      * @param IEventbriteAPI $eventbrite_api
-     * @param IFolderRepository $folder_repository
+     * @param IFolderService $folder_service
      * @param ICompanyRepository $company_repository
      * @param IGroupRepository $group_repository,
      * @param ITransactionService $tx_service
@@ -178,7 +178,7 @@ final class SummitService implements ISummitService
         IRSVPRepository                 $rsvp_repository,
         IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository,
         IEventbriteAPI                  $eventbrite_api,
-        IFolderRepository               $folder_repository,
+        IFolderService                  $folder_service,
         ICompanyRepository              $company_repository,
         IGroupRepository                $group_repository,
         ITransactionService             $tx_service
@@ -194,9 +194,9 @@ final class SummitService implements ISummitService
         $this->rsvp_repository                       = $rsvp_repository;
         $this->calendar_sync_work_request_repository = $calendar_sync_work_request_repository;
         $this->eventbrite_api                        = $eventbrite_api;
-        $this->folder_repository                     = $folder_repository;
+        $this->folder_service                        = $folder_service;
         $this->company_repository                    = $company_repository;
-        $this->group_repository                     = $group_repository;
+        $this->group_repository                      = $group_repository;
         $this->tx_service                            = $tx_service;
     }
 
@@ -1230,7 +1230,7 @@ final class SummitService implements ISummitService
                 throw new ValidationException(sprintf( "file exceeds max_file_size (%s MB).", ($max_file_size/1024)/1024));
             }
 
-            $uploader   = new FileUploader($this->folder_repository);
+            $uploader   = new FileUploader($this->folder_service);
             $attachment = $uploader->build($file, 'summit-event-attachments', true);
             $event->setAttachment($attachment);
 

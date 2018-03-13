@@ -13,6 +13,7 @@
  **/
 use App\Models\Foundation\Summit\Factories\PresentationSpeakerSummitAssistanceConfirmationRequestFactory;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
+use App\Services\Model\IFolderService;
 use Illuminate\Http\UploadedFile;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
@@ -20,7 +21,6 @@ use models\exceptions\ValidationException;
 use models\main\EmailCreationRequest;
 use models\main\File;
 use models\main\IEmailCreationRequestRepository;
-use models\main\IFolderRepository;
 use models\main\IMemberRepository;
 use models\main\MemberPromoCodeEmailCreationRequest;
 use models\main\SpeakerCreationEmailCreationRequest;
@@ -52,9 +52,9 @@ final class SpeakerService implements ISpeakerService
     private $member_repository;
 
     /**
-     * @var IFolderRepository
+     * @var IFolderService
      */
-    private $folder_repository;
+    private $folder_service;
 
     /**
      * @var ISpeakerRegistrationRequestRepository
@@ -89,7 +89,7 @@ final class SpeakerService implements ISpeakerService
      * @param ISpeakerRegistrationRequestRepository $speaker_registration_request_repository
      * @param ISpeakerSummitRegistrationPromoCodeRepository $registration_code_repository
      * @param IEmailCreationRequestRepository $email_creation_request_repository
-     * @param IFolderRepository $folder_repository
+     * @param IFolderService $folder_service
      * @param IPresentationSpeakerSummitAssistanceConfirmationRequestRepository $speakers_assistance_repository
      * @param ITransactionService $tx_service
      */
@@ -100,14 +100,14 @@ final class SpeakerService implements ISpeakerService
         ISpeakerRegistrationRequestRepository $speaker_registration_request_repository,
         ISpeakerSummitRegistrationPromoCodeRepository $registration_code_repository,
         IEmailCreationRequestRepository $email_creation_request_repository,
-        IFolderRepository $folder_repository,
+        IFolderService $folder_service,
         IPresentationSpeakerSummitAssistanceConfirmationRequestRepository $speakers_assistance_repository,
         ITransactionService $tx_service
     )
     {
         $this->speaker_repository                      = $speaker_repository;
         $this->member_repository                       = $member_repository;
-        $this->folder_repository                       = $folder_repository;
+        $this->folder_service                          = $folder_service;
         $this->speaker_registration_request_repository = $speaker_registration_request_repository;
         $this->registration_code_repository            = $registration_code_repository;
         $this->email_creation_request_repository       = $email_creation_request_repository;
@@ -397,7 +397,7 @@ final class SpeakerService implements ISpeakerService
                 throw new ValidationException(sprintf( "file exceeds max_file_size (%s MB).", ($max_file_size/1024)/1024));
             }
 
-            $uploader = new FileUploader($this->folder_repository);
+            $uploader = new FileUploader($this->folder_service);
             $photo    = $uploader->build($file, 'profile-images', true);
             $speaker->setPhoto($photo);
 
