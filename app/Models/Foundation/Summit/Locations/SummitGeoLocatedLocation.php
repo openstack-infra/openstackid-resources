@@ -386,7 +386,9 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
         $res = $this->images
             ->matching
             (
-                Criteria::create()->where(Criteria::expr()->eq("id", $image_id))
+                Criteria::create()
+                    ->where(Criteria::expr()->eq("id", $image_id))
+                    ->andWhere(Criteria::expr()->eq("class_name", SummitLocationImage::TypeImage))
 
             )->first();
         return $res === false ? null : $res;
@@ -441,6 +443,17 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
         $image->setLocation($this);
     }
 
+
+    /**
+     * @param SummitLocationImage $image
+     * @return $this
+     */
+    public function removeImage(SummitLocationImage $image){
+        $this->images->removeElement($image);
+        $image->ClearLocation();
+        return $this;
+    }
+
     /**
      * @param SummitLocationImage $map
      * @param $new_order
@@ -450,7 +463,7 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
         $maps         = $this->getMaps();
         $maps         = array_slice($maps,0, count($maps), false);
         $max_order    = count($maps);
-        $former_order =  1;
+        $former_order = 1;
         
         foreach ($maps as $m){
             if($m->getId() == $map->getId()) break;
@@ -472,6 +485,42 @@ class SummitGeoLocatedLocation extends SummitAbstractLocation
         $order = 1;
         foreach($maps as $m){
             $m->setOrder($order);
+            $order++;
+        }
+    }
+
+    /**
+     * @param SummitLocationImage $image
+     * @param $new_order
+     * @throws ValidationException
+     */
+    public function recalculateImageOrder(SummitLocationImage $image, $new_order){
+
+        $images       = $this->getImages();
+        $images       = array_slice($images,0, count($images), false);
+        $max_order    = count($images);
+        $former_order = 1;
+
+        foreach ($images as $i){
+            if($i->getId() == $image->getId()) break;
+            $former_order++;
+        }
+
+        if($new_order > $max_order)
+            throw new ValidationException(sprintf("max order is %s", $max_order));
+
+        unset($images[$former_order - 1]);
+
+        $images = array_merge
+        (
+            array_slice($images, 0, $new_order -1 , true) ,
+            [$image] ,
+            array_slice($images, $new_order -1 , count($images), true)
+        );
+
+        $order = 1;
+        foreach($images as $i){
+            $i->setOrder($order);
             $order++;
         }
     }

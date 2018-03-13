@@ -33,6 +33,7 @@ use models\summit\ISummitRepository;
 use models\summit\Summit;
 use models\summit\SummitAirport;
 use models\summit\SummitExternalLocation;
+use models\summit\SummitGeoLocatedLocation;
 use models\summit\SummitHotel;
 use models\summit\SummitVenue;
 use models\summit\SummitVenueRoom;
@@ -761,217 +762,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
         {
             Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @param $location_id
-     * @param $map_id
-     * @return mixed
-     */
-    public function getLocationMap($summit_id, $location_id, $map_id){
-        try {
-
-            $expand    = Request::input('expand', '');
-            $relations = Request::input('relations', '');
-            $relations = !empty($relations) ? explode(',', $relations) : [];
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $location = $summit->getLocation($location_id);
-            if (is_null($location)) {
-                return $this->error404();
-            }
-
-            if (!Summit::isPrimaryLocation($location)) {
-                return $this->error404();
-            }
-
-            $map = $location->getMap($map_id);
-            if (is_null($map)) {
-                return $this->error404();
-            }
-
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($map)->serialize($expand,[], $relations));
-
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-    /**
-     * @param LaravelRequest $request
-     * @param $summit_id
-     * @param $location_id
-     * @return mixed
-     */
-    public function addLocationMap(LaravelRequest $request, $summit_id, $location_id){
-
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $file      = $request->file('file');
-            if(is_null($file))
-                throw new ValidationException('file is required.');
-
-            $metadata  = $request->all();
-
-            $rules     = SummitLocationImageValidationRulesFactory::build();
-            // Creates a Validator instance and validates the data.
-            $validation = Validator::make($metadata, $rules);
-
-            if ($validation->fails()) {
-                $messages = $validation->messages()->toArray();
-
-                return $this->error412
-                (
-                    $messages
-                );
-            }
-
-            $map = $this->location_service->addLocationMap
-            (
-                $summit,
-                $location_id,
-                HTMLCleaner::cleanData
-                (
-                    $metadata, ['description']
-                ),
-                $file
-            );
-
-            return $this->created(SerializerRegistry::getInstance()->getSerializer($map)->serialize());
-        }
-        catch (EntityNotFoundException $ex1) {
-            Log::warning($ex1);
-            return $this->error404();
-        }
-        catch(ValidationException $ex2)
-        {
-            Log::warning($ex2);
-            return $this->error412(array($ex2->getMessage()));
-        }
-        catch(\HTTP401UnauthorizedException $ex3)
-        {
-            Log::warning($ex3);
-            return $this->error401();
-        }
-        catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param LaravelRequest $request
-     * @param $summit_id
-     * @param $location_id
-     * @param $map_id
-     * @return mixed
-     */
-    public function updateLocationMap(LaravelRequest $request, $summit_id, $location_id, $map_id){
-
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $content_type = $request->headers->has('Content-Type')  ? strtolower( $request->headers->get('Content-Type')) : null;
-
-            if (false !== $pos = strpos($content_type, ';')) {
-                $content_type = substr($content_type, 0, $pos);
-            }
-
-            if(!strstr($content_type, 'multipart/form-data'))
-                return $this->error403();
-
-            $multiPartRequestParser = new ParseMultiPartFormDataInputStream();
-            $input                  = $multiPartRequestParser->getInput();
-            $metadata               = $input['parameters'];
-            $files                  = $input['files'];
-            $file                   = null;
-
-            if(count($files) > 0)
-                $file = $files[0];
-
-            $rules      = SummitLocationImageValidationRulesFactory::build(true);
-            // Creates a Validator instance and validates the data.
-            $validation = Validator::make($metadata, $rules);
-
-            if ($validation->fails()) {
-                $messages = $validation->messages()->toArray();
-
-                return $this->error412
-                (
-                    $messages
-                );
-            }
-
-            $map = $this->location_service->updateLocationMap
-            (
-                $summit,
-                $location_id,
-                $map_id,
-                HTMLCleaner::cleanData
-                (
-                    $metadata, ['description']
-                ),
-                $file
-            );
-
-            return $this->updated(SerializerRegistry::getInstance()->getSerializer($map)->serialize());
-        }
-        catch (EntityNotFoundException $ex1) {
-            Log::warning($ex1);
-            return $this->error404();
-        }
-        catch(ValidationException $ex2)
-        {
-            Log::warning($ex2);
-            return $this->error412(array($ex2->getMessage()));
-        }
-        catch(\HTTP401UnauthorizedException $ex3)
-        {
-            Log::warning($ex3);
-            return $this->error401();
-        }
-        catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @param $location_id
-     * @param $map_id
-     * @return mixed
-     */
-    public function deleteLocationMap($summit_id, $location_id, $map_id){
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-            $this->location_service->deleteLocationMap($summit, $location_id, $map_id);
-            return $this->deleted();
-        }
-        catch (EntityNotFoundException $ex1) {
-            Log::warning($ex1);
-            return $this->error404();
-        }
-        catch(ValidationException $ex2)
-        {
-            Log::warning($ex2);
-            return $this->error412(array($ex2->getMessage()));
-        }
-        catch(\HTTP401UnauthorizedException $ex3)
-        {
-            Log::warning($ex3);
-            return $this->error401();
         }
         catch (Exception $ex) {
             Log::error($ex);
@@ -2023,4 +1813,437 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     *  Location Maps endpoints
+     */
+
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @param $map_id
+     * @return mixed
+     */
+    public function getLocationMap($summit_id, $location_id, $map_id){
+        try {
+
+            $expand    = Request::input('expand', '');
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $location = $summit->getLocation($location_id);
+            if (is_null($location)) {
+                return $this->error404();
+            }
+
+            if (!Summit::isPrimaryLocation($location)) {
+                return $this->error404();
+            }
+
+            $map = $location->getMap($map_id);
+            if (is_null($map)) {
+                return $this->error404();
+            }
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($map)->serialize($expand,[], $relations));
+
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $location_id
+     * @return mixed
+     */
+    public function addLocationMap(LaravelRequest $request, $summit_id, $location_id){
+
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $file      = $request->file('file');
+            if(is_null($file))
+                throw new ValidationException('file is required.');
+
+            $metadata  = $request->all();
+
+            $rules     = SummitLocationImageValidationRulesFactory::build();
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($metadata, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $map = $this->location_service->addLocationMap
+            (
+                $summit,
+                $location_id,
+                HTMLCleaner::cleanData
+                (
+                    $metadata, ['description']
+                ),
+                $file
+            );
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($map)->serialize());
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $location_id
+     * @param $map_id
+     * @return mixed
+     */
+    public function updateLocationMap(LaravelRequest $request, $summit_id, $location_id, $map_id){
+
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $content_type = $request->headers->has('Content-Type')  ? strtolower( $request->headers->get('Content-Type')) : null;
+
+            if (false !== $pos = strpos($content_type, ';')) {
+                $content_type = substr($content_type, 0, $pos);
+            }
+
+            if(!strstr($content_type, 'multipart/form-data'))
+                return $this->error403();
+
+            $multiPartRequestParser = new ParseMultiPartFormDataInputStream();
+            $input                  = $multiPartRequestParser->getInput();
+            $metadata               = $input['parameters'];
+            $files                  = $input['files'];
+            $file                   = null;
+
+            if(count($files) > 0)
+                $file = $files[0];
+
+            $rules      = SummitLocationImageValidationRulesFactory::build(true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($metadata, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $map = $this->location_service->updateLocationMap
+            (
+                $summit,
+                $location_id,
+                $map_id,
+                HTMLCleaner::cleanData
+                (
+                    $metadata, ['description']
+                ),
+                $file
+            );
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($map)->serialize());
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @param $map_id
+     * @return mixed
+     */
+    public function deleteLocationMap($summit_id, $location_id, $map_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $this->location_service->deleteLocationMap($summit, $location_id, $map_id);
+            return $this->deleted();
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     *  Location Images endpoints
+     */
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @param $image_id
+     * @return mixed
+     */
+    public function getLocationImage($summit_id, $location_id, $image_id){
+        try {
+
+            $expand    = Request::input('expand', '');
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $location = $summit->getLocation($location_id);
+            if (is_null($location)) {
+                return $this->error404();
+            }
+
+            if(!$location instanceof SummitGeoLocatedLocation){
+                return $this->error404();
+            }
+
+            $image = $location->getImage($image_id);
+            if (is_null($image)) {
+                return $this->error404();
+            }
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($image)->serialize($expand,[], $relations));
+
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $location_id
+     * @return mixed
+     */
+    public function addLocationImage(LaravelRequest $request, $summit_id, $location_id){
+
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $file      = $request->file('file');
+            if(is_null($file))
+                throw new ValidationException('file is required.');
+
+            $metadata  = $request->all();
+
+            $rules     = SummitLocationImageValidationRulesFactory::build();
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($metadata, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $image = $this->location_service->addLocationImage
+            (
+                $summit,
+                $location_id,
+                HTMLCleaner::cleanData
+                (
+                    $metadata, ['description']
+                ),
+                $file
+            );
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($image)->serialize());
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $location_id
+     * @param $image_id
+     * @return mixed
+     */
+    public function updateLocationImage(LaravelRequest $request, $summit_id, $location_id, $image_id){
+
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $content_type = $request->headers->has('Content-Type')  ? strtolower( $request->headers->get('Content-Type')) : null;
+
+            if (false !== $pos = strpos($content_type, ';')) {
+                $content_type = substr($content_type, 0, $pos);
+            }
+
+            if(!strstr($content_type, 'multipart/form-data'))
+                return $this->error403();
+
+            $multiPartRequestParser = new ParseMultiPartFormDataInputStream();
+            $input                  = $multiPartRequestParser->getInput();
+            $metadata               = $input['parameters'];
+            $files                  = $input['files'];
+            $file                   = null;
+
+            if(count($files) > 0)
+                $file = $files[0];
+
+            $rules      = SummitLocationImageValidationRulesFactory::build(true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($metadata, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $image = $this->location_service->updateLocationImage()
+            (
+                $summit,
+                $location_id,
+                $image_id,
+                HTMLCleaner::cleanData
+                (
+                    $metadata, ['description']
+                ),
+                $file
+            );
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($image)->serialize());
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $location_id
+     * @param $image_id
+     * @return mixed
+     */
+    public function deleteLocationImage($summit_id, $location_id, $image_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $this->location_service->deleteLocationImage($summit, $location_id, $image_id);
+            return $this->deleted();
+        }
+        catch (EntityNotFoundException $ex1) {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch(ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412(array($ex2->getMessage()));
+        }
+        catch(\HTTP401UnauthorizedException $ex3)
+        {
+            Log::warning($ex3);
+            return $this->error401();
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
 }

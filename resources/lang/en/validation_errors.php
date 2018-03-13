@@ -45,4 +45,10 @@ return [
     'LocationService.addLocationBanner.InvalidClassName' => 'invalid class name',
     'LocationService.addLocationMap.FileNotAllowedExtension' => 'file extension is not allowed (:allowed_extensions)',
     'LocationService.addLocationMap.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
+    'LocationService.updateLocationMap.FileNotAllowedExtension' => 'file extension is not allowed (:allowed_extensions)',
+    'LocationService.updateLocationMap.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
+    'LocationService.addLocationImage.FileNotAllowedExtension' => 'file extension is not allowed (:allowed_extensions)',
+    'LocationService.addLocationImage.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
+    'LocationService.updateLocationImage.FileNotAllowedExtension' => 'file extension is not allowed (:allowed_extensions)',
+    'LocationService.updateLocationImage.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
 ];

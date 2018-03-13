@@ -546,6 +546,43 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteLocationsData, $current_realm)
                 ],
             ],
+            // maps
+            [
+                'name' => 'add-location-image',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/images',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-location-image',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/images/{image_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'get-location-image',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/images/{image_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-location-image',
+                'route' => '/api/v1/summits/{id}/locations/{location_id}/images/{image_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
             // banners
             [
                 'name' => 'get-location-banners',
