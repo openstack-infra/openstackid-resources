@@ -1214,7 +1214,7 @@ final class LocationService implements ILocationService
                 throw new EntityNotFoundException
                 (
                     trans(
-                        'not_found_errors.LocationService.addLocationMap.LocationNotFound',
+                        'not_found_errors.LocationService.updateLocationMap.LocationNotFound',
                         [
                             'location_id' => $location_id,
                         ]
@@ -1226,7 +1226,7 @@ final class LocationService implements ILocationService
                 throw new EntityNotFoundException
                 (
                     trans(
-                        'not_found_errors.LocationService.addLocationMap.LocationNotFound',
+                        'not_found_errors.LocationService.updateLocationMap.LocationNotFound',
                         [
                             'location_id' => $location_id,
                         ]
@@ -1240,7 +1240,7 @@ final class LocationService implements ILocationService
                 throw new EntityNotFoundException
                 (
                     trans(
-                        'not_found_errors.LocationService.addLocationMap.MapNotFound',
+                        'not_found_errors.LocationService.updateLocationMap.MapNotFound',
                         [
                             'map_id'      => $map_id,
                             'location_id' => $location_id,
@@ -1254,7 +1254,7 @@ final class LocationService implements ILocationService
                     throw new ValidationException
                     (
                         trans(
-                            'validation_errors.LocationService.addLocationMap.FileNotAllowedExtension',
+                            'validation_errors.LocationService.updateLocationMap.FileNotAllowedExtension',
                             [
                                 'allowed_extensions' => implode(", ", $allowed_extensions),
                             ]
@@ -1267,7 +1267,7 @@ final class LocationService implements ILocationService
                     (
                         trans
                         (
-                            'validation_errors.LocationService.addLocationMap.FileMaxSize',
+                            'validation_errors.LocationService.updateLocationMap.FileMaxSize',
                             [
                                 'max_file_size' => (($max_file_size / 1024) / 1024)
                             ]
@@ -1353,8 +1353,8 @@ final class LocationService implements ILocationService
                     (
                         'not_found_errors.LocationService.deleteLocationMap.MapNotFound',
                         [
-                            'location_id'  => $location_id,
-                            'banner_id'    => $map_id,
+                            'location_id' => $location_id,
+                            'map_id'      => $map_id,
                         ]
                     )
                 );
@@ -1372,6 +1372,277 @@ final class LocationService implements ILocationService
             );
 
             $location->removeMap($map);
+
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param array $metadata
+     * @param $file
+     * @return SummitLocationImage
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addLocationImage(Summit $summit, $location_id, array $metadata, UploadedFile $file)
+    {
+        $image = $this->tx_service->transaction(function () use ($summit, $location_id, $metadata, $file) {
+            $max_file_size      = config('file_upload.max_file_upload_size') ;
+            $allowed_extensions = ['png','jpg','jpeg','gif','pdf'];
+            $location           = $summit->getLocation($location_id);
+
+            if (is_null($location)) {
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.addLocationImage.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$location instanceof SummitGeoLocatedLocation){
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.addLocationImage.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!in_array($file->extension(), $allowed_extensions)){
+                throw new ValidationException
+                (
+                    trans(
+                        'validation_errors.LocationService.addLocationImage.FileNotAllowedExtension',
+                        [
+                            'allowed_extensions' => implode(", ", $allowed_extensions),
+                        ]
+                    )
+                );
+            }
+
+            if($file->getSize() > $max_file_size)
+            {
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.LocationService.addLocationImage.FileMaxSize',
+                        [
+                            'max_file_size' => (($max_file_size/1024)/1024)
+                        ]
+                    )
+                );
+            }
+
+            $uploader = new FileUploader($this->folder_repository);
+            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/images/', $location->getSummitId(), $location->getId()), true);
+            $image    = SummitLocationImageFactory::buildImage($metadata);
+            $image->setPicture($pic);
+            $location->addImage($image);
+            return $image;
+        });
+
+        Event::fire
+        (
+            new LocationImageInserted
+            (
+                $image->getId(),
+                $image->getLocationId(),
+                $image->getLocation()->getSummitId(),
+                $image->getClassName()
+            )
+        );
+
+        return $image;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $image_id
+     * @param array $metadata
+     * @param $file
+     * @return SummitLocationImage
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateLocationImage(Summit $summit, $location_id, $image_id, array $metadata, UploadedFile $file)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $location_id, $image_id, $metadata, $file) {
+            $max_file_size      = config('file_upload.max_file_upload_size') ;
+            $allowed_extensions = ['png','jpg','jpeg','gif','pdf'];
+            $location           = $summit->getLocation($location_id);
+
+            if (is_null($location)) {
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.updateLocationImage.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$location instanceof SummitGeoLocatedLocation){
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.updateLocationImage.LocationNotFound',
+                        [
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $image = $location->getImage($image_id);
+
+            if (is_null($image)) {
+                throw new EntityNotFoundException
+                (
+                    trans(
+                        'not_found_errors.LocationService.updateLocationImage.ImageNotFound',
+                        [
+                            'image_id'      => $image,
+                            'location_id' => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!is_null($file)) {
+                if (!in_array($file->extension(), $allowed_extensions)) {
+                    throw new ValidationException
+                    (
+                        trans(
+                            'validation_errors.LocationService.updateLocationImage.FileNotAllowedExtension',
+                            [
+                                'allowed_extensions' => implode(", ", $allowed_extensions),
+                            ]
+                        )
+                    );
+                }
+
+                if ($file->getSize() > $max_file_size) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.LocationService.updateLocationImage.FileMaxSize',
+                            [
+                                'max_file_size' => (($max_file_size / 1024) / 1024)
+                            ]
+                        )
+                    );
+                }
+
+                $uploader = new FileUploader($this->folder_repository);
+                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/images/', $location->getSummitId(), $location->getId()), true);
+                $image->setPicture($pic);
+            }
+
+            $image = SummitLocationImageFactory::populate($image, $metadata);
+
+            if (isset($metadata['order']) && intval($metadata['order']) != $image->getOrder()) {
+                // request to update order
+                $location->recalculateImageOrder($image, intval($metadata['order']));
+            }
+
+            Event::fire
+            (
+                new LocationImageUpdated
+                (
+                    $image->getId(),
+                    $image->getLocationId(),
+                    $image->getLocation()->getSummitId(),
+                    $image->getClassName()
+                )
+            );
+
+            return $image;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $location_id
+     * @param int $image_id
+     * @return SummitAbstractLocation
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteLocationImage(Summit $summit, $location_id, $image_id)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $location_id, $image_id) {
+
+            $location = $summit->getLocation($location_id);
+
+            if(is_null($location)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationImage.LocationNotFound',
+                        [
+                            'summit_id'    => $summit->getId(),
+                            'location_id'  => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            if(!$location instanceof SummitGeoLocatedLocation){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationImage.LocationNotFound',
+                        [
+                            'summit_id'    => $summit->getId(),
+                            'location_id'  => $location_id,
+                        ]
+                    )
+                );
+            }
+
+            $image = $location->getImage($image_id);
+
+            if(is_null($image)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.LocationService.deleteLocationImage.ImageNotFound',
+                        [
+                            'location_id'  => $location_id,
+                            'image_id'     => $image_id,
+                        ]
+                    )
+                );
+            }
+
+            Event::fire
+            (
+                new LocationImageDeleted
+                (
+                    $image->getId(),
+                    $image->getLocationId(),
+                    $image->getLocation()->getSummitId(),
+                    $image->getClassName()
+                )
+            );
+
+            $location->removeImage($image);
 
         });
     }

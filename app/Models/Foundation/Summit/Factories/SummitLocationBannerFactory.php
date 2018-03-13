@@ -132,7 +132,14 @@ final class SummitLocationBannerFactory
      * @param array $data
      * @return ScheduledSummitLocationBanner|SummitLocationBanner
      */
-    public static function populate(Summit $summit, SummitAbstractLocation $location, SummitLocationBanner $banner, array $data){
+    public static function populate
+    (
+        Summit $summit,
+        SummitAbstractLocation $location,
+        SummitLocationBanner $banner,
+        array $data
+    )
+    {
 
         if($banner instanceof ScheduledSummitLocationBanner){
             return self::populateScheduledSummitLocationBanner($summit, $location, $banner, $data);
