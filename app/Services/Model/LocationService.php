@@ -1204,12 +1204,12 @@ final class LocationService implements ILocationService
      * @param int $location_id
      * @param int $map_id
      * @param array $metadata
-     * @param $file
+     * @param UploadedFile|null $file
      * @return SummitLocationImage
      * @throws EntityNotFoundException
      * @throws ValidationException
      */
-    public function updateLocationMap(Summit $summit, $location_id, $map_id, array $metadata, UploadedFile $file)
+    public function updateLocationMap(Summit $summit, $location_id, $map_id, array $metadata, UploadedFile $file = null)
     {
         return $this->tx_service->transaction(function () use ($summit, $location_id, $map_id, $metadata, $file) {
             $max_file_size      = config('file_upload.max_file_upload_size') ;
@@ -1475,12 +1475,12 @@ final class LocationService implements ILocationService
      * @param int $location_id
      * @param int $image_id
      * @param array $metadata
-     * @param $file
+     * @param UploadedFile|null $file
      * @return SummitLocationImage
      * @throws EntityNotFoundException
      * @throws ValidationException
      */
-    public function updateLocationImage(Summit $summit, $location_id, $image_id, array $metadata, UploadedFile $file)
+    public function updateLocationImage(Summit $summit, $location_id, $image_id, array $metadata, UploadedFile $file = null)
     {
         return $this->tx_service->transaction(function () use ($summit, $location_id, $image_id, $metadata, $file) {
             $max_file_size      = config('file_upload.max_file_upload_size') ;
