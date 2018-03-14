@@ -1947,8 +1947,8 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $files                  = $input['files'];
             $file                   = null;
 
-            if(count($files) > 0)
-                $file = $files[0];
+            if(isset($files['file']))
+                $file = $files['file'];
 
             $rules      = SummitLocationImageValidationRulesFactory::build(true);
             // Creates a Validator instance and validates the data.
@@ -2163,8 +2163,8 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $files                  = $input['files'];
             $file                   = null;
 
-            if(count($files) > 0)
-                $file = $files[0];
+            if(isset($files['file']))
+                $file = $files['file'];
 
             $rules      = SummitLocationImageValidationRulesFactory::build(true);
             // Creates a Validator instance and validates the data.

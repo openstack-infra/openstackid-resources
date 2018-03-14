@@ -1442,7 +1442,7 @@ final class LocationService implements ILocationService
                 );
             }
 
-            $uploader = new FileUploader($this->folder_repository);
+            $uploader = new FileUploader($this->folder_service);
             $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/images/', $location->getSummitId(), $location->getId()), true);
             $image    = SummitLocationImageFactory::buildImage($metadata);
             $image->setPicture($pic);
@@ -1546,7 +1546,7 @@ final class LocationService implements ILocationService
                     );
                 }
 
-                $uploader = new FileUploader($this->folder_repository);
+                $uploader = new FileUploader($this->folder_service);
                 $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/images/', $location->getSummitId(), $location->getId()), true);
                 $image->setPicture($pic);
             }
