@@ -954,9 +954,10 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
         ];
 
         $data = [
-            'description' => 'Pyrmont Theatre',
+            'description' => 'Pyrmont Theatre Update',
             'order'       => 2,
             'capacity'    => 1000,
+            'floor_id'    => 23
         ];
 
         $headers = [

@@ -1187,7 +1187,6 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            $payload['class_name'] = SummitAirport::ClassName;
             $rules = [
                 'name'        => 'sometimes|string|max:50',
                 'number'      => 'sometimes|integer',
@@ -1296,7 +1295,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 );
             }
 
-            if(isset($payload['floor_id']))
+            if(!isset($payload['floor_id']))
                 $payload['floor_id'] = intval($floor_id);
 
             $room = $this->location_service->updateVenueRoom($summit, $venue_id, $room_id, $payload);
@@ -2179,7 +2178,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
                 );
             }
 
-            $image = $this->location_service->updateLocationImage()
+            $image = $this->location_service->updateLocationImage
             (
                 $summit,
                 $location_id,

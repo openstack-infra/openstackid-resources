@@ -825,33 +825,39 @@ final class LocationService implements ILocationService
                     )
                 );
             }
+
             $old_floor_id = $room->getFloorId();
             $new_floor_id = $room->getFloorId();
-            $room         = SummitLocationFactory::populate($room, $data);
+            SummitLocationFactory::populate($room, $data);
             $floor        = null;
+
             if(isset($data['floor_id'])){
+                $old_floor_id = intval($room->getFloorId());
                 $new_floor_id = intval($data['floor_id']);
-                $floor        = $venue->getFloor($new_floor_id);
-
-                if(is_null($floor)){
-                    throw new EntityNotFoundException
-                    (
-                        trans
+                if($old_floor_id != $new_floor_id) {
+                    $floor = $venue->getFloor($new_floor_id);
+                    if (is_null($floor)) {
+                        throw new EntityNotFoundException
                         (
-                            'not_found_errors.LocationService.updateVenueRoom.FloorNotFound',
-                            [
-                                'floor_id' => $new_floor_id,
-                                'venue_id' => $venue_id
-                            ]
-                        )
-                    );
-                }
+                            trans
+                            (
+                                'not_found_errors.LocationService.updateVenueRoom.FloorNotFound',
+                                [
+                                    'floor_id' => $new_floor_id,
+                                    'venue_id' => $venue_id
+                                ]
+                            )
+                        );
+                    }
+                    if($old_floor_id > 0){
+                        // remove from old floor
+                        $room->getFloor()->removeRoom($room);
 
-                $floor->addRoom($room);
+                    }
+                    $floor->addRoom($room);
+                }
             }
 
-            $summit->addLocation($room);
-            $venue->addRoom($room);
 
             // request to update order
             if (isset($data['order']) && intval($data['order']) != $room->getOrder()) {
