@@ -25,12 +25,12 @@ final class ParseMultiPartFormDataInputStream
     protected $input;
 
     /**
-     * @function __construct
-     *
+     * ParseMultiPartFormDataInputStream constructor.
+     * @param $input
      */
-    public function __construct()
+    public function __construct($input)
     {
-        $this->input = file_get_contents('php://input');
+        $this->input = $input;
     }
 
     /**
@@ -234,12 +234,14 @@ final class ParseMultiPartFormDataInputStream
     private function parameter($string)
     {
         $data = [];
+        $string = trim($string);
+        if(empty($string)) return $data;
 
         if ( preg_match('/name=\"([^\"]*)\"[\n|\r]+([^\n\r].*)?\r$/s', $string, $match) ) {
             if (preg_match('/^(.*)\[\]$/i', $match[1], $tmp)) {
-                $data[$tmp[1]][] = ($match[2] !== NULL ? $match[2] : '');
+                $data[$tmp[1]][] = (count($match) >=2 && $match[2] !== NULL ? $match[2] : '');
             } else {
-                $data[$match[1]] = ($match[2] !== NULL ? $match[2] : '');
+                $data[$match[1]] = (count($match) >=2 && $match[2] !== NULL ? $match[2] : '');
             }
         }
 

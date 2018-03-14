@@ -1942,11 +1942,11 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             if(!strstr($content_type, 'multipart/form-data'))
                 return $this->error400();
 
-            $multiPartRequestParser = new ParseMultiPartFormDataInputStream();
-            $input                  = $multiPartRequestParser->getInput();
-            $metadata               = $input['parameters'];
-            $files                  = $input['files'];
-            $file                   = null;
+            $parser   = new ParseMultiPartFormDataInputStream(file_get_contents('php://input'));
+            $input    = $parser->getInput();
+            $metadata = $input['parameters'];
+            $files    = $input['files'];
+            $file     = null;
 
             if(isset($files['file']))
                 $file = $files['file'];
@@ -2158,11 +2158,11 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             if(!strstr($content_type, 'multipart/form-data'))
                 return $this->error400();
 
-            $multiPartRequestParser = new ParseMultiPartFormDataInputStream();
-            $input                  = $multiPartRequestParser->getInput();
-            $metadata               = $input['parameters'];
-            $files                  = $input['files'];
-            $file                   = null;
+            $parser   = new ParseMultiPartFormDataInputStream(file_get_contents('php://input'));
+            $input    = $parser->getInput();
+            $metadata = $input['parameters'];
+            $files    = $input['files'];
+            $file     = null;
 
             if(isset($files['file']))
                 $file = $files['file'];
