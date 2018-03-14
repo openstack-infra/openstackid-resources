@@ -50,4 +50,7 @@ trait SummitOwned
         }
     }
 
+    public function clearSummit(){
+        $this->summit = null;
+    }
 }

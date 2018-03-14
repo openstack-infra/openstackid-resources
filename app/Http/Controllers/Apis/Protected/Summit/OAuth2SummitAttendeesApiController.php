@@ -440,7 +440,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
      */
     public function addAttendee($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -522,7 +522,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
      */
     public function updateAttendee($summit_id, $attendee_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -576,7 +576,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
      */
     public function addAttendeeTicket($summit_id, $attendee_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);

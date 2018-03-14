@@ -114,10 +114,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if (!$request->isJson()) {
-                return $this->error412(array('invalid content type!'));
-            }
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 
@@ -166,10 +163,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if (!$request->isJson()) {
-                return $this->error412(array('invalid content type!'));
-            }
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 

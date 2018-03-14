@@ -29,7 +29,7 @@ class RSVPMultiValueQuestionTemplate extends RSVPQuestionTemplate
     private $empty_string;
 
     /**
-     * @ORM\OneToMany(targetEntity="RSVPQuestionValueTemplate", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="RSVPQuestionValueTemplate", mappedBy="owner", cascade={"persist", "remove"}, orphanRemoval=true)
      * @var RSVPQuestionValueTemplate[]
      */
     private $values;

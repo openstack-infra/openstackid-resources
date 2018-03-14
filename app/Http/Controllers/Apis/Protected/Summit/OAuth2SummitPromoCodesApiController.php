@@ -340,7 +340,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
      */
     public function addPromoCodeBySummit($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
@@ -391,7 +391,7 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
     public function updatePromoCodeBySummit($summit_id, $promo_code_id)
     {
         try {
-            if (!Request::isJson()) return $this->error403();
+            if (!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);

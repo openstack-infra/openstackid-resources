@@ -48,7 +48,7 @@ final class SummitLocationImageFactory
             $image->setName(trim($data['name']));
 
         if(isset($data['description']))
-            $image->setName(trim($data['description']));
+            $image->setDescription(trim($data['description']));
 
         return $image;
     }

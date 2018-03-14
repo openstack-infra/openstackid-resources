@@ -360,7 +360,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     public function addSpeakerBySummit($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -426,7 +426,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     public function updateSpeakerBySummit($summit_id, $speaker_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -533,7 +533,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     public function merge($speaker_from_id, $speaker_to_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $speaker_from = $this->speaker_repository->getById($speaker_from_id);
@@ -566,7 +566,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     public function addSpeaker(){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $rules = [
@@ -628,7 +628,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     public function updateSpeaker($speaker_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
 

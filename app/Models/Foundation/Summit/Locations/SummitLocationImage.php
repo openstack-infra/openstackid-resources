@@ -34,7 +34,7 @@ class SummitLocationImage extends SilverstripeBaseModel
     protected $description;
 
     /**
-     * @ORM\Column(name="Order", type="integer")
+     * @ORM\Column(name="`Order`", type="integer")
      */
     protected $order;
 
@@ -44,7 +44,7 @@ class SummitLocationImage extends SilverstripeBaseModel
     protected $class_name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER")
+     * @ORM\ManyToOne(targetEntity="models\main\File", fetch="EAGER", cascade={"persist"})
      * @ORM\JoinColumn(name="PictureID", referencedColumnName="ID", onDelete="CASCADE")
      * @var File
      */

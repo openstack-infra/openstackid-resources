@@ -19,10 +19,12 @@ use App\Services\Model\IAttendeeService;
 use App\Services\Model\IFolderService;
 use App\Services\Model\ILocationService;
 use App\Services\Model\IMemberService;
+use App\Services\Model\IRSVPTemplateService;
 use App\Services\Model\ISummitEventTypeService;
 use App\Services\Model\ISummitTrackService;
 use App\Services\Model\LocationService;
 use App\Services\Model\MemberService;
+use App\Services\Model\RSVPTemplateService;
 use App\Services\Model\SummitPromoCodeService;
 use App\Services\Model\SummitTrackService;
 use App\Services\SummitEventTypeService;
@@ -179,6 +181,12 @@ final class ServicesProvider extends ServiceProvider
         (
             IFolderService::class,
             FolderService::class
+        );
+
+        App::singleton
+        (
+            IRSVPTemplateService::class,
+            RSVPTemplateService::class
         );
 
         App::singleton(IGeoCodingAPI::class,   function(){

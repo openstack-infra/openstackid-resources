@@ -697,6 +697,23 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'get-rsvp-template',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-rsvp-template',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                ],
+            ],
             // rooms
             [
                 'name' => 'get-venue-room',

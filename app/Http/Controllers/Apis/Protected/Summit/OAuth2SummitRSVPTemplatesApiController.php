@@ -13,6 +13,7 @@
  **/
 use App\Http\Utils\PagingConstants;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
+use App\Services\Model\IRSVPTemplateService;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
@@ -26,7 +27,6 @@ use utils\Filter;
 use utils\FilterParser;
 use utils\OrderParser;
 use utils\PagingInfo;
-
 /**
  * Class OAuth2SummitRSVPTemplatesApiController
  * @package App\Http\Controllers
@@ -45,20 +45,28 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
     private $rsvp_template_repository;
 
     /**
+     * @var IRSVPTemplateService
+     */
+    private $rsvp_template_service;
+
+    /**
      * OAuth2SummitRSVPTemplatesApiController constructor.
      * @param ISummitRepository $summit_repository
      * @param IRSVPTemplateRepository $rsvp_template_repository
+     * @param IRSVPTemplateService $rsvp_template_service
      * @param IResourceServerContext $resource_server_context
      */
     public function __construct
     (
         ISummitRepository $summit_repository,
         IRSVPTemplateRepository $rsvp_template_repository,
+        IRSVPTemplateService $rsvp_template_service,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
         $this->summit_repository        = $summit_repository;
+        $this->rsvp_template_service    = $rsvp_template_service;
         $this->rsvp_template_repository = $rsvp_template_repository;
     }
 
@@ -152,6 +160,74 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
             return $this->error401();
         }
         catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @return mixed
+     */
+    public function getRSVPTemplate($summit_id, $template_id){
+        try {
+
+            $expand    = Request::input('expand', '');
+            $relations = Request::input('relations', '');
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+
+            $summit    = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $template = $summit->getRSVPTemplateById($template_id);
+
+            if (is_null($template)) {
+                return $this->error404();
+            }
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($template)->serialize($expand,[], $relations));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @return mixed
+     */
+    public function deleteRSVPTemplate($summit_id, $template_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->rsvp_template_service->deleteTemplate($summit, $template_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

@@ -30,6 +30,6 @@ run following commands on root folder
 
 Laravel may require some permissions to be configured: folders within storage and vendor require write access by the web server.   
 
-## check SS schema
+## create SS schema
 
 php artisan doctrine:schema:create --sql --em=ss > ss.sql

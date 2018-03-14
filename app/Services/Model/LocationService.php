@@ -1178,7 +1178,7 @@ final class LocationService implements ILocationService
             }
 
             $uploader = new FileUploader($this->folder_service);
-            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/maps/', $location->getSummitId(), $location->getId()), true);
+            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/maps', $location->getSummitId(), $location->getId()), true);
             $map      = SummitLocationImageFactory::buildMap($metadata);
             $map->setPicture($pic);
             $location->addMap($map);
@@ -1282,7 +1282,7 @@ final class LocationService implements ILocationService
                 }
 
                 $uploader = new FileUploader($this->folder_service);
-                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/maps/', $location->getSummitId(), $location->getId()), true);
+                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/maps', $location->getSummitId(), $location->getId()), true);
                 $map->setPicture($pic);
             }
 
@@ -1449,7 +1449,7 @@ final class LocationService implements ILocationService
             }
 
             $uploader = new FileUploader($this->folder_service);
-            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/images/', $location->getSummitId(), $location->getId()), true);
+            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/images', $location->getSummitId(), $location->getId()), true);
             $image    = SummitLocationImageFactory::buildImage($metadata);
             $image->setPicture($pic);
             $location->addImage($image);
@@ -1553,7 +1553,7 @@ final class LocationService implements ILocationService
                 }
 
                 $uploader = new FileUploader($this->folder_service);
-                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/images/', $location->getSummitId(), $location->getId()), true);
+                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/images', $location->getSummitId(), $location->getId()), true);
                 $image->setPicture($pic);
             }
 

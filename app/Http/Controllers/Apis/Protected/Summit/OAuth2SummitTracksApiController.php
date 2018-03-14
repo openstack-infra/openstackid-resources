@@ -289,7 +289,7 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
      */
     public function addTrackBySummit($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
@@ -345,7 +345,7 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
      */
     public function updateTrackBySummit($summit_id, $track_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);

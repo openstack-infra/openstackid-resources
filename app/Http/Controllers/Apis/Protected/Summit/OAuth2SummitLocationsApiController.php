@@ -731,7 +731,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function addLocation($summit_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -775,7 +775,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function addVenue($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -818,7 +818,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function addExternalLocation($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -861,7 +861,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function addHotel($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -904,7 +904,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function addAirport($summit_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -949,7 +949,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function addVenueFloor($summit_id, $venue_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -996,7 +996,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function addVenueRoom($summit_id, $venue_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -1040,7 +1040,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function addVenueFloorRoom($summit_id, $venue_id, $floor_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -1091,7 +1091,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function updateLocation($summit_id, $location_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -1137,7 +1137,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function updateVenue($summit_id, $venue_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -1183,7 +1183,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function updateVenueFloor($summit_id, $venue_id, $floor_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -1231,7 +1231,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function updateVenueRoom($summit_id, $venue_id, $room_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -1277,7 +1277,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
      */
     public function updateVenueFloorRoom($summit_id, $venue_id, $floor_id, $room_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
@@ -1326,7 +1326,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function updateHotel($summit_id, $hotel_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -1372,7 +1372,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function updateAirport($summit_id, $airport_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -1418,7 +1418,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function updateExternalLocation($summit_id, $external_location_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -1666,7 +1666,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function addLocationBanner($summit_id, $location_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -1759,7 +1759,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function updateLocationBanner($summit_id, $location_id, $banner_id){
         try {
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $payload = Input::json()->all();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -1867,6 +1867,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             if (is_null($summit)) return $this->error404();
 
             $file      = $request->file('file');
+
             if(is_null($file))
                 throw new ValidationException('file is required.');
 
@@ -1928,6 +1929,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
     public function updateLocationMap(LaravelRequest $request, $summit_id, $location_id, $map_id){
 
         try {
+
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
@@ -1938,7 +1940,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             }
 
             if(!strstr($content_type, 'multipart/form-data'))
-                return $this->error403();
+                return $this->error400();
 
             $multiPartRequestParser = new ParseMultiPartFormDataInputStream();
             $input                  = $multiPartRequestParser->getInput();
@@ -2154,7 +2156,7 @@ final class OAuth2SummitLocationsApiController extends OAuth2ProtectedController
             }
 
             if(!strstr($content_type, 'multipart/form-data'))
-                return $this->error403();
+                return $this->error400();
 
             $multiPartRequestParser = new ParseMultiPartFormDataInputStream();
             $input                  = $multiPartRequestParser->getInput();

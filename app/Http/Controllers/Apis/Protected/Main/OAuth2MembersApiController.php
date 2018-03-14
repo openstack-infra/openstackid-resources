@@ -223,7 +223,7 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
      */
     public function updateAffiliation($member_id, $affiliation_id){
         try {
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $member = $this->repository->getById($member_id);

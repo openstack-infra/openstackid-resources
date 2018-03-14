@@ -1689,6 +1689,16 @@ SQL;
     }
 
     /**
+     * @param RSVPTemplate $template
+     * @return $this
+     */
+    public function removeRSVPTemplate(RSVPTemplate $template){
+        $this->rsvp_templates->removeElement($template);
+        $template->clearSummit();
+        return $this;
+    }
+
+    /**
      * @param SummitAbstractLocation $location
      * @param int $new_order
      * @throws ValidationException

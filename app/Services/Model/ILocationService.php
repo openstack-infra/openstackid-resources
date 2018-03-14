@@ -48,7 +48,7 @@ interface ILocationService
     /**
      * @param Summit $summit
      * @param int $location_id
-     * @return SummitAbstractLocation
+     * @return void
      * @throws EntityNotFoundException
      * @throws ValidationException
      */

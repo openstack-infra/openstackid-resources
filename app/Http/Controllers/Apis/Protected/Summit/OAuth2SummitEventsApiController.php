@@ -327,11 +327,10 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $rules = [
-
                 'title'              => 'required|string|max:100',
                 'description'        => 'required|string',
                 'type_id'            => 'required|integer',
@@ -405,7 +404,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $rules = [
@@ -484,7 +483,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $rules = array
@@ -537,7 +536,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
 
             $this->service->unPublishEvent($summit, $event_id);
@@ -694,7 +693,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 
@@ -856,7 +855,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
         $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
         if (is_null($summit)) return $this->error404();
-        if(!Request::isJson()) return $this->error403();
+        if(!Request::isJson()) return $this->error400();
 
         $data = Input::json();
 
@@ -887,7 +886,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         $data      = $data->all();
         $member_id = $this->resource_server_context->getCurrentUserExternalId();
 
-        if (is_null($member_id)) return $this->error403();
+        if (is_null($member_id)) return $this->error400();
 
         $data['member_id'] = intval($member_id);
 
@@ -1016,7 +1015,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 
@@ -1061,7 +1060,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 
@@ -1106,7 +1105,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            if(!Request::isJson()) return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 

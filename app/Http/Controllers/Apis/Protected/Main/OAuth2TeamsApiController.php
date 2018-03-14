@@ -185,8 +185,7 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
     public function addTeam(){
         try {
 
-            if(!Request::isJson())
-                return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 
@@ -276,8 +275,7 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
     public function updateTeam($team_id){
         try {
 
-            if(!Request::isJson())
-                return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 
@@ -429,8 +427,7 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
     public function postTeamMessage($team_id){
         try {
 
-            if(!Request::isJson())
-                return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 
@@ -485,8 +482,7 @@ final class OAuth2TeamsApiController extends OAuth2ProtectedController
     public function addMember2MyTeam($team_id, $member_id){
         try {
 
-            if(!Request::isJson())
-                return $this->error403();
+            if(!Request::isJson()) return $this->error400();
 
             $data = Input::json();
 

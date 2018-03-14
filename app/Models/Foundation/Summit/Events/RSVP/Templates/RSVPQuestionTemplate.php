@@ -75,7 +75,7 @@ class RSVPQuestionTemplate extends SilverstripeBaseModel
     protected $template;
 
     /**
-     * @ORM\OneToMany(targetEntity="RSVPQuestionDependsOn", mappedBy="parent", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="RSVPQuestionDependsOn", mappedBy="parent", cascade={"persist", "remove"}, orphanRemoval=true)
      * @var RSVPQuestionDependsOn[]
      */
     protected $depends_on;

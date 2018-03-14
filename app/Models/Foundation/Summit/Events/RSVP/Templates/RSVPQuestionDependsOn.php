@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\SilverstripeBaseModel;
+use App\Models\Utils\BaseEntity;
 use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Table(name="RSVPQuestionTemplate_DependsOn")
@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping AS ORM;
  * Class RSVPQuestionDependsOn
  * @package App\Models\Foundation\Summit\Events\RSVP
  */
-class RSVPQuestionDependsOn extends SilverstripeBaseModel
+class RSVPQuestionDependsOn extends BaseEntity
 {
     /**
      * @ORM\ManyToOne(targetEntity="RSVPQuestionTemplate", inversedBy="depends_on")
