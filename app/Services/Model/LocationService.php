@@ -40,7 +40,6 @@ use Illuminate\Support\Facades\Log;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
-use models\main\IFolderRepository;
 use models\summit\Summit;
 use models\summit\SummitAbstractLocation;
 use models\summit\SummitGeoLocatedLocation;

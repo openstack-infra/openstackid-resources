@@ -32,7 +32,7 @@ final class SummitLocationImageValidationRulesFactory
         }
         return [
             'name'        => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'sometimes|string',
         ];
     }
 }

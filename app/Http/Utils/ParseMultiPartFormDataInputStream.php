@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Http\UploadedFile;
 /**
  * Class ParseMultiPartFormDataInputStream
  * @package utils
