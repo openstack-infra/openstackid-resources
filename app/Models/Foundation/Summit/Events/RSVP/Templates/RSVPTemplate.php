@@ -143,4 +143,48 @@ class RSVPTemplate extends SilverstripeBaseModel
         $this->questions = $questions;
     }
 
+    /**
+     * @param  string $name
+     * @return RSVPQuestionTemplate
+     */
+    public function getQuestionByName($name){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('name', trim($name)));
+        $res = $this->questions->matching($criteria)->first();
+        return $res ? $res : null;
+    }
+
+    /**
+     * @param  int $id
+     * @return RSVPQuestionTemplate
+     */
+    public function getQuestionById($id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($id)));
+        $res = $this->questions->matching($criteria)->first();
+        return $res ? $res : null;
+    }
+
+    /**
+     * @param RSVPQuestionTemplate $question
+     * @return $this
+     */
+    public function addQuestion(RSVPQuestionTemplate $question){
+        $questions = $this->getQuestions();
+        $this->questions->add($question);
+        $question->setTemplate($this);
+        $question->setOrder(count($questions) + 1);
+        return $this;
+    }
+
+    /**
+     * @param RSVPQuestionTemplate $question
+     * @return $this
+     */
+    public function removeQuestion(RSVPQuestionTemplate $question){
+        $this->questions->removeElement($question);
+        $question->clearTemplate();
+        return $this;
+    }
+
 }

@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionTemplate;
+use App\Models\Foundation\Summit\Factories\SummitRSVPTemplateQuestionFactory;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
@@ -64,5 +66,55 @@ final class RSVPTemplateService implements IRSVPTemplateService
 
            $summit->removeRSVPTemplate($template);
        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param $template_id
+     * @param array $data
+     * @return RSVPQuestionTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addQuestion(Summit $summit, $template_id, array $data)
+    {
+        return $this->tx_service->transaction(function() use($summit, $template_id, $data){
+
+            $template = $summit->getRSVPTemplateById($template_id);
+
+            if(is_null($template))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        '',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                        ]
+                    )
+                );
+
+            $former_question = $template->getQuestionByName($data['name']);
+            if(!is_null($former_question)){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        '',
+                        [
+                            'template_id' => $template_id,
+                            'name'        => $data['name']
+                        ]
+                    )
+                );
+            }
+
+            $question = SummitRSVPTemplateQuestionFactory::build($data);
+
+            $template->addQuestion($question);
+
+            return $question;
+        });
     }
 }

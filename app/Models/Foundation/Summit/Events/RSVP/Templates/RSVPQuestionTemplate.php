@@ -29,7 +29,8 @@ use models\utils\SilverstripeBaseModel;
  *     "RSVPMemberFirstNameQuestionTemplate" = "RSVPMemberFirstNameQuestionTemplate",
  *     "RSVPMemberLastNameQuestionTemplate"  = "RSVPMemberLastNameQuestionTemplate",
  *     "RSVPCheckBoxListQuestionTemplate"    = "RSVPCheckBoxListQuestionTemplate",
- *     "RSVPRadioButtonListQuestionTemplate" = "RSVPRadioButtonListQuestionTemplate"
+ *     "RSVPRadioButtonListQuestionTemplate" = "RSVPRadioButtonListQuestionTemplate",
+ *     "RSVPDropDownQuestionTemplate" = "RSVPDropDownQuestionTemplate"
  *     })
  * Class RSVPQuestionTemplate
  * @package App\Models\Foundation\Summit\Events\RSVP
@@ -181,6 +182,18 @@ class RSVPQuestionTemplate extends SilverstripeBaseModel
      */
     public function getClassName(){
         return 'RSVPQuestionTemplate';
+    }
+
+    public function clearTemplate(){
+        $this->template = null;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->is_mandatory = false;
+        $this->is_read_only = false;
+        $this->order        = 0;
     }
 
 }

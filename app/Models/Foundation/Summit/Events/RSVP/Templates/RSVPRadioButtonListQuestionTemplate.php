@@ -20,10 +20,11 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class RSVPRadioButtonListQuestionTemplate extends RSVPMultiValueQuestionTemplate
 {
+    const ClassName = 'RSVPRadioButtonListQuestionTemplate';
     /**
      * @return string
      */
     public function getClassName(){
-        return 'RSVPRadioButtonListQuestionTemplate';
+        return self::ClassName;
     }
 }

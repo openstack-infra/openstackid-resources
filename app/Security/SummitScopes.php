@@ -41,6 +41,8 @@ final class SummitScopes
 
     const WriteLocationsData    = '%s/locations/write';
 
+    const WriteRSVPTemplateData    = '%s/rsvp-templates/write';
+
     const WriteLocationBannersData = '%s/locations/banners/write';
 
     const WriteSummitSpeakerAssistanceData = '%s/summit-speaker-assistance/write';

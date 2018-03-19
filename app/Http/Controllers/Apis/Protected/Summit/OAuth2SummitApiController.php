@@ -11,13 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use App\Http\Utils\FilterAvailableSummitsStrategy;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Input;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
@@ -29,7 +26,6 @@ use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
 use utils\PagingResponse;
-
 /**
  * Class OAuth2SummitApiController
  * @package App\Http\Controllers
@@ -88,7 +84,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
 
             $summits = [];
 
-            foreach($this->_getSummits() as $summit){
+            foreach($this->repository->getAvailables() as $summit){
                 $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize($expand, $fields, $relations);
             }
 
@@ -110,11 +106,39 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     }
 
     /**
-     * @return \models\summit\Summit[]
+     * @return mixed
      */
-    private function _getSummits(){
-        return FilterAvailableSummitsStrategy::shouldReturnAllSummits($this->resource_server_context) ?
-            $this->repository->getAllOrderedByBeginDate():$this->repository->getAvailables();
+    public function getAllSummits(){
+             try {
+
+            $expand    = Request::input('expand', '');
+            $fields    = Request::input('fields', '');
+            $relations = Request::input('relations', '');
+
+            $relations = !empty($relations) ? explode(',', $relations) : [];
+            $fields    = !empty($fields) ? explode(',', $fields) : [];
+
+            $summits = [];
+
+            foreach($this->repository->getAllOrderedByBeginDate()as $summit){
+                $summits[] = SerializerRegistry::getInstance()->getSerializer($summit)->serialize($expand, $fields, $relations);
+            }
+
+            $response = new PagingResponse
+            (
+                count($summits),
+                count($summits),
+                1,
+                1,
+                $summits
+            );
+
+            return $this->ok($response->toArray());
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
     }
 
     /**

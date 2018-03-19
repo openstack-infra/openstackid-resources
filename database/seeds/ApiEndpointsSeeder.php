@@ -73,16 +73,23 @@ class ApiEndpointsSeeder extends Seeder
 
         $this->seedApiEndpoints('summits', [
             // summits
-            array(
+            [
                 'name' => 'get-summits',
                 'route' => '/api/v1/summits',
                 'http_method' => 'GET',
                 'scopes' => [
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
+                ],
+            ],
+            [
+                'name' => 'get-summits-all',
+                'route' => '/api/v1/summits/all',
+                'http_method' => 'GET',
+                'scopes' => [
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-summit',
                 'route' => '/api/v1/summits/{id}',
                 'http_method' => 'GET',
@@ -90,8 +97,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-summit-entity-events',
                 'route' => '/api/v1/summits/{id}/entity-events',
                 'http_method' => 'GET',
@@ -99,9 +106,9 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+            ],
             // attendees
-            array(
+            [
                 'name' => 'get-attendees',
                 'route' => '/api/v1/summits/{id}/attendees',
                 'http_method' => 'GET',
@@ -109,8 +116,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-own-attendee',
                 'route' => '/api/v1/summits/{id}/attendees/me',
                 'http_method' => 'GET',
@@ -118,8 +125,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-attendee',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
                 'http_method' => 'GET',
@@ -127,23 +134,23 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'delete-attendee',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'update-attendee',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
                 'http_method' => 'PUT',
                 'scopes' => [
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
-            ),
+            ],
             array(
                 'name' => 'get-attendee-schedule',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule',
@@ -706,12 +713,102 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'add-rsvp-template',
+                'route' => '/api/v1/summits/{id}/rsvp-templates',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-rsvp-template',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'delete-rsvp-template',
                 'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSummitData, $current_realm),
-                    sprintf(SummitScopes::WriteLocationsData, $current_realm)
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            // rsvp template questions
+            [
+                'name' => 'get-rsvp-template-question',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions/{question_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-rsvp-template-question',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-rsvp-template-question',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions/{question_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-rsvp-template-question',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions/{question_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            // multi value questions
+            [
+                'name' => 'add-rsvp-template-question-value',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions/{question_id}/values',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'get-rsvp-template-question-value',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions/{question_id}/values/{value_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-rsvp-template-question-value',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions/{question_id}/values/{value_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-rsvp-template-question-value',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}/questions/{question_id}/values/{value_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteRSVPTemplateData, $current_realm)
                 ],
             ],
             // rooms

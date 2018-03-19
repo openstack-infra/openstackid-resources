@@ -148,34 +148,34 @@ class Summit extends SilverstripeBaseModel
     private $time_zone_id;
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      */
     private $locations;
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="SummitEvent", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      */
     private $events;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      */
     private $rsvp_templates;
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitWIFIConnection", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="SummitWIFIConnection", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @var SummitWIFIConnection[]
      */
     private $wifi_connections;
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitRegistrationPromoCode", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="SummitRegistrationPromoCode", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @var SummitRegistrationPromoCode[]
      */
     private $promo_codes;
 
     /**
-     * @ORM\OneToMany(targetEntity="PresentationSpeakerSummitAssistanceConfirmationRequest", mappedBy="summit")
+     * @ORM\OneToMany(targetEntity="PresentationSpeakerSummitAssistanceConfirmationRequest", mappedBy="summit", fetch="EXTRA_LAZY")
      * @var PresentationSpeakerSummitAssistanceConfirmationRequest[]
      */
     private $speaker_assistances;
@@ -188,30 +188,30 @@ class Summit extends SilverstripeBaseModel
     private $logo;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitEventType", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEventType", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      */
     private $event_types;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategory", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategory", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @var PresentationCategory[]
      */
     private $presentation_categories;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitAttendee", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="models\summit\SummitAttendee", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @var SummitAttendee[]
      */
     private $attendees;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      * @var PresentationCategoryGroup[]
      */
     private $category_groups;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="models\summit\SummitTicketType", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      */
     private $ticket_types;
 

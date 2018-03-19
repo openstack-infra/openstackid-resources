@@ -1,4 +1,4 @@
-<?php namespace App\Models\Foundation\Summit\Events\RSVP;
+<?php namespace App\Http\Controllers;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,20 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Doctrine\ORM\Mapping AS ORM;
+
 /**
- * @ORM\Table(name="RSVPMemberFirstNameQuestionTemplate")
- * @ORM\Entity
- * Class RSVPMemberFirstNameQuestionTemplate
- * @package App\Models\Foundation\Summit\Events\RSVP
+ * Class SummitRSVPLiteralContentQuestionTemplateValidationRulesFactory
+ * @package App\Http\Controllers
  */
-class RSVPMemberFirstNameQuestionTemplate extends RSVPTextBoxQuestionTemplate
+final class SummitRSVPLiteralContentQuestionTemplateValidationRulesFactory
 {
-    const ClassName = 'RSVPMemberFirstNameQuestionTemplate';
     /**
-     * @return string
+     * @param array $data
+     * @param bool $update
+     * @return array
      */
-    public function getClassName(){
-        return self::ClassName;
+    public static function build(array $data, $update = false){
+        if($update){
+            return ['content' => 'sometimes|string'];
+        }
+        return ['content' => 'required|string'];
     }
 }

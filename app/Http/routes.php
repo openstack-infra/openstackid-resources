@@ -161,15 +161,18 @@ Route::group([
     Route::group(array('prefix' => 'summits'), function () {
 
         Route::get('',  [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summits_response_lifetime', 600), 'uses' => 'OAuth2SummitApiController@getSummits']);
-
-        Route::group(array('prefix' => '{id}'), function () {
+        Route::get('all', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@getAllSummits']);
+        Route::group(['prefix' => '{id}'], function () {
 
             // rsvp templates
-            Route::group(array('prefix' => 'rsvp-templates'), function () {
+            Route::group(['prefix' => 'rsvp-templates'], function () {
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getAllBySummit']);
-                Route::group(array('prefix' => '{template_id}'), function () {
+                Route::group(['prefix' => '{template_id}'], function () {
                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getRSVPTemplate']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@deleteRSVPTemplate']);
+                    Route::group(['prefix' => 'questions'], function () {
+                        Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@addRSVPTemplateQuestion']);
+                    });
                 });
             });
 

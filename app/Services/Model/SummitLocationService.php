@@ -48,10 +48,10 @@ use models\summit\SummitVenue;
 use models\summit\SummitVenueFloor;
 use models\summit\SummitVenueRoom;
 /**
- * Class LocationService
+ * Class SummitLocationService
  * @package App\Services\Model
  */
-final class LocationService implements ILocationService
+final class SummitLocationService implements ILocationService
 {
     /**
      * @var ISummitLocationRepository

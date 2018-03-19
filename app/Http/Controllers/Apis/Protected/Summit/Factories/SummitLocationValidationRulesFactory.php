@@ -53,10 +53,10 @@ final class SummitLocationValidationRulesFactory
             }
             break;
             case SummitExternalLocation::ClassName: {
-                return array_merge(SummitExternalLocationValidationRulesFactory::build($data, $update));
+                return array_merge($base_rules, SummitExternalLocationValidationRulesFactory::build($data, $update));
             }
             case SummitVenueRoom::ClassName: {
-                return array_merge(SummitVenueRoomValidationRulesFactory::build($data, $update));
+                return array_merge($base_rules, SummitVenueRoomValidationRulesFactory::build($data, $update));
             }
             break;
             default:{

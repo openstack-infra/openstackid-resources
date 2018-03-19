@@ -20,10 +20,11 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class RSVPTextBoxQuestionTemplate extends RSVPSingleValueTemplateQuestion
 {
+    const ClassName = 'RSVPTextBoxQuestionTemplate';
     /**
      * @return string
      */
     public function getClassName(){
-        return 'RSVPTextBoxQuestionTemplate';
+        return self::ClassName;
     }
 }

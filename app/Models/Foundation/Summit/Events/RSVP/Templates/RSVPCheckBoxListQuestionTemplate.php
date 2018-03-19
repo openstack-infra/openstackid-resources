@@ -20,10 +20,11 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class RSVPCheckBoxListQuestionTemplate extends RSVPMultiValueQuestionTemplate
 {
+    const ClassName = 'RSVPCheckBoxListQuestionTemplate';
     /**
      * @return string
      */
     public function getClassName(){
-        return 'RSVPCheckBoxListQuestionTemplate';
+        return self::ClassName;
     }
 }

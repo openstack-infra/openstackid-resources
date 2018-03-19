@@ -36,6 +36,7 @@ use App\ModelSerializers\Marketplace\SpokenLanguageSerializer;
 use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
+use App\ModelSerializers\Summit\RSVP\Templates\RSVPDropDownQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPMultiValueQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPQuestionValueTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPSingleValueTemplateQuestionSerializer;
@@ -126,6 +127,7 @@ final class SerializerRegistry
 
         $this->registry['RSVPCheckBoxListQuestionTemplate']    = RSVPMultiValueQuestionTemplateSerializer::class;
         $this->registry['RSVPRadioButtonListQuestionTemplate'] = RSVPMultiValueQuestionTemplateSerializer::class;
+        $this->registry['RSVPDropDownQuestionTemplate']        = RSVPDropDownQuestionTemplateSerializer::class;
 
         $this->registry['SpeakerExpertise']           = SpeakerExpertiseSerializer::class;
         $this->registry['SpeakerLanguage']            = SpeakerLanguageSerializer::class;

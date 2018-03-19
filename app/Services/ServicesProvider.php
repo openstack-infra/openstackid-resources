@@ -22,7 +22,7 @@ use App\Services\Model\IMemberService;
 use App\Services\Model\IRSVPTemplateService;
 use App\Services\Model\ISummitEventTypeService;
 use App\Services\Model\ISummitTrackService;
-use App\Services\Model\LocationService;
+use App\Services\Model\SummitLocationService;
 use App\Services\Model\MemberService;
 use App\Services\Model\RSVPTemplateService;
 use App\Services\Model\SummitPromoCodeService;
@@ -174,7 +174,7 @@ final class ServicesProvider extends ServiceProvider
         App::singleton
         (
             ILocationService::class,
-            LocationService::class
+            SummitLocationService::class
         );
 
         App::singleton

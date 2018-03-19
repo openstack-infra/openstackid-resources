@@ -113,4 +113,92 @@ final class OAuth2SummitRSVPTemplateApiTest extends ProtectedApiTest
         $this->assertResponseStatus(204);
 
     }
+
+    public function testAddRSVPTemplateQuestionRSVPTextBoxQuestionTemplate($summit_id = 24){
+
+        $templates_response = $this->testGetSummitRSVPTemplates($summit_id);
+        $templates = $templates_response->data;
+
+        $params = [
+            'id'          => $summit_id,
+            'template_id' => $templates[0]->id
+        ];
+
+        $name       = str_random(16).'_rsvp_question';
+        $data       = [
+            'name'          => $name,
+            'label'         => 'test label',
+            'initial_value' => 'test initial value',
+            'is_mandatory'  => true,
+            'class_name'    => \App\Models\Foundation\Summit\Events\RSVP\RSVPTextBoxQuestionTemplate::ClassName,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitRSVPTemplatesApiController@addRSVPTemplateQuestion",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+        $question = json_decode($content);
+        $this->assertTrue(!is_null($question));
+        $this->assertTrue($question->initial_value == 'test initial value');
+        return $question;
+    }
+
+    public function testAddRSVPTemplateQuestionRSVPDropDownQuestionTemplate($summit_id = 24){
+
+        $templates_response = $this->testGetSummitRSVPTemplates($summit_id);
+        $templates = $templates_response->data;
+
+        $params = [
+            'id'          => $summit_id,
+            'template_id' => $templates[0]->id
+        ];
+
+        $name       = str_random(16).'_rsvp_question';
+        $data       = [
+            'name'                => $name,
+            'label'               => 'test dropdown',
+            'is_mandatory'        => true,
+            'is_country_selector' => true,
+            'empty_string'        => '--select a value',
+            'class_name'          => \App\Models\Foundation\Summit\Events\RSVP\RSVPDropDownQuestionTemplate::ClassName,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitRSVPTemplatesApiController@addRSVPTemplateQuestion",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+        $question = json_decode($content);
+        $this->assertTrue(!is_null($question));
+        return $question;
+    }
 }

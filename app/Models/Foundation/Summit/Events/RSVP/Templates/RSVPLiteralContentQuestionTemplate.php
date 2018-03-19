@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping AS ORM;
  */
 class RSVPLiteralContentQuestionTemplate extends RSVPQuestionTemplate
 {
+    const ClassName = 'RSVPLiteralContentQuestionTemplate';
     /**
      * @ORM\Column(name="Content", type="string")
      * @var string
@@ -30,7 +31,7 @@ class RSVPLiteralContentQuestionTemplate extends RSVPQuestionTemplate
      * @return string
      */
     public function getClassName(){
-        return 'RSVPLiteralContentQuestionTemplate';
+        return self::ClassName;
     }
 
     /**
