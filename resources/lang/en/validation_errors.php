@@ -51,4 +51,7 @@ return [
     'LocationService.addLocationImage.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
     'LocationService.updateLocationImage.FileNotAllowedExtension' => 'file extension is not allowed (:allowed_extensions)',
     'LocationService.updateLocationImage.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
+    // RSVP Template Service
+    'RSVPTemplateService.addQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
+    'RSVPTemplateService.updateQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
 ];

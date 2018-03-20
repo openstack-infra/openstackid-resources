@@ -41,4 +41,9 @@ return [
     'LocationService.updateLocationImage.ImageNotFound' => 'image :image_id does not belongs to location :location_id',
     'LocationService.deleteLocationImage.LocationNotFound' => 'location :location_id not found on summit :summit_id',
     'LocationService.deleteLocationImage.ImageNotFound' => 'image :image_id not found on location :location_id',
+    // RSVP Template Service
+    'RSVPTemplateService.deleteTemplate.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
+    'RSVPTemplateService.addQuestion.TemplateNotFound'    => 'template :template_id not found on summit :summit_id',
+    'RSVPTemplateService.updateQuestion.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
+    'RSVPTemplateService.updateQuestion.QuestionNotFound' => 'question :question_id not found on template :template_id',
 ];

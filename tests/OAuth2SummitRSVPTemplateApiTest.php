@@ -52,7 +52,6 @@ final class OAuth2SummitRSVPTemplateApiTest extends ProtectedApiTest
 
         $templates = $this->testGetSummitRSVPTemplates($summit_id);
 
-
         $params = [
             'id'          => $summit_id,
             'template_id' => $templates->data[0]->id,
@@ -186,6 +185,48 @@ final class OAuth2SummitRSVPTemplateApiTest extends ProtectedApiTest
         $response = $this->action(
             "POST",
             "OAuth2SummitRSVPTemplatesApiController@addRSVPTemplateQuestion",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+        $question = json_decode($content);
+        $this->assertTrue(!is_null($question));
+        return $question;
+    }
+
+    public function testUpdateRSVPTemplateQuestion($summit_id = 24){
+
+        $templates = $this->testGetSummitRSVPTemplates($summit_id);
+        $template  = $templates->data[0];
+        $question  = $template->questions[0];
+
+        $params = [
+            'id'          => $summit_id,
+            'template_id' => $template->id,
+            'question_id' => $question->id
+        ];
+
+        $data       = [
+            'name'       => $question->name,
+            'label'      => $question->label.' update!',
+            'class_name' => $question->class_name
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitRSVPTemplatesApiController@updateRSVPTemplateQuestion",
             $params,
             [],
             [],

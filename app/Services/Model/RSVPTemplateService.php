@@ -18,7 +18,6 @@ use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
-
 /**
  * Class RSVPTemplateService
  * @package App\Services\Model
@@ -61,7 +60,14 @@ final class RSVPTemplateService implements IRSVPTemplateService
            if(is_null($template))
                throw new EntityNotFoundException
                (
-                 trans()
+                 trans
+                 (
+                     'not_found_errors.RSVPTemplateService.deleteTemplate.TemplateNotFound',
+                     [
+                         'summit_id'   => $summit->getId(),
+                         'template_id' => $template_id,
+                     ]
+                 )
                );
 
            $summit->removeRSVPTemplate($template);
@@ -87,7 +93,7 @@ final class RSVPTemplateService implements IRSVPTemplateService
                 (
                     trans
                     (
-                        '',
+                        'not_found_errors.RSVPTemplateService.addQuestion.TemplateNotFound',
                         [
                             'summit_id'   => $summit->getId(),
                             'template_id' => $template_id,
@@ -101,7 +107,7 @@ final class RSVPTemplateService implements IRSVPTemplateService
                 (
                     trans
                     (
-                        '',
+                        'validation_errors.RSVPTemplateService.addQuestion.QuestionNameAlreadyExists',
                         [
                             'template_id' => $template_id,
                             'name'        => $data['name']
@@ -115,6 +121,71 @@ final class RSVPTemplateService implements IRSVPTemplateService
             $template->addQuestion($question);
 
             return $question;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param int $question_id
+     * @param array $data
+     * @return RSVPQuestionTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateQuestion(Summit $summit, $template_id, $question_id, array $data)
+    {
+        return $this->tx_service->transaction(function() use($summit, $template_id, $question_id, $data){
+
+            $template = $summit->getRSVPTemplateById($template_id);
+
+            if(is_null($template))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.updateQuestion.TemplateNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                        ]
+                    )
+                );
+
+            $question = $template->getQuestionById($question_id);
+            if(is_null($question))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.updateQuestion.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+
+            if(isset($data['name'])) {
+                $former_question = $template->getQuestionByName($data['name']);
+                if (!is_null($former_question) && $former_question->getId() != $question_id) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.RSVPTemplateService.updateQuestion.QuestionNameAlreadyExists',
+                            [
+                                'template_id' => $template_id,
+                                'name' => $data['name']
+                            ]
+                        )
+                    );
+                }
+            }
+
+            return SummitRSVPTemplateQuestionFactory::populate($question, $data);
+
         });
     }
 }
