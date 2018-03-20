@@ -46,4 +46,6 @@ return [
     'RSVPTemplateService.addQuestion.TemplateNotFound'    => 'template :template_id not found on summit :summit_id',
     'RSVPTemplateService.updateQuestion.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
     'RSVPTemplateService.updateQuestion.QuestionNotFound' => 'question :question_id not found on template :template_id',
+    'RSVPTemplateService.deleteQuestion.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
+    'RSVPTemplateService.deleteQuestion.QuestionNotFound' => 'question :question_id not found on template :template_id',
 ];

@@ -175,6 +175,14 @@ Route::group([
                         Route::group(['prefix' => '{question_id}'], function () {
                             Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@updateRSVPTemplateQuestion']);
                             Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getRSVPTemplateQuestion']);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@deleteRSVPTemplateQuestion']);
+                            // multi values questions
+                            Route::group(['prefix' => 'values'], function () {
+
+                                Route::group(['prefix' => '{value_id}'], function () {
+
+                                });
+                            });
                         });
                     });
                 });

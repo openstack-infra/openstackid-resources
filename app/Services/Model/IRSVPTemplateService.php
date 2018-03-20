@@ -51,4 +51,14 @@ interface IRSVPTemplateService
      */
     public function updateQuestion(Summit $summit, $template_id, $question_id, array $payload);
 
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param int $question_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteQuestion(Summit $summit, $template_id, $question_id);
+
 }

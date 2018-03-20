@@ -27,6 +27,7 @@ use utils\Filter;
 use utils\FilterParser;
 use utils\OrderParser;
 use utils\PagingInfo;
+use Exception;
 /**
  * Class OAuth2SummitRSVPTemplatesApiController
  * @package App\Http\Controllers
@@ -349,6 +350,37 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
             $question = $this->rsvp_template_service->updateQuestion($summit, $template_id, $question_id, $payload);
 
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($question)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @param $question_id
+     * @return mixed
+     */
+    public function deleteRSVPTemplateQuestion($summit_id, $template_id, $question_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->rsvp_template_service->deleteQuestion($summit, $template_id, $question_id);
+
+            return $this->deleted();
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);

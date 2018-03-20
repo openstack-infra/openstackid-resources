@@ -242,4 +242,31 @@ final class OAuth2SummitRSVPTemplateApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($question));
         return $question;
     }
+
+    public function testDeleteRSVPTemplateQuestion($summit_id = 24, $template_id = 13, $question_id = 85){
+
+        $params = [
+            'id'          => $summit_id,
+            'template_id' => $template_id,
+            'question_id' => $question_id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitRSVPTemplatesApiController@deleteRSVPTemplateQuestion",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
 }
