@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Http\Utils\PagingConstants;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPMultiValueQuestionTemplate;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Services\Model\IRSVPTemplateService;
 use Illuminate\Support\Facades\Input;
@@ -247,7 +248,6 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
     public function getRSVPTemplateQuestion($summit_id, $template_id, $question_id){
         try {
 
-
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
@@ -401,6 +401,53 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
      * values endpoints
      */
 
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @param $question_id
+     * @param $value_id
+     * @return mixed
+     */
+    public function getRSVPTemplateQuestionValue($summit_id, $template_id, $question_id, $value_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $template = $summit->getRSVPTemplateById($template_id);
+            if (is_null($template)) return $this->error404();
+
+            $question = $template->getQuestionById($question_id);
+            if (is_null($question)) return $this->error404();
+
+            if (!$question instanceof RSVPMultiValueQuestionTemplate) return $this->error404();
+
+            $value = $question->getValueById($value_id);
+            if (is_null($value)) return $this->error404();
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($value)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @param $question_id
+     * @return mixed
+     */
     public function addRSVPTemplateQuestionValue($summit_id, $template_id, $question_id){
         try {
 
@@ -410,7 +457,7 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $rules = SummitRSVPTemplateQuestionValueValidationRulesFactory::build($payload);
+            $rules = SummitRSVPTemplateQuestionValueValidationRulesFactory::build($payload, true);
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($payload, $rules);
 
@@ -424,6 +471,54 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
             }
 
             $value = $this->rsvp_template_service->addQuestionValue($summit, $template_id, $question_id, $payload);
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($value)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @param $question_id
+     * @param $value_id
+     * @return mixed
+     */
+    public function updateRSVPTemplateQuestionValue($summit_id, $template_id, $question_id, $value_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $payload = Input::json()->all();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitRSVPTemplateQuestionValueValidationRulesFactory::build($payload, true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $value = $this->rsvp_template_service->updateQuestionValue($summit, $template_id, $question_id, $value_id, $payload);
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($value)->serialize());
         }

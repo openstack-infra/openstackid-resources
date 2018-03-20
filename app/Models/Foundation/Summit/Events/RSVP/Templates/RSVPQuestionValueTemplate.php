@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\IOrderable;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
@@ -19,7 +20,7 @@ use Doctrine\ORM\Mapping AS ORM;
  * Class RSVPQuestionValueTemplate
  * @package App\Models\Foundation\Summit\Events\RSVP
  */
-class RSVPQuestionValueTemplate extends SilverstripeBaseModel
+class RSVPQuestionValueTemplate extends SilverstripeBaseModel implements IOrderable
 {
     /**
      * @ORM\Column(name="Value", type="string")

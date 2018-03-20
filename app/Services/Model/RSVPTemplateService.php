@@ -324,4 +324,111 @@ final class RSVPTemplateService implements IRSVPTemplateService
             return $value;
         });
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param int $question_id
+     * @param int $value_id
+     * @param array $data
+     * @return RSVPQuestionValueTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateQuestionValue($summit, $template_id, $question_id, $value_id, $data)
+    {
+        return $this->tx_service->transaction(function() use($summit, $template_id, $question_id, $value_id, $data){
+
+            $template = $summit->getRSVPTemplateById($template_id);
+
+            if(is_null($template))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.updateQuestionValue.TemplateNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                        ]
+                    )
+                );
+
+            $question = $template->getQuestionById($question_id);
+            if(is_null($question))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.updateQuestionValue.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+
+            if(!$question instanceof RSVPMultiValueQuestionTemplate){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.updateQuestionValue.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+            }
+
+            if(isset($data['value'])) {
+                $former_value = $question->getValueByValue($data['value']);
+                if (!is_null($former_value) && $former_value->getId() != $value_id) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.RSVPTemplateService.updateQuestionValue.ValueAlreadyExist',
+                            [
+                                'summit_id' => $summit->getId(),
+                                'template_id' => $template_id,
+                                'question_id' => $question_id,
+                                'value' => $data['value']
+                            ]
+                        )
+                    );
+                }
+            }
+
+            $value = $question->getValueById($value_id);
+            if(is_null($value))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.updateQuestionValue.ValueNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                            'value_id'    => $value_id,
+                        ]
+                    )
+                );
+
+            $value = SummitRSVPTemplateQuestionValueFactory::populate($value, $data);
+
+
+            if (isset($data['order']) && intval($data['order']) != $value->getOrder()) {
+                // request to update order
+                $question->recalculateValueOrder($value, intval($data['order']));
+            }
+
+
+            return $value;
+        });
+    }
 }

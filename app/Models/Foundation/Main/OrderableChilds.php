@@ -11,8 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\Common\Collections\Selectable;
 use models\exceptions\ValidationException;
 /**
  * Trait OrderableChilds
@@ -21,12 +21,12 @@ use models\exceptions\ValidationException;
 trait OrderableChilds
 {
     /**
-     * @param ArrayCollection $collection
+     * @param Selectable $collection
      * @param IOrderable $element
      * @param $new_order
      * @throws ValidationException
      */
-    private static function recalculateOrderFor(ArrayCollection $collection, IOrderable $element, $new_order){
+    private static function recalculateOrderFor(Selectable $collection, IOrderable $element, $new_order){
         $criteria     = Criteria::create();
         $criteria->orderBy(['order'=> 'ASC']);
 
@@ -48,13 +48,13 @@ trait OrderableChilds
         $elements = array_merge
         (
             array_slice($elements, 0, $new_order -1 , true) ,
-            [$elements] ,
+            [$element] ,
             array_slice($elements, $new_order -1 , count($elements), true)
         );
 
         $order = 1;
-        foreach($elements as $q){
-            $q->setOrder($order);
+        foreach($elements as $e){
+            $e->setOrder($order);
             $order++;
         }
     }

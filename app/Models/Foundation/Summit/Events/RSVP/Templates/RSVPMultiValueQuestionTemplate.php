@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\OrderableChilds;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
@@ -159,43 +160,15 @@ class RSVPMultiValueQuestionTemplate extends RSVPQuestionTemplate
         return $this;
     }
 
+    use OrderableChilds;
+
     /**
      * @param RSVPQuestionValueTemplate $value
      * @param int $new_order
      * @throws ValidationException
      */
     public function recalculateValueOrder(RSVPQuestionValueTemplate $value, $new_order){
-
-        $criteria     = Criteria::create();
-        $criteria->orderBy(['order'=> 'ASC']);
-
-        $values       = $this->values->matching($criteria)->toArray();
-        $values       = array_slice($values,0, count($values), false);
-        $max_order    = count($values);
-        $former_order = 1;
-
-        foreach ($values as $v){
-            if($v->getId() == $value->getId()) break;
-            $former_order++;
-        }
-
-        if($new_order > $max_order)
-            throw new ValidationException(sprintf("max order is %s", $max_order));
-
-        unset($values[$former_order - 1]);
-
-        $values = array_merge
-        (
-            array_slice($values, 0, $new_order -1 , true) ,
-            [$values] ,
-            array_slice($values, $new_order -1 , count($values), true)
-        );
-
-        $order = 1;
-        foreach($values as $v){
-            $v->setOrder($order);
-            $order++;
-        }
+        self::recalculateOrderFor($this->values, $value, $new_order);
     }
 
     /**

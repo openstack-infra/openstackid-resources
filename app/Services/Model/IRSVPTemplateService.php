@@ -73,4 +73,17 @@ interface IRSVPTemplateService
      */
     public function addQuestionValue($summit, $template_id, $question_id, $payload);
 
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param int $question_id
+     * @param int $value_id
+     * @param array $payload
+     * @return RSVPQuestionValueTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateQuestionValue($summit, $template_id, $question_id, $value_id, $payload);
+
 }
