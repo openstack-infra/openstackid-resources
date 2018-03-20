@@ -109,7 +109,7 @@ final class SummitJsonGenerator extends Command {
         $key_current  = sprintf('/api/v1/summits/%s.expand=%s','current', urlencode($expand));
         $key_id       = sprintf('/api/v1/summits/%s.expand=%s', $summit->getIdentifier(), urlencode($expand));
 
-        $cache_lifetime = intval(Config::get('server.response_cache_lifetime', 300));
+        $cache_lifetime = intval(Config::get('cache_api_response.get_summit_response_lifetime', 300));
 
         if($summit->isActive())
         {

@@ -11,8 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Events\RSVP\RSVPMultiValueQuestionTemplate;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionValueTemplate;
 use App\Models\Foundation\Summit\Factories\SummitRSVPTemplateQuestionFactory;
+use App\Models\Foundation\Summit\Factories\SummitRSVPTemplateQuestionValueFactory;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
@@ -183,6 +186,11 @@ final class RSVPTemplateService implements IRSVPTemplateService
                 }
             }
 
+            if (isset($data['order']) && intval($data['order']) != $question->getOrder()) {
+                // request to update order
+                $template->recalculateQuestionOrder($question, intval($data['order']));
+            }
+
             return SummitRSVPTemplateQuestionFactory::populate($question, $data);
 
         });
@@ -231,6 +239,89 @@ final class RSVPTemplateService implements IRSVPTemplateService
                 );
 
             $template->removeQuestion($question);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param int $question_id
+     * @param array $data
+     * @return RSVPQuestionValueTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addQuestionValue($summit, $template_id, $question_id, $data)
+    {
+        return $this->tx_service->transaction(function() use($summit, $template_id, $question_id, $data){
+
+            $template = $summit->getRSVPTemplateById($template_id);
+
+            if(is_null($template))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.addQuestionValue.TemplateNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                        ]
+                    )
+                );
+
+            $question = $template->getQuestionById($question_id);
+            if(is_null($question))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.addQuestionValue.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+
+            if(!$question instanceof RSVPMultiValueQuestionTemplate){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.addQuestionValue.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+            }
+
+            $former_value = $question->getValueByValue($data['value']);
+            if(!is_null($former_value)){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.RSVPTemplateService.addQuestionValue.ValueAlreadyExist',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                            'value'       => $data['value']
+                        ]
+                    )
+                );
+            }
+
+            $value = SummitRSVPTemplateQuestionValueFactory::build($data);
+
+            $question->addValue($value);
+
+            return $value;
         });
     }
 }

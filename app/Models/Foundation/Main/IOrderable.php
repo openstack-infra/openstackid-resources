@@ -1,6 +1,6 @@
-<?php
+<?php namespace App\Models\Foundation\Main;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,10 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+interface IOrderable
+{
+    /**
+     * @param int $order
+     * @return void
+     */
+    public function setOrder($order);
 
-return [
-    'get_summit_response_lifetime'          => env('CACHE_API_RESPONSE_GET_SUMMIT_LIFETIME', 600),
-    'get_event_feedback_response_lifetime'  => env('CACHE_API_RESPONSE_GET_EVENT_FEEDBACK_LIFETIME', 300),
-    'get_published_event_response_lifetime' => env('CACHE_API_RESPONSE_GET_PUBLISHED_EVENT_LIFETIME', 300),
-    'get_summits_response_lifetime'         => env('CACHE_API_RESPONSE_GET_SUMMITS_LIFETIME', 600),
-];
+    /**
+     * @return int
+     */
+    public function getOrder();
+}

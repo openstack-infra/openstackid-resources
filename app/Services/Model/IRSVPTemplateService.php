@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionValueTemplate;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
@@ -60,5 +61,16 @@ interface IRSVPTemplateService
      * @throws ValidationException
      */
     public function deleteQuestion(Summit $summit, $template_id, $question_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param int $question_id
+     * @param array $payload
+     * @return RSVPQuestionValueTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addQuestionValue($summit, $template_id, $question_id, $payload);
 
 }

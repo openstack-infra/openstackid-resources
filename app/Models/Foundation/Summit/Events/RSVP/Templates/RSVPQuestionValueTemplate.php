@@ -121,4 +121,8 @@ class RSVPQuestionValueTemplate extends SilverstripeBaseModel
             return 0;
         }
     }
+
+    public function clearOwner(){
+        $this->owner = null;
+    }
 }

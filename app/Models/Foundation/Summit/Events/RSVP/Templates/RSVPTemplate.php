@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\OrderableChilds;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use models\exceptions\ValidationException;
 use models\main\Member;
 use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
@@ -177,6 +179,17 @@ class RSVPTemplate extends SilverstripeBaseModel
         return $this;
     }
 
+    use OrderableChilds;
+
+    /**
+     * @param RSVPQuestionTemplate $question
+     * @param int $new_order
+     * @throws ValidationException
+     */
+    public function recalculateQuestionOrder(RSVPQuestionTemplate $question, $new_order){
+        self::recalculateOrderFor($this->questions, $question, $new_order);
+    }
+
     /**
      * @param RSVPQuestionTemplate $question
      * @return $this
@@ -186,5 +199,4 @@ class RSVPTemplate extends SilverstripeBaseModel
         $question->clearTemplate();
         return $this;
     }
-
 }

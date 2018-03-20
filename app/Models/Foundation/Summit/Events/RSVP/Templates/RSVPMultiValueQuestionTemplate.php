@@ -14,6 +14,8 @@
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
+use models\exceptions\ValidationException;
+
 /**
  * @ORM\Table(name="RSVPMultiValueQuestionTemplate")
  * @ORM\Entity
@@ -123,4 +125,86 @@ class RSVPMultiValueQuestionTemplate extends RSVPQuestionTemplate
         }
     }
 
+    /**
+     * @param  int $id
+     * @return RSVPQuestionValueTemplate
+     */
+    public function getValueById($id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($id)));
+        $res = $this->values->matching($criteria)->first();
+        return $res ? $res : null;
+    }
+
+    /**
+     * @param  string $value
+     * @return RSVPQuestionValueTemplate
+     */
+    public function getValueByValue($value){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('value', trim($value)));
+        $res = $this->values->matching($criteria)->first();
+        return $res ? $res : null;
+    }
+
+    /**
+     * @param RSVPQuestionValueTemplate $value
+     * @return $this
+     */
+    public function addValue(RSVPQuestionValueTemplate $value){
+        $values = $this->getValues();
+        $this->values->add($value);
+        $value->setOwner($this);
+        $value->setOrder(count($values) + 1);
+        return $this;
+    }
+
+    /**
+     * @param RSVPQuestionValueTemplate $value
+     * @param int $new_order
+     * @throws ValidationException
+     */
+    public function recalculateValueOrder(RSVPQuestionValueTemplate $value, $new_order){
+
+        $criteria     = Criteria::create();
+        $criteria->orderBy(['order'=> 'ASC']);
+
+        $values       = $this->values->matching($criteria)->toArray();
+        $values       = array_slice($values,0, count($values), false);
+        $max_order    = count($values);
+        $former_order = 1;
+
+        foreach ($values as $v){
+            if($v->getId() == $value->getId()) break;
+            $former_order++;
+        }
+
+        if($new_order > $max_order)
+            throw new ValidationException(sprintf("max order is %s", $max_order));
+
+        unset($values[$former_order - 1]);
+
+        $values = array_merge
+        (
+            array_slice($values, 0, $new_order -1 , true) ,
+            [$values] ,
+            array_slice($values, $new_order -1 , count($values), true)
+        );
+
+        $order = 1;
+        foreach($values as $v){
+            $v->setOrder($order);
+            $order++;
+        }
+    }
+
+    /**
+     * @param RSVPQuestionValueTemplate $value
+     * @return $this
+     */
+    public function removeValue(RSVPQuestionValueTemplate $value){
+        $this->values->removeElement($value);
+        $value->clearOwner();
+        return $this;
+    }
 }

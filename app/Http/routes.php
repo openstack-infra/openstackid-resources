@@ -178,7 +178,7 @@ Route::group([
                             Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@deleteRSVPTemplateQuestion']);
                             // multi values questions
                             Route::group(['prefix' => 'values'], function () {
-
+                                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@addRSVPTemplateQuestionValue']);
                                 Route::group(['prefix' => '{value_id}'], function () {
 
                                 });

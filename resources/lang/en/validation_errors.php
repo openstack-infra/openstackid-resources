@@ -54,4 +54,5 @@ return [
     // RSVP Template Service
     'RSVPTemplateService.addQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
     'RSVPTemplateService.updateQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
+    'RSVPTemplateService.addQuestionValue.ValueAlreadyExist' => 'value :value already exists on question :question_id',
 ];

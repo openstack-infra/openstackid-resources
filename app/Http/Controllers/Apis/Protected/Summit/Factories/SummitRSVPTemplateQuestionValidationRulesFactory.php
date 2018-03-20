@@ -48,7 +48,7 @@ final class SummitRSVPTemplateQuestionValidationRulesFactory
                 'name'          => 'sometimes|alpha_dash|max:255',
                 'label'         => 'sometimes|string',
                 'is_mandatory'  => 'sometimes|boolean',
-                'order'         => 'sometimes|int|min:1',
+                'order'         => 'sometimes|integer|min:1',
                 'is_read_only;' => 'sometimes|boolean',
             ]);
         }

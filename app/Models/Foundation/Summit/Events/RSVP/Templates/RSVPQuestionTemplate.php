@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\IOrderable;
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
 /**
@@ -35,7 +36,7 @@ use models\utils\SilverstripeBaseModel;
  * Class RSVPQuestionTemplate
  * @package App\Models\Foundation\Summit\Events\RSVP
  */
-class RSVPQuestionTemplate extends SilverstripeBaseModel
+class RSVPQuestionTemplate extends SilverstripeBaseModel implements IOrderable
 {
 
     /**
@@ -57,8 +58,8 @@ class RSVPQuestionTemplate extends SilverstripeBaseModel
     protected $is_mandatory;
 
     /**
-     * @ORM\Column(name="`Order`", type="string")
-     * @var string
+     * @ORM\Column(name="`Order`", type="integer")
+     * @var int
      */
     protected $order;
 
@@ -130,7 +131,7 @@ class RSVPQuestionTemplate extends SilverstripeBaseModel
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getOrder()
     {
@@ -138,7 +139,7 @@ class RSVPQuestionTemplate extends SilverstripeBaseModel
     }
 
     /**
-     * @param string $order
+     * @param int $order
      */
     public function setOrder($order)
     {
