@@ -11,10 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\OrderableChilds;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Query;
+use Doctrine\Common\Collections\ArrayCollection;
 use models\exceptions\ValidationException;
 use models\main\File;
 use models\utils\SilverstripeBaseModel;
@@ -205,42 +206,15 @@ class SummitVenueFloor extends SilverstripeBaseModel
         $room->clearFloor();
     }
 
+    use OrderableChilds;
+
     /**
      * @param SummitVenueRoom $room
      * @param int $new_order
      * @throws ValidationException
      */
     public function recalculateRoomsOrder(SummitVenueRoom $room, $new_order){
-
-        $criteria     = Criteria::create();
-        $criteria->orderBy(['order'=> 'ASC']);
-        $rooms        = $this->rooms->matching($criteria)->toArray();
-        $rooms        = array_slice($rooms,0, count($rooms), false);
-        $max_order    = count($rooms);
-        $former_order =  1;
-        foreach ($rooms as $r){
-            if($r->getId() == $room->getId()) break;
-            $former_order++;
-        }
-
-        if($new_order > $max_order)
-            throw new ValidationException(sprintf("max order is %s", $max_order));
-
-        unset($rooms[$former_order - 1]);
-
-        $rooms = array_merge
-        (
-            array_slice($rooms, 0, $new_order -1 , true) ,
-            [$room] ,
-            array_slice($rooms, $new_order -1 , count($rooms), true)
-        );
-
-        $order = 1;
-        foreach($rooms as $r){
-            $r->setOrder($order);
-            $order++;
-        }
-
+        self::recalculateOrderFor($this->rooms, $room, $new_order);
     }
 
 }

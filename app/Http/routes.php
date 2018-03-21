@@ -182,6 +182,7 @@ Route::group([
                                 Route::group(['prefix' => '{value_id}'], function () {
                                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getRSVPTemplateQuestionValue']);
                                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@updateRSVPTemplateQuestionValue']);
+                                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@deleteRSVPTemplateQuestionValue']);
                                 });
                             });
                         });

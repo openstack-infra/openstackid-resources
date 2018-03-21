@@ -12,18 +12,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use App\Models\Foundation\Main\IOrderable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitVenueRoom")
  * Class SummitVenueRoom
  * @package models\summit
  */
-class SummitVenueRoom extends SummitAbstractLocation
+class SummitVenueRoom extends SummitAbstractLocation implements IOrderable
 {
     /**
      * @ORM\ManyToOne(targetEntity="models\summit\SummitVenue", inversedBy="rooms")

@@ -431,4 +431,84 @@ final class RSVPTemplateService implements IRSVPTemplateService
             return $value;
         });
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param int $question_id
+     * @param int $value_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteQuestionValue($summit, $template_id, $question_id, $value_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $template_id, $question_id, $value_id){
+
+            $template = $summit->getRSVPTemplateById($template_id);
+
+            if(is_null($template))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.deleteQuestionValue.TemplateNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                        ]
+                    )
+                );
+
+            $question = $template->getQuestionById($question_id);
+            if(is_null($question))
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.deleteQuestionValue.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+
+            if(!$question instanceof RSVPMultiValueQuestionTemplate)
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.deleteQuestionValue.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+
+            $value = $question->getValueById($value_id);
+
+            if(is_null($value)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.deleteQuestionValue.ValueNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                            'value_id'    => $value_id
+                        ]
+                    )
+                );
+            }
+
+            $question->removeValue($value);
+
+        });
+    }
 }

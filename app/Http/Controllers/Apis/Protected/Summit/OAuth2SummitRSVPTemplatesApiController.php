@@ -536,4 +536,36 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @param $question_id
+     * @param $value_id
+     * @return mixed
+     */
+    public function deleteRSVPTemplateQuestionValue($summit_id, $template_id, $question_id, $value_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->rsvp_template_service->deleteQuestionValue($summit, $template_id, $question_id, $value_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }
