@@ -25,17 +25,14 @@ use models\summit\Summit;
  * Class RSVPTemplateService
  * @package App\Services\Model
  */
-final class RSVPTemplateService implements IRSVPTemplateService
+final class RSVPTemplateService
+    extends AbstractService
+    implements IRSVPTemplateService
 {
     /**
      * @var IRSVPTemplateRepository
      */
     private $rsvp_template_repository;
-
-    /**
-     * @var ITransactionService
-     */
-    private $tx_service;
 
     /**
      * RSVPTemplateService constructor.
@@ -44,8 +41,8 @@ final class RSVPTemplateService implements IRSVPTemplateService
      */
     public function __construct(IRSVPTemplateRepository $rsvp_template_repository, ITransactionService $tx_service)
     {
+        parent::__construct($tx_service);
         $this->rsvp_template_repository = $rsvp_template_repository;
-        $this->tx_service = $tx_service;
     }
 
     /**

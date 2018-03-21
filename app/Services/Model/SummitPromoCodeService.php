@@ -32,7 +32,9 @@ use services\model\ISummitPromoCodeService;
  * Class SummitPromoCodeService
  * @package App\Services\Model
  */
-final class SummitPromoCodeService implements ISummitPromoCodeService
+final class SummitPromoCodeService
+    extends AbstractService
+    implements ISummitPromoCodeService
 {
     /**
      * @var ISummitRegistrationPromoCodeRepository
@@ -60,11 +62,6 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
     private $email_creation_request_repository;
 
     /**
-     * @var ITransactionService
-     */
-    private $tx_service;
-
-    /**
      * SummitPromoCodeService constructor.
      * @param ISummitRegistrationPromoCodeRepository $promo_code_repository
      * @param IMemberRepository $member_repository
@@ -83,12 +80,12 @@ final class SummitPromoCodeService implements ISummitPromoCodeService
         ITransactionService $tx_service
     )
     {
+        parent::__construct($tx_service);
         $this->promo_code_repository             = $promo_code_repository;
         $this->member_repository                 = $member_repository;
         $this->company_repository                = $company_repository;
         $this->speaker_repository                = $speaker_repository;
         $this->email_creation_request_repository = $email_creation_request_repository;
-        $this->tx_service                        = $tx_service;
     }
 
     /**

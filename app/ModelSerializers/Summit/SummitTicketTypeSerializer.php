@@ -16,13 +16,14 @@
  * Class SummitTicketTypeSerializer
  * @package ModelSerializers
  */
-class SummitTicketTypeSerializer extends SilverStripeSerializer
+final class SummitTicketTypeSerializer extends SilverStripeSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
         'Name'        => 'name:json_string',
         'Description' => 'description:json_string',
-    );
+        'ExternalId'  => 'external_id:json_string',
+        'SummitId'    => 'summit_id:json_int',
+    ];
 
     /**
      * @param null $expand

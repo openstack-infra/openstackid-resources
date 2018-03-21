@@ -51,17 +51,14 @@ use models\summit\SummitVenueRoom;
  * Class SummitLocationService
  * @package App\Services\Model
  */
-final class SummitLocationService implements ILocationService
+final class SummitLocationService
+    extends AbstractService
+    implements ILocationService
 {
     /**
      * @var ISummitLocationRepository
      */
     private $location_repository;
-
-    /**
-     * @var ITransactionService
-     */
-    private $tx_service;
 
     /**
      * @var IGeoCodingAPI
@@ -88,10 +85,10 @@ final class SummitLocationService implements ILocationService
         ITransactionService $tx_service
     )
     {
+        parent::__construct($tx_service);
         $this->location_repository = $location_repository;
         $this->geo_coding_api      = $geo_coding_api;
         $this->folder_service      = $folder_service;
-        $this->tx_service          = $tx_service;
     }
 
     /**

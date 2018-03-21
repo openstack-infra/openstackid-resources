@@ -1,4 +1,4 @@
-<?php namespace models\summit;
+<?php namespace App\Services\Model;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,29 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IBaseRepository;
-use utils\Filter;
-use utils\Order;
-use utils\PagingInfo;
-use utils\PagingResponse;
+use libs\utils\ITransactionService;
 /**
- * Interface ISummitTicketTypeRepository
- * @package models\summit
+ * Class AbstractService
+ * @package App\Services\Model
  */
-interface ISummitTicketTypeRepository extends IBaseRepository
+abstract class AbstractService
 {
     /**
-     * @param Summit $summit
-     * @param PagingInfo $paging_info
-     * @param Filter|null $filter
-     * @param Order|null $order
-     * @return PagingResponse
+     * @var ITransactionService
      */
-    public function getBySummit
-    (
-        Summit $summit,
-        PagingInfo $paging_info,
-        Filter $filter = null,
-        Order $order = null
-    );
+    protected $tx_service;
+
+    /**
+     * AbstractService constructor.
+     * @param ITransactionService $tx_service
+     */
+    public function __construct(ITransactionService $tx_service)
+    {
+        $this->tx_service = $tx_service;
+    }
 }

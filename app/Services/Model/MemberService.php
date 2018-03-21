@@ -22,16 +22,14 @@ use DateTime;
  * Class MemberService
  * @package App\Services\Model
  */
-final class MemberService implements IMemberService
+final class MemberService
+    extends AbstractService
+    implements IMemberService
 {
     /**
      * @var IOrganizationRepository
      */
     private $organization_repository;
-    /**
-     * @var ITransactionService
-     */
-    private $tx_service;
 
     /**
      * MemberService constructor.
@@ -44,8 +42,8 @@ final class MemberService implements IMemberService
         ITransactionService $tx_service
     )
     {
+        parent::__construct($tx_service);
         $this->organization_repository = $organization_repository;
-        $this->tx_service              = $tx_service;
     }
 
     /**

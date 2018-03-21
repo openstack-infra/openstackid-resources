@@ -421,6 +421,12 @@ Route::group([
                 });
             });
 
+            // ticket types
+            Route::group(['prefix' => 'ticket-types'], function () {
+                Route::get('', 'OAuth2SummitsTicketTypesApiController@getAllBySummit');
+                Route::get('csv', 'OAuth2SummitsTicketTypesApiController@getAllBySummitCSV');
+            });
+
             // external orders
             Route::group(['prefix' => 'external-orders'], function () {
                 Route::get('{external_order_id}', 'OAuth2SummitApiController@getExternalOrder');

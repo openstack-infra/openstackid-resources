@@ -18,7 +18,9 @@ use models\main\IFolderRepository;
  * Class FolderService
  * @package App\Services\Model
  */
-final class FolderService implements IFolderService
+final class FolderService
+    extends AbstractService
+    implements IFolderService
 {
 
     /**
@@ -27,19 +29,14 @@ final class FolderService implements IFolderService
     private $folder_repository;
 
     /**
-     * @var ITransactionService
-     */
-    private $tx_service;
-
-    /**
      * FolderService constructor.
      * @param IFolderRepository $folder_repository
      * @param ITransactionService $tx_service
      */
     public function __construct(IFolderRepository $folder_repository, ITransactionService $tx_service)
     {
+        parent::__construct($tx_service);
         $this->folder_repository = $folder_repository;
-        $this->tx_service = $tx_service;
     }
 
     /**

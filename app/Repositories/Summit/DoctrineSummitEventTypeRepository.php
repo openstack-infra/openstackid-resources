@@ -22,7 +22,6 @@ use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
  * Class DoctrineSummitEventTypeRepository
  * @package App\Repositories\Summit

@@ -31,6 +31,18 @@ class SummitTicketType extends SilverstripeBaseModel
     private $name;
 
     /**
+     * @ORM\Column(name="Description", type="string")
+     * @var string
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(name="ExternalId", type="string")
+     * @var string
+     */
+    private $external_id;
+
+    /**
      * @return string
      */
     public function getName()
@@ -63,22 +75,17 @@ class SummitTicketType extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\Column(name="Description", type="string")
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @ORM\Column(name="ExternalId", type="string")
-     * @var string
-     */
-    private $external_id;
-
-    /**
      * @return string
      */
     public function getExternalId(){return $this->external_id; }
 
+    /**
+     * @param string $external_id
+     */
+    public function setExternalId($external_id)
+    {
+        $this->external_id = $external_id;
+    }
 
     public function __construct()
     {

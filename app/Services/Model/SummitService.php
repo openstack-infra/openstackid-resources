@@ -17,6 +17,7 @@ use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use App\Http\Utils\FileUploader;
 use App\Models\Utils\IntervalParser;
+use App\Services\Model\AbstractService;
 use App\Services\Model\IFolderService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use GuzzleHttp\Exception\ClientException;
@@ -71,7 +72,9 @@ use DateInterval;
  * Class SummitService
  * @package services\model
  */
-final class SummitService implements ISummitService
+final class SummitService
+    extends AbstractService
+    implements ISummitService
 {
 
     /**
@@ -79,10 +82,6 @@ final class SummitService implements ISummitService
      */
     const MIN_EVENT_MINUTES = 5;
 
-    /**
-     * @var ITransactionService
-     */
-    private $tx_service;
 
     /**
      * @var ISummitEventRepository
@@ -184,6 +183,7 @@ final class SummitService implements ISummitService
         ITransactionService             $tx_service
     )
     {
+        parent::__construct($tx_service);
         $this->event_repository                      = $event_repository;
         $this->speaker_repository                    = $speaker_repository;
         $this->entity_events_repository              = $entity_events_repository;
@@ -197,7 +197,6 @@ final class SummitService implements ISummitService
         $this->folder_service                        = $folder_service;
         $this->company_repository                    = $company_repository;
         $this->group_repository                      = $group_repository;
-        $this->tx_service                            = $tx_service;
     }
 
     /**

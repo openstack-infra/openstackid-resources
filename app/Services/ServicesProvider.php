@@ -21,11 +21,13 @@ use App\Services\Model\ILocationService;
 use App\Services\Model\IMemberService;
 use App\Services\Model\IRSVPTemplateService;
 use App\Services\Model\ISummitEventTypeService;
+use App\Services\Model\ISummitTicketTypeService;
 use App\Services\Model\ISummitTrackService;
 use App\Services\Model\SummitLocationService;
 use App\Services\Model\MemberService;
 use App\Services\Model\RSVPTemplateService;
 use App\Services\Model\SummitPromoCodeService;
+use App\Services\Model\SummitTicketTypeService;
 use App\Services\Model\SummitTrackService;
 use App\Services\SummitEventTypeService;
 use Illuminate\Support\Facades\App;
@@ -46,7 +48,6 @@ use services\model\PresentationService;
 use services\model\SpeakerService;
 use services\model\SummitService;
 use services\utils\RedisCacheService;
-
 /***
  * Class ServicesProvider
  * @package services
@@ -187,6 +188,12 @@ final class ServicesProvider extends ServiceProvider
         (
             IRSVPTemplateService::class,
             RSVPTemplateService::class
+        );
+
+        App::singleton
+        (
+            ISummitTicketTypeService::class,
+            SummitTicketTypeService::class
         );
 
         App::singleton(IGeoCodingAPI::class,   function(){

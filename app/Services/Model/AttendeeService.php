@@ -25,12 +25,13 @@ use models\summit\Summit;
 use models\summit\SummitAttendee;
 use models\summit\SummitAttendeeTicket;
 use services\apis\IEventbriteAPI;
-
 /**
  * Class AttendeeService
  * @package App\Services\Model
  */
-final class AttendeeService implements IAttendeeService
+final class AttendeeService
+    extends AbstractService
+    implements IAttendeeService
 {
 
     /**
@@ -54,11 +55,6 @@ final class AttendeeService implements IAttendeeService
     private $ticket_repository;
 
     /**
-     * @var ITransactionService
-     */
-    private $tx_service;
-
-    /**
      * @var IEventbriteAPI
      */
     private $eventbrite_api;
@@ -74,12 +70,12 @@ final class AttendeeService implements IAttendeeService
         ITransactionService $tx_service
     )
     {
+        parent::__construct($tx_service);
         $this->attendee_repository    = $attendee_repository;
         $this->ticket_repository      = $ticket_repository;
         $this->member_repository      = $member_repository;
         $this->ticket_type_repository = $ticket_type_repository;
         $this->eventbrite_api         = $eventbrite_api;
-        $this->tx_service             = $tx_service;
     }
 
     /**

@@ -14,6 +14,7 @@
 
 use App\Events\PresentationMaterialDeleted;
 use App\Events\PresentationMaterialUpdated;
+use App\Services\Model\AbstractService;
 use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
@@ -27,17 +28,14 @@ use libs\utils\ITransactionService;
  * Class PresentationService
  * @package services\model
  */
-final class PresentationService implements IPresentationService
+final class PresentationService
+    extends AbstractService
+    implements IPresentationService
 {
     /**
      * @var ISummitEventRepository
      */
     private $presentation_repository;
-
-    /**
-     * @var ITransactionService
-     */
-    private $tx_service;
 
     /**
      * @var IPresentationVideoFactory
@@ -51,9 +49,9 @@ final class PresentationService implements IPresentationService
        ITransactionService $tx_service
     )
     {
+        parent::__construct($tx_service);
         $this->presentation_repository = $presentation_repository;
         $this->video_factory           = $video_factory;
-        $this->tx_service              = $tx_service;
     }
 
     /**

@@ -70,21 +70,6 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
     }
 
     /**
-     * @param $filter_element
-     * @return bool
-     */
-    private function validateClassName($filter_element){
-        if($filter_element instanceof FilterElement){
-            return in_array($filter_element->getValue(), SummitEventTypeConstants::$valid_class_names);
-        }
-        $valid = true;
-        foreach($filter_element[0] as $elem){
-            $valid = $valid && in_array($elem->getValue(), SummitEventTypeConstants::$valid_class_names);
-        }
-        return $valid;
-    }
-
-    /**
      * @param $summit_id
      * @return mixed
      */
@@ -136,6 +121,29 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
                 ]);
             }
 
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'class_name'      => sprintf('sometimes|in:%s',implode(',', SummitEventTypeConstants::$valid_class_names)),
+                'name'            => 'sometimes|string',
+                'is_default'      => 'sometimes|boolean',
+                'black_out_times' => 'sometimes|boolean',
+                'use_sponsors' => 'sometimes|boolean',
+                'are_sponsors_mandatory' => 'sometimes|boolean',
+                'allows_attachment' => 'sometimes|boolean',
+                'use_speakers' => 'sometimes|boolean',
+                'are_speakers_mandatory' => 'sometimes|boolean',
+                'use_moderator' => 'sometimes|boolean',
+                'is_moderator_mandatory' => 'sometimes|boolean',
+                'should_be_available_on_cfp' => 'sometimes|boolean',
+            ], [
+                'class_name.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", SummitEventTypeConstants::$valid_class_names)
+                ),
+            ]);
+
             $order = null;
 
             if (Input::has('order'))
@@ -145,18 +153,6 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
                     'id',
                     'name',
                 ]);
-            }
-
-            if(is_null($filter)) $filter = new Filter();
-
-            if($filter->hasFilter("class_name") && !$this->validateClassName($filter->getFilter("class_name"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name filter has an invalid value ( valid values are %s",
-                        implode(", ", SummitEventTypeConstants::$valid_class_names)
-                    )
-                );
             }
 
             $data = $this->repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
@@ -242,6 +238,29 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
                 ]);
             }
 
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'class_name'      => sprintf('sometimes|in:%s',implode(',', SummitEventTypeConstants::$valid_class_names)),
+                'name'            => 'sometimes|string',
+                'is_default'      => 'sometimes|boolean',
+                'black_out_times' => 'sometimes|boolean',
+                'use_sponsors' => 'sometimes|boolean',
+                'are_sponsors_mandatory' => 'sometimes|boolean',
+                'allows_attachment' => 'sometimes|boolean',
+                'use_speakers' => 'sometimes|boolean',
+                'are_speakers_mandatory' => 'sometimes|boolean',
+                'use_moderator' => 'sometimes|boolean',
+                'is_moderator_mandatory' => 'sometimes|boolean',
+                'should_be_available_on_cfp' => 'sometimes|boolean',
+            ], [
+                'class_name.in' =>  sprintf
+                (
+                    ":attribute has an invalid value ( valid values are %s )",
+                    implode(", ", SummitEventTypeConstants::$valid_class_names)
+                ),
+            ]);
+
             $order = null;
 
             if (Input::has('order'))
@@ -251,18 +270,6 @@ final class OAuth2SummitsEventTypesApiController extends OAuth2ProtectedControll
                     'id',
                     'name',
                 ]);
-            }
-
-            if(is_null($filter)) $filter = new Filter();
-
-            if($filter->hasFilter("class_name") && !$this->validateClassName($filter->getFilter("class_name"))){
-                throw new ValidationException(
-                    sprintf
-                    (
-                        "class_name filter has an invalid value ( valid values are %s",
-                        implode(", ", SummitEventTypeConstants::$valid_class_names)
-                    )
-                );
             }
 
             $data = $this->repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);

@@ -27,17 +27,14 @@ use models\summit\Summit;
  * Class SummitTrackService
  * @package App\Services\Model
  */
-final class SummitTrackService implements ISummitTrackService
+final class SummitTrackService
+    extends AbstractService
+    implements ISummitTrackService
 {
     /**
      * @var ISummitTrackRepository
      */
     private $repository;
-
-    /**
-     * @var ITransactionService
-     */
-    private $tx_service;
 
     /**
      * SummitTrackService constructor.
@@ -46,8 +43,8 @@ final class SummitTrackService implements ISummitTrackService
      */
     public function __construct(ISummitTrackRepository $repository, ITransactionService $tx_service)
     {
+        parent::__construct($tx_service);
         $this->repository = $repository;
-        $this->tx_service = $tx_service;
     }
 
     /**

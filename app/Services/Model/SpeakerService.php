@@ -13,6 +13,7 @@
  **/
 use App\Models\Foundation\Summit\Factories\PresentationSpeakerSummitAssistanceConfirmationRequestFactory;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
+use App\Services\Model\AbstractService;
 use App\Services\Model\IFolderService;
 use Illuminate\Http\UploadedFile;
 use libs\utils\ITransactionService;
@@ -39,7 +40,9 @@ use App\Http\Utils\FileUploader;
  * Class SpeakerService
  * @package services\model
  */
-final class SpeakerService implements ISpeakerService
+final class SpeakerService
+    extends AbstractService
+    implements ISpeakerService
 {
     /**
      * @var ISpeakerRepository
@@ -72,15 +75,9 @@ final class SpeakerService implements ISpeakerService
     private $email_creation_request_repository;
 
     /**
-     * @var ITransactionService
-     */
-    private $tx_service;
-
-    /**
      * @var IPresentationSpeakerSummitAssistanceConfirmationRequestRepository
      */
     private $speakers_assistance_repository;
-
 
     /**
      * SpeakerService constructor.
@@ -105,6 +102,7 @@ final class SpeakerService implements ISpeakerService
         ITransactionService $tx_service
     )
     {
+        parent::__construct($tx_service);
         $this->speaker_repository                      = $speaker_repository;
         $this->member_repository                       = $member_repository;
         $this->folder_service                          = $folder_service;
@@ -112,7 +110,6 @@ final class SpeakerService implements ISpeakerService
         $this->registration_code_repository            = $registration_code_repository;
         $this->email_creation_request_repository       = $email_creation_request_repository;
         $this->speakers_assistance_repository          = $speakers_assistance_repository;
-        $this->tx_service                              = $tx_service;
     }
 
     /**

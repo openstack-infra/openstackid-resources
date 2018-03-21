@@ -17,6 +17,7 @@ use App\Events\SummitEventTypeUpdated;
 use App\Models\Foundation\Summit\Factories\SummitEventTypeFactory;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
+use App\Services\Model\AbstractService;
 use App\Services\Model\ISummitEventTypeService;
 use Illuminate\Support\Facades\Event;
 use libs\utils\ITransactionService;
@@ -28,14 +29,10 @@ use models\summit\SummitEventType;
  * Class SummitEventTypeService
  * @package App\Services
  */
-final class SummitEventTypeService implements ISummitEventTypeService
+final class SummitEventTypeService
+    extends AbstractService
+    implements ISummitEventTypeService
 {
-
-    /**
-     * @var ITransactionService
-     */
-    private $tx_service;
-
     /**
      * @var ISummitEventTypeRepository
      */
@@ -59,7 +56,7 @@ final class SummitEventTypeService implements ISummitEventTypeService
         ITransactionService $tx_service
     )
     {
-        $this->tx_service                     = $tx_service;
+        parent::__construct($tx_service);
         $this->repository                     = $repository;
         $this->default_event_types_repository = $default_event_types_repository;
     }
