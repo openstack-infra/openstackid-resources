@@ -15,6 +15,7 @@ use GuzzleHttp\Client;
 use Exception;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
+use models\summit\Summit;
 /**
  * Class EventbriteAPI
  * @package services\apis
@@ -48,26 +49,28 @@ final class EventbriteAPI implements IEventbriteAPI
 
             $client = new Client();
 
-            $query = array
-            (
+            $query = [
+
                 'token' => $this->auth_info['token']
-            );
+            ];
 
             foreach ($params as $param => $value) {
                 $query[$param] = $value;
             }
 
-            $response = $client->get($api_url, array
-                (
+            $response = $client->get($api_url, [
                     'query' => $query
-                )
+                ]
             );
 
             if ($response->getStatusCode() !== 200)
                 throw new Exception('invalid status code!');
+
             $content_type = $response->getHeaderLine('content-type');
+
             if (empty($content_type))
                 throw new Exception('invalid content type!');
+
             if ($content_type !== 'application/json')
                 throw new Exception('invalid content type!');
 
@@ -88,6 +91,16 @@ final class EventbriteAPI implements IEventbriteAPI
     {
         $order_id = intval($order_id);
         $url      = sprintf('%s/orders/%s', self::BaseUrl, $order_id);
-        return $this->getEntity($url, array('expand' => 'attendees'));
+        return $this->getEntity($url, ['expand' => 'attendees']);
+    }
+
+    /**
+     * @param Summit $summit
+     * @return mixed
+     */
+    public function getTicketTypes(Summit $summit){
+        $event_id = $summit->getExternalSummitId();
+        $url      = sprintf('%s/events/%s', self::BaseUrl, $event_id);
+        return $this->getEntity($url, ['expand' => 'ticket_classes']);
     }
 }

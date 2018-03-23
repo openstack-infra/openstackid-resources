@@ -1133,6 +1133,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'seed-default-ticket-types',
+                'route' => '/api/v1/summits/{id}/ticket-types/seed-defaults',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTicketTypeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'update-ticket-type',
                 'route' => '/api/v1/summits/{id}/ticket-types/{ticket_type_id}',
                 'http_method' => 'PUT',

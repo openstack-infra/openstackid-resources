@@ -48,4 +48,11 @@ interface ISummitTicketTypeService
      * @throws ValidationException
      */
     public function deleteTicketType(Summit $summit, $ticket_type_id);
+
+    /**
+     * @param Summit $summit
+     * @return SummitTicketType[]
+     * @throws ValidationException
+     */
+    public function seedSummitTicketTypesFromEventBrite(Summit $summit);
 }

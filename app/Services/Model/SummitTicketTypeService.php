@@ -18,6 +18,8 @@ use models\exceptions\ValidationException;
 use models\summit\ISummitTicketTypeRepository;
 use models\summit\Summit;
 use models\summit\SummitTicketType;
+use services\apis\IEventbriteAPI;
+
 /**
  * Class SummitTicketTypeService
  * @package App\Services\Model
@@ -33,18 +35,26 @@ final class SummitTicketTypeService
     private $repository;
 
     /**
+     * @var IEventbriteAPI
+     */
+    private $eventbrite_api;
+
+    /**
      * SummitTicketTypeService constructor.
      * @param ISummitTicketTypeRepository $repository
+     * @param IEventbriteAPI $eventbrite_api
      * @param ITransactionService $tx_service
      */
     public function __construct
     (
         ISummitTicketTypeRepository $repository,
+        IEventbriteAPI $eventbrite_api,
         ITransactionService $tx_service
     )
     {
         parent::__construct($tx_service);
-        $this->repository = $repository;
+        $this->repository     = $repository;
+        $this->eventbrite_api = $eventbrite_api;
     }
 
     /**
@@ -193,6 +203,60 @@ final class SummitTicketTypeService
             }
 
             $summit->removeTicketType($ticket_type);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @return SummitTicketType[]
+     * @throws ValidationException
+     */
+    public function seedSummitTicketTypesFromEventBrite(Summit $summit){
+
+        return $this->tx_service->transaction(function() use($summit){
+            $res                = [];
+            $external_summit_id = $summit->getExternalSummitId();
+
+            if(empty($external_summit_id)){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.SummitTicketTypeService.seedSummitTicketTypesFromEventBrite.MissingExternalId',
+                        [
+                            'summit_id' => $summit->getId()
+                        ]
+                    )
+                );
+            }
+
+            $response = $this->eventbrite_api->getTicketTypes($summit);
+
+            if (!isset($response['ticket_classes'])) return $res;
+
+            $ticket_classes = $response['ticket_classes'];
+
+            foreach ($ticket_classes as $ticket_class) {
+
+                $id              = $ticket_class['id'];
+                $old_ticket_type = $summit->getTicketTypeByExternalId($id);
+
+                if (!is_null($old_ticket_type)) {
+
+                    $old_ticket_type->setName(trim($ticket_class['name']));
+                    $old_ticket_type->setDescription(isset($ticket_class['description']) ? trim($ticket_class['description']) : '');
+                    continue;
+                }
+
+                $new_ticket_type = new SummitTicketType();
+                $new_ticket_type->setExternalId($id);
+                $new_ticket_type->setName($ticket_class['name']);
+                $new_ticket_type->setDescription(isset($ticket_class['description']) ? trim($ticket_class['description']) : '');
+                $summit->addTicketType($new_ticket_type);
+                $res[] = $new_ticket_type;
+            }
+
+            return $res;
         });
     }
 }

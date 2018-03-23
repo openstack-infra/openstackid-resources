@@ -1,5 +1,4 @@
-<?php
-namespace services\apis;
+<?php namespace services\apis;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +11,11 @@ namespace services\apis;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\Summit;
+/**
+ * Interface IEventbriteAPI
+ * @package services\apis
+ */
 interface IEventbriteAPI
 {
     /**
@@ -25,4 +29,10 @@ interface IEventbriteAPI
      * @return mixed
      */
     public function getOrder($order_id);
+
+    /**
+     * @param Summit $summit
+     * @return mixed
+     */
+    public function getTicketTypes(Summit $summit);
 }

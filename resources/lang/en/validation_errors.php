@@ -59,4 +59,5 @@ return [
     'SummitTicketTypeService.addTicketType.ExternalIdAlreadyExists' => 'ticket external id :external_id already exists on summit :summit_id',
     'SummitTicketTypeService.updateTicketType.NameAlreadyExists' => 'ticket name :name already exists on summit :summit_id',
     'SummitTicketTypeService.updateTicketType.ExternalIdAlreadyExists' => 'ticket external id :external_id already exists on summit :summit_id',
+    'SummitTicketTypeService.seedSummitTicketTypesFromEventBrite.MissingExternalId' => 'summit :summit_is has not set external id (eventbrite)',
 ];
