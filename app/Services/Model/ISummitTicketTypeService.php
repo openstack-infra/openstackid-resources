@@ -39,4 +39,13 @@ interface ISummitTicketTypeService
      * @throws ValidationException
      */
     public function updateTicketType(Summit $summit, $ticket_type_id, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $ticket_type_id
+     * @return SummitTicketType
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteTicketType(Summit $summit, $ticket_type_id);
 }

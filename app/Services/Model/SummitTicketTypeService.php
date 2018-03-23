@@ -164,4 +164,35 @@ final class SummitTicketTypeService
             return $ticket_type;
         });
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $ticket_type_id
+     * @return SummitTicketType
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function deleteTicketType(Summit $summit, $ticket_type_id)
+    {
+        return $this->tx_service->transaction(function() use ($summit, $ticket_type_id){
+
+            $ticket_type = $summit->getTicketTypeById($ticket_type_id);
+
+            if(is_null($ticket_type)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.SummitTicketTypeService.deleteTicketType.TicketTypeNotFound',
+                        [
+                            'ticket_type_id' => $ticket_type_id,
+                            'summit_id'      => $summit->getId()
+                        ]
+                    )
+                );
+            }
+
+            $summit->removeTicketType($ticket_type);
+        });
+    }
 }

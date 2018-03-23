@@ -1142,6 +1142,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'delete-ticket-type',
+                'route' => '/api/v1/summits/{id}/ticket-types/{ticket_type_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTicketTypeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-ticket-type',
                 'route' => '/api/v1/summits/{id}/ticket-types/{ticket_type_id}',
                 'http_method' => 'GET',
