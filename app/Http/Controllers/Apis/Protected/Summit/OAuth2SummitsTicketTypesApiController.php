@@ -259,6 +259,35 @@ final class OAuth2SummitsTicketTypesApiController extends OAuth2ProtectedControl
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $ticket_type_id
+     * @return mixed
+     */
+    public function getTicketTypeBySummit($summit_id, $ticket_type_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $ticket_type = $summit->getTicketTypeById($ticket_type_id);
+            if(is_null($ticket_type))
+                return $this->error404();
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($ticket_type)->serialize( Request::input('expand', '')));
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(['message' => $ex2->getMessage()]);
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
     public function addTicketTypeBySummit($summit_id){
         try {
 

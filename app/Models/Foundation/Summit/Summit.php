@@ -820,18 +820,6 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @param int $ticket_type_id
-     * @return SummitTicketType|null
-     */
-    public function getTicketType($ticket_type_id)
-    {
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('id', intval($ticket_type_id)));
-        $ticket_type = $this->ticket_types->matching($criteria)->first();
-        return $ticket_type === false ? null : $ticket_type;
-    }
-
-    /**
      * @param string $ticket_type_external_id
      * @return SummitTicketType|null
      */
