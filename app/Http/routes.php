@@ -429,7 +429,8 @@ Route::group([
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsTicketTypesApiController@addTicketTypeBySummit']);
                 Route::group(['prefix' => '{ticket_type_id}'], function () {
                     Route::get('', 'OAuth2SummitsTicketTypesApiController@getTicketTypeBySummit');
-
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsTicketTypesApiController@updateTicketTypeBySummit']);
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsTicketTypesApiController@deleteTicketTypeBySummit']);
                 });
             });
 

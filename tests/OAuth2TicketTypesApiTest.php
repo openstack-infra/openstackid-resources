@@ -83,6 +83,10 @@ final class OAuth2TicketTypesApiTest extends ProtectedApiTest
         return $ticket_type;
     }
 
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
     public function testAddTicketType($summit_id = 24){
         $params = [
             'id' => $summit_id,
@@ -118,6 +122,47 @@ final class OAuth2TicketTypesApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($ticket_type));
         $this->assertTrue($ticket_type->name == $name);
         $this->assertTrue($ticket_type->external_id == $external_id);
+        return $ticket_type;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testUpdateTicketType($summit_id = 24){
+
+        $ticket_type = $this->testAddTicketType($summit_id);
+
+        $params = [
+            'id'             => $summit_id,
+            'ticket_type_id' => $ticket_type->id
+        ];
+
+        $data = [
+            'description' => 'test description',
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitsTicketTypesApiController@updateTicketTypeBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $ticket_type = json_decode($content);
+        $this->assertTrue(!is_null($ticket_type));
+        $this->assertTrue($ticket_type->description == 'test description');
         return $ticket_type;
     }
 }

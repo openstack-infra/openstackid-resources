@@ -53,4 +53,5 @@ return [
     'RSVPTemplateService.deleteQuestionValue.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
     'RSVPTemplateService.deleteQuestionValue.QuestionNotFound' => 'question :question_id not found on template :template_id',
     'RSVPTemplateService.deleteQuestionValue.ValueNotFound' => 'value :value_id not found on question :question_id',
+    'SummitTicketTypeService.updateTicketType.TicketTypeNotFound' => 'ticket type :ticket_type_id does not exists on summit :summit_id',
 ];

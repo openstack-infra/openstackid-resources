@@ -57,4 +57,6 @@ return [
     'RSVPTemplateService.addQuestionValue.ValueAlreadyExist' => 'value :value already exists on question :question_id',
     'SummitTicketTypeService.addTicketType.NameAlreadyExists' => 'ticket name :name already exists on summit :summit_id',
     'SummitTicketTypeService.addTicketType.ExternalIdAlreadyExists' => 'ticket external id :external_id already exists on summit :summit_id',
+    'SummitTicketTypeService.updateTicketType.NameAlreadyExists' => 'ticket name :name already exists on summit :summit_id',
+    'SummitTicketTypeService.updateTicketType.ExternalIdAlreadyExists' => 'ticket external id :external_id already exists on summit :summit_id',
 ];

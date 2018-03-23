@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Http\Utils\EpochCellFormatter;
+use App\Http\Utils\PagingConstants;
 use App\Services\Model\ISummitTicketTypeService;
 use Illuminate\Support\Facades\Request;
 use App\Models\Foundation\Summit\Events\SummitEventTypeConstants;
@@ -76,7 +77,7 @@ final class OAuth2SummitsTicketTypesApiController extends OAuth2ProtectedControl
         $rules  = [
 
             'page'     => 'integer|min:1',
-            'per_page' => 'required_with:page|integer|min:5|max:100',
+            'per_page' => sprintf('required_with:page|integer|min:%s|max:%s', PagingConstants::DefaultPageSize, PagingConstants::MaxPageSize),
         ];
 
         try {
@@ -93,7 +94,7 @@ final class OAuth2SummitsTicketTypesApiController extends OAuth2ProtectedControl
 
             // default values
             $page     = 1;
-            $per_page = 5;
+            $per_page = PagingConstants::DefaultPageSize;
 
             if (Input::has('page')) {
                 $page     = intval(Input::get('page'));
@@ -327,6 +328,56 @@ final class OAuth2SummitsTicketTypesApiController extends OAuth2ProtectedControl
             Log::error($ex);
             return $this->error500($ex);
         }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $ticket_type_id
+     * @return mixed
+     */
+    public function updateTicketTypeBySummit($summit_id, $ticket_type_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $data    = Input::json();
+            $payload = $data->all();
+            $summit  = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitTicketTypeValidationRulesFactory::build($payload, true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $ticket_type = $this->ticket_type_service->updateTicketType($summit, $ticket_type_id, $payload);
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($ticket_type)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function deleteTicketTypeBySummit(){
+
     }
 
 
