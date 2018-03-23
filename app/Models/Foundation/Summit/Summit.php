@@ -1678,6 +1678,52 @@ SQL;
     }
 
     /**
+     * @param SummitTicketType $ticket_type
+     * @return $this
+     */
+    public function addTicketType(SummitTicketType $ticket_type)
+    {
+        $this->ticket_types->add($ticket_type);
+        $ticket_type->setSummit($this);
+        return $this;
+    }
+
+
+    /**
+     * @param SummitTicketType $ticket_type
+     * @return $this
+     */
+    public function removeTicketType(SummitTicketType $ticket_type)
+    {
+        $this->ticket_types->remove($ticket_type);
+        $ticket_type->clearSummit($this);
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @return SummitTicketType|null
+     */
+    public function getTicketTypeByName($name){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('name', trim($name)));
+        $res = $this->ticket_types->matching($criteria)->first();
+        return $res === false ? null : $res;
+    }
+
+
+    /**
+     * @param int $id
+     * @return SummitTicketType|null
+     */
+    public function getTicketTypeById($id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($id)));
+        $res = $this->ticket_types->matching($criteria)->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
      * @param int $rsvp_template_id
      * @return RSVPTemplate|null
      */

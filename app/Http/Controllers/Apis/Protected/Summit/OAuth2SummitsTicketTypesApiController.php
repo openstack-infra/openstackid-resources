@@ -259,4 +259,50 @@ final class OAuth2SummitsTicketTypesApiController extends OAuth2ProtectedControl
         }
     }
 
+    public function addTicketTypeBySummit($summit_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $data    = Input::json();
+            $payload = $data->all();
+            $summit  = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitTicketTypeValidationRulesFactory::build($payload);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $ticket_type = $this->ticket_type_service->addTicketType($summit, $payload);
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($ticket_type)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
+    public function seedDefaultTicketTypesBySummit($summit_id){
+
+    }
+
 }

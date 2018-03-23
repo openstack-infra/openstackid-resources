@@ -1123,6 +1123,15 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'add-ticket-type',
+                'route' => '/api/v1/summits/{id}/ticket-types',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTicketTypeData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
             // track groups
             array(
                 'name' => 'get-track-groups',

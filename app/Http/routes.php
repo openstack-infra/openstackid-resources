@@ -425,6 +425,8 @@ Route::group([
             Route::group(['prefix' => 'ticket-types'], function () {
                 Route::get('', 'OAuth2SummitsTicketTypesApiController@getAllBySummit');
                 Route::get('csv', 'OAuth2SummitsTicketTypesApiController@getAllBySummitCSV');
+                Route::post('seed-defaults', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsTicketTypesApiController@seedDefaultTicketTypesBySummit']);
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitsTicketTypesApiController@addTicketTypeBySummit']);
             });
 
             // external orders

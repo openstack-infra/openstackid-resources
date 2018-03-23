@@ -11,8 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
+use models\summit\Summit;
+use models\summit\SummitTicketType;
+/**
+ * Interface ISummitTicketTypeService
+ * @package App\Services\Model
+ */
 interface ISummitTicketTypeService
 {
-
+    /**
+     * @param Summit $summit
+     * @param array $data
+     * @return SummitTicketType
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addTicketType(Summit $summit, array $data);
 }
