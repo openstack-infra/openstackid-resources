@@ -1,4 +1,4 @@
-<?php namespace models\summit;
+<?php namespace App\Services\Model;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,12 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\Summit\Repositories\ISummitOwnedEntityRepository;
+
 /**
- * Interface ISummitTicketTypeRepository
- * @package models\summit
+ * Class PresentationCategoryGroupService
+ * @package App\Services\Model
  */
-interface ISummitTicketTypeRepository extends ISummitOwnedEntityRepository
+final class PresentationCategoryGroupService
+    extends AbstractService
+    implements IPresentationCategoryGroupService
 {
 
 }

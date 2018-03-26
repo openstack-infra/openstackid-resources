@@ -11,16 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Doctrine\Common\Collections\Criteria;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Class PresentationCategoryGroup
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrinePresentationCategoryGroupRepository")
  * @ORM\Table(name="PresentationCategoryGroup")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
- * @ORM\DiscriminatorMap({"PresentationCategoryGroup" = "PresentationCategoryGroup", "PrivatePresentationCategoryGroup" = "PrivatePresentationCategoryGroup"})
+ * @ORM\DiscriminatorMap({
+ *     "PresentationCategoryGroup" = "PresentationCategoryGroup",
+ *     "PrivatePresentationCategoryGroup" = "PrivatePresentationCategoryGroup"
+ * })
  * @package models\summit
  */
 class PresentationCategoryGroup extends SilverstripeBaseModel
@@ -104,6 +108,22 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
     }
 
     /**
+     * @return int
+     */
+    public function getSummitId(){
+        try {
+            return is_null($this->summit) ? 0 : $this->summit->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    public function clearSummit(){
+        $this->summit = null;
+    }
+
+    /**
      * @return Summit
      */
     public function getSummit(){
@@ -117,6 +137,7 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
     }
 
     /**
+     * owning side
      * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory", inversedBy="groups")
      * @ORM\JoinTable(name="PresentationCategoryGroup_Categories",
      *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryGroupID", referencedColumnName="ID")},
@@ -134,4 +155,47 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
         return $this->categories;
     }
 
+    /**
+     * @param PresentationCategory $track
+     */
+    public function addCategory(PresentationCategory $track){
+        $track->addToGroup($this);
+        $this->categories[] = $track;
+    }
+
+    /**
+     * @param PresentationCategory $track
+     */
+    public function removeCategory(PresentationCategory $track){
+        $track->removeFromGroup($this);
+        $this->categories->removeElement($track);
+    }
+
+    /**
+     * @param int $category_id
+     * @return PresentationCategory|null
+     */
+    public function getCategoryById($category_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($category_id)));
+        $res = $this->categories->matching($criteria)->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
+     * @param int $category_id
+     * @return bool
+     */
+    public function hasCategory($category_id){
+        return $this->getCategoryById($category_id) != null;
+    }
+
+    const ClassName = 'PresentationCategoryGroup';
+
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return self::ClassName;
+    }
 }

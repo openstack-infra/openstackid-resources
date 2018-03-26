@@ -11,33 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IBaseRepository;
-use utils\Filter;
-use utils\Order;
-use utils\PagingInfo;
-use utils\PagingResponse;
-
+use App\Models\Foundation\Summit\Repositories\ISummitOwnedEntityRepository;
 /**
  * Interface ISummitRegistrationPromoCodeRepository
  * @package models\summit
  */
-interface ISummitRegistrationPromoCodeRepository extends IBaseRepository
+interface ISummitRegistrationPromoCodeRepository extends ISummitOwnedEntityRepository
 {
-    /**
-     * @param Summit $summit
-     * @param PagingInfo $paging_info
-     * @param Filter|null $filter
-     * @param Order|null $order
-     * @return PagingResponse
-     */
-    public function getBySummit
-    (
-        Summit $summit,
-        PagingInfo $paging_info,
-        Filter $filter = null,
-        Order $order = null
-    );
-
     /**
      * @param Summit $summit
      * @return array

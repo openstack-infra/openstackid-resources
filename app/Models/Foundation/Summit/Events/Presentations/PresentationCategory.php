@@ -11,9 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping AS ORM;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\Common\Collections\ArrayCollection;
 /**
@@ -136,6 +138,7 @@ class PresentationCategory extends SilverstripeBaseModel
     }
 
     /**
+     *
      * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="categories")
      * @var PresentationCategoryGroup[]
      */
@@ -154,8 +157,8 @@ class PresentationCategory extends SilverstripeBaseModel
     {
         parent::__construct();
 
-        $this->groups                    = new ArrayCollection();
-        $this->allowed_tags              = new ArrayCollection();
+        $this->groups                    = new ArrayCollection;
+        $this->allowed_tags              = new ArrayCollection;
         $this->session_count             = 0;
         $this->alternate_count           = 0;
         $this->lightning_alternate_count = 0;
@@ -180,10 +183,43 @@ class PresentationCategory extends SilverstripeBaseModel
     }
 
     /**
+     * @param PresentationCategoryGroup $group
+     */
+    public function addToGroup(PresentationCategoryGroup $group){
+        $this->groups->add($group);
+    }
+
+    /**
+     * @param PresentationCategoryGroup $group
+     */
+    public function removeFromGroup(PresentationCategoryGroup $group){
+        $this->groups->removeElement($group);
+    }
+
+    /**
      * @return Tag[]
      */
     public function getAllowedTags(){
         return $this->allowed_tags;
+    }
+
+    /**
+     * @param int $group_id
+     * @return PresentationCategoryGroup|null
+     */
+    public function getGroupById($group_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($group_id)));
+        $res = $this->groups->matching($criteria)->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
+     * @param int $group_id
+     * @return bool
+     */
+    public function belongsToGroup($group_id){
+        return $this->getGroupById($group_id) != null;
     }
 
     /**

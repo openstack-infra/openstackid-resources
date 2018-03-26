@@ -71,6 +71,9 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
         $this->service                   = $service;
     }
 
+    /**
+     * @return mixed
+     */
     public function getSummits()
     {
         try {
@@ -237,110 +240,6 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
         }
         catch (Exception $ex)
         {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @return mixed
-     */
-    public function getTracks($summit_id){
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            //tracks
-            $tracks = array();
-            foreach ($summit->getPresentationCategories() as $track)
-            {
-                $tracks[] = SerializerRegistry::getInstance()->getSerializer($track)->serialize(Request::input('expand', ''));
-            }
-
-            $response = new PagingResponse
-            (
-                count($tracks),
-                count($tracks),
-                1,
-                1,
-                $tracks
-            );
-
-            return $this->ok($response->toArray());
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @param $track_id
-     * @return mixed
-     */
-    public function getTrack($summit_id, $track_id){
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $track = $summit->getPresentationCategory($track_id);
-            if (is_null($track)) return $this->error404();
-
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($track)->serialize(Request::input('expand', '')));
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @return mixed
-     */
-    public function getTracksGroups($summit_id){
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            //track groups
-            $groups = array();
-            foreach ($summit->getCategoryGroups() as $group)
-            {
-                $groups[] = SerializerRegistry::getInstance()->getSerializer($group)->serialize(Request::input('expand', ''));
-            }
-
-            $response = new PagingResponse
-            (
-                count($groups),
-                count($groups),
-                1,
-                1,
-                $groups
-            );
-
-            return $this->ok($response->toArray());
-        } catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @param $track_group_id
-     * @return mixed
-     */
-    public function getTrackGroup($summit_id, $track_group_id){
-        try {
-            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $group = $summit->getCategoryGroup($track_group_id);
-            if (is_null($group)) return $this->error404();
-
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($group)->serialize(Request::input('expand', '')));
-        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

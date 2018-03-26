@@ -22,6 +22,8 @@ class PresentationCategoryGroupSerializer extends SilverStripeSerializer
         'Name'        => 'name:json_string',
         'Color'       => 'color:json_string',
         'Description' => 'description:json_string',
+        'ClassName'   => 'class_name:json_string',
+        'SummitId'    => 'summit_id:json_int',
     ];
 
     /**
@@ -31,7 +33,7 @@ class PresentationCategoryGroupSerializer extends SilverStripeSerializer
      * @param array $params
      * @return array
      */
-    public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
+    public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
 

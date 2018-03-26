@@ -484,8 +484,11 @@ Route::group([
 
             // track groups
             Route::group(['prefix' => 'track-groups'], function () {
-                Route::get('', 'OAuth2SummitTracksApiController@getTracksGroups');
-                Route::get('{track_group_id}', 'OAuth2SummitApiController@getTrackGroup');
+                Route::get('', 'OAuth2PresentationCategoryGroupController@getAllBySummit');
+                Route::get('csv', 'OAuth2PresentationCategoryGroupController@getAllBySummitCSV');
+                Route::group(['prefix' => '{track_group_id}'], function () {
+
+                });
             });
 
             // promo codes

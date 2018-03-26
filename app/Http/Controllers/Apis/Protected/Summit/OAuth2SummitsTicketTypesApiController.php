@@ -15,7 +15,6 @@ use App\Http\Utils\EpochCellFormatter;
 use App\Http\Utils\PagingConstants;
 use App\Services\Model\ISummitTicketTypeService;
 use Illuminate\Support\Facades\Request;
-use App\Models\Foundation\Summit\Events\SummitEventTypeConstants;
 use models\summit\ISummitTicketTypeRepository;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;

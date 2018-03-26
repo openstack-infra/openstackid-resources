@@ -12,32 +12,12 @@
  * limitations under the License.
  **/
 use models\summit\Summit;
-use models\utils\IBaseRepository;
-use utils\Filter;
-use utils\Order;
-use utils\PagingInfo;
-use utils\PagingResponse;
 /**
  * Interface ISummitLocationRepository
  * @package App\Models\Foundation\Summit\Repositories
  */
-interface ISummitLocationRepository extends IBaseRepository
+interface ISummitLocationRepository extends ISummitOwnedEntityRepository
 {
-    /**
-     * @param Summit $summit
-     * @param PagingInfo $paging_info
-     * @param Filter|null $filter
-     * @param Order|null $order
-     * @return PagingResponse
-     */
-    public function getBySummit
-    (
-        Summit $summit,
-        PagingInfo $paging_info,
-        Filter $filter = null,
-        Order $order = null
-    );
-
     /**
      * @param Summit $summit
      * @return array

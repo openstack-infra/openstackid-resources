@@ -43,7 +43,7 @@ trait SummitOwned
      */
     public function getSummitId(){
         try {
-            return $this->summit->getId();
+            return is_null($this->summit) ? 0 : $this->summit->getId();
         }
         catch(\Exception $ex){
             return 0;

@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Doctrine\Common\Collections\Criteria;
 use models\main\Group;
 use models\summit\PresentationCategoryGroup;
 use Doctrine\ORM\Mapping AS ORM;
@@ -54,6 +55,41 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     protected $allowed_groups;
 
     /**
+     * @param Group $group
+     */
+    public function addToGroup(Group $group){
+        if($this->allowed_groups->contains($group)) return;
+        $this->allowed_groups->add($group);
+    }
+
+    /**
+     * @param Group $group
+     */
+    public function removeFromGroup(Group $group){
+        if(!$this->allowed_groups->contains($group)) return;
+        $this->allowed_groups->removeElement($group);
+    }
+
+    /**
+     * @param int $group_id
+     * @return Group|null
+     */
+    public function getGroupById($group_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($group_id)));
+        $res = $this->allowed_groups->matching($criteria)->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
+     * @param int $group_id
+     * @return bool
+     */
+    public function belongsToGroup($group_id){
+        return $this->getGroupById($group_id) != null;
+    }
+
+    /**
      * @return bool
      */
     public function isSubmissionOpen()
@@ -69,6 +105,12 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
         $now        = new DateTime('now', new DateTimeZone('UTC'));
 
         return ($now >= $start_date && $now <= $end_date);
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->allowed_groups = new ArrayCollection;
     }
 
     /**
@@ -101,5 +143,14 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     public function getAllowedGroups()
     {
         return $this->allowed_groups;
+    }
+
+    const ClassName = 'PrivatePresentationCategoryGroup';
+
+    /**
+     * @return string
+     */
+    public function getClassName(){
+        return self::ClassName;
     }
 }

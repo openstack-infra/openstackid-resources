@@ -15,6 +15,7 @@ use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
+use App\Models\Foundation\Summit\Repositories\IPresentationCategoryGroupRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
@@ -34,6 +35,7 @@ use models\main\Organization;
 use models\summit\ISummitRegistrationPromoCodeRepository;
 use models\summit\ISummitTicketTypeRepository;
 use models\summit\PresentationCategory;
+use models\summit\PresentationCategoryGroup;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
@@ -294,28 +296,35 @@ final class RepositoriesProvider extends ServiceProvider
         App::singleton(
             ISummitTrackRepository::class,
             function(){
-                return  EntityManager::getRepository(PresentationCategory::class);
+                return EntityManager::getRepository(PresentationCategory::class);
             }
         );
 
         App::singleton(
             IRSVPTemplateRepository::class,
             function(){
-                return  EntityManager::getRepository(RSVPTemplate::class);
+                return EntityManager::getRepository(RSVPTemplate::class);
             }
         );
 
         App::singleton(
             ISummitLocationRepository::class,
             function(){
-                return  EntityManager::getRepository(SummitAbstractLocation::class);
+                return EntityManager::getRepository(SummitAbstractLocation::class);
             }
         );
 
         App::singleton(
             ISummitLocationBannerRepository::class,
             function(){
-                return  EntityManager::getRepository(SummitLocationBanner::class);
+                return EntityManager::getRepository(SummitLocationBanner::class);
+            }
+        );
+
+        App::singleton(
+            IPresentationCategoryGroupRepository::class,
+            function(){
+                return EntityManager::getRepository(PresentationCategoryGroup::class);
             }
         );
     }

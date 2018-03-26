@@ -1169,7 +1169,7 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             // track groups
-            array(
+            [
                 'name' => 'get-track-groups',
                 'route' => '/api/v1/summits/{id}/track-groups',
                 'http_method' => 'GET',
@@ -1177,8 +1177,17 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
+                'name' => 'get-track-groups-csv',
+                'route' => '/api/v1/summits/{id}/track-groups/csv',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-track-group',
                 'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}',
                 'http_method' => 'GET',
@@ -1186,7 +1195,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+            ],
             //external orders
             array(
                 'name' => 'get-external-order',

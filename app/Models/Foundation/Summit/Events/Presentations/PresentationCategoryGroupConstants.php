@@ -1,4 +1,4 @@
-<?php namespace models\summit;
+<?php namespace App\Models\Foundation\Summit\Events\Presentations;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,12 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\Summit\Repositories\ISummitOwnedEntityRepository;
+use models\summit\PresentationCategoryGroup;
+use models\summit\PrivatePresentationCategoryGroup;
 /**
- * Interface ISummitTicketTypeRepository
- * @package models\summit
+ * Class PresentationCategoryGroupConstants
+ * @package App\Models\Foundation\Summit\Events\Presentations
  */
-interface ISummitTicketTypeRepository extends ISummitOwnedEntityRepository
+final class PresentationCategoryGroupConstants
 {
-
+    public static $valid_class_names = [
+        PresentationCategoryGroup::ClassName,
+        PrivatePresentationCategoryGroup::ClassName,
+    ];
 }
