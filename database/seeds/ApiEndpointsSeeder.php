@@ -1196,6 +1196,51 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'add-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTrackGroupsData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'associate-track-2-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}/tracks/{track_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTrackGroupsData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'disassociate-track-2-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}/tracks/{track_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTrackGroupsData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'associate-group-2-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}/allowed-groups/{group_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTrackGroupsData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'disassociate-group-2-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}/allowed-groups/{group_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTrackGroupsData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
             //external orders
             array(
                 'name' => 'get-external-order',

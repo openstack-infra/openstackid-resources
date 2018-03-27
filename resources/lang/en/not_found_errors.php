@@ -41,7 +41,7 @@ return [
     'LocationService.updateLocationImage.ImageNotFound' => 'image :image_id does not belongs to location :location_id',
     'LocationService.deleteLocationImage.LocationNotFound' => 'location :location_id not found on summit :summit_id',
     'LocationService.deleteLocationImage.ImageNotFound' => 'image :image_id not found on location :location_id',
-    // RSVP Template Service
+    // RSVPTemplateService
     'RSVPTemplateService.deleteTemplate.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
     'RSVPTemplateService.addQuestion.TemplateNotFound'    => 'template :template_id not found on summit :summit_id',
     'RSVPTemplateService.updateQuestion.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
@@ -53,6 +53,18 @@ return [
     'RSVPTemplateService.deleteQuestionValue.TemplateNotFound' => 'template :template_id not found on summit :summit_id',
     'RSVPTemplateService.deleteQuestionValue.QuestionNotFound' => 'question :question_id not found on template :template_id',
     'RSVPTemplateService.deleteQuestionValue.ValueNotFound' => 'value :value_id not found on question :question_id',
+    // SummitTicketTypeService
     'SummitTicketTypeService.updateTicketType.TicketTypeNotFound' => 'ticket type :ticket_type_id does not exists on summit :summit_id',
     'SummitTicketTypeService.deleteTicketType.TicketTypeNotFound' => 'ticket type :ticket_type_id does not exists on summit :summit_id',
+    // PresentationCategoryGroupService
+    'PresentationCategoryGroupService.updateTrackGroup.TrackGroupNotFound' => 'track group :track_group_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.deleteTrackGroup.TrackGroupNotFound' => 'track group :track_group_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.associateTrack2TrackGroup.TrackGroupNotFound' => 'track group :track_group_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.associateTrack2TrackGroup.TrackNotFound' => 'track  :track_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.disassociateTrack2TrackGroup.TrackGroupNotFound' => 'track group :track_group_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.disassociateTrack2TrackGroup.TrackNotFound' => 'track  :track_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.associateAllowedGroup2TrackGroup.TrackGroupNotFound' => 'track group :track_group_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.associateAllowedGroup2TrackGroup.GroupNotFound' => 'group :group_id does not exists.',
+    'PresentationCategoryGroupService.disassociateAllowedGroup2TrackGroup.TrackGroupNotFound' => 'track group :track_group_id does not exists on summit :summit_id',
+    'PresentationCategoryGroupService.disassociateAllowedGroup2TrackGroup.GroupNotFound' => 'group :group_id does not exists.',
 ];

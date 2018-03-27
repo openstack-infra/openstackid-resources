@@ -11,7 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Events\SummitTicketTypeInserted;
+use App\Events\SummitTicketTypeDeleted;
+use App\Events\SummitTicketTypeUpdated;
 use App\Models\Foundation\Summit\Factories\SummitTicketTypeFactory;
+use Illuminate\Support\Facades\Event;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
@@ -19,7 +23,6 @@ use models\summit\ISummitTicketTypeRepository;
 use models\summit\Summit;
 use models\summit\SummitTicketType;
 use services\apis\IEventbriteAPI;
-
 /**
  * Class SummitTicketTypeService
  * @package App\Services\Model
@@ -66,7 +69,7 @@ final class SummitTicketTypeService
      */
     public function addTicketType(Summit $summit, array $data)
     {
-        return $this->tx_service->transaction(function() use ($summit, $data){
+        $ticket_type =  $this->tx_service->transaction(function() use ($summit, $data){
 
             $former_ticket_type = $summit->getTicketTypeByName(trim($data['name']));
 
@@ -104,6 +107,18 @@ final class SummitTicketTypeService
             $summit->addTicketType($ticket_type);
             return $ticket_type;
         });
+
+        Event::fire
+        (
+            new SummitTicketTypeInserted
+            (
+                $ticket_type->getId(),
+                $ticket_type->getSummitId()
+            )
+        );
+
+        return $ticket_type;
+
     }
 
     /**
@@ -171,6 +186,15 @@ final class SummitTicketTypeService
 
             $ticket_type = SummitTicketTypeFactory::populate($ticket_type, $data);
 
+            Event::fire
+            (
+                new SummitTicketTypeUpdated
+                (
+                    $ticket_type->getId(),
+                    $ticket_type->getSummitId()
+                )
+            );
+
             return $ticket_type;
         });
     }
@@ -201,6 +225,15 @@ final class SummitTicketTypeService
                     )
                 );
             }
+
+            Event::fire
+            (
+                new SummitTicketTypeDeleted
+                (
+                    $ticket_type->getId(),
+                    $ticket_type->getSummitId()
+                )
+            );
 
             $summit->removeTicketType($ticket_type);
         });
@@ -254,6 +287,17 @@ final class SummitTicketTypeService
                 $new_ticket_type->setDescription(isset($ticket_class['description']) ? trim($ticket_class['description']) : '');
                 $summit->addTicketType($new_ticket_type);
                 $res[] = $new_ticket_type;
+            }
+
+            foreach ($res as $ticket_type){
+                Event::fire
+                (
+                    new SummitTicketTypeInserted
+                    (
+                        $ticket_type->getId(),
+                        $ticket_type->getSummitId()
+                    )
+                );
             }
 
             return $res;

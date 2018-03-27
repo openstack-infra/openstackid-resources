@@ -950,7 +950,7 @@ class Summit extends SilverstripeBaseModel
      * @param int $group_id
      * @return null|PresentationCategoryGroup
      */
-    public function getCategoryGroup($group_id)
+    public function getCategoryGroupById($group_id)
     {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($group_id)));
@@ -958,6 +958,35 @@ class Summit extends SilverstripeBaseModel
         return $group === false ? null : $group;
     }
 
+    /**
+     * @param string $name
+     * @return null|PresentationCategoryGroup
+     */
+    public function getCategoryGroupByName($name)
+    {
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('name', trim($name)));
+        $group = $this->category_groups->matching($criteria)->first();
+        return $group === false ? null : $group;
+    }
+
+    /**
+     * @param PresentationCategoryGroup $track_group
+     */
+    public function addCategoryGroup(PresentationCategoryGroup $track_group){
+        if($this->category_groups->contains($track_group)) return;
+        $this->category_groups->add($track_group);
+        $track_group->setSummit($this);
+    }
+
+    /**
+     * @param PresentationCategoryGroup $track_group
+     */
+    public function removeCategoryGroup(PresentationCategoryGroup $track_group){
+        if(!$this->category_groups->contains($track_group)) return;
+        $this->category_groups->removeElement($track_group);
+        $track_group->clearSummit();
+    }
 
     /**
      * @param int $member_id

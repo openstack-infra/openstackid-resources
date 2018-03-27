@@ -45,6 +45,11 @@ final class OAuth2PresentationCategoryGroupController
     private $summit_repository;
 
     /**
+     * @var IPresentationCategoryGroupService
+     */
+    private $presentation_category_group_service;
+
+    /**
      * OAuth2SummitsTicketTypesApiController constructor.
      * @param IPresentationCategoryGroupRepository $repository
      * @param ISummitRepository $summit_repository
@@ -62,6 +67,7 @@ final class OAuth2PresentationCategoryGroupController
         parent::__construct($resource_server_context);
         $this->repository                           = $repository;
         $this->summit_repository                    = $summit_repository;
+        $this->presentation_category_group_service  = $presentation_category_group_service;
     }
     /**
      * @param $summit_id
@@ -185,8 +191,6 @@ final class OAuth2PresentationCategoryGroupController
      * @return mixed
      */
     public function getAllBySummitCSV($summit_id){
-        $values = Input::all();
-
         try {
 
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
@@ -287,4 +291,172 @@ final class OAuth2PresentationCategoryGroupController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function addTrackGroupBySummit($summit_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $data    = Input::json();
+            $payload = $data->all();
+            $summit  = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = PresentationCategoryGroupValidationRulesFactory::build($payload);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $track_group = $this->presentation_category_group_service->addTrackGroup($summit, $payload);
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($track_group)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $track_group_id
+     * @param $track_id
+     * @return mixed
+     */
+    public function associateTrack2TrackGroup($summit_id, $track_group_id, $track_id){
+        try {
+
+            $summit  = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->presentation_category_group_service->associateTrack2TrackGroup($summit, $track_group_id, $track_id);
+
+            return $this->updated();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $track_group_id
+     * @param $track_id
+     * @return mixed
+     */
+    public function disassociateTrack2TrackGroup($summit_id, $track_group_id, $track_id){
+        try {
+
+            $summit  = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->presentation_category_group_service->disassociateTrack2TrackGroup($summit, $track_group_id, $track_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $track_group_id
+     * @param $group_id
+     * @return mixed
+     */
+    public function associateAllowedGroup2TrackGroup($summit_id, $track_group_id, $group_id){
+        try {
+
+            $summit  = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->presentation_category_group_service->associateAllowedGroup2TrackGroup($summit, $track_group_id, $group_id);
+
+            return $this->updated();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $track_group_id
+     * @param $group_id
+     * @return mixed
+     */
+    public function disassociateAllowedGroup2TrackGroup($summit_id, $track_group_id, $group_id){
+        try {
+
+            $summit  = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->presentation_category_group_service->disassociateAllowedGroup2TrackGroup($summit, $track_group_id, $group_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

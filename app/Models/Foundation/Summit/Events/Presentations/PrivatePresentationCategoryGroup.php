@@ -1,4 +1,5 @@
 <?php namespace models\summit;
+
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,13 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Doctrine\Common\Collections\Criteria;
-use models\main\Group;
-use models\summit\PresentationCategoryGroup;
-use Doctrine\ORM\Mapping AS ORM;
-use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
 use DateTimeZone;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
+use models\main\Group;
+use Doctrine\ORM\Mapping AS ORM;
 /**
  * Class PrivatePresentationCategoryGroup
  * @ORM\Entity
@@ -57,16 +57,18 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     /**
      * @param Group $group
      */
-    public function addToGroup(Group $group){
-        if($this->allowed_groups->contains($group)) return;
+    public function addToGroup(Group $group)
+    {
+        if ($this->allowed_groups->contains($group)) return;
         $this->allowed_groups->add($group);
     }
 
     /**
      * @param Group $group
      */
-    public function removeFromGroup(Group $group){
-        if(!$this->allowed_groups->contains($group)) return;
+    public function removeFromGroup(Group $group)
+    {
+        if (!$this->allowed_groups->contains($group)) return;
         $this->allowed_groups->removeElement($group);
     }
 
@@ -74,7 +76,8 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
      * @param int $group_id
      * @return Group|null
      */
-    public function getGroupById($group_id){
+    public function getGroupById($group_id)
+    {
         $criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($group_id)));
         $res = $this->allowed_groups->matching($criteria)->first();
@@ -85,7 +88,8 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
      * @param int $group_id
      * @return bool
      */
-    public function belongsToGroup($group_id){
+    public function belongsToGroup($group_id)
+    {
         return $this->getGroupById($group_id) != null;
     }
 
@@ -95,14 +99,13 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     public function isSubmissionOpen()
     {
 
-        if (empty($this->submission_begin_date) || empty($this->submission_end_date))
-        {
+        if (empty($this->submission_begin_date) || empty($this->submission_end_date)) {
             return false;
         }
 
         $start_date = new DateTime($this->submission_begin_date->getTimestamp(), new DateTimeZone('UTC'));
-        $end_date   = new DateTime($this->submission_end_date->getTimestamp(), new DateTimeZone('UTC'));
-        $now        = new DateTime('now', new DateTimeZone('UTC'));
+        $end_date = new DateTime($this->submission_end_date->getTimestamp(), new DateTimeZone('UTC'));
+        $now = new DateTime('now', new DateTimeZone('UTC'));
 
         return ($now >= $start_date && $now <= $end_date);
     }
@@ -110,7 +113,8 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     public function __construct()
     {
         parent::__construct();
-        $this->allowed_groups = new ArrayCollection;
+        $this->allowed_groups                  = new ArrayCollection;
+        $this->max_submission_allowed_per_user = 0;
     }
 
     /**
@@ -150,7 +154,75 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     /**
      * @return string
      */
-    public function getClassName(){
+    public function getClassName()
+    {
         return self::ClassName;
     }
+
+    /**
+     * @param DateTime $submission_begin_date
+     */
+    public function setSubmissionBeginDate(DateTime $submission_begin_date)
+    {
+        $summit = $this->getSummit();
+        if (!is_null($summit)) {
+            $submission_begin_date = $summit->convertDateFromTimeZone2UTC($submission_begin_date);
+        }
+        $this->submission_begin_date = $submission_begin_date;
+    }
+
+    /**
+     * @param DateTime $submission_end_date
+     */
+    public function setSubmissionEndDate(DateTime $submission_end_date)
+    {
+        $summit = $this->getSummit();
+        if (!is_null($summit)) {
+            $submission_end_date = $summit->convertDateFromTimeZone2UTC($submission_end_date);
+        }
+        $this->submission_end_date = $submission_end_date;
+    }
+
+    /**
+     * @param int $max_submission_allowed_per_user
+     */
+    public function setMaxSubmissionAllowedPerUser($max_submission_allowed_per_user)
+    {
+        $this->max_submission_allowed_per_user = $max_submission_allowed_per_user;
+    }
+
+    /**
+     * @return DateTime|null
+     */
+    public function getLocalSubmissionBeginDate()
+    {
+        $res = null;
+        if(!empty($this->submission_begin_date)) {
+            $value  = clone $this->submission_begin_date;
+            $summit = $this->getSummit();
+            if(!is_null($summit))
+            {
+                $res = $summit->convertDateFromUTC2TimeZone($value);
+            }
+        }
+        return $res;
+    }
+
+    /**
+     * @return DateTime|null
+     */
+    public function getLocalSubmissionEndDate()
+    {
+        $res = null;
+        if(!empty($this->submission_end_date)) {
+            $value  = clone $this->submission_end_date;
+            $summit = $this->getSummit();
+            if(!is_null($summit))
+            {
+                $res = $summit->convertDateFromUTC2TimeZone($value);
+            }
+        }
+        return $res;
+    }
+
 }

@@ -486,8 +486,24 @@ Route::group([
             Route::group(['prefix' => 'track-groups'], function () {
                 Route::get('', 'OAuth2PresentationCategoryGroupController@getAllBySummit');
                 Route::get('csv', 'OAuth2PresentationCategoryGroupController@getAllBySummitCSV');
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@addTrackGroupBySummit']);
+
                 Route::group(['prefix' => '{track_group_id}'], function () {
 
+                    Route::group(['prefix' => 'tracks'], function () {
+
+                        Route::group(['prefix' => '{track_id}'], function () {
+                            Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@associateTrack2TrackGroup']);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@disassociateTrack2TrackGroup']);
+                        });
+                    });
+                    Route::group(['prefix' => 'allowed-groups'], function () {
+
+                        Route::group(['prefix' => '{group_id}'], function () {
+                            Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@associateAllowedGroup2TrackGroup']);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@disassociateAllowedGroup2TrackGroup']);
+                        });
+                    });
                 });
             });
 

@@ -39,6 +39,8 @@ final class SummitScopes
 
     const WriteTracksData    = '%s/tracks/write';
 
+    const WriteTrackGroupsData    = '%s/track-groups/write';
+
     const WriteLocationsData    = '%s/locations/write';
 
     const WriteRSVPTemplateData    = '%s/rsvp-templates/write';

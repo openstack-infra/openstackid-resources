@@ -36,7 +36,9 @@ use App\Factories\EntityEvents\SummitEventCreatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventDeletedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventTypeActionEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventUpdatedEntityEventFactory;
+use App\Factories\EntityEvents\SummitTicketTypeActionEntityEventFactory;
 use App\Factories\EntityEvents\TrackActionEntityEventFactory;
+use App\Factories\EntityEvents\TrackGroupActionActionEntityEventFactory;
 use App\Services\Utils\SCPFileUploader;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -269,5 +271,38 @@ final class EventServiceProvider extends ServiceProvider
             EntityEventPersister::persist(LocationImageActionEntityEventFactory::build($event, 'DELETE'));
         });
 
+        // ticket types
+
+        Event::listen(\App\Events\SummitTicketTypeInserted::class, function($event)
+        {
+            EntityEventPersister::persist(SummitTicketTypeActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
+        Event::listen(\App\Events\SummitTicketTypeUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(SummitTicketTypeActionEntityEventFactory::build($event, 'UPDATE'));
+        });
+
+        Event::listen(\App\Events\SummitTicketTypeDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(SummitTicketTypeActionEntityEventFactory::build($event, 'DELETE'));
+        });
+
+        // track groups
+
+        Event::listen(\App\Events\TrackGroupInserted::class, function($event)
+        {
+            EntityEventPersister::persist(TrackGroupActionActionEntityEventFactory::build($event, 'INSERT'));
+        });
+
+        Event::listen(\App\Events\TrackGroupUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(TrackGroupActionActionEntityEventFactory::build($event, 'UPDATE'));
+        });
+
+        Event::listen(\App\Events\TrackGroupDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(TrackGroupActionActionEntityEventFactory::build($event, 'DELETE'));
+        });
     }
 }

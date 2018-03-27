@@ -27,7 +27,7 @@ final class TrackFromTrackGroupEventType extends EntityEventType
     {
         $metadata = $this->entity_event->getMetadata();
         if(!isset($metadata['group_id'])) return null;
-        $group = $this->entity_event->getSummit()->getCategoryGroup(intval($metadata['group_id']));
+        $group = $this->entity_event->getSummit()->getCategoryGroupById(intval($metadata['group_id']));
         if (is_null($group)) return null;
         $this->entity_event->registerEntity($group);
         return $group;

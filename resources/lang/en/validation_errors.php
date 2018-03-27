@@ -51,13 +51,16 @@ return [
     'LocationService.addLocationImage.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
     'LocationService.updateLocationImage.FileNotAllowedExtension' => 'file extension is not allowed (:allowed_extensions)',
     'LocationService.updateLocationImage.FileMaxSize' => 'file exceeds max_file_size (:max_file_size MB)',
-    // RSVP Template Service
+    // RSVPTemplateService
     'RSVPTemplateService.addQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
     'RSVPTemplateService.updateQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
     'RSVPTemplateService.addQuestionValue.ValueAlreadyExist' => 'value :value already exists on question :question_id',
+    // SummitTicketTypeService
     'SummitTicketTypeService.addTicketType.NameAlreadyExists' => 'ticket name :name already exists on summit :summit_id',
     'SummitTicketTypeService.addTicketType.ExternalIdAlreadyExists' => 'ticket external id :external_id already exists on summit :summit_id',
     'SummitTicketTypeService.updateTicketType.NameAlreadyExists' => 'ticket name :name already exists on summit :summit_id',
     'SummitTicketTypeService.updateTicketType.ExternalIdAlreadyExists' => 'ticket external id :external_id already exists on summit :summit_id',
     'SummitTicketTypeService.seedSummitTicketTypesFromEventBrite.MissingExternalId' => 'summit :summit_is has not set external id (eventbrite)',
+    // PresentationCategoryGroupService
+    'PresentationCategoryGroupService.addTrackGroup.NameAlreadyExists' => 'name :name already exists for summit :summit_id',
 ];

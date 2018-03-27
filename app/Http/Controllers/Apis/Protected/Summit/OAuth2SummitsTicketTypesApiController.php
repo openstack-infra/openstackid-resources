@@ -168,21 +168,12 @@ final class OAuth2SummitsTicketTypesApiController extends OAuth2ProtectedControl
      * @return mixed
      */
     public function getAllBySummitCSV($summit_id){
-        $values = Input::all();
-        $rules  = [
-        ];
 
         try {
 
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $validation = Validator::make($values, $rules);
-
-            if ($validation->fails()) {
-                $ex = new ValidationException();
-                throw $ex->setMessages($validation->messages()->toArray());
-            }
 
             // default values
             $page     = 1;

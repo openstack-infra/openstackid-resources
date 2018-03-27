@@ -13,17 +13,17 @@
  **/
 use Illuminate\Queue\SerializesModels;
 /**
- * Class TrackAction
+ * Class TrackGroupAction
  * @package App\Events
  */
-abstract class TrackAction
+abstract class TrackGroupAction
 {
     use SerializesModels;
 
     /**
      * @var int
      */
-    protected $track_id;
+    protected $track_group_id;
 
     /**
      * @var int
@@ -31,22 +31,37 @@ abstract class TrackAction
     protected $summit_id;
 
     /**
-     * TrackAction constructor.
-     * @param int $summit_id
-     * @param int $track_id
+     * @var string
      */
-    public function __construct($summit_id, $track_id)
+    protected $class_name;
+
+    /**
+     * TrackGroupAction constructor.
+     * @param int $track_group_id
+     * @param int $summit_id
+     * @param string $class_name
+     */
+    public function __construct($track_group_id, $summit_id, $class_name)
     {
+        $this->track_group_id = $track_group_id;
         $this->summit_id = $summit_id;
-        $this->track_id  = $track_id;
+        $this->class_name = $class_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClassName()
+    {
+        return $this->class_name;
     }
 
     /**
      * @return int
      */
-    public function getTrackId()
+    public function getTrackGroupId()
     {
-        return $this->track_id;
+        return $this->track_group_id;
     }
 
     /**
