@@ -38,6 +38,9 @@ Route::group([
                 Route::group(['prefix' => '{location_id}'], function () {
                     Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
                     Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents');
+                    Route::group(['prefix' => 'banners'], function () {
+                        Route::get('', 'OAuth2SummitLocationsApiController@getLocationBanners');
+                    });
                 });
             });
         });
