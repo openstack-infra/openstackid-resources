@@ -40,8 +40,48 @@ final class OAuth2TrackGroupsApiTest extends ProtectedApiTest
         $track_groups = json_decode($content);
         $this->assertTrue(!is_null($track_groups));
         $this->assertResponseStatus(200);
+        return $track_groups;
     }
 
+    /**
+     * @param int $summit_id
+     */
+    public function testGetTrackGroupById($summit_id = 24){
+        $track_groups_response = $this->testGetTrackGroups($summit_id);
+
+        $track_groups = $track_groups_response->data;
+
+        $track_group  = null;
+        foreach($track_groups as $track_group_aux){
+            if($track_group_aux->class_name == \models\summit\PrivatePresentationCategoryGroup::ClassName){
+                $track_group = $track_group_aux;
+                break;
+            }
+        }
+
+        $params = [
+            'id'             => $summit_id,
+            'track_group_id' => $track_group->id,
+            'expand'         => 'tracks,allowed_groups',
+        ];
+
+        $headers  = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "GET",
+            "OAuth2PresentationCategoryGroupController@getTrackGroupBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content     = $response->getContent();
+        $track_group = json_decode($content);
+        $this->assertTrue(!is_null($track_group));
+        $this->assertResponseStatus(200);
+
+    }
 
     /**
      * @param int $summit_id
@@ -109,6 +149,48 @@ final class OAuth2TrackGroupsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
         $track_group = json_decode($content);
         $this->assertTrue(!is_null($track_group));
+        return $track_group;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testUpdateTrackGroup($summit_id = 24){
+
+        $track_group = $this->testAddTrackGroup($summit_id);
+
+        $params = [
+            'id'             => $summit_id,
+            'track_group_id' => $track_group->id
+        ];
+
+        $data = [
+            'description' => 'test desc track group update',
+            'class_name'  => \models\summit\PrivatePresentationCategoryGroup::ClassName
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2PresentationCategoryGroupController@updateTrackGroupBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $track_group = json_decode($content);
+        $this->assertTrue(!is_null($track_group));
+        $this->assertTrue($track_group->description == 'test desc track group update');
         return $track_group;
     }
 

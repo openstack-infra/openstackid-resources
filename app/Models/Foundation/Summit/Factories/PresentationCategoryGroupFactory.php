@@ -107,10 +107,10 @@ final class PresentationCategoryGroupFactory
      */
     public static function populate(Summit $summit, PresentationCategoryGroup $track_group, array $data){
         if($track_group instanceof PrivatePresentationCategoryGroup){
-            return self::populatePrivatePresentationCategoryGroup($track_group, $data);
+            return self::populatePrivatePresentationCategoryGroup($summit, $track_group, $data);
         }
         else if($track_group instanceof PresentationCategoryGroup){
-            return self::populatePresentationCategoryGroup($summit, $track_group,$data);
+            return self::populatePresentationCategoryGroup($track_group, $data);
         }
         return $track_group;
     }

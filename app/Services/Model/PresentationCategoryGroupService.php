@@ -105,7 +105,7 @@ final class PresentationCategoryGroupService
      */
     public function updateTrackGroup(Summit $summit, $track_group_id, array $data)
     {
-        $this->tx_service->transaction(function () use ($summit, $track_group_id, $data) {
+        return $this->tx_service->transaction(function () use ($summit, $track_group_id, $data) {
 
             if (isset($data['name'])) {
                 $former_track_group = $summit->getCategoryGroupByName(trim($data['name']));

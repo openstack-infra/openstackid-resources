@@ -12,6 +12,8 @@
  * limitations under the License.
  **/
 
+use models\summit\PresentationCategoryGroup;
+
 /**
  * Class PresentationCategoryGroupSerializer
  * @package ModelSerializers
@@ -36,8 +38,9 @@ class PresentationCategoryGroupSerializer extends SilverStripeSerializer
     public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
+        $track_group = $this->object;
+        if(!$track_group instanceof PresentationCategoryGroup) return $values;
 
-        $group  = $this->object;
         $color  = isset($values['color']) ? $values['color']:'';
         if(empty($color))
             $color = 'f0f0ee';
@@ -46,9 +49,9 @@ class PresentationCategoryGroupSerializer extends SilverStripeSerializer
         }
         $values['color'] = $color;
 
-        $categories      = array();
+        $categories = [];
 
-        foreach($group->getCategories() as $c)
+        foreach($track_group->getCategories() as $c)
         {
             if(!is_null($expand) &&  in_array('tracks', explode(',',$expand))){
                 $categories[] = SerializerRegistry::getInstance()->getSerializer($c)->serialize();
