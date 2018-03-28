@@ -15,6 +15,8 @@ use models\summit\SummitAirport;
 use models\summit\SummitExternalLocation;
 use models\summit\SummitHotel;
 use models\summit\SummitVenue;
+use models\summit\SummitVenueRoom;
+
 /**
  * Class SummitLocationConstants
  * @package App\Models\Foundation\Summit\Locations
@@ -26,5 +28,6 @@ final class SummitLocationConstants
         SummitAirport::ClassName,
         SummitHotel::ClassName,
         SummitExternalLocation::ClassName,
+        SummitVenueRoom::ClassName
     ];
 }

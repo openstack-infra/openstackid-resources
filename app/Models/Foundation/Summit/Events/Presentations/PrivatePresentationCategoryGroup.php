@@ -47,8 +47,8 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
     /**
      * @ORM\ManyToMany(targetEntity="models\main\Group")
      * @ORM\JoinTable(name="PrivatePresentationCategoryGroup_AllowedGroups",
-     *      joinColumns={@ORM\JoinColumn(name="PrivatePresentationCategoryGroupID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="GroupID", referencedColumnName="ID")}
+     *      joinColumns={@ORM\JoinColumn(name="PrivatePresentationCategoryGroupID", referencedColumnName="ID", onDelete="CASCADE")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="GroupID", referencedColumnName="ID", onDelete="CASCADE")}
      * )
      * @var Group[]
      */

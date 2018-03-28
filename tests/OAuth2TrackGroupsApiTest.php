@@ -256,4 +256,33 @@ final class OAuth2TrackGroupsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(201);
     }
 
+    /**
+     * @param int $summit_id
+     * @param int $track_group_id
+     */
+    public function testDeleteExistentTrackGroup($summit_id = 24, $track_group_id = 85){
+
+        $params = [
+            'id'             => $summit_id,
+            'track_group_id' => $track_group_id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2PresentationCategoryGroupController@deleteTrackGroupBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
 }

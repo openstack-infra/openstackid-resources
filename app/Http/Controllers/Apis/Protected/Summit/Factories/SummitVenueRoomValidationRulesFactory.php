@@ -27,17 +27,10 @@ final class SummitVenueRoomValidationRulesFactory
 
         $rules = SummitAbstractLocationValidationRulesFactory::build($data, $update);
 
-        if($update) {
-            return array_merge([
-                'capacity'           => 'sometimes|integer:min:0',
-                'override_blackouts' => 'sometimes|boolean',
-                'floor_id'           => 'sometimes|integer',
-            ], $rules);
-        }
-
         return array_merge([
             'capacity'           => 'sometimes|integer:min:0',
             'override_blackouts' => 'sometimes|boolean',
+            'floor_id'           => 'sometimes|integer',
         ], $rules);
     }
 }

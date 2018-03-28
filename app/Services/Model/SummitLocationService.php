@@ -693,7 +693,7 @@ final class SummitLocationService
 
             if(isset($data['floor_id'])){
                 $floor_id = intval($data['floor_id']);
-                $floor = $venue->getFloor($floor_id);
+                $floor    = $venue->getFloor($floor_id);
 
                 if(is_null($floor)){
                     throw new EntityNotFoundException
@@ -853,7 +853,6 @@ final class SummitLocationService
                     $floor->addRoom($room);
                 }
             }
-
 
             // request to update order
             if (isset($data['order']) && intval($data['order']) != $room->getOrder()) {
