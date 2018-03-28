@@ -55,6 +55,7 @@ abstract class SilverStripeDoctrineRepository extends DoctrineRepository
         $resource_server_ctx = App::make(\models\oauth2\IResourceServerContext::class);
         $member_repository   = App::make(\models\main\IMemberRepository::class);
         $member_id           = $resource_server_ctx->getCurrentUserExternalId();
+        if(is_null($member_id)) return false;
         $member              = $member_repository->getById($member_id);
         if (!is_null($member)){
             return $member->isOnGroup($group_code);

@@ -114,7 +114,7 @@ final class PresentationCategoryGroupService
                     (
                         trans('validation_errors.PresentationCategoryGroupService.updateTrackGroup.NameAlreadyExists'),
                         [
-                            'name' => trim($data['name']),
+                            'name'      => trim($data['name']),
                             'summit_id' => $summit->getId(),
                         ]
                     );
@@ -129,14 +129,14 @@ final class PresentationCategoryGroupService
                     trans('not_found_errors.PresentationCategoryGroupService.updateTrackGroup.TrackGroupNotFound'),
                     [
                         'track_group_id' => $track_group_id,
-                        'summit_id' => $summit->getId(),
+                        'summit_id'      => $summit->getId(),
                     ]
                 );
             }
 
             Event::fire
             (
-                new TrackGroupInserted
+                new TrackGroupUpdated
                 (
 
                     $track_group->getId(),

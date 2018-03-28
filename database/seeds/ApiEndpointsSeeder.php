@@ -151,7 +151,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
             ],
-            array(
+            [
                 'name' => 'get-attendee-schedule',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule',
                 'http_method' => 'GET',
@@ -159,19 +159,19 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'add-event-attendee-schedule',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule/{event_id}',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'delete-event-attendee-schedule',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule/{event_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
+            ],
             array(
                 'name' => 'checking-event-attendee-schedule',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule/{event_id}/check-in',
@@ -443,19 +443,19 @@ class ApiEndpointsSeeder extends Seeder
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
             ),
-            array(
+            [
                 'name' => 'add-event-feedback-v2',
                 'route' => '/api/v2/summits/{id}/events/{event_id}/feedback',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'update-event-feedback-v2',
                 'route' => '/api/v2/summits/{id}/events/{event_id}/feedback',
                 'http_method' => 'PUT',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-event-feedback',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/feedback/{attendee_id?}',
                 'http_method' => 'GET',
@@ -463,13 +463,13 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'delete-rsvp',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/schedule/{event_id}/rsvp',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
+            ],
             // locations
             [
                  'name' => 'get-locations',
@@ -1206,6 +1206,24 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'update-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTrackGroupsData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-track-group',
+                'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTrackGroupsData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'associate-track-2-track-group',
                 'route' => '/api/v1/summits/{id}/track-groups/{track_group_id}/tracks/{track_id}',
                 'http_method' => 'PUT',
@@ -1255,7 +1273,7 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [sprintf('%s/summits/confirm-external-orders', $current_realm)],
             ),
             //videos
-            array(
+            [
                 'name' => 'get-presentation-videos',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos',
                 'http_method' => 'GET',
@@ -1263,8 +1281,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/video/{video_id}',
                 'http_method' => 'GET',
@@ -1272,76 +1290,76 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'create-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteVideoData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'update-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos/{video_id}',
                 'http_method' => 'PUT',
                 'scopes' => [sprintf(SummitScopes::WriteVideoData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'delete-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos/{video_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::WriteVideoData, $current_realm)],
-            ),
+            ],
             //members
-            array(
+            [
                 'name' => 'get-own-member',
                 'route' => '/api/v1/summits/{id}/members/{member_id}',
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/me/read', $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-own-member-favorites',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/favorites',
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/me/read', $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'add-2-own-member-favorites',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/favorites/{event_id}',
                 'http_method' => 'POST',
                 'scopes' => [sprintf('%s/me/summits/events/favorites/add', $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'delete-rsvp-member',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}/rsvp',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'remove-from-own-member-favorites',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/favorites/{event_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf('%s/me/summits/events/favorites/delete', $current_realm)],
-            ),
-           [
+            ],
+            [
                 'name' => 'get-own-member-schedule',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/schedule',
                 'http_method' => 'GET',
                 'scopes' => [sprintf('%s/me/read', $current_realm)],
             ],
-           [
+            [
                 'name' => 'add-2-own-member-schedule',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
             ],
-           [
+            [
                 'name' => 'remove-from-own-member-schedule',
                 'route' => '/api/v1/summits/{id}/members/{member_id}/schedule/{event_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
             ],
             // notifications
-           [
+            [
                 'name' => 'get-notifications',
                 'route' => '/api/v1/summits/{id}/notifications',
                 'http_method' => 'GET',

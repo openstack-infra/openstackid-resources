@@ -492,6 +492,9 @@ Route::group([
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@addTrackGroupBySummit']);
 
                 Route::group(['prefix' => '{track_group_id}'], function () {
+                    Route::get('', 'OAuth2PresentationCategoryGroupController@getTrackGroupBySummit');
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@updateTrackGroupBySummit']);
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@deleteTrackGroupBySummit']);
 
                     Route::group(['prefix' => 'tracks'], function () {
 
