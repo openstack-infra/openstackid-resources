@@ -82,6 +82,83 @@ final class OAuth2SummitRSVPTemplateApiTest extends ProtectedApiTest
         return $rsvp_template;
     }
 
+    public function testAddRSVPTemplate($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $title       = str_random(16).'_rsvp_template_title';
+
+        $data        = [
+            'title'      => $title,
+            'is_enabled' => false,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitRSVPTemplatesApiController@addRSVPTemplate",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+        $template = json_decode($content);
+        $this->assertTrue(!is_null($template));
+        $this->assertTrue($template->title == $title);
+        return $template;
+    }
+
+    public function testUpdateRSVPTemplate($summit_id = 24){
+
+        $template = $this->testAddRSVPTemplate($summit_id);
+
+        $params = [
+            'id' => $summit_id,
+            'template_id' => $template->id
+        ];
+
+        $data        = [
+            'is_enabled' => true,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitRSVPTemplatesApiController@updateRSVPTemplate",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+
+        $template = json_decode($content);
+        $this->assertTrue(!is_null($template));
+        $this->assertTrue($template->is_enabled == true);
+        return $template;
+    }
+
+
     public function testDeleteRSVPTemplate($summit_id = 23){
 
         $template = $this->testGetRSVPTemplateById($summit_id);

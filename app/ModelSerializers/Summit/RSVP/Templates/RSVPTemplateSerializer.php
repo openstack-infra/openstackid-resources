@@ -21,9 +21,8 @@ use ModelSerializers\SilverStripeSerializer;
 final class RSVPTemplateSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-
         'Title'        => 'title:json_string',
-        'Enabled'      => 'is_enable:json_boolean',
+        'Enabled'      => 'is_enabled:json_boolean',
         'CreatedById'  => 'created_by_id:json_int',
         'SummitId'     => 'summit_id:json_int',
     ];

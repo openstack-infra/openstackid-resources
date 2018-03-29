@@ -14,12 +14,15 @@
 use App\Models\Foundation\Summit\Events\RSVP\RSVPMultiValueQuestionTemplate;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionTemplate;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionValueTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
+use App\Models\Foundation\Summit\Factories\SummitRSVPTemplateFactory;
 use App\Models\Foundation\Summit\Factories\SummitRSVPTemplateQuestionFactory;
 use App\Models\Foundation\Summit\Factories\SummitRSVPTemplateQuestionValueFactory;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\Member;
 use models\summit\Summit;
 /**
  * Class RSVPTemplateService
@@ -43,6 +46,88 @@ final class RSVPTemplateService
     {
         parent::__construct($tx_service);
         $this->rsvp_template_repository = $rsvp_template_repository;
+    }
+
+    /**
+     * @param Summit $summit
+     * @param Member|null $creator
+     * @param array $payload
+     * @return RSVPTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addTemplate(Summit $summit, Member $creator, array $payload)
+    {
+        return $this->tx_service->transaction(function() use($summit, $creator, $payload){
+
+            $former_template = $summit->getRSVPTemplateByTitle($payload['title']);
+
+            if(!is_null($former_template)){
+                throw new ValidationException
+                (
+                    trans('validation_errors.RSVPTemplateService.addTemplate.TitleAlreadyExists'),
+                    [
+                        'title'     => $payload['title'],
+                        'summit_id' => $summit->getId()
+                    ]
+                );
+            }
+
+            $template = SummitRSVPTemplateFactory::build($payload);
+
+            if(!is_null($creator))
+                $template->setCreatedBy($creator);
+
+            $summit->addRSVPTemplate($template);
+
+            return $template;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param array $payload
+     * @return RSVPTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateTemplate(Summit $summit, $template_id, array $payload)
+    {
+        return $this->tx_service->transaction(function() use($summit, $template_id, $payload){
+
+            if(isset($payload['title'])) {
+                $former_template = $summit->getRSVPTemplateByTitle($payload['title']);
+
+                if (!is_null($former_template) && $former_template->getId() != $template_id) {
+                    throw new ValidationException
+                    (
+                        trans('validation_errors.RSVPTemplateService.updateTemplate.TitleAlreadyExists',
+                            [
+                                'title' => $payload['title'],
+                                'summit_id' => $summit->getId()
+                            ]
+                        )
+                    );
+                }
+            }
+
+            $template = $summit->getRSVPTemplateById($template_id);
+
+            if(is_null($template)){
+                throw new EntityNotFoundException
+                (
+                    trans('not_found_errors.RSVPTemplateService.updateTemplate.TemplateNotFound',
+                        [
+                            'template_id' => $template_id,
+                            'summit_id'   => $summit->getId()
+                        ]
+                    )
+                );
+            }
+
+            return SummitRSVPTemplateFactory::populate($template, $payload);
+        });
     }
 
     /**
@@ -508,4 +593,5 @@ final class RSVPTemplateService
 
         });
     }
+
 }

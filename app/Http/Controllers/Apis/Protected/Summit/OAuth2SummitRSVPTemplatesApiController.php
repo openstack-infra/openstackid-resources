@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
@@ -52,9 +53,15 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
     private $rsvp_template_service;
 
     /**
+     * @var IMemberRepository
+     */
+    private $member_repository;
+
+    /**
      * OAuth2SummitRSVPTemplatesApiController constructor.
      * @param ISummitRepository $summit_repository
      * @param IRSVPTemplateRepository $rsvp_template_repository
+     * @param IMemberRepository $member_repository
      * @param IRSVPTemplateService $rsvp_template_service
      * @param IResourceServerContext $resource_server_context
      */
@@ -62,15 +69,21 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
     (
         ISummitRepository $summit_repository,
         IRSVPTemplateRepository $rsvp_template_repository,
+        IMemberRepository $member_repository,
         IRSVPTemplateService $rsvp_template_service,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
         $this->summit_repository        = $summit_repository;
+        $this->member_repository        = $member_repository;
         $this->rsvp_template_service    = $rsvp_template_service;
         $this->rsvp_template_repository = $rsvp_template_repository;
     }
+
+    /**
+     *  Template endpoints
+     */
 
     /**
      * @param $summit_id
@@ -228,6 +241,102 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
         {
             Log::warning($ex2);
             return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function addRSVPTemplate($summit_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $payload = Input::json()->all();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitRSVPTemplateValidationRulesFactory::build($payload);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $current_member = null;
+            if(!is_null($this->resource_server_context->getCurrentUserExternalId())){
+                $current_member = $this->member_repository->getById($this->resource_server_context->getCurrentUserExternalId());
+            }
+
+            $template = $this->rsvp_template_service->addTemplate($summit, $current_member, $payload);
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($template)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $template_id
+     * @return mixed
+     */
+    public function updateRSVPTemplate($summit_id, $template_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $payload = Input::json()->all();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitRSVPTemplateValidationRulesFactory::build($payload, true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $template = $this->rsvp_template_service->updateTemplate($summit, $template_id, $payload);
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($template)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
         }
         catch (Exception $ex) {
             Log::error($ex);
@@ -457,7 +566,7 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $rules = SummitRSVPTemplateQuestionValueValidationRulesFactory::build($payload, true);
+            $rules = SummitRSVPTemplateQuestionValueValidationRulesFactory::build($payload);
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($payload, $rules);
 

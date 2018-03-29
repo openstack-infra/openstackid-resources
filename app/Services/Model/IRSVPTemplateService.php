@@ -13,8 +13,10 @@
  **/
 use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionTemplate;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPQuestionValueTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\Member;
 use models\summit\Summit;
 /**
  * Interface IRSVPTemplateService
@@ -22,6 +24,26 @@ use models\summit\Summit;
  */
 interface IRSVPTemplateService
 {
+    /**
+     * @param Summit $summit
+     * @param Member|null $creator
+     * @param array $payload
+     * @return RSVPTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addTemplate(Summit $summit, Member $creator, array $payload);
+
+    /**
+     * @param Summit $summit
+     * @param int $template_id
+     * @param array $payload
+     * @return RSVPTemplate
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function updateTemplate(Summit $summit, $template_id, array $payload);
+
     /**
      * @param Summit $summit
      * @param int $template_id

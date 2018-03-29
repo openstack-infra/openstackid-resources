@@ -55,6 +55,8 @@ return [
     'RSVPTemplateService.addQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
     'RSVPTemplateService.updateQuestion.QuestionNameAlreadyExists' => 'question name :name already exists for template :template_id',
     'RSVPTemplateService.addQuestionValue.ValueAlreadyExist' => 'value :value already exists on question :question_id',
+    'RSVPTemplateService.addTemplate.TitleAlreadyExists' => 'title :title already exists on summit :summit_id',
+    'RSVPTemplateService.updateTemplate.TitleAlreadyExists' => 'title :title already exists on summit :summit_id',
     // SummitTicketTypeService
     'SummitTicketTypeService.addTicketType.NameAlreadyExists' => 'ticket name :name already exists on summit :summit_id',
     'SummitTicketTypeService.addTicketType.ExternalIdAlreadyExists' => 'ticket external id :external_id already exists on summit :summit_id',
@@ -63,4 +65,6 @@ return [
     'SummitTicketTypeService.seedSummitTicketTypesFromEventBrite.MissingExternalId' => 'summit :summit_is has not set external id (eventbrite)',
     // PresentationCategoryGroupService
     'PresentationCategoryGroupService.addTrackGroup.NameAlreadyExists' => 'name :name already exists for summit :summit_id',
+
+
 ];

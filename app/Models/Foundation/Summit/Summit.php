@@ -1752,10 +1752,34 @@ SQL;
     }
 
     /**
+     * @param string $rsvp_template_title
+     * @return RSVPTemplate|null
+     */
+    public function getRSVPTemplateByTitle($rsvp_template_title){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('title', trim($rsvp_template_title)));
+        $rsvp_template = $this->rsvp_templates->matching($criteria)->first();
+        return $rsvp_template === false ? null : $rsvp_template;
+    }
+
+
+    /**
+     * @param RSVPTemplate $template
+     * @return $this
+     */
+    public function addRSVPTemplate(RSVPTemplate $template){
+        if($this->rsvp_templates->contains($template)) return;
+        $this->rsvp_templates->add($template);
+        $template->setSummit($this);
+        return $this;
+    }
+
+    /**
      * @param RSVPTemplate $template
      * @return $this
      */
     public function removeRSVPTemplate(RSVPTemplate $template){
+        if(!$this->rsvp_templates->contains($template)) return;
         $this->rsvp_templates->removeElement($template);
         $template->clearSummit();
         return $this;
