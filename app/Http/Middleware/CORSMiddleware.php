@@ -179,9 +179,8 @@ class CORSMiddleware
 					$data = $this->cache_service->getHash($cache_id, CORSRequestPreflightData::$cache_attributes);
 					if (!count($data))
 					{
-						$response = new Response();
-						$response->setStatusCode(403);
-						return $response;
+					    // there wasnt preflight so just regular processing
+						return null;
 					}
 					// ----Step 2b: Check that pre-flight information declared during the pre-flight request match the current request on key information
 					$match  = false;
