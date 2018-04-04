@@ -1,6 +1,6 @@
-<?php namespace models\summit;
+<?php namespace App\Events;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,36 +11,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IBaseRepository;
+use Illuminate\Queue\SerializesModels;
+
 /**
- * Interface ISummitRepository
- * @package models\summit
+ * Class SummitAction
+ * @package App\Events
  */
-interface ISummitRepository extends IBaseRepository
+class SummitAction
 {
-    /**
-     * @return Summit
-     */
-    public function getCurrent();
+    use SerializesModels;
 
     /**
-     * @return Summit
+     * @var int
      */
-    public function getActive();
+    protected $summit_id;
 
     /**
-     * @return Summit[]
+     * SummitAction constructor.
+     * @param int $summit_id
      */
-    public function getAvailables();
+    public function __construct($summit_id)
+    {
+        $this->summit_id = $summit_id;
+    }
 
     /**
-     * @return Summit[]
+     * @return int
      */
-    public function getAllOrderedByBeginDate();
-
-    /**
-     * @param string $name
-     * @return Summit
-     */
-    public function getByName($name);
+    public function getSummitId()
+    {
+        return $this->summit_id;
+    }
 }

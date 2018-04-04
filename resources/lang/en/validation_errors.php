@@ -67,5 +67,6 @@ return [
     'PresentationCategoryGroupService.addTrackGroup.NameAlreadyExists' => 'name :name already exists for summit :summit_id',
     // SummitService
     'SummitService.AddSummit.NameAlreadyExists' => 'name :name its already being assigned to another summit',
-
+    'SummitService.updateSummit.NameAlreadyExists'=> 'name :name its already being assigned to another summit',
+    'SummitService.updateSummit.SummitAlreadyActive' => 'summit :active_summit_id is already activated please deactivate it to set current summit as active'
 ];

@@ -184,6 +184,68 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         return $summit;
     }
 
+    public function testUpdateSummitAlreadyActiveError(){
+        $summit = $this->testAddSummit();
+        $params = [
+            'id' => $summit->id
+        ];
+        $data = [
+             'active' => 1
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitApiController@updateSummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+    }
+
+    public function testUpdateSummitTitle(){
+        $summit = $this->testAddSummit();
+        $params = [
+            'id' => $summit->id
+        ];
+        $data = [
+            'name' => $summit->name.' update!'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitApiController@updateSummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $summit = json_decode($content);
+        $this->assertTrue(!is_null($summit));
+
+        return $summit;
+    }
+
     public function testGetSummitMin($summit_id = 23)
     {
 

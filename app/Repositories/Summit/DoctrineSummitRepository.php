@@ -89,4 +89,20 @@ final class DoctrineSummitRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    /**
+     * @return Summit
+     */
+    public function getActive()
+    {
+        $res = $this->getEntityManager()->createQueryBuilder()
+            ->select("s")
+            ->from(\models\summit\Summit::class, "s")
+            ->where('s.active = 1')
+            ->orderBy('s.begin_date', 'DESC')
+            ->getQuery()
+            ->getResult();
+        if (count($res) == 0) return null;
+        return $res[0];
+    }
 }

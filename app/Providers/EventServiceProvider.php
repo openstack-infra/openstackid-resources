@@ -32,6 +32,7 @@ use App\Factories\EntityEvents\PresentationMaterialUpdatedEntityEventFactory;
 use App\Factories\EntityEvents\PresentationSpeakerCreatedEntityEventFactory;
 use App\Factories\EntityEvents\PresentationSpeakerDeletedEntityEventFactory;
 use App\Factories\EntityEvents\PresentationSpeakerUpdatedEntityEventFactory;
+use App\Factories\EntityEvents\SummitActionEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventCreatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventDeletedEntityEventFactory;
 use App\Factories\EntityEvents\SummitEventTypeActionEntityEventFactory;
@@ -303,6 +304,18 @@ final class EventServiceProvider extends ServiceProvider
         Event::listen(\App\Events\TrackGroupDeleted::class, function($event)
         {
             EntityEventPersister::persist(TrackGroupActionActionEntityEventFactory::build($event, 'DELETE'));
+        });
+
+        // summits
+
+        Event::listen(\App\Events\SummitUpdated::class, function($event)
+        {
+            EntityEventPersister::persist(SummitActionEntityEventFactory::build($event, 'UPDATE'));
+        });
+
+        Event::listen(\App\Events\SummitDeleted::class, function($event)
+        {
+            EntityEventPersister::persist(SummitActionEntityEventFactory::build($event, 'DELETE'));
         });
     }
 }

@@ -68,4 +68,6 @@ return [
     'PresentationCategoryGroupService.associateAllowedGroup2TrackGroup.GroupNotFound' => 'group :group_id does not exists.',
     'PresentationCategoryGroupService.disassociateAllowedGroup2TrackGroup.TrackGroupNotFound' => 'track group :track_group_id does not exists on summit :summit_id',
     'PresentationCategoryGroupService.disassociateAllowedGroup2TrackGroup.GroupNotFound' => 'group :group_id does not exists.',
+    'SummitService.updateSummit.SummitNotFound' => 'summit :summit_id not found',
+    'SummitService.deleteSummit.SummitNotFound' => 'summit :summit_id not found',
 ];

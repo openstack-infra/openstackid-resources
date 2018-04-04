@@ -15,6 +15,8 @@ use App\Events\MyFavoritesAdd;
 use App\Events\MyFavoritesRemove;
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
+use App\Events\SummitDeleted;
+use App\Events\SummitUpdated;
 use App\Http\Utils\FileUploader;
 use App\Models\Foundation\Summit\Factories\SummitFactory;
 use App\Models\Utils\IntervalParser;
@@ -1525,6 +1527,54 @@ final class SummitService extends AbstractService implements ISummitService
     {
         return $this->tx_service->transaction(function () use ($summit_id, $data) {
 
+            if(isset($data['name'])) {
+
+                $former_summit = $this->summit_repository->getByName(trim($data['name']));
+                if (!is_null($former_summit) && $former_summit->getId() != $summit_id) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.SummitService.updateSummit.NameAlreadyExists',
+                            ['name' => $data['name']]
+                        )
+                    );
+                }
+            }
+
+            if(isset($data['active'])) {
+                $active = boolval($data['active']);
+                $active_summit = $this->summit_repository->getActive();
+                if ($active && !is_null($active_summit) && $active_summit->getId() != $summit_id) {
+                    throw new ValidationException
+                    (
+                        trans
+                        (
+                            'validation_errors.SummitService.updateSummit.SummitAlreadyActive',
+                            ['active_summit_id' => $active_summit->getId()]
+                        )
+                    );
+                }
+            }
+
+            $summit = $this->summit_repository->getById($summit_id);
+
+            if(is_null($summit)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.SummitService.updateSummit.SummitNotFound',
+                        ['summit_id' => $summit_id]
+                    )
+                );
+            }
+
+            $summit =  SummitFactory::populate($summit, $data);
+
+            Event::fire(new SummitUpdated($summit_id));
+
+            return $summit;
         });
     }
 
@@ -1537,6 +1587,23 @@ final class SummitService extends AbstractService implements ISummitService
     public function deleteSummit($summit_id)
     {
         return $this->tx_service->transaction(function () use ($summit_id) {
+
+            $summit = $this->summit_repository->getById($summit_id);
+
+            if(is_null($summit)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.SummitService.deleteSummit.SummitNotFound',
+                        ['summit_id' => $summit_id]
+                    )
+                );
+            }
+
+            $this->summit_repository->delete($summit);
+
+            Event::fire(new SummitDeleted($summit_id));
 
         });
     }
