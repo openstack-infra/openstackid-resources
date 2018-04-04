@@ -246,6 +246,34 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         return $summit;
     }
 
+    public function testDeleteSummit(){
+
+        $summit = $this->testAddSummit();
+        $params = [
+            'id' => $summit->id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitApiController@deleteSummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+
+    }
+
     public function testGetSummitMin($summit_id = 23)
     {
 

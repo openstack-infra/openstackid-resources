@@ -14,7 +14,6 @@
 use Doctrine\ORM\Cache;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SummitWIFIConnection")

@@ -13,6 +13,7 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
+use App\Models\Foundation\Summit\TrackTagGroup;
 use App\Models\Utils\TimeZoneUtils;
 use DateTime;
 use DateTimeZone;
@@ -184,7 +185,6 @@ class Summit extends SilverstripeBaseModel
      */
     private $calendar_sync_desc;
 
-
     /**
      * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
      */
@@ -205,6 +205,12 @@ class Summit extends SilverstripeBaseModel
      * @var SummitWIFIConnection[]
      */
     private $wifi_connections;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\TrackTagGroup", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @var TrackTagGroup[]
+     */
+    private $track_tag_groups;
 
     /**
      * @ORM\OneToMany(targetEntity="SummitRegistrationPromoCode", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
@@ -292,16 +298,6 @@ class Summit extends SilverstripeBaseModel
      * @var PresentationCategory[]
      */
     private $excluded_categories_for_upload_slide_decks;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\main\Tag")
-     * @ORM\JoinTable(name="Summit_CategoryDefaultTags",
-     *      joinColumns={@ORM\JoinColumn(name="SummitID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="TagID", referencedColumnName="ID")}
-     * )
-     * @var Tag[]
-     */
-    private $category_default_tags;
 
     /**
      * @return string
@@ -564,8 +560,8 @@ class Summit extends SilverstripeBaseModel
         $this->excluded_categories_for_alternate_presentations = new ArrayCollection;
         $this->excluded_categories_for_rejected_presentations = new ArrayCollection;
         $this->excluded_categories_for_upload_slide_decks = new ArrayCollection;
-        $this->category_default_tags = new ArrayCollection;
         $this->rsvp_templates = new ArrayCollection;
+        $this->track_tag_groups = new ArrayCollection;
     }
 
     /**
@@ -1765,14 +1761,6 @@ SQL;
     public function getExcludedCategoriesForUploadSlideDecks()
     {
         return $this->excluded_categories_for_upload_slide_decks->toArray();
-    }
-
-    /**
-     * @return Tag[]
-     */
-    public function getCategoryDefaultTags()
-    {
-        return $this->category_default_tags->toArray();
     }
 
     /**
