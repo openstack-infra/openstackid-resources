@@ -196,4 +196,29 @@ interface ISummitService
      * @return bool
      */
     public function updateEvents(Summit $summit, array $data);
+
+    /**
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return Summit
+     */
+    public function addSummit(array $data);
+
+    /**
+     * @param int $summit_id
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return Summit
+     */
+    public function updateSummit($summit_id, array $data);
+
+    /**
+     * @param int $summit_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSummit($summit_id);
 }

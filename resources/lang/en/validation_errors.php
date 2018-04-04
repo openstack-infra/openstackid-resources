@@ -65,6 +65,7 @@ return [
     'SummitTicketTypeService.seedSummitTicketTypesFromEventBrite.MissingExternalId' => 'summit :summit_is has not set external id (eventbrite)',
     // PresentationCategoryGroupService
     'PresentationCategoryGroupService.addTrackGroup.NameAlreadyExists' => 'name :name already exists for summit :summit_id',
-
+    // SummitService
+    'SummitService.AddSummit.NameAlreadyExists' => 'name :name its already being assigned to another summit',
 
 ];

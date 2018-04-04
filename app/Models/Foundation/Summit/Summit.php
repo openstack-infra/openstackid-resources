@@ -13,6 +13,7 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
+use App\Models\Utils\TimeZoneUtils;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -44,6 +45,30 @@ class Summit extends SilverstripeBaseModel
      * @var string
      */
     private $dates_label;
+
+    /**
+     * @ORM\Column(name="Link", type="string")
+     * @var string
+     */
+    private $link;
+
+    /**
+     * @ORM\Column(name="Slug", type="string")
+     * @var string
+     */
+    private $slug;
+
+    /**
+     * @ORM\Column(name="RegistrationLink", type="string")
+     * @var string
+     */
+    private $registration_link;
+
+    /**
+     * @ORM\Column(name="MaxSubmissionAllowedPerUser", type="integer")
+     * @var int
+     */
+    private $max_submission_allowed_per_user;
 
     /**
      * @ORM\Column(name="SummitBeginDate", type="datetime")
@@ -146,6 +171,19 @@ class Summit extends SilverstripeBaseModel
      * @var string
      */
     private $time_zone_id;
+
+    /**
+     * @ORM\Column(name="CalendarSyncName", type="string")
+     * @var string
+     */
+    private $calendar_sync_name;
+
+    /**
+     * @ORM\Column(name="CalendarSyncDescription", type="string")
+     * @var string
+     */
+    private $calendar_sync_desc;
+
 
     /**
      * @ORM\OneToMany(targetEntity="SummitAbstractLocation", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
@@ -342,7 +380,7 @@ class Summit extends SilverstripeBaseModel
      */
     public function setScheduleDefaultStartDate($schedule_default_start_date)
     {
-        $this->schedule_default_start_date = $schedule_default_start_date;
+        $this->schedule_default_start_date = $this->convertDateFromTimeZone2UTC($schedule_default_start_date);
     }
 
     /**
@@ -358,7 +396,7 @@ class Summit extends SilverstripeBaseModel
      */
     public function setBeginDate($begin_date)
     {
-        $this->begin_date = $begin_date;
+       $this->begin_date = $this->convertDateFromTimeZone2UTC($begin_date);
     }
 
     /**
@@ -374,7 +412,7 @@ class Summit extends SilverstripeBaseModel
      */
     public function setEndDate($end_date)
     {
-        $this->end_date = $end_date;
+        $this->end_date = $this->convertDateFromTimeZone2UTC($end_date);
     }
 
     /**
@@ -406,7 +444,7 @@ class Summit extends SilverstripeBaseModel
      */
     public function setStartShowingVenuesDate($start_showing_venues_date)
     {
-        $this->start_showing_venues_date = $start_showing_venues_date;
+        $this->start_showing_venues_date = $this->convertDateFromTimeZone2UTC($start_showing_venues_date);
     }
 
     /**
@@ -499,12 +537,18 @@ class Summit extends SilverstripeBaseModel
     }
 
 
+    const DefaultMaxSubmissionAllowedPerUser = 3;
     /**
      * Summit constructor.
      */
     public function __construct()
     {
         parent::__construct();
+        // default values
+        $this->active  = false;
+        $this->available_on_api = false;
+        $this->max_submission_allowed_per_user = self::DefaultMaxSubmissionAllowedPerUser;
+
         $this->locations = new ArrayCollection;
         $this->events = new ArrayCollection;
         $this->event_types = new ArrayCollection;
@@ -558,14 +602,7 @@ class Summit extends SilverstripeBaseModel
      */
     public function getTimeZone()
     {
-        $time_zone_id = $this->time_zone_id;
-        if (empty($time_zone_id)) return null;
-        $time_zone_list = timezone_identifiers_list();
-        if (isset($time_zone_list[$time_zone_id])) {
-            $time_zone_name = $time_zone_list[$time_zone_id];
-            return new DateTimeZone($time_zone_name);
-        }
-        return null;
+        return TimeZoneUtils::getTimeZoneById($this->time_zone_id);
     }
 
     /**
@@ -1400,11 +1437,25 @@ SQL;
     }
 
     /**
+     * @param DateTime $submission_begin_date
+     */
+    public function setSubmissionBeginDate(DateTime $submission_begin_date){
+        $this->submission_begin_date = $this->convertDateFromTimeZone2UTC($submission_begin_date);
+    }
+
+    /**
      * @return DateTime
      */
     public function getSubmissionEndDate()
     {
         return $this->submission_end_date;
+    }
+
+    /**
+     * @param DateTime $submission_end_date
+     */
+    public function setSubmissionEndDate(DateTime $submission_end_date){
+        $this->submission_end_date = $this->convertDateFromTimeZone2UTC($submission_end_date);
     }
 
     /**
@@ -1416,11 +1467,25 @@ SQL;
     }
 
     /**
+     * @param DateTime $voting_begin_date
+     */
+    public function setVotingBeginDate(DateTime $voting_begin_date){
+        $this->voting_begin_date = $this->convertDateFromTimeZone2UTC($voting_begin_date);
+    }
+
+    /**
      * @return DateTime
      */
     public function getVotingEndDate()
     {
         return $this->voting_end_date;
+    }
+
+    /**
+     * @param DateTime $voting_end_date
+     */
+    public function setVotingEndDate(DateTime $voting_end_date){
+        $this->voting_end_date = $this->convertDateFromTimeZone2UTC($voting_end_date);
     }
 
     /**
@@ -1432,11 +1497,25 @@ SQL;
     }
 
     /**
+     * @param DateTime $selection_begin_date
+     */
+    public function setSelectionBeginDate(DateTime $selection_begin_date){
+        $this->selection_begin_date = $this->convertDateFromTimeZone2UTC($selection_begin_date);
+    }
+
+    /**
      * @return DateTime
      */
     public function getSelectionEndDate()
     {
         return $this->selection_end_date;
+    }
+
+    /**
+     * @param DateTime $selection_end_date
+     */
+    public function setSelectionEndDate(DateTime $selection_end_date){
+        $this->selection_end_date = $this->convertDateFromTimeZone2UTC($selection_end_date);
     }
 
     /**
@@ -1448,6 +1527,13 @@ SQL;
     }
 
     /**
+     * @param DateTime $registration_begin_date
+     */
+    public function setRegistrationBeginDate(DateTime $registration_begin_date){
+        $this->registration_begin_date = $this->convertDateFromTimeZone2UTC($registration_begin_date);
+    }
+
+    /**
      * @return DateTime
      */
     public function getRegistrationEndDate()
@@ -1455,6 +1541,12 @@ SQL;
         return $this->registration_end_date;
     }
 
+    /**
+     * @param DateTime $registration_end_date
+     */
+    public function setRegistrationEndDate(DateTime $registration_end_date){
+        $this->registration_end_date = $this->convertDateFromTimeZone2UTC($registration_end_date);
+    }
 
     /**
      * @return int
@@ -1628,7 +1720,7 @@ SQL;
     public function removePromoCode(SummitRegistrationPromoCode $promo_code)
     {
         $this->promo_codes->removeElement($promo_code);
-        $promo_code->setSummit(null);
+        $promo_code->clearSummit();
         return $this;
     }
 
@@ -1639,7 +1731,7 @@ SQL;
     public function removeEventType(SummitEventType $event_type)
     {
         $this->event_types->removeElement($event_type);
-        $event_type->setSummit(null);
+        $event_type->clearSummit();
         return $this;
     }
 
@@ -1712,8 +1804,8 @@ SQL;
      */
     public function removeTicketType(SummitTicketType $ticket_type)
     {
-        $this->ticket_types->remove($ticket_type);
-        $ticket_type->clearSummit($this);
+        $this->ticket_types->removeElement($ticket_type);
+        $ticket_type->clearSummit();
         return $this;
     }
 
@@ -1857,4 +1949,69 @@ SQL;
         $location->setSummit(null);
         return $this;
     }
+
+    /**
+     * @param string $calendar_sync_name
+     */
+    public function setCalendarSyncName($calendar_sync_name)
+    {
+        $this->calendar_sync_name = $calendar_sync_name;
+    }
+
+    /**
+     * @param string $calendar_sync_desc
+     */
+    public function setCalendarSyncDesc($calendar_sync_desc)
+    {
+        $this->calendar_sync_desc = $calendar_sync_desc;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLink()
+    {
+        return $this->link;
+    }
+
+    /**
+     * @param string $link
+     */
+    public function setLink($link)
+    {
+        $this->link = $link;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegistrationLink()
+    {
+        return $this->registration_link;
+    }
+
+    /**
+     * @param string $registration_link
+     */
+    public function setRegistrationLink($registration_link)
+    {
+        $this->registration_link = $registration_link;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxSubmissionAllowedPerUser()
+    {
+        return $this->max_submission_allowed_per_user;
+    }
+
+    /**
+     * @param int $max_submission_allowed_per_user
+     */
+    public function setMaxSubmissionAllowedPerUser($max_submission_allowed_per_user)
+    {
+        $this->max_submission_allowed_per_user = $max_submission_allowed_per_user;
+    }
+
 }

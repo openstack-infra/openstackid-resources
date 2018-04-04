@@ -165,8 +165,10 @@ Route::group([
 
         Route::get('',  [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summits_response_lifetime', 600), 'uses' => 'OAuth2SummitApiController@getSummits']);
         Route::get('all', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@getAllSummits']);
+        Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@addSummit']);
         Route::group(['prefix' => '{id}'], function () {
-
+            Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@updateSummit']);
+            Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@deleteSummit']);
             // rsvp templates
             Route::group(['prefix' => 'rsvp-templates'], function () {
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getAllBySummit']);

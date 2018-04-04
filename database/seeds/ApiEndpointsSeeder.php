@@ -79,6 +79,7 @@ class ApiEndpointsSeeder extends Seeder
                 'http_method' => 'GET',
                 'scopes' => [
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm),
                 ],
             ],
             [
@@ -96,6 +97,30 @@ class ApiEndpointsSeeder extends Seeder
                 'scopes' => [
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-summit',
+                'route' => '/api/v1/summits',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                ],
+            ],
+            [
+                'name' => 'update-summit',
+                'route' => '/api/v1/summits/{id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                ],
+            ],
+            [
+                'name' => 'delete-summit',
+                'route' => '/api/v1/summits/{id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
                 ],
             ],
             [

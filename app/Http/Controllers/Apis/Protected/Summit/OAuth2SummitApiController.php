@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use Exception;
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
@@ -23,6 +24,7 @@ use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
+use ModelSerializers\ISerializerTypeSelector;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
 use utils\PagingResponse;
@@ -36,7 +38,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
     /**
      * @var ISummitService
      */
-    private $service;
+    private $summit_service;
 
     /**
      * @var ISpeakerRepository
@@ -53,22 +55,39 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
      */
     private $event_feedback_repository;
 
+    /**
+     * @var ISerializerTypeSelector
+     */
+    private $serializer_type_selector;
 
+    /**
+     * OAuth2SummitApiController constructor.
+     * @param ISummitRepository $summit_repository
+     * @param ISummitEventRepository $event_repository
+     * @param ISpeakerRepository $speaker_repository
+     * @param IEventFeedbackRepository $event_feedback_repository
+     * @param ISummitService $summit_service
+     * @param ISerializerTypeSelector $serializer_type_selector
+     * @param IResourceServerContext $resource_server_context
+     */
     public function __construct
     (
         ISummitRepository $summit_repository,
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
-        ISummitService $service,
+        ISummitService $summit_service,
+        ISerializerTypeSelector $serializer_type_selector,
         IResourceServerContext $resource_server_context
     ) {
         parent::__construct($resource_server_context);
+
         $this->repository                = $summit_repository;
         $this->speaker_repository        = $speaker_repository;
         $this->event_repository          = $event_repository;
         $this->event_feedback_repository = $event_feedback_repository;
-        $this->service                   = $service;
+        $this->serializer_type_selector  = $serializer_type_selector;
+        $this->summit_service            = $summit_service;
     }
 
     /**
@@ -154,8 +173,119 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($summit)->serialize($expand));
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($summit, $serializer_type)->serialize($expand));
         } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function addSummit(){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $payload = Input::json()->all();
+
+            $rules = SummitValidationRulesFactory::build($payload);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+
+            $summit = $this->summit_service->addSummit($payload);
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($summit, $serializer_type)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function updateSummit($summit_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $payload = Input::json()->all();
+
+            $rules = SummitValidationRulesFactory::build($payload, true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $summit = $this->summit_service->updateSummit($summit_id, $payload);
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($summit, $serializer_type)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function deleteSummit($summit_id){
+        try {
+
+            $this->summit_service->deleteSummit($summit_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -217,7 +347,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
                 $from_date = new \DateTime("@$from_date");
             }
 
-            list($last_event_id, $last_event_date, $list) = $this->service->getSummitEntityEvents
+            list($last_event_id, $last_event_date, $list) = $this->summit_service->getSummitEntityEvents
             (
                 $summit,
                 $this->resource_server_context->getCurrentUserExternalId(),
@@ -254,7 +384,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
         try {
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            $order = $this->service->getExternalOrder($summit, $external_order_id);
+            $order = $this->summit_service->getExternalOrder($summit, $external_order_id);
             return $this->ok($order);
         }
         catch (EntityNotFoundException $ex1) {
@@ -286,7 +416,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
                 throw new \HTTP401UnauthorizedException;
             }
 
-            $attendee = $this->service->confirmExternalOrderAttendee
+            $attendee = $this->summit_service->confirmExternalOrderAttendee
             (
                 new ConfirmationExternalOrderRequest
                 (

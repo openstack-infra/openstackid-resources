@@ -36,6 +36,7 @@ use App\ModelSerializers\Marketplace\SpokenLanguageSerializer;
 use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
+use App\ModelSerializers\Summit\AdminSummitSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPDropDownQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPMultiValueQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPQuestionValueTemplateSerializer;
@@ -87,7 +88,12 @@ final class SerializerRegistry
 
     private function __construct()
     {
-        $this->registry['Summit']                     = SummitSerializer::class;
+        $this->registry['Summit']        =
+            [
+                self::SerializerType_Public  =>  SummitSerializer::class,
+                self::SerializerType_Private =>  AdminSummitSerializer::class
+            ];
+
         $this->registry['SummitWIFIConnection']       = SummitWIFIConnectionSerializer::class;
         $this->registry['SummitType']                 = SummitTypeSerializer::class;
         $this->registry['SummitEventType']            = SummitEventTypeSerializer::class;

@@ -70,6 +70,10 @@ class SummitRegistrationPromoCode extends SilverstripeBaseModel
         return $this->summit;
     }
 
+    public function clearSummit(){
+        $this->summit = null;
+    }
+
     /**
      * @return int
      */

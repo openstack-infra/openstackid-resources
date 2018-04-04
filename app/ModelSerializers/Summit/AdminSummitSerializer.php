@@ -1,6 +1,6 @@
-<?php namespace models\summit;
+<?php namespace App\ModelSerializers\Summit;
 /**
- * Copyright 2015 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,31 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IBaseRepository;
+use ModelSerializers\SummitSerializer;
 /**
- * Interface ISummitRepository
- * @package models\summit
+ * Class AdminSummitSerializer
+ * @package App\ModelSerializers\Summit
  */
-interface ISummitRepository extends IBaseRepository
+final class AdminSummitSerializer extends SummitSerializer
 {
-    /**
-     * @return Summit
-     */
-    public function getCurrent();
-
-    /**
-     * @return Summit[]
-     */
-    public function getAvailables();
-
-    /**
-     * @return Summit[]
-     */
-    public function getAllOrderedByBeginDate();
-
-    /**
-     * @param string $name
-     * @return Summit
-     */
-    public function getByName($name);
+    protected static $array_mappings = [
+        'AvailableOnApi' => 'available_on_api:json_boolean',
+        'MaxSubmissionAllowedPerUser' => 'max_submission_allowed_per_user:json_int',
+        'RegistrationLink' => 'registration_link:json_string',
+        'Link' => 'link:json_string',
+    ];
 }

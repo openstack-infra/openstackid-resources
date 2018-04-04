@@ -16,7 +16,9 @@ use App\Events\MyFavoritesRemove;
 use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use App\Http\Utils\FileUploader;
+use App\Models\Foundation\Summit\Factories\SummitFactory;
 use App\Models\Utils\IntervalParser;
+use App\Models\Utils\TimeZoneUtils;
 use App\Services\Model\AbstractService;
 use App\Services\Model\IFolderService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -44,6 +46,7 @@ use models\summit\ISummitAttendeeRepository;
 use models\summit\ISummitAttendeeTicketRepository;
 use models\summit\ISummitEntityEventRepository;
 use models\summit\ISummitEventRepository;
+use models\summit\ISummitRepository;
 use models\summit\Presentation;
 use models\summit\PresentationType;
 use models\summit\Summit;
@@ -72,9 +75,7 @@ use DateInterval;
  * Class SummitService
  * @package services\model
  */
-final class SummitService
-    extends AbstractService
-    implements ISummitService
+final class SummitService extends AbstractService implements ISummitService
 {
 
     /**
@@ -149,7 +150,13 @@ final class SummitService
     private $group_repository;
 
     /**
+     * @var ISummitRepository
+     */
+    private $summit_repository;
+
+    /**
      * SummitService constructor.
+     * @param ISummitRepository $summit_repository
      * @param ISummitEventRepository $event_repository
      * @param ISpeakerRepository $speaker_repository
      * @param ISummitEntityEventRepository $entity_events_repository
@@ -167,6 +174,7 @@ final class SummitService
      */
     public function __construct
     (
+        ISummitRepository               $summit_repository,
         ISummitEventRepository          $event_repository,
         ISpeakerRepository              $speaker_repository,
         ISummitEntityEventRepository    $entity_events_repository,
@@ -184,6 +192,7 @@ final class SummitService
     )
     {
         parent::__construct($tx_service);
+        $this->summit_repository                     = $summit_repository;
         $this->event_repository                      = $event_repository;
         $this->speaker_repository                    = $speaker_repository;
         $this->entity_events_repository              = $entity_events_repository;
@@ -1470,6 +1479,65 @@ final class SummitService
             }
 
             return true;
+        });
+    }
+
+    /**
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return Summit
+     */
+    public function addSummit(array $data)
+    {
+        return $this->tx_service->transaction(function () use ($data) {
+
+            $name = trim($data['name']);
+            $former_summit = $this->summit_repository->getByName($name);
+            if(!is_null($former_summit)){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.SummitService.AddSummit.NameAlreadyExists',
+                        ['name' => $name]
+                    )
+                );
+            }
+
+            $summit = SummitFactory::build($data);
+
+            $this->summit_repository->add($summit);
+
+            return $summit;
+
+        });
+    }
+
+    /**
+     * @param int $summit_id
+     * @param array $data
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return Summit
+     */
+    public function updateSummit($summit_id, array $data)
+    {
+        return $this->tx_service->transaction(function () use ($summit_id, $data) {
+
+        });
+    }
+
+    /**
+     * @param int $summit_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSummit($summit_id)
+    {
+        return $this->tx_service->transaction(function () use ($summit_id) {
+
         });
     }
 }

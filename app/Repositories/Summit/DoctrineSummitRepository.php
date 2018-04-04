@@ -74,4 +74,19 @@ final class DoctrineSummitRepository
     {
         return Summit::class;
     }
+
+    /**
+     * @param string $name
+     * @return Summit
+     */
+    public function getByName($name)
+    {
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select("s")
+            ->from(\models\summit\Summit::class, "s")
+            ->where('s.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

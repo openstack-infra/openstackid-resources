@@ -119,6 +119,71 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
+    public function testAddSummitAlreadyExistsName(){
+        $params = [
+        ];
+
+        $data = [
+            'name'         => 'Vancouver, BC',
+            'start_date'   => 1522853212,
+            'end_date'     => 1542853212,
+            'time_zone_id' => 'America/Argentina/Buenos_Aires'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitApiController@addSummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+    }
+
+    public function testAddSummit(){
+        $params = [
+        ];
+        $name        = str_random(16).'_summit';
+        $data = [
+            'name'         => $name,
+            'start_date'   => 1522853212,
+            'end_date'     => 1542853212,
+            'time_zone_id' => 'America/Argentina/Buenos_Aires'
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitApiController@addSummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $summit = json_decode($content);
+        $this->assertTrue(!is_null($summit));
+        return $summit;
+    }
+
     public function testGetSummitMin($summit_id = 23)
     {
 
