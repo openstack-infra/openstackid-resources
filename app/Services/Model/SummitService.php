@@ -701,6 +701,9 @@ final class SummitService extends AbstractService implements ISummitService
                     throw new ValidationException(sprintf('rsvp template id %s is not enabled', $data['rsvp_template_id']));
 
                 $event->setRSVPTemplate($rsvp_template);
+
+                $event->setRSVPMaxUserNumber(intval($data['rsvp_max_user_number']));
+                $event->setRSVPMaxUserWaitListNumber(intval($data['rsvp_max_user_wait_list_number']));
             }
 
             if (isset($data['head_count']))
