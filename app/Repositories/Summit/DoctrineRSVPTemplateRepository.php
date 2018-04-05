@@ -11,7 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Events\RSVP\RSVPCheckBoxListQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPDropDownQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPLiteralContentQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPMemberEmailQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPMemberFirstNameQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPMemberLastNameQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPRadioButtonListQuestionTemplate;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPTextAreaQuestionTemplate;
+use App\Models\Foundation\Summit\Events\RSVP\RSVPTextBoxQuestionTemplate;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Repositories\SilverStripeDoctrineRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -111,5 +120,24 @@ final class DoctrineRSVPTemplateRepository
             $paging_info->getLastPage($total),
             $data
         );
+    }
+
+    /**
+     * @param Summit $summit
+     * @return array
+     */
+    public function getQuestionsMetadata(Summit $summit)
+    {
+        return [
+            RSVPMemberEmailQuestionTemplate::getMetadata(),
+            RSVPMemberFirstNameQuestionTemplate::getMetadata(),
+            RSVPMemberLastNameQuestionTemplate::getMetadata(),
+            RSVPTextBoxQuestionTemplate::getMetadata(),
+            RSVPTextAreaQuestionTemplate::getMetadata(),
+            RSVPCheckBoxListQuestionTemplate::getMetadata(),
+            RSVPRadioButtonListQuestionTemplate::getMetadata(),
+            RSVPDropDownQuestionTemplate::getMetadata(),
+            RSVPLiteralContentQuestionTemplate::getMetadata(),
+        ];
     }
 }

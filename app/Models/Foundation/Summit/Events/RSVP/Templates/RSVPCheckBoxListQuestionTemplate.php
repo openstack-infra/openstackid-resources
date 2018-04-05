@@ -27,4 +27,15 @@ class RSVPCheckBoxListQuestionTemplate extends RSVPMultiValueQuestionTemplate
     public function getClassName(){
         return self::ClassName;
     }
+
+    public static $metadata = [
+        'class_name'  => self::ClassName,
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(RSVPMultiValueQuestionTemplate::getMetadata(), self::$metadata);
+    }
 }

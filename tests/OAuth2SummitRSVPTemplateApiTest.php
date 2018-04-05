@@ -48,6 +48,37 @@ final class OAuth2SummitRSVPTemplateApiTest extends ProtectedApiTest
         return $rsvp_templates;
     }
 
+    public function testGetSummitRSVPTemplateQuestionsMetadata($summit_id = 23)
+    {
+        $params = [
+            'id'       => $summit_id,
+        ];
+
+        $headers =
+            [
+                "HTTP_Authorization" => " Bearer " . $this->access_token,
+                "CONTENT_TYPE"       => "application/json"
+            ];
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitRSVPTemplatesApiController@getRSVPTemplateQuestionsMetadata",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $metadata = json_decode($content);
+        $this->assertTrue(!is_null($metadata));
+        return $metadata;
+    }
+
     public function testGetRSVPTemplateById($summit_id = 23){
 
         $templates = $this->testGetSummitRSVPTemplates($summit_id);

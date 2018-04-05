@@ -197,4 +197,20 @@ class RSVPQuestionTemplate extends SilverstripeBaseModel implements IOrderable
         $this->order        = 0;
     }
 
+    public static $metadata = [
+        'name'         => 'string',
+        'label'        => 'string',
+        'is_mandatory' => 'boolean',
+        'is_read_only' => 'boolean',
+        'template_id'  => 'integer',
+        'order'        => 'integer'
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return self::$metadata;
+    }
+
 }

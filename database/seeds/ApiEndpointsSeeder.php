@@ -747,6 +747,14 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-rsvp-template-question-metadata',
+                'route' => '/api/v1/summits/{id}/rsvp-templates/questions/metadata',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'update-rsvp-template',
                 'route' => '/api/v1/summits/{id}/rsvp-templates/{template_id}',
                 'http_method' => 'PUT',

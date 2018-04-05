@@ -38,4 +38,10 @@ interface IRSVPTemplateRepository extends IBaseRepository
         Order $order = null
     );
 
+    /**
+     * @param Summit $summit
+     * @return mixed
+     */
+    public function getQuestionsMetadata(Summit $summit);
+
 }

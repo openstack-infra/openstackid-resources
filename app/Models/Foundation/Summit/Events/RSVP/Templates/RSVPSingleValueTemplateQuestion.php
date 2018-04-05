@@ -46,6 +46,20 @@ class RSVPSingleValueTemplateQuestion extends RSVPQuestionTemplate
      * @return string
      */
     public function getClassName(){
-        return 'RSVPSingleValueTemplateQuestion';
+        return self::ClassName;
+    }
+
+    const ClassName = 'RSVPSingleValueTemplateQuestion';
+
+    public static $metadata = [
+        'initial_value' => 'string',
+        'class_name'    => self::ClassName,
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(RSVPQuestionTemplate::getMetadata(), self::$metadata);
     }
 }

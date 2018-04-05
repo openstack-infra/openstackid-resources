@@ -27,4 +27,15 @@ class RSVPMemberLastNameQuestionTemplate extends RSVPTextBoxQuestionTemplate
     public function getClassName(){
         return self::ClassName;
     }
+
+    public static $metadata = [
+        'class_name'       => self::ClassName,
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(RSVPTextBoxQuestionTemplate::getMetadata(), self::$metadata);
+    }
 }

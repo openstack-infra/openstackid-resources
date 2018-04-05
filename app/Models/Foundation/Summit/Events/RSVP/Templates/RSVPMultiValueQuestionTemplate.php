@@ -104,7 +104,23 @@ class RSVPMultiValueQuestionTemplate extends RSVPQuestionTemplate
      * @return string
      */
     public function getClassName(){
-        return 'RSVPMultiValueQuestionTemplate';
+        return self::ClassName;
+    }
+
+    const ClassName = 'RSVPMultiValueQuestionTemplate';
+
+    public static $metadata = [
+        'empty_string'     => 'string',
+        'values'           => 'array',
+        'default_value_id' => 'integer',
+        'class_name'       => self::ClassName,
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(RSVPQuestionTemplate::getMetadata(), self::$metadata);
     }
 
     /**

@@ -102,4 +102,19 @@ class RSVPDropDownQuestionTemplate extends RSVPMultiValueQuestionTemplate
         $this->is_multiselect      = false;
         $this->is_country_selector = false;
     }
+
+
+    public static $metadata = [
+        'use_chosen_plugin'   => 'boolean',
+        'is_multiselect'      => 'boolean',
+        'is_country_selector' => 'boolean',
+        'class_name'          => self::ClassName,
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(RSVPMultiValueQuestionTemplate::getMetadata(), self::$metadata);
+    }
 }

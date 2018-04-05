@@ -218,6 +218,21 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
         }
     }
 
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getRSVPTemplateQuestionsMetadata($summit_id){
+        $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+        if (is_null($summit)) return $this->error404();
+
+        return $this->ok
+        (
+            $this->rsvp_template_repository->getQuestionsMetadata($summit)
+        );
+    }
+
     /**
      * @param $summit_id
      * @param $template_id

@@ -172,6 +172,11 @@ Route::group([
             // rsvp templates
             Route::group(['prefix' => 'rsvp-templates'], function () {
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getAllBySummit']);
+
+                Route::group(['prefix' => 'questions'], function () {
+                    Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getRSVPTemplateQuestionsMetadata']);
+                });
+
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@addRSVPTemplate']);
                 Route::group(['prefix' => '{template_id}'], function () {
                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getRSVPTemplate']);
