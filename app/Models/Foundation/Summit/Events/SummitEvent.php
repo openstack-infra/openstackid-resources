@@ -95,16 +95,22 @@ class SummitEvent extends SilverstripeBaseModel
     protected $avg_feedback;
 
     /**
-     * @ORM\Column(name="RSVPLink", type="string")
-     * @var string
-     */
-    protected $rsvp_link;
-
-    /**
      * @ORM\Column(name="HeadCount", type="integer")
      * @var int
      */
     protected $head_count;
+
+    /**
+     * @ORM\Column(name="RSVPMaxUserNumber", type="integer")
+     * @var int
+     */
+    protected $rsvp_max_user_number;
+
+    /**
+     * @ORM\Column(name="RSVPMaxUserWaitListNumber", type="integer")
+     * @var int
+     */
+    protected $rsvp_max_user_wait_list_number;
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate", fetch="EXTRA_LAZY")
@@ -118,6 +124,12 @@ class SummitEvent extends SilverstripeBaseModel
      * @var RSVP[]
      */
     protected $rsvp;
+
+    /**
+     * @ORM\Column(name="RSVPLink", type="string")
+     * @var string
+     */
+    protected $rsvp_link;
 
     /**
      * @ORM\ManyToOne(targetEntity="PresentationCategory", fetch="EXTRA_LAZY")
@@ -197,10 +209,14 @@ class SummitEvent extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
+
         $this->allow_feedback = false;
         $this->published      = false;
         $this->avg_feedback   = 0;
         $this->head_count     = 0;
+        $this->rsvp_max_user_number = 0;
+        $this->rsvp_max_user_wait_list_number = 0;
+
         $this->tags           = new ArrayCollection();
         $this->feedback       = new ArrayCollection();
         $this->sponsors       = new ArrayCollection();
@@ -856,4 +872,37 @@ class SummitEvent extends SilverstripeBaseModel
     public function getLocationName(){
         return $this->hasLocation() ? $this->location->getName() : 'TBD';
     }
+
+    /**
+     * @return int
+     */
+    public function getRSVPMaxUserNumber()
+    {
+        return $this->rsvp_max_user_number;
+    }
+
+    /**
+     * @param int $rsvp_max_user_number
+     */
+    public function setRSVPMaxUserNumber($rsvp_max_user_number)
+    {
+        $this->rsvp_max_user_number = $rsvp_max_user_number;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRSVPMaxUserWaitListNumber()
+    {
+        return $this->rsvp_max_user_wait_list_number;
+    }
+
+    /**
+     * @param mixed $rsvp_max_user_wait_list_number
+     */
+    public function setRSVPMaxUserWaitListNumber($rsvp_max_user_wait_list_number)
+    {
+        $this->rsvp_max_user_wait_list_number = $rsvp_max_user_wait_list_number;
+    }
+
 }
