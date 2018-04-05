@@ -487,6 +487,7 @@ Route::group([
                 Route::get('', 'OAuth2SummitTracksApiController@getAllBySummit');
                 Route::get('csv', 'OAuth2SummitTracksApiController@getAllBySummitCSV');
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@addTrackBySummit']);
+                Route::post('copy/{to_summit_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@copyTracksToSummit']);
                 Route::group(['prefix' => '{track_id}'], function () {
                     Route::get('', 'OAuth2SummitTracksApiController@getTrackBySummit');
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@updateTrackBySummit']);

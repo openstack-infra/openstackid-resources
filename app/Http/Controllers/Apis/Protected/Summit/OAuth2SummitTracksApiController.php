@@ -29,6 +29,8 @@ use utils\FilterParser;
 use utils\OrderParser;
 use utils\PagingInfo;
 use Exception;
+use utils\PagingResponse;
+
 /**
  * Class OAuth2SummitTracksApiController
  * @package App\Http\Controllers
@@ -322,6 +324,48 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
             $track = $this->track_service->addTrack($summit, $data->all());
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($track)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $to_summit_id
+     * @return mixed
+     */
+    public function copyTracksToSummit($summit_id, $to_summit_id){
+        try {
+
+            $from_summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($from_summit)) return $this->error404();
+
+            $to_summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($to_summit_id);
+            if (is_null($to_summit)) return $this->error404();
+
+            $tracks = $this->track_service->copyTracks($from_summit, $to_summit);
+
+            $response = new PagingResponse
+            (
+                count($tracks),
+                count($tracks),
+                1,
+                1,
+                $tracks
+            );
+
+            return $this->created($response->toArray());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);

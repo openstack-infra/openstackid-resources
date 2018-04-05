@@ -954,7 +954,7 @@ class Summit extends SilverstripeBaseModel
     public function getPresentationCategoryByTitle($category_title)
     {
         $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('title', intval($category_title)));
+        $criteria->where(Criteria::expr()->eq('title', trim($category_title)));
         $category = $this->presentation_categories->matching($criteria)->first();
         return $category === false ? null : $category;
     }

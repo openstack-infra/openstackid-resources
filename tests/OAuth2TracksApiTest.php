@@ -22,6 +22,7 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
      * @return mixed
      */
     public function testGetTracksByTitle($summit_id = 23){
+
         $params = [
 
             'id'       => $summit_id,
@@ -260,5 +261,33 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
 
         $content = $response->getContent();
         $this->assertResponseStatus(412);
+    }
+
+    public function testCopyTracks($from_summit_id = 24, $to_summit_id = 25){
+
+        $params = [
+            'id'            => $from_summit_id,
+            'to_summit_id' => $to_summit_id
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitTracksApiController@copyTracksToSummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $added_tracks = json_decode($content);
+        $this->assertTrue(!is_null($added_tracks));
     }
 }

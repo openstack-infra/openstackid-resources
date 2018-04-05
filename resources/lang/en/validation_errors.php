@@ -68,5 +68,6 @@ return [
     // SummitService
     'SummitService.AddSummit.NameAlreadyExists' => 'name :name its already being assigned to another summit',
     'SummitService.updateSummit.NameAlreadyExists'=> 'name :name its already being assigned to another summit',
-    'SummitService.updateSummit.SummitAlreadyActive' => 'summit :active_summit_id is already activated please deactivate it to set current summit as active'
+    'SummitService.updateSummit.SummitAlreadyActive' => 'summit :active_summit_id is already activated please deactivate it to set current summit as active',
+    'SummitTrackService.copyTracks.SameSummit' => 'from summit is equal a to summit.',
 ];

@@ -1111,6 +1111,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'copy-tracks-to-summit',
+                'route' => '/api/v1/summits/{id}/tracks/copy/{to_summit_id}',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTracksData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'add-track',
                 'route' => '/api/v1/summits/{id}/tracks',
                 'http_method' => 'POST',

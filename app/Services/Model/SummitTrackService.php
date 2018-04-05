@@ -111,7 +111,6 @@ final class SummitTrackService
                     throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['title'], $summit->getId()));
             }
 
-
             $track = PresentationCategoryFactory::populate($track, $data);
 
             Event::fire(new TrackUpdated($track->getSummitId(), $track->getId()));
@@ -153,5 +152,62 @@ final class SummitTrackService
 
             $this->repository->delete($track);
         });
+    }
+
+    /**
+     * @param Summit $from_summit
+     * @param Summit $to_summit
+     * @return PresentationCategory[]
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function copyTracks(Summit $from_summit, Summit $to_summit)
+    {
+        $added_tracks = $this->tx_service->transaction(function () use ($from_summit, $to_summit) {
+
+            if($from_summit->getId() == $to_summit->getId()){
+                throw new ValidationException
+                (
+                  trans
+                  (
+                      'validation_errors.SummitTrackService.copyTracks.SameSummit'
+                  )
+                );
+            }
+
+            $added_tracks = [];
+            foreach($from_summit->getPresentationCategories() as $track_2_copy){
+                $former_track = $to_summit->getPresentationCategoryByTitle($track_2_copy->getTitle());
+                if(!is_null($former_track)) continue;
+
+                $former_track = $to_summit->getPresentationCategoryByCode($track_2_copy->getCode());
+                if(!is_null($former_track)) continue;
+
+                $data      = [
+                    'title'                     => $track_2_copy->getTitle(),
+                    'code'                      => $track_2_copy->getCode(),
+                    'description'               => $track_2_copy->getDescription(),
+                    'session_count'             => $track_2_copy->getSessionCount(),
+                    'alternate_count'           => $track_2_copy->getAlternateCount(),
+                    'lightning_count'           => $track_2_copy->getLightningCount(),
+                    'lightning_alternate_count' => $track_2_copy->getLightningAlternateCount(),
+                    'voting_visible'            => $track_2_copy->isVotingVisible(),
+                    'chair_visible'             => $track_2_copy->isChairVisible(),
+                ];
+
+                $new_track = PresentationCategoryFactory::build($to_summit, $data);
+
+                $to_summit->addPresentationCategory($new_track);
+                $added_tracks[] = $new_track;
+            }
+
+            return $added_tracks;
+        });
+
+        foreach ($added_tracks as $track){
+            Event::fire(new TrackInserted($track->getSummitId(), $track->getId()));
+        }
+
+        return $added_tracks;
     }
 }

@@ -49,4 +49,13 @@ interface ISummitTrackService
      */
     public function deleteTrack(Summit $summit, $track_id);
 
+    /**
+     * @param Summit $from_summit
+     * @param Summit $to_summit
+     * @return PresentationCategory[]
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function copyTracks(Summit $from_summit, Summit $to_summit);
+
 }
