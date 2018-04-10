@@ -1270,7 +1270,7 @@ class Summit extends SilverstripeBaseModel
 SELECT URLSegment FROM SiteTree
 INNER JOIN
 SummitPage ON SummitPage.ID = SiteTree.ID 
-WHERE SummitID = :summit_id AND ClassName IN ('SummitStaticAboutBostonPage', 'SummitStaticAboutPage','SummitNewStaticAboutPage','SummitHighlightsPage');
+WHERE SummitID = :summit_id AND ClassName IN ('SummitStaticAboutBostonPage', 'SummitStaticAboutPage','SummitNewStaticAboutPage','SummitHighlightsPage', 'SummitAboutPage');
 SQL;
             $stmt = $this->prepareRawSQL($sql);
             $stmt->execute(['summit_id' => $this->id]);
