@@ -418,6 +418,8 @@ class SummitEvent extends SilverstripeBaseModel
     {
         $this->rsvp_link     = $rsvp_link;
         $this->rsvp_template = null;
+        $this->rsvp_max_user_wait_list_number = 0;
+        $this->rsvp_max_user_number = 0;
     }
 
     /**

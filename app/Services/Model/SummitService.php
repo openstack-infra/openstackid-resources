@@ -687,8 +687,9 @@ final class SummitService extends AbstractService implements ISummitService
                 throw new ValidationException("rsvp_link and rsvp_template_id are both set, you need to especify only one");
             }
 
-            if (isset($data['rsvp_link']))
-                $event->setRsvpLink(html_entity_decode(trim($data['rsvp_link'])));
+            if (isset($data['rsvp_link'])) {
+                $event->setRSVPLink(html_entity_decode(trim($data['rsvp_link'])));
+            }
 
             if (isset($data['rsvp_template_id'])) {
 
