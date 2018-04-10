@@ -38,6 +38,7 @@ use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
 use App\ModelSerializers\Summit\AdminSummitSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPDropDownQuestionTemplateSerializer;
+use App\ModelSerializers\Summit\RSVP\Templates\RSVPLiteralContentQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPMultiValueQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPQuestionValueTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPSingleValueTemplateQuestionSerializer;
@@ -126,6 +127,7 @@ final class SerializerRegistry
         $this->registry['RSVPSingleValueTemplateQuestion']     = RSVPSingleValueTemplateQuestionSerializer::class;
         $this->registry['RSVPTextBoxQuestionTemplate']         = RSVPSingleValueTemplateQuestionSerializer::class;
         $this->registry['RSVPTextAreaQuestionTemplate']        = RSVPSingleValueTemplateQuestionSerializer::class;
+        $this->registry['RSVPLiteralContentQuestionTemplate']  = RSVPLiteralContentQuestionTemplateSerializer::class;
         $this->registry['RSVPMemberEmailQuestionTemplate']     = RSVPSingleValueTemplateQuestionSerializer::class;
         $this->registry['RSVPMemberFirstNameQuestionTemplate'] = RSVPSingleValueTemplateQuestionSerializer::class;
         $this->registry['RSVPMemberLastNameQuestionTemplate']  = RSVPSingleValueTemplateQuestionSerializer::class;
