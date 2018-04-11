@@ -29,6 +29,7 @@ final class SummitFactory
     /**
      * @param Summit $summit
      * @param array $data
+     * @return Summit
      */
     public static function populate(Summit $summit, array $data){
 
@@ -37,9 +38,7 @@ final class SummitFactory
         }
 
         if(isset($data['time_zone_id']) ){
-            $time_zone_list = array_flip(timezone_identifiers_list());
-            $time_zone_id   = $time_zone_list[trim($data['time_zone_id'])];
-            $summit->setTimeZoneId($time_zone_id);
+            $summit->setTimeZoneId(trim($data['time_zone_id']));
         }
 
         if(isset($data['active']) ){

@@ -14,6 +14,7 @@
  **/
 use Illuminate\Support\Facades\Config;
 use models\summit\Summit;
+use DateTime;
 /**
  * Class SummitSerializer
  * @package ModelSerializers
@@ -22,22 +23,22 @@ class SummitSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
 
-        'Name'                        => 'name:json_string',
-        'BeginDate'                   => 'start_date:datetime_epoch',
-        'EndDate'                     => 'end_date:datetime_epoch',
-        'SubmissionBeginDate'         => 'submission_begin_date:datetime_epoch',
-        'SubmissionEndDate'           => 'submission_end_date:datetime_epoch',
-        'VotingBeginDate'             => 'voting_begin_date:datetime_epoch',
-        'VotingEndDate'               => 'voting_end_date:datetime_epoch',
-        'SelectionBeginDate'          => 'selection_begin_date:datetime_epoch',
-        'SelectionEndDate'            => 'selection_end_date:datetime_epoch',
-        'RegistrationBeginDate'       => 'registration_begin_date:datetime_epoch',
-        'RegistrationEndDate'         => 'registration_end_date:datetime_epoch',
-        'StartShowingVenuesDate'      => 'start_showing_venues_date:datetime_epoch',
-        'ScheduleDefaultStartDate'    => 'schedule_start_date:datetime_epoch',
-        'Active'                      => 'active:json_boolean',
-        'TypeId'                      => 'type_id:json_int' ,
-        'DatesLabel'                  => 'dates_label:json_string' ,
+        'Name'                                           => 'name:json_string',
+        'BeginDate'                                      => 'start_date:datetime_epoch',
+        'EndDate'                                        => 'end_date:datetime_epoch',
+        'SubmissionBeginDate'                            => 'submission_begin_date:datetime_epoch',
+        'SubmissionEndDate'                              => 'submission_end_date:datetime_epoch',
+        'VotingBeginDate'                                => 'voting_begin_date:datetime_epoch',
+        'VotingEndDate'                                  => 'voting_end_date:datetime_epoch',
+        'SelectionBeginDate'                             => 'selection_begin_date:datetime_epoch',
+        'SelectionEndDate'                               => 'selection_end_date:datetime_epoch',
+        'RegistrationBeginDate'                          => 'registration_begin_date:datetime_epoch',
+        'RegistrationEndDate'                            => 'registration_end_date:datetime_epoch',
+        'StartShowingVenuesDate'                         => 'start_showing_venues_date:datetime_epoch',
+        'ScheduleDefaultStartDate'                       => 'schedule_start_date:datetime_epoch',
+        'Active'                                         => 'active:json_boolean',
+        'TypeId'                                         => 'type_id:json_int' ,
+        'DatesLabel'                                     => 'dates_label:json_string' ,
         // calculated attributes
         'PresentationVotesCount'                         => 'presentation_votes_count:json_int' ,
         'PresentationVotersCount'                        => 'presentation_voters_count:json_int' ,
@@ -72,20 +73,17 @@ class SummitSerializer extends SilverStripeSerializer
         $summit              = $this->object;
         if(!$summit instanceof Summit) return [];
         $values              = parent::serialize($expand, $fields, $relations, $params);
-        $time_zone_list      = timezone_identifiers_list();
-        $time_zone_id        = $summit->getTimeZoneId();
         if(!count($relations)) $relations = $this->getAllowedRelations();
+
+        $timezone            = $summit->getTimeZone();
         $values['time_zone'] = null;
 
-        if (!empty($time_zone_id) && isset($time_zone_list[$time_zone_id])) {
-
-            $time_zone_name = $time_zone_list[$time_zone_id];
-            $time_zone = new \DateTimeZone($time_zone_name);
-            $time_zone_info = $time_zone->getLocation();
-            $time_zone_info['name'] = $time_zone->getName();
-            $now = new \DateTime($summit->getLocalBeginDate()->format('Y-m-d H:i:s'), $time_zone);
-            $time_zone_info['offset'] = $time_zone->getOffset($now);
-            $values['time_zone'] = $time_zone_info;
+        if (!is_null($timezone)) {
+            $time_zone_info = $timezone->getLocation();
+            $time_zone_info['name']   = $timezone->getName();
+            $now                      = new DateTime($summit->getLocalBeginDate()->format('Y-m-d H:i:s'), $timezone);
+            $time_zone_info['offset'] = $timezone->getOffset($now);
+            $values['time_zone']      = $time_zone_info;
         }
 
         $values['logo'] = ($summit->hasLogo()) ?
@@ -139,7 +137,7 @@ class SummitSerializer extends SilverStripeSerializer
                     }
                     break;
                     case 'tracks':{
-                        $presentation_categories = array();
+                        $presentation_categories = [];
                         foreach ($summit->getPresentationCategories() as $cat) {
                             $presentation_categories[] = SerializerRegistry::getInstance()->getSerializer($cat)->serialize();
                         }
@@ -148,7 +146,7 @@ class SummitSerializer extends SilverStripeSerializer
                     break;
                     case 'track_groups':{
                         // track_groups
-                        $track_groups = array();
+                        $track_groups = [];
                         foreach ($summit->getCategoryGroups() as $group) {
                             $track_groups[] = SerializerRegistry::getInstance()->getSerializer($group)->serialize();
                         }
@@ -156,7 +154,7 @@ class SummitSerializer extends SilverStripeSerializer
                     }
                     break;
                     case 'sponsors':{
-                        $sponsors = array();
+                        $sponsors = [];
                         foreach ($summit->getSponsors() as $company) {
                             $sponsors[] = SerializerRegistry::getInstance()->getSerializer($company)->serialize();
                         }
@@ -164,7 +162,7 @@ class SummitSerializer extends SilverStripeSerializer
                     }
                     break;
                     case 'speakers':{
-                        $speakers = array();
+                        $speakers = [];
                         foreach ($summit->getSpeakers() as $speaker) {
                             $speakers[] =
                                 SerializerRegistry::getInstance()->getSerializer($speaker)->serialize
@@ -181,38 +179,38 @@ class SummitSerializer extends SilverStripeSerializer
                     }
                     break;
                     case 'schedule': {
-                        $event_types = array();
+                        $event_types = [];
                         foreach ($summit->getEventTypes() as $event_type) {
                             $event_types[] = SerializerRegistry::getInstance()->getSerializer($event_type)->serialize();
                         }
                         $values['event_types'] = $event_types;
 
-                        $presentation_categories = array();
+                        $presentation_categories = [];
                         foreach ($summit->getPresentationCategories() as $cat) {
                             $presentation_categories[] = SerializerRegistry::getInstance()->getSerializer($cat)->serialize();
                         }
                         $values['tracks'] = $presentation_categories;
 
                         // track_groups
-                        $track_groups = array();
+                        $track_groups = [];
                         foreach ($summit->getCategoryGroups() as $group) {
                             $track_groups[] = SerializerRegistry::getInstance()->getSerializer($group)->serialize();
                         }
                         $values['track_groups'] = $track_groups;
 
-                        $schedule = array();
+                        $schedule = [];
                         foreach ($summit->getScheduleEvents() as $event) {
                             $schedule[] = SerializerRegistry::getInstance()->getSerializer($event)->serialize();
                         }
                         $values['schedule'] = $schedule;
 
-                        $sponsors = array();
+                        $sponsors = [];
                         foreach ($summit->getSponsors() as $company) {
                             $sponsors[] = SerializerRegistry::getInstance()->getSerializer($company)->serialize();
                         }
                         $values['sponsors'] = $sponsors;
 
-                        $speakers = array();
+                        $speakers = [];
                         foreach ($summit->getSpeakers() as $speaker) {
                             $speakers[] =
                                 SerializerRegistry::getInstance()->getSerializer($speaker)->serialize

@@ -14,16 +14,14 @@
  **/
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\TrackTagGroup;
-use App\Models\Utils\TimeZoneUtils;
+use App\Models\Utils\TimeZoneEntity;
 use DateTime;
-use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use models\exceptions\ValidationException;
 use models\main\Company;
 use models\main\File;
 use models\main\Member;
-use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
@@ -35,6 +33,7 @@ use Doctrine\ORM\Mapping AS ORM;
 class Summit extends SilverstripeBaseModel
 {
 
+    use TimeZoneEntity;
     /**
      * @ORM\Column(name="Title", type="string")
      * @var string
@@ -168,7 +167,7 @@ class Summit extends SilverstripeBaseModel
     private $start_showing_venues_date;
 
     /**
-     * @ORM\Column(name="TimeZone", type="string")
+     * @ORM\Column(name="TimeZoneIdentifier", type="string")
      * @var string
      */
     private $time_zone_id;
@@ -516,23 +515,6 @@ class Summit extends SilverstripeBaseModel
     }
 
 
-    /**
-     * @return string
-     */
-    public function getTimeZoneId()
-    {
-        return $this->time_zone_id;
-    }
-
-    /**
-     * @param string $time_zone_id
-     */
-    public function setTimeZoneId($time_zone_id)
-    {
-        $this->time_zone_id = $time_zone_id;
-    }
-
-
     const DefaultMaxSubmissionAllowedPerUser = 3;
     /**
      * Summit constructor.
@@ -574,53 +556,6 @@ class Summit extends SilverstripeBaseModel
         $criteria->where(Criteria::expr()->eq('id', intval($assistance_id)));
         $speaker_assistance = $this->speaker_assistances->matching($criteria)->first();
         return $speaker_assistance === false ? null : $speaker_assistance;
-    }
-
-    /**
-     * @param DateTime $value
-     * @return null|DateTime
-     */
-    public function convertDateFromTimeZone2UTC(DateTime $value)
-    {
-        $summit_time_zone = $this->getTimeZone();
-
-        if (!is_null($summit_time_zone) && !empty($value)) {
-            $utc_timezone = new DateTimeZone("UTC");
-            $timestamp = $value->format('Y-m-d H:i:s');
-            $local_date = new DateTime($timestamp, $summit_time_zone);
-            return $local_date->setTimezone($utc_timezone);
-        }
-        return null;
-    }
-
-    /**
-     * @return DateTimeZone|null
-     */
-    public function getTimeZone()
-    {
-        return TimeZoneUtils::getTimeZoneById($this->time_zone_id);
-    }
-
-    /**
-     * @param DateTime $value
-     * @return null|DateTime
-     */
-    public function convertDateFromUTC2TimeZone(DateTime $value)
-    {
-        $time_zone_id = $this->time_zone_id;
-        if (empty($time_zone_id)) return $value;
-        $time_zone_list = timezone_identifiers_list();
-
-        if (isset($time_zone_list[$time_zone_id]) && !empty($value)) {
-            $utc_timezone = new DateTimeZone("UTC");
-            $time_zone_name = $time_zone_list[$time_zone_id];
-            $summit_time_zone = new DateTimeZone($time_zone_name);
-            $timestamp = $value->format('Y-m-d H:i:s');
-            $utc_date = new DateTime($timestamp, $utc_timezone);
-
-            return $utc_date->setTimezone($summit_time_zone);
-        }
-        return null;
     }
 
     /**

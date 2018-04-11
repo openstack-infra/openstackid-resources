@@ -20,7 +20,6 @@ use App\Events\SummitUpdated;
 use App\Http\Utils\FileUploader;
 use App\Models\Foundation\Summit\Factories\SummitFactory;
 use App\Models\Utils\IntervalParser;
-use App\Models\Utils\TimeZoneUtils;
 use App\Services\Model\AbstractService;
 use App\Services\Model\IFolderService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
