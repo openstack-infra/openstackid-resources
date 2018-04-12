@@ -31,6 +31,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\AdminActionsCalendarSyncProcessingCommand::class,
         \App\Console\Commands\ChatTeamMessagesSender::class,
         \App\Console\Commands\SummitListJsonGenerator::class,
+        \App\Console\Commands\PromoCodesRedeemProcessor::class,
     ];
 
     /**
@@ -71,6 +72,10 @@ class Kernel extends ConsoleKernel
         $schedule->command('summit:member-schedule-action-process', [CalendarSyncInfo::ProviderOutlook, 1000])->withoutOverlapping();
         // iCloud
         $schedule->command('summit:member-schedule-action-process', [CalendarSyncInfo::ProvideriCloud, 1000])->withoutOverlapping();
+
+        // redeem code processor
+
+        $schedule->command('summit:promo-codes-redeem-processor', [end($summit_ids)])->daily()->withoutOverlapping();
 
     }
 }

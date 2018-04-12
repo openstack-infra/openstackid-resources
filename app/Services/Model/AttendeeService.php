@@ -20,6 +20,7 @@ use models\summit\factories\SummitAttendeeFactory;
 use models\summit\factories\SummitAttendeeTicketFactory;
 use models\summit\ISummitAttendeeRepository;
 use models\summit\ISummitAttendeeTicketRepository;
+use models\summit\ISummitRegistrationPromoCodeRepository;
 use models\summit\ISummitTicketTypeRepository;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
@@ -29,9 +30,7 @@ use services\apis\IEventbriteAPI;
  * Class AttendeeService
  * @package App\Services\Model
  */
-final class AttendeeService
-    extends AbstractService
-    implements IAttendeeService
+final class AttendeeService extends AbstractService implements IAttendeeService
 {
 
     /**
@@ -59,6 +58,11 @@ final class AttendeeService
      */
     private $eventbrite_api;
 
+    /**
+     * @var ISummitRegistrationPromoCodeRepository
+     */
+    private $promo_code_repository;
+
 
     public function __construct
     (
@@ -66,6 +70,7 @@ final class AttendeeService
         IMemberRepository $member_repository,
         ISummitAttendeeTicketRepository $ticket_repository,
         ISummitTicketTypeRepository $ticket_type_repository,
+        ISummitRegistrationPromoCodeRepository $promo_code_repository,
         IEventbriteAPI $eventbrite_api,
         ITransactionService $tx_service
     )
@@ -75,6 +80,7 @@ final class AttendeeService
         $this->ticket_repository      = $ticket_repository;
         $this->member_repository      = $member_repository;
         $this->ticket_type_repository = $ticket_type_repository;
+        $this->promo_code_repository  = $promo_code_repository;
         $this->eventbrite_api         = $eventbrite_api;
     }
 
@@ -212,7 +218,7 @@ final class AttendeeService
                 $summit_external_id      = $external_order['event_id'];
 
                 if (intval($attendee->getSummit()->getSummitExternalId()) !== intval($summit_external_id))
-                    throw new ValidationException('order %s does not belongs to current summit!', $external_order_id);
+                    throw new ValidationException('order %s does not belongs to current summit!', $summit_external_id);
 
                 foreach ($external_order['attendees'] as $external_attendee){
                    if($data['external_attendee_id'] == $external_attendee['id']){
@@ -254,6 +260,37 @@ final class AttendeeService
                 throw new EntityNotFoundException(sprintf("ticket id %s does not belongs to attendee id %s", $ticket_id, $attendee->getId()));
             }
             $attendee->removeTicket($ticket);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $page_nbr
+     * @return mixed
+     */
+    public function updateRedeemedPromoCodes(Summit $summit, $page_nbr = 1)
+    {
+        return $this->tx_service->transaction(function() use($summit, $page_nbr){
+            $response = $this->eventbrite_api->getAttendees($summit, $page_nbr);
+
+            if(!isset($response['pagination'])) return false;
+            if(!isset($response['attendees'])) return false;
+            $pagination = $response['pagination'];
+            $attendees  = $response['attendees'];
+            $has_more_items = boolval($pagination['has_more_items']);
+
+            foreach($attendees as $attendee){
+                if(!isset($attendee['promotional_code'])) continue;
+                $promotional_code = $attendee['promotional_code'];
+                if(!isset($promotional_code['code'])) continue;
+                $code = $promotional_code['code'];
+
+                $promo_code = $this->promo_code_repository->getByCode($code);
+                if(is_null($promo_code)) continue;
+                $promo_code->setRedeemed(true);
+            }
+
+            return $has_more_items;
         });
     }
 }

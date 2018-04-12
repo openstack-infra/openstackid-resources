@@ -35,4 +35,12 @@ interface IEventbriteAPI
      * @return mixed
      */
     public function getTicketTypes(Summit $summit);
+
+    /**
+     * @param Summit $summit
+     * @param int $page_nbr
+     * @param string $expand
+     * @return mixed
+     */
+    public function getAttendees(Summit $summit, $page_nbr, $expand = 'promotional_code');
 }

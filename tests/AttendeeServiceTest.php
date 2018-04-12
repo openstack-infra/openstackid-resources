@@ -1,4 +1,4 @@
-<?php namespace models\summit;
+<?php
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,22 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\Summit\Repositories\ISummitOwnedEntityRepository;
+use App\Services\Model\IAttendeeService;
 /**
- * Interface ISummitRegistrationPromoCodeRepository
- * @package models\summit
+ * Class AttendeeServiceTest
  */
-interface ISummitRegistrationPromoCodeRepository extends ISummitOwnedEntityRepository
+final class AttendeeServiceTest  extends TestCase
 {
-    /**
-     * @param Summit $summit
-     * @return array
-     */
-    public function getMetadata(Summit $summit);
+    public function testRedeemPromoCodes(){
 
-    /**
-     * @param string $code
-     * @return SummitRegistrationPromoCode|null
-     */
-    public function getByCode($code);
+        $service = App::make(IAttendeeService::class);
+        $repo   =  EntityManager::getRepository(\models\summit\Summit::class);
+        $summit = $repo->getById(24);
+
+        $service->updateRedeemedPromoCodes($summit);
+    }
 }

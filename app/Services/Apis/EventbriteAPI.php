@@ -103,4 +103,16 @@ final class EventbriteAPI implements IEventbriteAPI
         $url      = sprintf('%s/events/%s', self::BaseUrl, $event_id);
         return $this->getEntity($url, ['expand' => 'ticket_classes']);
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $page_nbr
+     * @param string $expand
+     * @return mixed
+     */
+    public function getAttendees(Summit $summit, $page_nbr, $expand = 'promotional_code'){
+        $event_id = $summit->getExternalSummitId();
+        $url      = sprintf('%s/events/%s/attendees', self::BaseUrl, $event_id);
+        return $this->getEntity($url, ['expand' => $expand, 'page' => $page_nbr]);
+    }
 }

@@ -43,6 +43,26 @@ class DoctrineSummitRegistrationPromoCodeRepository
         return SummitRegistrationPromoCode::class;
     }
 
+    /**
+     * @param string $code
+     * @return SummitRegistrationPromoCode|null
+     */
+    public function getByCode($code){
+        $query  =   $this->getEntityManager()
+            ->createQueryBuilder()
+            ->select("pc")
+            ->from(SummitRegistrationPromoCode::class, "pc")
+            ->leftJoin(MemberSummitRegistrationPromoCode::class, 'mpc', 'WITH', 'pc.id = mpc.id')
+            ->leftJoin(SponsorSummitRegistrationPromoCode::class, 'spc', 'WITH', 'mpc.id = spc.id')
+            ->leftJoin(SpeakerSummitRegistrationPromoCode::class, 'spkpc', 'WITH', 'spkpc.id = pc.id')
+
+            ->where("pc.code = :code");
+
+        $query->setParameter("code", $code);
+
+        return $query->getQuery()->getOneOrNullResult();
+    }
+
     protected function getFilterMappings()
     {
         return [

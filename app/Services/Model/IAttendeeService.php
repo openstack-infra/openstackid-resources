@@ -67,4 +67,11 @@ interface IAttendeeService
      * @return SummitAttendeeTicket
      */
     public function deleteAttendeeTicket(SummitAttendee $attendee, $ticket_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $page_nbr
+     * @return mixed
+     */
+    public function updateRedeemedPromoCodes(Summit $summit, $page_nbr = 1);
 }
