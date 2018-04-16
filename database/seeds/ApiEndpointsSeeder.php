@@ -1409,6 +1409,13 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm),
                     sprintf(SummitScopes::ReadNotifications, $current_realm)
                 ],
+                'name' => 'add-notifications',
+                'route' => '/api/v1/summits/{id}/notifications',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteNotifications, $current_realm)
+                ],
             ],
             // promo codes
             [

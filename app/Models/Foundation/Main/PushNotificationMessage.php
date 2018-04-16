@@ -31,10 +31,15 @@ class PushNotificationMessage extends SilverstripeBaseModel
     const PlatformMobile = 'MOBILE';
     const PlatformWeb    = 'WEB';
 
+    const PriorityHigh = 'HIGH';
+    const PriorityNormal = 'NORMAL';
+
     public function __construct()
     {
         parent::__construct();
-        $this->is_sent = false;
+        $this->is_sent  = false;
+        $this->approved = false;
+        $this->priority = self::PriorityNormal;
     }
 
     /**
@@ -92,7 +97,7 @@ class PushNotificationMessage extends SilverstripeBaseModel
      */
     public function getOwnerId(){
         try{
-            return $this->owner->getId();
+            return is_null($this->owner) ? 0 : $this->owner->getId();
         }
         catch (\Exception $ex){
             return 0;
@@ -104,7 +109,7 @@ class PushNotificationMessage extends SilverstripeBaseModel
      */
     public function getApprovedById(){
         try{
-            return $this->approved_by->getId();
+            return is_null($this->approved_by) ? 0 : $this->approved_by->getId();
         }
         catch (\Exception $ex){
             return 0;

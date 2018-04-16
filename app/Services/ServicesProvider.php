@@ -22,6 +22,7 @@ use App\Services\Model\IMemberService;
 use App\Services\Model\IPresentationCategoryGroupService;
 use App\Services\Model\IRSVPTemplateService;
 use App\Services\Model\ISummitEventTypeService;
+use App\Services\Model\ISummitPushNotificationService;
 use App\Services\Model\ISummitTicketTypeService;
 use App\Services\Model\ISummitTrackService;
 use App\Services\Model\PresentationCategoryGroupService;
@@ -29,6 +30,7 @@ use App\Services\Model\SummitLocationService;
 use App\Services\Model\MemberService;
 use App\Services\Model\RSVPTemplateService;
 use App\Services\Model\SummitPromoCodeService;
+use App\Services\Model\SummitPushNotificationService;
 use App\Services\Model\SummitTicketTypeService;
 use App\Services\Model\SummitTrackService;
 use App\Services\SummitEventTypeService;
@@ -202,6 +204,11 @@ final class ServicesProvider extends ServiceProvider
         (
             IPresentationCategoryGroupService::class,
             PresentationCategoryGroupService::class
+        );
+
+        App::singleton(
+            ISummitPushNotificationService::class,
+            SummitPushNotificationService::class
         );
 
         App::singleton(IGeoCodingAPI::class,   function(){

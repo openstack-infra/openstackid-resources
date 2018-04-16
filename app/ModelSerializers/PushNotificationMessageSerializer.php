@@ -21,7 +21,6 @@ use ModelSerializers\SilverStripeSerializer;
 class PushNotificationMessageSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-
         'Message'      => 'message:json_string',
         'Priority'     => 'priority:json_string',
         'Created'      => 'created:datetime_epoch',

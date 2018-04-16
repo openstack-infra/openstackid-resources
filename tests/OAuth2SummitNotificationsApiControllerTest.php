@@ -59,4 +59,125 @@ final class OAuth2SummitNotificationsApiControllerTest extends ProtectedApiTest
 
         return $notifications;
     }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testAddPushNotificationEveryone($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $message = str_random(16).'_message';
+
+        $data = [
+            'message'  => $message,
+            'channel' => \models\summit\SummitPushNotificationChannel::Everyone,
+            'platform'   => \models\summit\SummitPushNotification::PlatformMobile,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitNotificationsApiController@addPushNotification",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $notification = json_decode($content);
+        $this->assertTrue(!is_null($notification));
+        return $notification;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testAddPushNotificationMembersFail($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $message = str_random(16).'_message';
+
+        $data = [
+            'message'  => $message,
+            'channel' => \models\summit\SummitPushNotificationChannel::Members,
+            'platform'   => \models\summit\SummitPushNotification::PlatformMobile,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitNotificationsApiController@addPushNotification",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testAddPushNotificationMembers($summit_id = 24){
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $message = str_random(16).'_message';
+
+        $data = [
+            'message'  => $message,
+            'channel' => \models\summit\SummitPushNotificationChannel::Members,
+            'platform'   => \models\summit\SummitPushNotification::PlatformMobile,
+            'recipient_ids' => [13867]
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitNotificationsApiController@addPushNotification",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $notification = json_decode($content);
+        $this->assertTrue(!is_null($notification));
+        return $notification;
+    }
 }

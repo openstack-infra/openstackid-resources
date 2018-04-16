@@ -185,6 +185,19 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
+        Validator::extend('int_array', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('int_array', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be an array of int", $attribute);
+            });
+            if(!is_array($value)) return false;
+            foreach($value as $element)
+            {
+                if(!is_int($element)) return false;
+            }
+            return true;
+        });
+
         Validator::extend('team_permission', function($attribute, $value, $parameters, $validator)
         {
             $validator->addReplacer('team_permission', function($message, $attribute, $rule, $parameters) use ($validator) {

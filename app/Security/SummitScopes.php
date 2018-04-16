@@ -21,6 +21,7 @@ final class SummitScopes
     const ReadSummitData     = '%s/summits/read';
     const ReadAllSummitData  = '%s/summits/read/all';
     const ReadNotifications  = '%s/summits/read-notifications';
+    const WriteNotifications  = '%s/summits/write-notifications';
 
     const WriteSummitData    = '%s/summits/write';
     const WriteSpeakersData  = '%s/speakers/write';

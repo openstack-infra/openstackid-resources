@@ -12,30 +12,20 @@
  * limitations under the License.
  **/
 
-/**
- * Class SummitTicketTypeValidationRulesFactory
- * @package App\Http\Controllers
- */
-final class SummitTicketTypeValidationRulesFactory
+final class SummitPushNotificationValidationRulesFactory
 {
     /**
      * @param array $data
      * @return array
      */
-    public static function build(array $data, $update = false){
-        if($update){
-            return [
-                'name'        => 'sometimes|string',
-                'description' => 'sometimes|string',
-                'external_id' => 'sometimes|string|max:255',
-            ];
-        }
-
+    public static function build(array $data){
         return [
-            'name'        => 'required|string',
-            'description' => 'sometimes|string',
-            'external_id' => 'required|string|max:255',
+            'message'       => 'required|string',
+            'platform'      => 'required|in:MOBILE,WEB',
+            'channel'       => 'required_if:platform,MOBILE|in:EVERYONE,SPEAKERS,ATTENDEES,MEMBERS,SUMMIT,EVENT,GROUP',
+            'event_id'      => 'required_if:channel,EVENT|integer',
+            'group_id'      => 'required_if:channel,GROUP|integer',
+            'recipient_ids' => 'required_if:channel,MEMBERS|int_array',
         ];
     }
-
 }

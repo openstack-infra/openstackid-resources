@@ -12,17 +12,18 @@
  * limitations under the License.
  **/
 use App\Http\Utils\PagingConstants;
+use App\Services\Model\ISummitPushNotificationService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitNotificationRepository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Input;
 use models\summit\ISummitRepository;
-use models\summit\SummitPushNotificationChannel;
+use ModelSerializers\SerializerRegistry;
 use utils\Filter;
 use utils\FilterParser;
-use utils\FilterParserException;
 use utils\OrderParser;
 use utils\PagingInfo;
 use Illuminate\Support\Facades\Validator;
@@ -39,21 +40,30 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
     private $summit_repository;
 
     /**
-     * OAuth2SummitNotificationsApiController constructor.
-     * @param ISummitRepository $summit_repository
-     * @param ISummitNotificationRepository $notification_repository
-     * @param IResourceServerContext $resource_server_context
+     * @var ISummitPushNotificationService
      */
+    private $push_notification_service;
+
+    /**
+     * @var IMemberRepository
+     */
+    private $member_repository;
+
     public function __construct
     (
         ISummitRepository $summit_repository,
         ISummitNotificationRepository $notification_repository,
+        IMemberRepository $member_repository,
+        ISummitPushNotificationService $push_notification_service,
         IResourceServerContext $resource_server_context
     )
     {
         parent::__construct($resource_server_context);
-        $this->repository         = $notification_repository;
-        $this->summit_repository = $summit_repository;
+
+        $this->repository                = $notification_repository;
+        $this->push_notification_service = $push_notification_service;
+        $this->member_repository         = $member_repository;
+        $this->summit_repository         = $summit_repository;
     }
 
     /**
@@ -144,6 +154,56 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
         }
         catch (\Exception $ex)
         {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function addPushNotification($summit_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $data = Input::json();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitPushNotificationValidationRulesFactory::build($data->all());
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $current_member = null;
+            if(!is_null($this->resource_server_context->getCurrentUserExternalId())){
+                $current_member = $this->member_repository->getById($this->resource_server_context->getCurrentUserExternalId());
+            }
+
+            $notification = $this->push_notification_service->addPushNotification($summit, $current_member, $data->all());
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($notification)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (\Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

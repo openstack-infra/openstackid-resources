@@ -544,6 +544,7 @@ class Summit extends SilverstripeBaseModel
         $this->excluded_categories_for_upload_slide_decks = new ArrayCollection;
         $this->rsvp_templates = new ArrayCollection;
         $this->track_tag_groups = new ArrayCollection;
+        $this->notifications = new ArrayCollection;
     }
 
     /**
@@ -1001,6 +1002,12 @@ class Summit extends SilverstripeBaseModel
      * @var SummitEntityEvent[]
      */
     private $entity_events;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\SummitPushNotification", mappedBy="summit", cascade={"persist"}, orphanRemoval=true)
+     * @var SummitPushNotification[]
+     */
+    private $notifications;
 
     /**
      * @param SummitEvent $summit_event
@@ -1937,4 +1944,13 @@ SQL;
         $this->max_submission_allowed_per_user = $max_submission_allowed_per_user;
     }
 
+    /**
+     * @param SummitPushNotification $notification
+     * @return $this
+     */
+    public function addNotification(SummitPushNotification $notification){
+        $this->notifications->add($notification);
+        $notification->setSummit($this);
+        return $this;
+    }
 }

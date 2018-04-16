@@ -70,4 +70,8 @@ return [
     'PresentationCategoryGroupService.disassociateAllowedGroup2TrackGroup.GroupNotFound' => 'group :group_id does not exists.',
     'SummitService.updateSummit.SummitNotFound' => 'summit :summit_id not found',
     'SummitService.deleteSummit.SummitNotFound' => 'summit :summit_id not found',
+    // SummitPushNotificationService
+    'SummitPushNotificationService.addPushNotification.EventNotFound' => 'event :event_id does not belongs to summit :summit_id schedule',
+    'SummitPushNotificationService.addPushNotification.GroupNotFound' => 'group :group_id not found',
+    'SummitPushNotificationService.addPushNotification.MemberNotFound' => 'member :member_id not found',
 ];

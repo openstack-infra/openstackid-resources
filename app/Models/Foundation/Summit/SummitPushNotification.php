@@ -14,6 +14,7 @@
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use models\main\Group;
+use models\main\Member;
 use models\main\PushNotificationMessage;
 /**
  * Class SummitPushNotificationChannel
@@ -141,19 +142,20 @@ class SummitPushNotification extends PushNotificationMessage
     }
 
     /**
-     * @param ArrayCollection $recipients
-     */
-    public function setRecipients($recipients)
-    {
-        $this->recipients = $recipients;
-    }
-
-    /**
      * SummitPushNotification constructor.
      */
     public function __construct()
     {
         parent::__construct();
-        $this->recipients = new ArrayCollection();
+        $this->recipients = new ArrayCollection;
+    }
+
+    /**
+     * @param Member $member
+     * @return $this
+     */
+    public function addRecipient(Member $member){
+        $this->recipients->add($member);
+        return $this;
     }
 }
