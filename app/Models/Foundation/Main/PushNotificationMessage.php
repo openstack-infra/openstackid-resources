@@ -11,16 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="PushNotificationMessage")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
- * @ORM\DiscriminatorMap({"PushNotificationMessage" = "PushNotificationMessage", "SummitPushNotification" = "models\summit\SummitPushNotification", "ChatTeamPushNotificationMessage" = "ChatTeamPushNotificationMessage"})
+ * @ORM\DiscriminatorMap({
+ *     "PushNotificationMessage" = "PushNotificationMessage",
+ *     "SummitPushNotification" = "models\summit\SummitPushNotification",
+ *     "ChatTeamPushNotificationMessage" = "ChatTeamPushNotificationMessage"
+ * })
  * Class PushNotificationMessage
  * @package models\main
  */
@@ -91,6 +93,18 @@ class PushNotificationMessage extends SilverstripeBaseModel
     public function getOwnerId(){
         try{
             return $this->owner->getId();
+        }
+        catch (\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getApprovedById(){
+        try{
+            return $this->approved_by->getId();
         }
         catch (\Exception $ex){
             return 0;
@@ -179,6 +193,13 @@ class PushNotificationMessage extends SilverstripeBaseModel
     }
 
     /**
+     * @return bool
+     */
+    public function hasOwner(){
+        return $this->getOwnerId() > 0;
+    }
+
+    /**
      * @param Member $owner
      */
     public function setOwner($owner)
@@ -240,6 +261,13 @@ class PushNotificationMessage extends SilverstripeBaseModel
     public function getApprovedBy()
     {
         return $this->approved_by;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasApprovedBy(){
+        return $this->getApprovedById() > 0;
     }
 
     /**

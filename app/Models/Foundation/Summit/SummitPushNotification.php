@@ -11,12 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use models\main\Group;
 use models\main\PushNotificationMessage;
-
 /**
  * Class SummitPushNotificationChannel
  * @package models\summit
@@ -62,6 +60,29 @@ class SummitPushNotification extends PushNotificationMessage
      * @var string
      */
     private $channel;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent")
+     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID")
+     * @var SummitEvent
+     */
+    private $summit_event;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="models\main\Group")
+     * @ORM\JoinColumn(name="GroupID", referencedColumnName="ID")
+     * @var Group
+     */
+    private $group;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="models\main\Member")
+     * @ORM\JoinTable(name="SummitPushNotification_Recipients",
+     *      joinColumns={@ORM\JoinColumn(name="SummitPushNotificationID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")}
+     *      )
+     */
+    private $recipients;
 
     /**
      * @return string
@@ -126,29 +147,6 @@ class SummitPushNotification extends PushNotificationMessage
     {
         $this->recipients = $recipients;
     }
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\summit\SummitEvent")
-     * @ORM\JoinColumn(name="EventID", referencedColumnName="ID")
-     * @var SummitEvent
-     */
-    private $summit_event;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="models\main\Group")
-     * @ORM\JoinColumn(name="GroupID", referencedColumnName="ID")
-     * @var Group
-     */
-    private $group;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="models\main\Member")
-     * @ORM\JoinTable(name="SummitPushNotification_Recipients",
-     *      joinColumns={@ORM\JoinColumn(name="SummitPushNotificationID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="MemberID", referencedColumnName="ID")}
-     *      )
-     */
-    private $recipients;
 
     /**
      * SummitPushNotification constructor.

@@ -34,6 +34,7 @@ use App\ModelSerializers\Marketplace\RemoteCloudServiceSerializer;
 use App\ModelSerializers\Marketplace\ServiceOfferedTypeSerializer;
 use App\ModelSerializers\Marketplace\SpokenLanguageSerializer;
 use App\ModelSerializers\Marketplace\SupportChannelTypeSerializer;
+use App\ModelSerializers\PushNotificationMessageSerializer;
 use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
 use App\ModelSerializers\Summit\AdminSummitSerializer;
@@ -177,8 +178,8 @@ final class SerializerRegistry
         $this->registry['Group']                           = GroupSerializer::class;
         $this->registry['Affiliation']                     = AffiliationSerializer::class;
         $this->registry['Organization']                    = OrganizationSerializer::class;
-
         // push notification
+        $this->registry['PushNotificationMessage']         = PushNotificationMessageSerializer::class;
         $this->registry['SummitPushNotification']          = SummitPushNotificationSerializer::class;
 
         // teams

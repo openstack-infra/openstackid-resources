@@ -1046,44 +1046,6 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     }
 
-    public function testGetSummitNotifications()
-    {
-
-        $params = array
-        (
-            'id' => 7,
-            'page' => 1,
-            'per_page' => 15,
-            'filter' => [
-                'channel==' . \models\summit\SummitPushNotificationChannel::Event . ',channel==' . \models\summit\SummitPushNotificationChannel::Group,
-            ],
-            'order' => '+sent_date'
-        );
-
-        $headers = array
-        (
-            "HTTP_Authorization" => " Bearer " . $this->access_token,
-            "CONTENT_TYPE" => "application/json"
-        );
-
-        $response = $this->action
-        (
-            "GET",
-            "OAuth2SummitNotificationsApiController@getAll",
-            $params,
-            array(),
-            array(),
-            array(),
-            $headers
-        );
-
-        $content = $response->getContent();
-        $this->assertResponseStatus(200);
-
-        $notifications = json_decode($content);
-        $this->assertTrue(!is_null($notifications));
-    }
-
     public function testAdd2Favorite($summit_id = 22, $event_id = 18719){
         $params = array
         (

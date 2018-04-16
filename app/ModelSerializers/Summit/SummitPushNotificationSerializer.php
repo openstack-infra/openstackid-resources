@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\ModelSerializers\PushNotificationMessageSerializer;
 use models\summit\SummitPushNotification;
 use models\summit\SummitPushNotificationChannel;
 
@@ -19,16 +20,12 @@ use models\summit\SummitPushNotificationChannel;
  * Class SummitPushNotificationSerializer
  * @package ModelSerializers
  */
-final class SummitPushNotificationSerializer extends SilverStripeSerializer
+final class SummitPushNotificationSerializer extends PushNotificationMessageSerializer
 {
-    protected static $array_mappings = array
-    (
+    protected static $array_mappings = [
         'Channel'  => 'channel:json_string',
-        'Message'  => 'message:json_string',
-        'SentDate' => 'sent_date:datetime_epoch',
-        'Created'  => 'created:datetime_epoch',
-        'IsSent'   => 'is_sent:json_boolean',
-    );
+        'SummitId' => 'summit_id:json_int',
+    ];
 
     /**
      * @param null $expand
@@ -37,7 +34,7 @@ final class SummitPushNotificationSerializer extends SilverStripeSerializer
      * @param array $params
      * @return array
      */
-    public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() )
+    public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [] )
     {
         $notification = $this->object;
         if(! $notification instanceof SummitPushNotification) return [];
@@ -50,6 +47,13 @@ final class SummitPushNotificationSerializer extends SilverStripeSerializer
         if($notification->getChannel() == SummitPushNotificationChannel::Group){
             $values['group'] = SerializerRegistry::getInstance()->getSerializer($notification->getGroup())->serialize();
         }
+
+        if($notification->getChannel() == SummitPushNotificationChannel::Members){
+            $values['recipients'] = [];
+            foreach ($notification->getRecipients() as $recipient)
+                $values['recipients'][] = SerializerRegistry::getInstance()->getSerializer($recipient)->serialize();
+        }
+
         return $values;
     }
 }

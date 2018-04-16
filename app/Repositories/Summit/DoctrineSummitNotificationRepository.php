@@ -43,7 +43,8 @@ final class DoctrineSummitNotificationRepository
             'channel'   => 'n.channel:json_string',
             'sent_date' => 'n.sent_date:datetime_epoch',
             'created'   => 'n.created:datetime_epoch',
-            'is_sent'   => 'n.is_sent:json_int',
+            'is_sent'   => 'n.is_sent:json_boolean',
+            'approved'  => 'n.approved:json_boolean',
         ];
     }
 

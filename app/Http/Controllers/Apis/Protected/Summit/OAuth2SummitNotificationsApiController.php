@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use App\Http\Utils\PagingConstants;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\oauth2\IResourceServerContext;
@@ -20,13 +20,13 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Input;
 use models\summit\ISummitRepository;
 use models\summit\SummitPushNotificationChannel;
+use utils\Filter;
 use utils\FilterParser;
 use utils\FilterParserException;
 use utils\OrderParser;
 use utils\PagingInfo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Request;
-
 /**
  * Class OAuth2SummitNotificationsApiController
  * @package App\Http\Controllers
@@ -49,7 +49,8 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
         ISummitRepository $summit_repository,
         ISummitNotificationRepository $notification_repository,
         IResourceServerContext $resource_server_context
-    ) {
+    )
+    {
         parent::__construct($resource_server_context);
         $this->repository         = $notification_repository;
         $this->summit_repository = $summit_repository;
@@ -68,11 +69,10 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
 
             $values = Input::all();
 
-            $rules = array
-            (
+            $rules = [
                 'page'     => 'integer|min:1',
-                'per_page' => 'required_with:page|integer|min:5|max:100',
-            );
+                'per_page' => sprintf('required_with:page|integer|min:%s|max:%s', PagingConstants::MinPageSize, PagingConstants::MaxPageSize),
+            ];
 
             $validation = Validator::make($values, $rules);
 
@@ -83,7 +83,7 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
 
             // default values
             $page     = 1;
-            $per_page = 5;
+            $per_page = PagingConstants::DefaultPageSize;
 
             if (Input::has('page')) {
                 $page     = intval(Input::get('page'));
@@ -97,28 +97,32 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
                     'sent_date' => ['>', '<', '<=', '>=', '=='],
                     'created'   => ['>', '<', '<=', '>=', '=='],
                     'is_sent'   => ['=='],
+                    'approved'  => ['=='],
                     'event_id'  => ['=='],
                 ]);
-                $channels = $filter->getFlatFilter("channel");
-                // validate that channel filter, if present if for a public one
-                if(!is_null($channels) && is_array($channels)){
-                    foreach ($channels as $element){
-                       if(!SummitPushNotificationChannel::isPublicChannel($element->getValue()))
-                            throw new ValidationException(sprintf("%s channel is not public!", $element->getValue()));
-                    }
-                }
             }
+
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'channel'   => 'sometimes|in:EVERYONE,SPEAKERS,ATTENDEES,MEMBERS,SUMMIT,EVENT,GROUP',
+                'sent_date' => 'sometimes|date_format:U',
+                'created'   => 'sometimes|date_format:U',
+                'is_sent'   => 'sometimes|boolean',
+                'approved'  => 'sometimes|boolean',
+                'event_id'  => 'sometimes|integer',
+            ]);
 
             $order = null;
 
             if (Input::has('order'))
             {
-                $order = OrderParser::parse(Input::get('order'), array
-                (
+                $order = OrderParser::parse(Input::get('order'), [
+
                     'sent_date',
                     'created',
                     'id',
-                ));
+                ]);
             }
 
             $result = $this->repository->getAllByPageBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
@@ -137,10 +141,6 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
         {
             Log::warning($ex2);
             return $this->error412($ex2->getMessages());
-        }
-        catch(FilterParserException $ex3){
-            Log::warning($ex3);
-            return $this->error412($ex3->getMessages());
         }
         catch (\Exception $ex)
         {

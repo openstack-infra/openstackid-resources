@@ -237,8 +237,8 @@ Route::group([
             });
 
             // notifications
-            Route::group(array('prefix' => 'notifications'), function () {
-                Route::get('', 'OAuth2SummitNotificationsApiController@getAll');
+            Route::group(['prefix' => 'notifications'], function () {
+                Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' =>  'OAuth2SummitNotificationsApiController@getAll']);
             });
 
             // speakers
@@ -249,7 +249,7 @@ Route::group([
 
                 Route::group(['prefix' => '{speaker_id}'], function () {
                     Route::get('', 'OAuth2SummitSpeakersApiController@getSummitSpeaker')->where('speaker_id', 'me|[0-9]+');
-                    Route::put('',[ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@updateSpeakerBySummit'])->where('speaker_id', 'me|[0-9]+');
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@updateSpeakerBySummit'])->where('speaker_id', 'me|[0-9]+');
                 });
             });
 

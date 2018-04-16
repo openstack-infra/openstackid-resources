@@ -11,18 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use models\utils\IBaseRepository;
+use App\Models\Foundation\Main\Repositories\IPushNotificationRepository;
 use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
-
 /**
  * Interface ISummitNotificationRepository
  * @package models\summit
  */
-interface ISummitNotificationRepository extends IBaseRepository
+interface ISummitNotificationRepository extends IPushNotificationRepository
 {
     /**
      * @param Summit $summit

@@ -93,7 +93,6 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
 
         $values = Input::all();
         $rules  = [
-
             'page'     => 'integer|min:1',
             'per_page' => sprintf('required_with:page|integer|min:%s|max:%s', PagingConstants::MinPageSize, PagingConstants::MaxPageSize),
         ];
@@ -113,7 +112,7 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
 
             // default values
             $page     = 1;
-            $per_page = PagingConstants::DefaultPageSize;;
+            $per_page = PagingConstants::DefaultPageSize;
 
             if (Input::has('page')) {
                 $page     = intval(Input::get('page'));
