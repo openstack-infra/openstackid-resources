@@ -44,6 +44,8 @@ final class SummitValidationRulesFactory
                 'link'                      => 'sometimes|url',
                 'registration_link'         => 'sometimes|url',
                 'max_submission_allowed_per_user'  => 'sometimes|integer|min:1',
+                'secondary_registration_link' => 'sometimes|url',
+                'secondary_registration_label' => 'sometimes|string',
             ];
         }
 
@@ -71,6 +73,8 @@ final class SummitValidationRulesFactory
             'link'                      => 'sometimes|url',
             'registration_link'         => 'sometimes|url',
             'max_submission_allowed_per_user'  => 'sometimes|integer|min:1',
+            'secondary_registration_link' => 'sometimes|url',
+            'secondary_registration_label' => 'sometimes|string',
         ];
     }
 }

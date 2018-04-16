@@ -148,6 +148,14 @@ final class SummitFactory
             $summit->setScheduleDefaultStartDate($start_datetime);
         }
 
+        if(isset($data['secondary_registration_link']) ){
+            $summit->setSecondaryRegistrationLink(trim($data['secondary_registration_link']));
+        }
+
+        if(isset($data['secondary_registration_label']) ){
+            $summit->setSecondaryRegistrationLabel(trim($data['secondary_registration_label']));
+        }
+
         return $summit;
     }
 }

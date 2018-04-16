@@ -19,9 +19,12 @@ use ModelSerializers\SummitSerializer;
 final class AdminSummitSerializer extends SummitSerializer
 {
     protected static $array_mappings = [
-        'AvailableOnApi' => 'available_on_api:json_boolean',
+        'AvailableOnApi'              => 'available_on_api:json_boolean',
         'MaxSubmissionAllowedPerUser' => 'max_submission_allowed_per_user:json_int',
-        'RegistrationLink' => 'registration_link:json_string',
-        'Link' => 'link:json_string',
+        'RegistrationLink'            => 'registration_link:json_string',
+        'Link'                        => 'link:json_string',
+        'ExternalSummitId'            => 'external_summit_id:json_string',
+        'CalendarSyncName'            => 'calendar_sync_name:json_string',
+        'CalendarSyncDesc'            => 'calendar_sync_desc:json_string',
     ];
 }

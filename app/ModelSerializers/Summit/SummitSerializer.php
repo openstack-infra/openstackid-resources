@@ -52,6 +52,9 @@ class SummitSerializer extends SilverStripeSerializer
         'SpeakerAnnouncementEmailAcceptedAlternateCount' => 'speaker_announcement_email_accepted_alternate_count:json_int',
         'SpeakerAnnouncementEmailAcceptedRejectedCount'  => 'speaker_announcement_email_accepted_rejected_count:json_int',
         'SpeakerAnnouncementEmailAlternateRejectedCount' => 'speaker_announcement_email_alternate_rejected_count:json_int',
+        'TimeZoneId'                                     => 'time_zone_id:json_string',
+        'SecondaryRegistrationLink'                      => 'secondary_registration_link:json_string',
+        'SecondaryRegistrationLabel'                     => 'secondary_registration_label:json_string',
     ];
 
     protected static $allowed_relations = [

@@ -173,6 +173,18 @@ class Summit extends SilverstripeBaseModel
     private $time_zone_id;
 
     /**
+     * @ORM\Column(name="SecondaryRegistrationLink", type="string")
+     * @var string
+     */
+    private $secondary_registration_link;
+
+    /**
+     * @ORM\Column(name="SecondaryRegistrationBtnText", type="string")
+     * @var string
+     */
+    private $secondary_registration_label;
+
+    /**
      * @ORM\Column(name="CalendarSyncName", type="string")
      * @var string
      */
@@ -1952,5 +1964,53 @@ SQL;
         $this->notifications->add($notification);
         $notification->setSummit($this);
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTimeZoneId()
+    {
+        return $this->time_zone_id;
+    }
+
+    /**
+     * @param string $time_zone_id
+     */
+    public function setTimeZoneId($time_zone_id)
+    {
+        $this->time_zone_id = $time_zone_id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecondaryRegistrationLink()
+    {
+        return $this->secondary_registration_link;
+    }
+
+    /**
+     * @param string $secondary_registration_link
+     */
+    public function setSecondaryRegistrationLink($secondary_registration_link)
+    {
+        $this->secondary_registration_link = $secondary_registration_link;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSecondaryRegistrationLabel()
+    {
+        return $this->secondary_registration_label;
+    }
+
+    /**
+     * @param string $secondary_registration_label
+     */
+    public function setSecondaryRegistrationLabel($secondary_registration_label)
+    {
+        $this->secondary_registration_label = $secondary_registration_label;
     }
 }
