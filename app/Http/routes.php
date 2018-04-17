@@ -245,6 +245,7 @@ Route::group([
                     Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' =>  'OAuth2SummitNotificationsApiController@getById']);
                     Route::put('approve', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' =>  'OAuth2SummitNotificationsApiController@approveNotification']);
                     Route::delete('approve', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' =>  'OAuth2SummitNotificationsApiController@unApproveNotification']);
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' =>  'OAuth2SummitNotificationsApiController@deleteNotification']);
                 });
             });
 

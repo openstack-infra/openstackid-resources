@@ -1455,6 +1455,15 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteNotifications, $current_realm)
                 ],
             ],
+            [
+                'name' => 'delete-notification',
+                'route' => '/api/v1/summits/{id}/notifications/{notification_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteNotifications, $current_realm)
+                ],
+            ],
             // promo codes
             [
                 'name' => 'get-promo-codes',

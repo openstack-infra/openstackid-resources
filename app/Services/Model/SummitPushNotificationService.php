@@ -212,7 +212,7 @@ final class SummitPushNotificationService
                 (
                     trans
                     (
-                        "not_found_errors.SummitPushNotificationService.approveNotification.unApproveNotification",
+                        "not_found_errors.SummitPushNotificationService.unApproveNotification.NotificationNotFound",
                         [
                             'summit_id' => $summit->getId(),
                             'notification_id' => $notification_id
@@ -223,6 +223,36 @@ final class SummitPushNotificationService
             }
 
             return $notification->unApprove();
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $notification_id
+     * @return void
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function deleteNotification(Summit $summit, $notification_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $notification_id){
+            $notification = $summit->getNotificationById($notification_id);
+            if(is_null($notification)){
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        "not_found_errors.SummitPushNotificationService.deleteNotification.NotificationNotFound",
+                        [
+                            'summit_id' => $summit->getId(),
+                            'notification_id' => $notification_id
+                        ]
+                    )
+
+                );
+            }
+
+            $summit->removeNotification($notification);
         });
     }
 }

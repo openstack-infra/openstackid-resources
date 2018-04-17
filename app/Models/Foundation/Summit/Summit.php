@@ -2025,6 +2025,16 @@ SQL;
     }
 
     /**
+     * @param SummitPushNotification $notification
+     * @return $this
+     */
+    public function removeNotification(SummitPushNotification $notification){
+        $this->notifications->removeElement($notification);
+        $notification->clearSummit();
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getCalendarSyncName()
