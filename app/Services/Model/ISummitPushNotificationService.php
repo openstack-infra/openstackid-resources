@@ -31,4 +31,24 @@ interface ISummitPushNotificationService
      * @throws EntityNotFoundException
      */
     public function addPushNotification(Summit $summit, Member $current_member, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param Member|null $current_member
+     * @param int $notification_id
+     * @return SummitPushNotification
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function approveNotification(Summit $summit, Member $current_member, $notification_id);
+
+    /**
+     * @param Summit $summit
+     * @param Member|null $current_member
+     * @param int $notification_id
+     * @return SummitPushNotification
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function unApproveNotification(Summit $summit, Member $current_member, $notification_id);
 }

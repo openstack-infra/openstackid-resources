@@ -1437,6 +1437,24 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteNotifications, $current_realm)
                 ],
             ],
+            [
+                'name' => 'approve-notification',
+                'route' => '/api/v1/summits/{id}/notifications/{notification_id}/approve',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteNotifications, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'unapprove-notification',
+                'route' => '/api/v1/summits/{id}/notifications/{notification_id}/approve',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteNotifications, $current_realm)
+                ],
+            ],
             // promo codes
             [
                 'name' => 'get-promo-codes',

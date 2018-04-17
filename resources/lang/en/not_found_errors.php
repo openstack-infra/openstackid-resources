@@ -74,4 +74,6 @@ return [
     'SummitPushNotificationService.addPushNotification.EventNotFound' => 'event :event_id does not belongs to summit :summit_id schedule',
     'SummitPushNotificationService.addPushNotification.GroupNotFound' => 'group :group_id not found',
     'SummitPushNotificationService.addPushNotification.MemberNotFound' => 'member :member_id not found',
+    'SummitPushNotificationService.approveNotification.approveNotification' => 'notification :notification_id not found on summit :summit_id',
+    'SummitPushNotificationService.approveNotification.unApproveNotification'=> 'notification :notification_id not found on summit :summit_id',
 ];

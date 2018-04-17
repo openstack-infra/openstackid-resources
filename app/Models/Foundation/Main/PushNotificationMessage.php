@@ -213,6 +213,25 @@ class PushNotificationMessage extends SilverstripeBaseModel
     }
 
     /**
+     * @param Member|null $approved_by
+     * @return $this
+     */
+    public function approve(Member $approved_by = null){
+        $this->approved = true;
+        $this->approved_by = $approved_by;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function unApprove(){
+        $this->approved = false;
+        $this->approved_by = null;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getPriority()

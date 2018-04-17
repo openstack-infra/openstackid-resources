@@ -274,6 +274,65 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
 
     /**
      * @param $summit_id
+     * @param $notification_id
+     * @return mixed
+     */
+    public function approveNotification($summit_id, $notification_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member = null;
+            if(!is_null($this->resource_server_context->getCurrentUserExternalId())){
+                $current_member = $this->member_repository->getById($this->resource_server_context->getCurrentUserExternalId());
+            }
+
+            $notification = $this->push_notification_service->approveNotification($summit, $current_member, $notification_id);
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($notification)->serialize( Request::input('expand', '')));
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $notification_id
+     * @return mixed
+     */
+    public function unApproveNotification($summit_id, $notification_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $current_member = null;
+            if(!is_null($this->resource_server_context->getCurrentUserExternalId())){
+                $current_member = $this->member_repository->getById($this->resource_server_context->getCurrentUserExternalId());
+            }
+
+            $notification = $this->push_notification_service->unApproveNotification($summit, $current_member, $notification_id);
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($notification)->serialize( Request::input('expand', '')));
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
+    /**
+     * @param $summit_id
      * @return mixed
      */
     public function addPushNotification($summit_id){
