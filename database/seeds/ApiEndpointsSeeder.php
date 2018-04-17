@@ -1409,6 +1409,26 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm),
                     sprintf(SummitScopes::ReadNotifications, $current_realm)
                 ],
+            ],
+            [
+                'name' => 'get-notifications-csv',
+                'route' => '/api/v1/summits/{id}/notifications/csv',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadNotifications, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'get-notification-by-id',
+                'route' => '/api/v1/summits/{id}/notifications/{notification_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadNotifications, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'add-notifications',
                 'route' => '/api/v1/summits/{id}/notifications',
                 'http_method' => 'POST',

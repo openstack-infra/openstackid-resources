@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\BooleanCellFormatter;
+use App\Http\Utils\EpochCellFormatter;
 use App\Http\Utils\PagingConstants;
 use App\Services\Model\ISummitPushNotificationService;
 use models\exceptions\EntityNotFoundException;
@@ -154,6 +156,117 @@ class OAuth2SummitNotificationsApiController extends OAuth2ProtectedController
         }
         catch (\Exception $ex)
         {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getAllCSV($summit_id)
+    {
+        try
+        {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+
+            // default values
+            $page     = 1;
+            $per_page = PHP_INT_MAX;
+
+
+            $filter = null;
+            if (Input::has('filter')) {
+                $filter = FilterParser::parse(Input::get('filter'), [
+                    'channel'   => ['=='],
+                    'sent_date' => ['>', '<', '<=', '>=', '=='],
+                    'created'   => ['>', '<', '<=', '>=', '=='],
+                    'is_sent'   => ['=='],
+                    'approved'  => ['=='],
+                    'event_id'  => ['=='],
+                ]);
+            }
+
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'channel'   => 'sometimes|in:EVERYONE,SPEAKERS,ATTENDEES,MEMBERS,SUMMIT,EVENT,GROUP',
+                'sent_date' => 'sometimes|date_format:U',
+                'created'   => 'sometimes|date_format:U',
+                'is_sent'   => 'sometimes|boolean',
+                'approved'  => 'sometimes|boolean',
+                'event_id'  => 'sometimes|integer',
+            ]);
+
+            $order = null;
+
+            if (Input::has('order'))
+            {
+                $order = OrderParser::parse(Input::get('order'), [
+
+                    'sent_date',
+                    'created',
+                    'id',
+                ]);
+            }
+
+            $data     = $this->repository->getAllByPageBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
+            $filename = "push-notification-" . date('Ymd');
+            $list     =  $data->toArray();
+            return $this->export
+            (
+                'csv',
+                $filename,
+                $list['data'],
+                [
+                    'created'     => new EpochCellFormatter,
+                    'last_edited' => new EpochCellFormatter,
+                    'sent_date'   => new EpochCellFormatter,
+                    'is_sent'     => new BooleanCellFormatter,
+                    'approved'    => new BooleanCellFormatter,
+                ]
+            );
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (\Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $notification_id
+     * @return mixed
+     */
+    public function getById($summit_id, $notification_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $notification = $summit->getNotificationById($notification_id);
+            if(is_null($notification))
+                return $this->error404();
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($notification)->serialize( Request::input('expand', '')));
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
