@@ -1796,7 +1796,6 @@ SQL;
         return $rsvp_template === false ? null : $rsvp_template;
     }
 
-
     /**
      * @param RSVPTemplate $template
      * @return $this
@@ -2012,5 +2011,32 @@ SQL;
     public function setSecondaryRegistrationLabel($secondary_registration_label)
     {
         $this->secondary_registration_label = $secondary_registration_label;
+    }
+
+    /**
+     * @param int $notification_id
+     * @return SummitPushNotification|null
+     */
+    public function getNotificationById($notification_id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($notification_id)));
+        $notification = $this->notifications->matching($criteria)->first();
+        return $notification === false ? null : $notification;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCalendarSyncName()
+    {
+        return $this->calendar_sync_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCalendarSyncDesc()
+    {
+        return $this->calendar_sync_desc;
     }
 }

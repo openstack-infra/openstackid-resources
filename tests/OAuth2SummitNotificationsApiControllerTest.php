@@ -64,6 +64,44 @@ final class OAuth2SummitNotificationsApiControllerTest extends ProtectedApiTest
      * @param int $summit_id
      * @return mixed
      */
+    public function testGetPushNotificationById($summit_id = 24){
+        $notifications_response = $this->testGetApprovedSummitNotifications($summit_id);
+
+        $params = [
+            'id' => $summit_id,
+            'notification_id' => $notifications_response->data[0]->id
+        ];
+
+        $headers = [
+
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        ];
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitNotificationsApiController@getById",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $notification = json_decode($content);
+        $this->assertTrue(!is_null($notification));
+
+        return $notification;
+    }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
     public function testAddPushNotificationEveryone($summit_id = 24){
 
         $params = [
