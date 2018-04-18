@@ -127,7 +127,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             'name'         => 'Vancouver, BC',
             'start_date'   => 1522853212,
             'end_date'     => 1542853212,
-            'time_zone_id' => 'America/Argentina/Buenos_Aires'
+            'time_zone_id' => 'America/Argentina/Buenos_Aires',
         ];
 
         $headers = [
@@ -158,7 +158,9 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
             'name'         => $name,
             'start_date'   => 1522853212,
             'end_date'     => 1542853212,
-            'time_zone_id' => 'America/Argentina/Buenos_Aires'
+            'time_zone_id' => 'America/Argentina/Buenos_Aires',
+            'submission_begin_date' => null,
+            'submission_end_date' => null,
         ];
 
         $headers = [

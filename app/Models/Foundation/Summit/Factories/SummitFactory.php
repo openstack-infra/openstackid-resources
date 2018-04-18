@@ -65,87 +65,122 @@ final class SummitFactory
             $summit->setCalendarSyncDesc(trim($data['calendar_sync_desc']));
         }
 
-        if(isset($data['start_date']) && isset($data['end_date'])) {
-            $start_datetime = intval($data['start_date']);
-            $start_datetime = new \DateTime("@$start_datetime");
-            $start_datetime->setTimezone($summit->getTimeZone());
-            $end_datetime = intval($data['end_date']);
-            $end_datetime = new \DateTime("@$end_datetime");
-            $end_datetime->setTimezone($summit->getTimeZone());
+        if(array_key_exists('start_date', $data) && array_key_exists('end_date', $data)) {
+            if (isset($data['start_date']) && isset($data['end_date'])) {
+                $start_datetime = intval($data['start_date']);
+                $start_datetime = new \DateTime("@$start_datetime");
+                $start_datetime->setTimezone($summit->getTimeZone());
+                $end_datetime = intval($data['end_date']);
+                $end_datetime = new \DateTime("@$end_datetime");
+                $end_datetime->setTimezone($summit->getTimeZone());
 
-            // set local time from UTC
-            $summit->setBeginDate($start_datetime);
-            $summit->setEndDate($end_datetime);
+                // set local time from UTC
+                $summit->setBeginDate($start_datetime);
+                $summit->setEndDate($end_datetime);
+            }
+            else{
+                $summit->clearBeginEndDates();
+            }
         }
 
-        if(isset($data['submission_begin_date']) && isset($data['submission_end_date'])) {
-            $start_datetime = intval($data['submission_begin_date']);
-            $start_datetime = new \DateTime("@$start_datetime");
-            $start_datetime->setTimezone($summit->getTimeZone());
-            $end_datetime = intval($data['submission_end_date']);
-            $end_datetime = new \DateTime("@$end_datetime");
-            $end_datetime->setTimezone($summit->getTimeZone());
+        if(array_key_exists('submission_begin_date', $data) && array_key_exists('submission_end_date', $data)) {
+            if (isset($data['submission_begin_date']) && isset($data['submission_end_date'])) {
+                $start_datetime = intval($data['submission_begin_date']);
+                $start_datetime = new \DateTime("@$start_datetime");
+                $start_datetime->setTimezone($summit->getTimeZone());
+                $end_datetime = intval($data['submission_end_date']);
+                $end_datetime = new \DateTime("@$end_datetime");
+                $end_datetime->setTimezone($summit->getTimeZone());
 
-            // set local time from UTC
-            $summit->setSubmissionBeginDate($start_datetime);
-            $summit->setSubmissionEndDate($end_datetime);
+                // set local time from UTC
+                $summit->setSubmissionBeginDate($start_datetime);
+                $summit->setSubmissionEndDate($end_datetime);
+            }
+            else{
+                $summit->clearSubmissionDates();
+            }
         }
 
-        if(isset($data['voting_begin_date']) && isset($data['voting_end_date'])) {
-            $start_datetime = intval($data['voting_begin_date']);
-            $start_datetime = new \DateTime("@$start_datetime");
-            $start_datetime->setTimezone($summit->getTimeZone());
-            $end_datetime = intval($data['voting_end_date']);
-            $end_datetime = new \DateTime("@$end_datetime");
-            $end_datetime->setTimezone($summit->getTimeZone());
+        if(array_key_exists('voting_begin_date', $data) && array_key_exists('voting_end_date', $data)) {
+            if (isset($data['voting_begin_date']) && isset($data['voting_end_date'])) {
+                $start_datetime = intval($data['voting_begin_date']);
+                $start_datetime = new \DateTime("@$start_datetime");
+                $start_datetime->setTimezone($summit->getTimeZone());
+                $end_datetime = intval($data['voting_end_date']);
+                $end_datetime = new \DateTime("@$end_datetime");
+                $end_datetime->setTimezone($summit->getTimeZone());
 
-            // set local time from UTC
-            $summit->setVotingBeginDate($start_datetime);
-            $summit->setVotingEndDate($end_datetime);
+                // set local time from UTC
+                $summit->setVotingBeginDate($start_datetime);
+                $summit->setVotingEndDate($end_datetime);
+            }
+            else{
+                $summit->clearVotingDates();
+            }
         }
 
-        if(isset($data['selection_begin_date']) && isset($data['selection_end_date'])) {
-            $start_datetime = intval($data['selection_begin_date']);
-            $start_datetime = new \DateTime("@$start_datetime");
-            $start_datetime->setTimezone($summit->getTimeZone());
-            $end_datetime = intval($data['selection_end_date']);
-            $end_datetime = new \DateTime("@$end_datetime");
-            $end_datetime->setTimezone($summit->getTimeZone());
+        if(array_key_exists('selection_begin_date', $data) && array_key_exists('selection_end_date', $data)) {
+            if (isset($data['selection_begin_date']) && isset($data['selection_end_date'])) {
+                $start_datetime = intval($data['selection_begin_date']);
+                $start_datetime = new \DateTime("@$start_datetime");
+                $start_datetime->setTimezone($summit->getTimeZone());
+                $end_datetime = intval($data['selection_end_date']);
+                $end_datetime = new \DateTime("@$end_datetime");
+                $end_datetime->setTimezone($summit->getTimeZone());
 
-            // set local time from UTC
-            $summit->setSelectionBeginDate($start_datetime);
-            $summit->setSelectionEndDate($end_datetime);
+                // set local time from UTC
+                $summit->setSelectionBeginDate($start_datetime);
+                $summit->setSelectionEndDate($end_datetime);
+            }
+            else{
+                $summit->clearSelectionDates();
+            }
         }
 
-        if(isset($data['registration_begin_date']) && isset($data['registration_end_date'])) {
-            $start_datetime = intval($data['registration_begin_date']);
-            $start_datetime = new \DateTime("@$start_datetime");
-            $start_datetime->setTimezone($summit->getTimeZone());
-            $end_datetime = intval($data['registration_end_date']);
-            $end_datetime = new \DateTime("@$end_datetime");
-            $end_datetime->setTimezone($summit->getTimeZone());
+        if(array_key_exists('registration_begin_date', $data) && array_key_exists('registration_end_date', $data)) {
+            if (isset($data['registration_begin_date']) && isset($data['registration_end_date'])) {
+                $start_datetime = intval($data['registration_begin_date']);
+                $start_datetime = new \DateTime("@$start_datetime");
+                $start_datetime->setTimezone($summit->getTimeZone());
+                $end_datetime = intval($data['registration_end_date']);
+                $end_datetime = new \DateTime("@$end_datetime");
+                $end_datetime->setTimezone($summit->getTimeZone());
 
-            // set local time from UTC
-            $summit->setRegistrationBeginDate($start_datetime);
-            $summit->setRegistrationEndDate($end_datetime);
+                // set local time from UTC
+                $summit->setRegistrationBeginDate($start_datetime);
+                $summit->setRegistrationEndDate($end_datetime);
+            }
+            else{
+                $summit->clearRegistrationDates();
+            }
         }
 
-        if(isset($data['start_showing_venues_date'])) {
-            $start_datetime = intval($data['start_showing_venues_date']);
-            $start_datetime = new \DateTime("@$start_datetime");
-            $start_datetime->setTimezone($summit->getTimeZone());
+        if(array_key_exists('start_showing_venues_date', $data)){
+            if (isset($data['start_showing_venues_date'])) {
+                $start_datetime = intval($data['start_showing_venues_date']);
+                $start_datetime = new \DateTime("@$start_datetime");
+                $start_datetime->setTimezone($summit->getTimeZone());
 
-            // set local time from UTC
-            $summit->setStartShowingVenuesDate($start_datetime);
+                // set local time from UTC
+                $summit->setStartShowingVenuesDate($start_datetime);
+            }
+            else{
+                $summit->clearStartShowingVenuesDate();
+            }
         }
 
-        if(isset($data['schedule_start_date'])) {
-            $start_datetime = intval($data['schedule_start_date']);
-            $start_datetime = new \DateTime("@$start_datetime");
-            $start_datetime->setTimezone($summit->getTimeZone());
+        if(array_key_exists('schedule_start_date', $data)) {
+            if (isset($data['schedule_start_date'])) {
+                $start_datetime = intval($data['schedule_start_date']);
+                $start_datetime = new \DateTime("@$start_datetime");
+                $start_datetime->setTimezone($summit->getTimeZone());
 
-            // set local time from UTC
-            $summit->setScheduleDefaultStartDate($start_datetime);
+                // set local time from UTC
+                $summit->setScheduleDefaultStartDate($start_datetime);
+            }
+            else{
+                $summit->clearScheduleDefaultStartDate();
+            }
         }
 
         if(isset($data['link']) ){

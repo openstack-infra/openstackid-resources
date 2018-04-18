@@ -390,6 +390,10 @@ class Summit extends SilverstripeBaseModel
         $this->schedule_default_start_date = $this->convertDateFromTimeZone2UTC($schedule_default_start_date);
     }
 
+    public function clearScheduleDefaultStartDate(){
+        $this->schedule_default_start_date = null;
+    }
+
     /**
      * @return mixed
      */
@@ -404,6 +408,14 @@ class Summit extends SilverstripeBaseModel
     public function setBeginDate($begin_date)
     {
        $this->begin_date = $this->convertDateFromTimeZone2UTC($begin_date);
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearBeginEndDates(){
+        $this->begin_date = $this->end_date = null;
+        return $this;
     }
 
     /**
@@ -452,6 +464,10 @@ class Summit extends SilverstripeBaseModel
     public function setStartShowingVenuesDate($start_showing_venues_date)
     {
         $this->start_showing_venues_date = $this->convertDateFromTimeZone2UTC($start_showing_venues_date);
+    }
+
+    public function clearStartShowingVenuesDate(){
+        $this->start_showing_venues_date = null;
     }
 
     /**
@@ -1394,6 +1410,14 @@ SQL;
     }
 
     /**
+     * @return $this
+     */
+    public function clearSubmissionDates(){
+        $this->submission_begin_date =  $this->submission_end_date = null;
+        return $this;
+    }
+
+    /**
      * @return DateTime
      */
     public function getSubmissionEndDate()
@@ -1421,6 +1445,14 @@ SQL;
      */
     public function setVotingBeginDate(DateTime $voting_begin_date){
         $this->voting_begin_date = $this->convertDateFromTimeZone2UTC($voting_begin_date);
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearVotingDates(){
+        $this->voting_begin_date = $this->voting_end_date = null;
+        return $this;
     }
 
     /**
@@ -1454,6 +1486,14 @@ SQL;
     }
 
     /**
+     * @return $this
+     */
+    public function clearSelectionDates(){
+        $this->selection_begin_date =  $this->selection_end_date = null;
+        return $this;
+    }
+
+    /**
      * @return DateTime
      */
     public function getSelectionEndDate()
@@ -1481,6 +1521,14 @@ SQL;
      */
     public function setRegistrationBeginDate(DateTime $registration_begin_date){
         $this->registration_begin_date = $this->convertDateFromTimeZone2UTC($registration_begin_date);
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearRegistrationDates(){
+        $this->registration_begin_date = $this->registration_end_date = null;
+        return $this;
     }
 
     /**
