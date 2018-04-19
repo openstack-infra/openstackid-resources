@@ -507,6 +507,7 @@ Route::group([
             Route::group(['prefix' => 'track-groups'], function () {
                 Route::get('', 'OAuth2PresentationCategoryGroupController@getAllBySummit');
                 Route::get('csv', 'OAuth2PresentationCategoryGroupController@getAllBySummitCSV');
+                Route::get('metadata', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@getMetadata']);
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2PresentationCategoryGroupController@addTrackGroupBySummit']);
 
                 Route::group(['prefix' => '{track_group_id}'], function () {

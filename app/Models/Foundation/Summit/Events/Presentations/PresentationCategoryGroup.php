@@ -198,4 +198,22 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
     public function getClassName(){
         return self::ClassName;
     }
+
+    public static $metadata = [
+        'class_name'  => self::ClassName,
+        'id'          => 'integer',
+        'summit_id'   => 'integer',
+        'name'        => 'string',
+        'color'       => 'string',
+        'description' => 'string',
+        'categories'  => 'array'
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return self::$metadata;
+    }
+
 }

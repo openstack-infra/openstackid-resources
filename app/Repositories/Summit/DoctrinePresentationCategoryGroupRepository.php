@@ -145,4 +145,16 @@ final class DoctrinePresentationCategoryGroupRepository
             $data
         );
     }
+
+    /**
+     * @param Summit $summit
+     * @return array
+     */
+    public function getMetadata(Summit $summit)
+    {
+        return [
+            PresentationCategoryGroup::getMetadata(),
+            PrivatePresentationCategoryGroup::getMetadata(),
+        ];
+    }
 }

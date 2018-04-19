@@ -225,4 +225,20 @@ class PrivatePresentationCategoryGroup extends PresentationCategoryGroup
         return $res;
     }
 
+
+    public static $metadata = [
+        'class_name'                      => self::ClassName,
+        'submission_begin_date'           => 'datetime',
+        'submission_end_date'             => 'datetime',
+        'max_submission_allowed_per_user' => 'integer',
+        'allowed_groups'                  => 'array'
+    ];
+
+    /**
+     * @return array
+     */
+    public static function getMetadata(){
+        return array_merge(PresentationCategoryGroup::getMetadata(), self::$metadata);
+    }
+
 }

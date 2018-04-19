@@ -11,11 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\Summit;
 /**
  * Interface IPresentationCategoryGroupRepository
  * @package App\Models\Foundation\Summit\Repositories
  */
 interface IPresentationCategoryGroupRepository extends ISummitOwnedEntityRepository
 {
-
+    /**
+     * @param Summit $summit
+     * @return array
+     */
+    public function getMetadata(Summit $summit);
 }

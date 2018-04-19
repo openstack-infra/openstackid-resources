@@ -16,6 +16,7 @@ final class OAuth2TrackGroupsApiTest extends ProtectedApiTest
 {
     /**
      * @param int $summit_id
+     * @return mixed
      */
     public function testGetTrackGroups($summit_id = 23)
     {
@@ -42,6 +43,36 @@ final class OAuth2TrackGroupsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
         return $track_groups;
     }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testGetTrackGroupsMetadata($summit_id = 23)
+    {
+
+        $params = [
+            'id'      => $summit_id,
+        ];
+
+        $headers = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "GET",
+            "OAuth2PresentationCategoryGroupController@getMetadata",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $metadata = json_decode($content);
+        $this->assertTrue(!is_null($metadata));
+        $this->assertResponseStatus(200);
+        return $metadata;
+    }
+
 
     /**
      * @param int $summit_id
