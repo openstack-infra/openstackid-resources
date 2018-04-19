@@ -13,6 +13,7 @@
  **/
 use App\Http\Utils\BooleanCellFormatter;
 use App\Http\Utils\EpochCellFormatter;
+use App\Http\Utils\PagingConstants;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
 use App\Services\Model\ISummitTrackService;
 use Illuminate\Support\Facades\Request;
@@ -77,7 +78,7 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
         $rules  = [
 
             'page'     => 'integer|min:1',
-            'per_page' => 'required_with:page|integer|min:5|max:100',
+            'per_page' => sprintf('required_with:page|integer|min:%s|max:%s', PagingConstants::MinPageSize, PagingConstants::MaxPageSize),
         ];
 
         try {
@@ -94,7 +95,7 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
 
             // default values
             $page     = 1;
-            $per_page = 5;
+            $per_page = PagingConstants::DefaultPageSize;;
 
             if (Input::has('page')) {
                 $page     = intval(Input::get('page'));
@@ -105,12 +106,22 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
 
             if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'), [
-                    'title'       => ['=@', '=='],
+                    'name'        => ['=@', '=='],
                     'description' => ['=@', '=='],
                     'code'        => ['=@', '=='],
                     'group_name'  => ['=@', '=='],
                 ]);
             }
+
+
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'name'         => 'sometimes|string',
+                'description'  => 'sometimes|string',
+                'code'         => 'sometimes|string',
+                'group_name'   => 'sometimes|string',
+            ]);
 
             $order = null;
 
@@ -120,11 +131,9 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
 
                     'id',
                     'code',
-                    'title'
+                    'name'
                 ]);
             }
-
-            if(is_null($filter)) $filter = new Filter();
 
             $data = $this->repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
 

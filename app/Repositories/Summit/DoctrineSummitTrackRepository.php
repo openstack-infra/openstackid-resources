@@ -41,7 +41,7 @@ final class DoctrineSummitTrackRepository
     protected function getFilterMappings()
     {
         return [
-            'title'       => 't.title:json_string',
+            'name'        => 't.title:json_string',
             'description' => 't.description:json_string',
             'code'        => 't.code:json_string',
             'group_name'  => new DoctrineFilterMapping
@@ -58,7 +58,7 @@ final class DoctrineSummitTrackRepository
     {
         return [
             'code'  => 't.code',
-            'title' => 't.title',
+            'name'  => 't.title',
             'id'    => 't.id',
         ];
     }
