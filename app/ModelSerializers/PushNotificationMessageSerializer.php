@@ -23,6 +23,7 @@ class PushNotificationMessageSerializer extends SilverStripeSerializer
     protected static $array_mappings = [
         'Message'      => 'message:json_string',
         'Priority'     => 'priority:json_string',
+        'Platform'     => 'platform:json_string',
         'Created'      => 'created:datetime_epoch',
         'SentDate'     => 'sent_date:datetime_epoch',
         'IsSent'       => 'is_sent:json_boolean',

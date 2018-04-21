@@ -264,15 +264,15 @@ class PushNotificationMessage extends SilverstripeBaseModel
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isPlatform()
+    public function getPlatform()
     {
         return $this->platform;
     }
 
     /**
-     * @param bool $platform
+     * @param string $platform
      */
     public function setPlatform($platform)
     {
