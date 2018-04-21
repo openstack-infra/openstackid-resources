@@ -244,11 +244,25 @@ final class SummitPushNotificationService
                     (
                         "not_found_errors.SummitPushNotificationService.deleteNotification.NotificationNotFound",
                         [
-                            'summit_id' => $summit->getId(),
+                            'summit_id'       => $summit->getId(),
                             'notification_id' => $notification_id
                         ]
                     )
 
+                );
+            }
+
+            if($notification->isSent()){
+                throw new ValidationException
+                (
+                    trans
+                    (
+                        'validation_errors.SummitPushNotificationService.deleteNotification.NotificationAlreadySent',
+                        [
+                            'summit_id'       => $summit->getId(),
+                            'notification_id' => $notification_id
+                        ]
+                    )
                 );
             }
 

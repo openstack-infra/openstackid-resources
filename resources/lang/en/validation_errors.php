@@ -72,4 +72,5 @@ return [
     'SummitTrackService.copyTracks.SameSummit' => 'from summit is equal a to summit.',
     // SummitPushNotificationService
     'SummitPushNotificationService.addPushNotification.MemberNotActive' => 'member :member_id is not active',
+    'SummitPushNotificationService.deleteNotification.NotificationAlreadySent' => 'notification :notification_id is already sent.',
 ];
