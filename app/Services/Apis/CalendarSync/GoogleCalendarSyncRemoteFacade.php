@@ -45,7 +45,9 @@ final class GoogleCalendarSyncRemoteFacade
      * @var \Google_Client
      */
     private $client;
-
+    // https://developers.google.com/calendar/v3/errors
+    const ReasonForbidden = 'Forbidden';
+    const ReasonRateLimit = 'userRateLimitExceeded';
     /**
      * GoogleCalendarSyncRemoteFacade constructor.
      * @param CalendarSyncInfoOAuth2 $sync_calendar_info
@@ -112,8 +114,19 @@ final class GoogleCalendarSyncRemoteFacade
         }
         catch(Google_Service_Exception $ex1){
             if($ex1->getCode() == 403) {
-                Log::error($ex1);
-                throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                $errors  = $ex1->getErrors();
+                if(count($errors) == 0 ) return false;
+                $errors = $errors[0];
+                $reason = isset($errors['reason']) ? $errors['reason'] : '';
+                if($reason == self::ReasonForbidden) {
+                    Log::warning($ex1);
+                    return false;
+                }
+                if($reason == self::ReasonRateLimit) {
+                    Log::error($ex1);
+                    throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                }
+                return false;
             }
             if($ex1->getCode() == 401){
                 throw new RevokedAccessException($ex1->getMessage());
@@ -196,8 +209,19 @@ final class GoogleCalendarSyncRemoteFacade
         }
         catch(Google_Service_Exception $ex1){
             if($ex1->getCode() == 403) {
-                Log::error($ex1);
-                throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                $errors  = $ex1->getErrors();
+                if(count($errors) == 0 ) return false;
+                $errors = $errors[0];
+                $reason = isset($errors['reason']) ? $errors['reason'] : '';
+                if($reason == self::ReasonForbidden) {
+                    Log::warning($ex1);
+                    return false;
+                }
+                if($reason == self::ReasonRateLimit) {
+                    Log::error($ex1);
+                    throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                }
+                return false;
             }
             if($ex1->getCode() == 401){
                 throw new RevokedAccessException($ex1->getMessage());
@@ -242,8 +266,19 @@ final class GoogleCalendarSyncRemoteFacade
         }
         catch(Google_Service_Exception $ex1){
             if($ex1->getCode() == 403) {
-                Log::error($ex1);
-                throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                $errors  = $ex1->getErrors();
+                if(count($errors) == 0 ) return false;
+                $errors = $errors[0];
+                $reason = isset($errors['reason']) ? $errors['reason'] : '';
+                if($reason == self::ReasonForbidden) {
+                    Log::warning($ex1);
+                    return false;
+                }
+                if($reason == self::ReasonRateLimit) {
+                    Log::error($ex1);
+                    throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                }
+                return false;
             }
             if($ex1->getCode() == 401){
                 throw new RevokedAccessException($ex1->getMessage());
@@ -287,8 +322,19 @@ final class GoogleCalendarSyncRemoteFacade
         }
         catch(Google_Service_Exception $ex1){
             if($ex1->getCode() == 403) {
-                Log::error($ex1);
-                throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                $errors  = $ex1->getErrors();
+                if(count($errors) == 0 ) return false;
+                $errors = $errors[0];
+                $reason = isset($errors['reason']) ? $errors['reason'] : '';
+                if($reason == self::ReasonForbidden) {
+                    Log::warning($ex1);
+                    return false;
+                }
+                if($reason == self::ReasonRateLimit) {
+                    Log::error($ex1);
+                    throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                }
+                return false;
             }
             if($ex1->getCode() == 401){
                 throw new RevokedAccessException($ex1->getMessage());
@@ -326,8 +372,19 @@ final class GoogleCalendarSyncRemoteFacade
         }
         catch(Google_Service_Exception $ex1){
             if($ex1->getCode() == 403) {
-                Log::error($ex1);
-                throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                $errors  = $ex1->getErrors();
+                if(count($errors) == 0 ) return false;
+                $errors = $errors[0];
+                $reason = isset($errors['reason']) ? $errors['reason'] : '';
+                if($reason == self::ReasonForbidden) {
+                    Log::warning($ex1);
+                    return false;
+                }
+                if($reason == self::ReasonRateLimit) {
+                    Log::error($ex1);
+                    throw new RateLimitExceededException($ex1->getMessage(), $ex1->getCode());
+                }
+                return false;
             }
             if($ex1->getCode() == 401){
                 throw new RevokedAccessException($ex1->getMessage());
