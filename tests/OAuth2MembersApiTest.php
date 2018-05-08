@@ -41,6 +41,30 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
+    public function testGetMembersEmpty()
+    {
+
+        $params = [
+            'filter' => ['first_name=@', 'last_name=@'],
+            //AND FILTER
+            'order'  => '+first_name,-last_name'
+        ];
+
+        $headers = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "GET",
+            "OAuth2MembersApiController@getAll",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+    }
+
     public function testGetMembersByEmail()
     {
         $params = [
@@ -120,7 +144,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
             'expand' => 'groups, ccla_teams'
         ];
 
-        $headers  = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $headers  = ["HTTP_Authorization" => " Bearer " . $this->access_token];
         $response = $this->action(
             "GET",
             "OAuth2MembersApiController@getAll",

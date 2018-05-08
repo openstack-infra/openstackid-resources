@@ -61,7 +61,7 @@ class FilterElement extends AbstractFilterElement
         switch($this->operator)
         {
             case 'like':
-                return "%".$this->value."%";
+                return  empty($this->value) ? '' : "%".$this->value."%";
                 break;
             default:
                 return $this->value;

@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\PagingConstants;
 use App\Services\Model\IMemberService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
@@ -61,11 +62,10 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
 
         $values = Input::all();
 
-        $rules = array
-        (
+        $rules = [
             'page'     => 'integer|min:1',
-            'per_page' => 'required_with:page|integer|min:5|max:100',
-        );
+            'per_page' => sprintf('required_with:page|integer|min:%s|max:%s', PagingConstants::MinPageSize, PagingConstants::MaxPageSize),
+        ];
 
         try {
 
@@ -78,7 +78,7 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
 
             // default values
             $page     = 1;
-            $per_page = 5;
+            $per_page = PagingConstants::DefaultPageSize;;
 
             if (Input::has('page')) {
                 $page     = intval(Input::get('page'));
@@ -88,8 +88,8 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             $filter = null;
 
             if (Input::has('filter')) {
-                $filter = FilterParser::parse(Input::get('filter'),  array
-                (
+                $filter = FilterParser::parse(Input::get('filter'),  [
+
                     'irc'            => ['=@', '=='],
                     'twitter'        => ['=@', '=='],
                     'first_name'     => ['=@', '=='],
@@ -100,22 +100,34 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
                     'email_verified' => ['=='],
                     'active'         => ['=='],
                     'github_user'    => ['=@', '=='],
-                ));
+                ]);
             }
+
+            if(is_null($filter)) $filter = new Filter();
+
+            $filter->validate([
+                'irc'            => 'sometimes|required|string',
+                'twitter'        => 'sometimes|required|string',
+                'first_name'     => 'sometimes|required|string',
+                'last_name'      => 'sometimes|required|string',
+                'email'          => 'sometimes|required|string',
+                'group_slug'     => 'sometimes|required|string',
+                'group_id'       => 'sometimes|required|integer',
+                'email_verified' => 'sometimes|required|boolean',
+                'active'         => 'sometimes|required|boolean',
+                'github_user'    => 'sometimes|required|string',
+            ]);
 
             $order = null;
 
             if (Input::has('order'))
             {
-                $order = OrderParser::parse(Input::get('order'), array
-                (
+                $order = OrderParser::parse(Input::get('order'), [
                     'first_name',
                     'last_name',
                     'id',
-                ));
+                ]);
             }
-
-            if(is_null($filter)) $filter = new Filter();
 
             $data      = $this->repository->getAllByPage(new PagingInfo($page, $per_page), $filter, $order);
             $fields    = Request::input('fields', '');

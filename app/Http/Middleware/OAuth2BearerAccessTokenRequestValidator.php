@@ -258,13 +258,16 @@ class OAuth2BearerAccessTokenRequestValidator
      */
     protected function getHeaders()
     {
-        $headers = array();
+        $headers = [];
         if (function_exists('getallheaders')) {
             foreach (getallheaders() as $name => $value) {
                 $headers[strtolower($name)] = $value;
             }
-        } else {
-            // @codeCoverageIgnoreEnd
+        }
+
+        if(count($headers) == 0 )
+        {
+
             foreach ($_SERVER as $name => $value) {
                 if (substr($name, 0, 5) == 'HTTP_') {
                     $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
