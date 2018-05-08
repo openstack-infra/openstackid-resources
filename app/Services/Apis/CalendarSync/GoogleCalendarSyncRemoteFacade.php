@@ -46,8 +46,10 @@ final class GoogleCalendarSyncRemoteFacade
      */
     private $client;
     // https://developers.google.com/calendar/v3/errors
-    const ReasonForbidden = 'Forbidden';
-    const ReasonRateLimit = 'userRateLimitExceeded';
+    const ReasonForbidden          = 'Forbidden';
+    const ReasonRateLimit          = 'userRateLimitExceeded';
+    const ReasonDailyLimitExceeded = 'dailyLimitExceeded';
+    const ReasonQuotaExceeded      = 'quotaExceeded';
     /**
      * GoogleCalendarSyncRemoteFacade constructor.
      * @param CalendarSyncInfoOAuth2 $sync_calendar_info

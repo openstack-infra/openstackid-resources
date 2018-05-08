@@ -134,9 +134,11 @@ final class ICloudCalendarSyncRemoteFacade
         }
         return [$etag, $vcard];
     }
+
     /**
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
-     * @return ScheduleCalendarSyncInfo
+     * @return ScheduleCalendarSyncInfo|null
+     * @throws RevokedAccessException
      */
     public function addEvent(MemberEventScheduleSummitActionSyncWorkRequest $request)
     {
@@ -169,6 +171,10 @@ final class ICloudCalendarSyncRemoteFacade
 
             return $sync_info;
         }
+        catch(UserUnAuthorizedException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return null;
@@ -179,6 +185,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @return bool
+     * @throws RevokedAccessException
      */
     public function updateEvent
     (
@@ -210,6 +217,10 @@ final class ICloudCalendarSyncRemoteFacade
             $schedule_sync_info->setLocationId($summit_event->getLocationId());
             return true;
         }
+        catch(UserUnAuthorizedException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return false;
@@ -220,6 +231,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @return bool
+     * @throws RevokedAccessException
      */
     public function deleteEvent(MemberEventScheduleSummitActionSyncWorkRequest $request, ScheduleCalendarSyncInfo $schedule_sync_info)
     {
@@ -234,6 +246,10 @@ final class ICloudCalendarSyncRemoteFacade
 
             return $res->isSuccessFull();
         }
+        catch(UserUnAuthorizedException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return false;
@@ -244,6 +260,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param MemberCalendarScheduleSummitActionSyncWorkRequest $request
      * @param CalendarSyncInfo $calendar_sync_info
      * @return bool
+     * @throws RevokedAccessException
      */
     public function createCalendar(MemberCalendarScheduleSummitActionSyncWorkRequest $request, CalendarSyncInfo $calendar_sync_info)
     {
@@ -295,7 +312,6 @@ final class ICloudCalendarSyncRemoteFacade
         catch(UserUnAuthorizedException $ex1){
             Log::warning($ex1);
             throw new RevokedAccessException($ex1->getMessage());
-            return false;
         }
         catch (Exception $ex){
             Log::error($ex);
@@ -307,12 +323,17 @@ final class ICloudCalendarSyncRemoteFacade
      * @param MemberCalendarScheduleSummitActionSyncWorkRequest $request
      * @param CalendarSyncInfo $calendar_sync_info
      * @return bool
+     * @throws RevokedAccessException
      */
     public function deleteCalendar(MemberCalendarScheduleSummitActionSyncWorkRequest $request, CalendarSyncInfo $calendar_sync_info)
     {
         try {
             $this->client->deleteCalendar($this->sync_calendar_info->getExternalId());
             return true;
+        }
+        catch(UserUnAuthorizedException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
         }
         catch (Exception $ex){
             Log::error($ex);
