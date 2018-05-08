@@ -106,6 +106,12 @@ final class DoctrineSummitEventRepository
                 'c',
                 "c.id :operator :value"
             ),
+            'location_id' => new DoctrineJoinFilterMapping
+            (
+                'e.location',
+                'l',
+                "l.id :operator :value"
+            ),
             'speaker' => new DoctrineFilterMapping
             (
                 "( concat(sp.first_name, ' ', sp.last_name) :operator ':value' ".
@@ -121,6 +127,10 @@ final class DoctrineSummitEventRepository
             'speaker_email' => new DoctrineFilterMapping
             (
                 "(sprr.email :operator ':value' OR spmm.email :operator ':value')"
+            ),
+            'speaker_id' => new DoctrineFilterMapping
+            (
+                "(sp.id :operator :value OR spm.id :operator :value)"
             ),
             'selection_status' => new DoctrineSwitchFilterMapping([
                  'selected' => new DoctrineCaseFilterMapping(
@@ -194,6 +204,7 @@ final class DoctrineSummitEventRepository
 
         if($class == \models\summit\Presentation::class) {
             $query = $query->innerJoin("e.category", "cc", Join::WITH);
+            $query = $query->innerJoin("e.location", "loc", Join::WITH);
             $query = $query->leftJoin("e.speakers", "sp", Join::WITH);
             $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
             $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
