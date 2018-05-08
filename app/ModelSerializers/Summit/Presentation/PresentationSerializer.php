@@ -25,7 +25,7 @@ class PresentationSerializer extends SummitEventSerializer
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
         'ToRecord'                => 'to_record:json_boolean',
-        'FeatureCloud'            => 'feature_cloud:json_boolean',
+        'AttendingMedia'          => 'attending_media:json_boolean',
         'StatusNice'              => 'status:json_string',
     ];
 
@@ -37,7 +37,7 @@ class PresentationSerializer extends SummitEventSerializer
         'problem_addressed',
         'attendees_expected_learnt',
         'to_record',
-        'feature_cloud',
+        'attending_media',
         'status',
     ];
 

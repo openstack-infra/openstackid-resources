@@ -803,11 +803,12 @@ final class SummitService extends AbstractService implements ISummitService
         // main data
         if(isset($data['attendees_expected_learnt']))
             $event->setAttendeesExpectedLearnt(html_entity_decode($data['attendees_expected_learnt']));
+
         if(isset($data['level']))
             $event->setLevel($data['level']);
 
-        $event->setFeatureCloud(isset($data['feature_cloud'])?
-            filter_var($data['feature_cloud'], FILTER_VALIDATE_BOOLEAN) : 0);
+        $event->setAttendingMedia(isset($data['attending_media'])?
+            filter_var($data['attending_media'], FILTER_VALIDATE_BOOLEAN) : 0);
 
         // if we are creating the presentation from admin, then
         // we should mark it as received and complete

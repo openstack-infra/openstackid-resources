@@ -104,10 +104,10 @@ class Presentation extends SummitEvent
     protected $to_record;
 
     /**
-     * @ORM\Column(name="FeatureCloud", type="boolean")
+     * @ORM\Column(name="AttendingMedia", type="boolean")
      * @var bool
      */
-    protected $feature_cloud;
+    protected $attending_media;
 
     /**
      * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="moderated_presentations")
@@ -169,10 +169,11 @@ class Presentation extends SummitEvent
     public function __construct()
     {
         parent::__construct();
-        $this->materials     = new ArrayCollection();
-        $this->speakers      = new ArrayCollection();
-        $this->to_record     = false;
-        $this->feature_cloud = false;
+
+        $this->materials       = new ArrayCollection();
+        $this->speakers        = new ArrayCollection();
+        $this->to_record       = false;
+        $this->attending_media = false;
     }
 
     /**
@@ -475,19 +476,19 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getFeatureCloud()
+    public function getAttendingMedia()
     {
-        return $this->feature_cloud;
+        return $this->attending_media;
     }
 
     /**
-     * @param mixed $feature_cloud
+     * @param bool $attending_media
      */
-    public function setFeatureCloud($feature_cloud)
+    public function setAttendingMedia($attending_media)
     {
-        $this->feature_cloud = $feature_cloud;
+        $this->attending_media = $attending_media;
     }
 
     /**
