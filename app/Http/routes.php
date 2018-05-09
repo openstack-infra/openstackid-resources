@@ -10,70 +10,9 @@
 |
 */
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
 
-// public api ( without AUTHZ [OAUTH2.0])
-
-Route::group([
-    'namespace' => 'App\Http\Controllers',
-    'prefix'     => 'api/public/v1',
-    'before'     => [],
-    'after'      => [],
-    'middleware' => [
-        'ssl',
-        'rate.limit:1000,1', // 1000 request per minute
-        'etags'
-    ]
-], function(){
-    // members
-    Route::group(['prefix'=>'members'], function() {
-        Route::get('', 'OAuth2MembersApiController@getAll');
-    });
-
-    // summits
-    Route::group(['prefix'=>'summits'], function() {
-        Route::get('', [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summit_response_lifetime', 600), 'uses' => 'OAuth2SummitApiController@getSummits']);
-        Route::group(['prefix' => '{id}'], function () {
-            // locations
-            Route::group(['prefix' => 'locations'], function () {
-                Route::group(['prefix' => '{location_id}'], function () {
-                    Route::get('', 'OAuth2SummitLocationsApiController@getLocation');
-                    Route::get('/events/published','OAuth2SummitLocationsApiController@getLocationPublishedEvents');
-                    Route::group(['prefix' => 'banners'], function () {
-                        Route::get('', 'OAuth2SummitLocationsApiController@getLocationBanners');
-                    });
-                });
-            });
-        });
-    });
-
-    // marketplace
-    Route::group(array('prefix' => 'marketplace'), function () {
-
-        Route::group(array('prefix' => 'appliances'), function () {
-            Route::get('', 'AppliancesApiController@getAll');
-        });
-
-        Route::group(array('prefix' => 'distros'), function () {
-            Route::get('', 'DistributionsApiController@getAll');
-        });
-
-        Route::group(array('prefix' => 'consultants'), function () {
-            Route::get('', 'ConsultantsApiController@getAll');
-        });
-
-        Route::group(array('prefix' => 'hosted-private-clouds'), function () {
-            Route::get('', 'PrivateCloudsApiController@getAll');
-        });
-
-        Route::group(array('prefix' => 'remotely-managed-private-clouds'), function () {
-            Route::get('', 'RemoteCloudsApiController@getAll');
-        });
-
-        Route::group(array('prefix' => 'public-clouds'), function () {
-            Route::get('', 'PublicCloudsApiController@getAll');
-        });
-    });
-});
+require app_path('Http/Routes/public.php');
 
 //OAuth2 Protected API
 Route::group([
@@ -288,6 +227,7 @@ Route::group([
                     Route::get('', 'OAuth2SummitEventsApiController@getUnpublishedEvents');
                     //Route::get('{event_id}', 'OAuth2SummitEventsApiController@getUnpublisedEvent');
                 });
+
                 Route::group(array('prefix' => 'published'), function () {
                     Route::get('', 'OAuth2SummitEventsApiController@getScheduledEvents');
                     Route::get('/empty-spots', 'OAuth2SummitEventsApiController@getScheduleEmptySpots');
@@ -309,14 +249,15 @@ Route::group([
             });
 
             // presentations
-            Route::group(array('prefix' => 'presentations'), function () {
-                Route::group(array('prefix' => '{presentation_id}'), function () {
+            Route::group(['prefix' => 'presentations'], function () {
+                Route::group(['prefix' => '{presentation_id}'], function () {
 
-                    Route::group(array('prefix' => 'videos'), function () {
+                    Route::group(['prefix' => 'videos'], function () {
+
                         Route::get('', 'OAuth2PresentationApiController@getPresentationVideos');
                         Route::get('{video_id}', 'OAuth2PresentationApiController@getPresentationVideo');
                         Route::post('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@addVideo' ]);
-                        Route::group(array('prefix' => '{video_id}'), function () {
+                        Route::group(['prefix' => '{video_id}'], function () {
                             Route::put('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@updateVideo' ]);
                             Route::delete('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@deleteVideo' ]);
                         });
