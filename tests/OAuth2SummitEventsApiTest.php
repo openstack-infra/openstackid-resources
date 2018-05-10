@@ -580,6 +580,42 @@ final class OAuth2SummitEventsApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($events));
     }
 
+
+    public function testGetORSpeakers($summit_id=24)
+    {
+        $params = array
+        (
+            'id' => $summit_id,
+            'filter' => [
+                'speaker_id==13987,speaker_id==12765'
+            ]
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getScheduledEvents",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
     public function testCurrentSummitPublishedEventsSummitTypeDesign()
     {
         $params = array

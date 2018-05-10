@@ -181,6 +181,7 @@ final class DoctrineSummitEventRepository
     public function getAllByPage(PagingInfo $paging_info, Filter $filter = null, Order $order = null)
     {
         $class  = $filter->hasFilter('speaker')
+        || $filter->hasFilter('speaker_id')
         || $filter->hasFilter('selection_status')
         || $filter->hasFilter('speaker_email')?
             \models\summit\Presentation::class:
