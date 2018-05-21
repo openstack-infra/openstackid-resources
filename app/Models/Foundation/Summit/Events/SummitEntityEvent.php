@@ -113,7 +113,7 @@ class SummitEntityEvent extends SilverstripeBaseModel
      */
     public function getOwnerId(){
         try{
-            return $this->owner->getId();
+            return is_null($this->owner) ? 0 : $this->owner->getId();
         }
         catch(\Exception $ex){
             return 0;
