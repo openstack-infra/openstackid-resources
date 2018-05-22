@@ -103,10 +103,7 @@ class Presentation extends SummitEvent
      */
     protected $to_record;
 
-    /**
-     * @ORM\Column(name="AttendingMedia", type="boolean")
-     * @var bool
-     */
+
     protected $attending_media;
 
     /**
