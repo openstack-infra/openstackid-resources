@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Apis\CalendarSync\ICalendarSyncRemoteFacadeFactory;
 use App\Services\Apis\GoogleGeoCodingAPI;
 use App\Services\Apis\IGeoCodingAPI;
 use App\Services\Model\AttendeeService;
@@ -39,6 +40,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use ModelSerializers\BaseSerializerTypeSelector;
 use ModelSerializers\ISerializerTypeSelector;
+use services\apis\CalendarSync\CalendarSyncRemoteFacadeFactory;
 use services\apis\EventbriteAPI;
 use services\apis\FireBaseGCMApi;
 use services\apis\IEventbriteAPI;
@@ -114,6 +116,12 @@ final class ServicesProvider extends ServiceProvider
             AttendeeService::class
         );
 
+        App::singleton
+        (
+            ICalendarSyncRemoteFacadeFactory::class,
+            CalendarSyncRemoteFacadeFactory::class
+        );
+
         // work request pre processors
 
         App::singleton
@@ -129,7 +137,6 @@ final class ServicesProvider extends ServiceProvider
         App::when('App\Services\Model\AdminActionsCalendarSyncPreProcessor')
             ->needs('App\Services\Model\ICalendarSyncWorkRequestQueueManager')
             ->give('App\Services\Model\AdminScheduleWorkQueueManager');
-
 
         // work request process services
 

@@ -13,6 +13,7 @@
  **/
 use App\Services\Apis\CalendarSync\Exceptions\RevokedAccessException;
 use CalDAVClient\Facade\CalDavClient;
+use CalDAVClient\Facade\Exceptions\ConflictException;
 use CalDAVClient\Facade\Exceptions\ForbiddenException;
 use CalDAVClient\Facade\Exceptions\UserUnAuthorizedException;
 use CalDAVClient\Facade\Requests\EventRequestVO;
@@ -29,7 +30,6 @@ use models\summit\SummitVenueRoom;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Exception;
-
 /**
  * Class ICloudCalendarSyncRemoteFacade
  * @package services\apis\CalendarSync
@@ -37,6 +37,8 @@ use Exception;
 final class ICloudCalendarSyncRemoteFacade
     extends AbstractCalendarSyncRemoteFacade
 {
+    const NonExistParentConflict = 'non-existent parent';
+
     /**
      * @var ICalDavClient
      */
@@ -139,6 +141,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @return ScheduleCalendarSyncInfo|null
      * @throws RevokedAccessException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function addEvent(MemberEventScheduleSummitActionSyncWorkRequest $request)
     {
@@ -175,6 +178,11 @@ final class ICloudCalendarSyncRemoteFacade
             Log::warning($ex1);
             throw new RevokedAccessException($ex1->getMessage());
         }
+        catch (ConflictException $ex2){
+            Log::warning($ex2);
+            if(strpos($ex2->getMessage(), self::NonExistParentConflict) != false)
+                throw new RevokedAccessException($ex2->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return null;
@@ -186,6 +194,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @return bool
      * @throws RevokedAccessException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function updateEvent
     (
@@ -221,6 +230,11 @@ final class ICloudCalendarSyncRemoteFacade
             Log::warning($ex1);
             throw new RevokedAccessException($ex1->getMessage());
         }
+        catch (ConflictException $ex2){
+            Log::warning($ex2);
+            if(strpos($ex2->getMessage(), self::NonExistParentConflict) != false)
+                throw new RevokedAccessException($ex2->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return false;
@@ -232,6 +246,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @return bool
      * @throws RevokedAccessException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function deleteEvent(MemberEventScheduleSummitActionSyncWorkRequest $request, ScheduleCalendarSyncInfo $schedule_sync_info)
     {
@@ -250,6 +265,11 @@ final class ICloudCalendarSyncRemoteFacade
             Log::warning($ex1);
             throw new RevokedAccessException($ex1->getMessage());
         }
+        catch (ConflictException $ex2){
+            Log::warning($ex2);
+            if(strpos($ex2->getMessage(), self::NonExistParentConflict) != false)
+                throw new RevokedAccessException($ex2->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return false;
@@ -261,6 +281,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param CalendarSyncInfo $calendar_sync_info
      * @return bool
      * @throws RevokedAccessException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function createCalendar(MemberCalendarScheduleSummitActionSyncWorkRequest $request, CalendarSyncInfo $calendar_sync_info)
     {
@@ -324,6 +345,7 @@ final class ICloudCalendarSyncRemoteFacade
      * @param CalendarSyncInfo $calendar_sync_info
      * @return bool
      * @throws RevokedAccessException
+     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function deleteCalendar(MemberCalendarScheduleSummitActionSyncWorkRequest $request, CalendarSyncInfo $calendar_sync_info)
     {

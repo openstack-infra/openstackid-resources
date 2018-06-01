@@ -11,30 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use App\Services\Apis\CalendarSync\ICalendarSyncRemoteFacadeFactory;
 use models\summit\CalendarSync\CalendarSyncInfo;
-
 /**
  * Class CalendarSyncRemoteFacadeFactory
  * @package services\apis\CalendarSync
  */
-final class CalendarSyncRemoteFacadeFactory
+final class CalendarSyncRemoteFacadeFactory implements ICalendarSyncRemoteFacadeFactory
 {
-    private function __construct(){}
-
-    private function __clone(){}
-
-    private static $instance = null;
-
-    /**
-     * @return CalendarSyncRemoteFacadeFactory
-     */
-    public static function getInstance(){
-        if(self::$instance == null)
-            self::$instance = new CalendarSyncRemoteFacadeFactory();
-        return self::$instance;
-    }
-
     /**
      * @param CalendarSyncInfo $sync_calendar_info
      * @return ICalendarSyncRemoteFacade|null
