@@ -13,24 +13,24 @@
  **/
 use App\Services\Apis\CalendarSync\Exceptions\RateLimitExceededException;
 use App\Services\Apis\CalendarSync\Exceptions\RevokedAccessException;
+use App\Services\Apis\CalendarSync\ICalendarSyncRemoteFacadeFactory;
+use CalDAVClient\Facade\Exceptions\ConflictException;
 use CalDAVClient\Facade\Exceptions\ForbiddenException;
 use CalDAVClient\Facade\Exceptions\NotFoundResourceException;
 use CalDAVClient\Facade\Exceptions\ServerErrorException;
-use CalDAVClient\Facade\Exceptions\UserUnAuthorizedException;
 use models\main\CalendarSyncErrorEmailRequest;
 use models\main\IEmailCreationRequestRepository;
+use models\summit\CalendarSync\CalendarSyncInfo;
 use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberCalendarScheduleSummitActionSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberEventScheduleSummitActionSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\MemberScheduleSummitActionSyncWorkRequest;
 use models\summit\IAbstractCalendarSyncWorkRequestRepository;
 use models\summit\ICalendarSyncInfoRepository;
-use services\apis\CalendarSync\CalendarSyncRemoteFacadeFactory;
 use utils\PagingInfo;
 use libs\utils\ITransactionService;
 use Illuminate\Support\Facades\Log;
 use Exception;
-
 /**
  * Class MemberActionsCalendarSyncProcessingService
  * @package App\Services\Model
@@ -38,7 +38,7 @@ use Exception;
 final class MemberActionsCalendarSyncProcessingService
 implements IMemberActionsCalendarSyncProcessingService
 {
-
+    const NonExistParentConflict = 'non-existent parent';
     const FailedAddSummitEventTxFileFormatName = '/tmp/failed_insert_member_%s_calendar_%s_summit_event_%s.json';
     /**
      * @var IAbstractCalendarSyncWorkRequestRepository
@@ -66,11 +66,17 @@ implements IMemberActionsCalendarSyncProcessingService
     private $email_creation_request_repository;
 
     /**
+     * @var ICalendarSyncRemoteFacadeFactory
+     */
+    private $facade_factory;
+
+    /**
      * MemberActionsCalendarSyncProcessingService constructor.
      * @param IAbstractCalendarSyncWorkRequestRepository $work_request_repository
      * @param ICalendarSyncInfoRepository $calendar_sync_repository
      * @param IEmailCreationRequestRepository $email_creation_request_repository
      * @param ICalendarSyncWorkRequestPreProcessor $preprocessor_requests
+     * @param ICalendarSyncRemoteFacadeFactory $facade_factory
      * @param ITransactionService $tx_manager
      */
     public function __construct
@@ -79,6 +85,7 @@ implements IMemberActionsCalendarSyncProcessingService
         ICalendarSyncInfoRepository $calendar_sync_repository,
         IEmailCreationRequestRepository $email_creation_request_repository,
         ICalendarSyncWorkRequestPreProcessor $preprocessor_requests,
+        ICalendarSyncRemoteFacadeFactory $facade_factory,
         ITransactionService $tx_manager
     )
     {
@@ -86,14 +93,28 @@ implements IMemberActionsCalendarSyncProcessingService
         $this->calendar_sync_repository          = $calendar_sync_repository;
         $this->email_creation_request_repository = $email_creation_request_repository;
         $this->preprocessor_requests             = $preprocessor_requests;
+        $this->facade_factory                    = $facade_factory;
         $this->tx_manager                        = $tx_manager;
     }
 
-
+    /**
+     * @param CalendarSyncInfo|null $calendar_sync_info
+     */
+    private function sendReSyncCalendarEmail(CalendarSyncInfo $calendar_sync_info){
+        if(!is_null($calendar_sync_info) && !$calendar_sync_info->isRevoked()){
+            // revoke it ...
+            $calendar_sync_info->setRevoked(true);
+            // create email request
+            $email_request = new CalendarSyncErrorEmailRequest();
+            $email_request->setSyncInfo($calendar_sync_info);
+            $this->email_creation_request_repository->add($email_request);
+        }
+    }
     /**
      * @param string $provider
      * @param int $batch_size
-     * @return int
+     * @return int|mixed
+     * @throws Exception
      */
     public function processActions($provider = 'ALL', $batch_size = 1000)
     {
@@ -105,6 +126,7 @@ implements IMemberActionsCalendarSyncProcessingService
                 $provider,
                 new PagingInfo(1, $batch_size)
             );
+
             $requests = $this->preprocessor_requests->preProcessActions($res->getItems());
             log::info(sprintf("provider %s got %s request to process ...", $provider, count($requests)));
 
@@ -113,7 +135,7 @@ implements IMemberActionsCalendarSyncProcessingService
                     log::debug(sprintf("iteration # %s", $count+1));
                     if (!$request instanceof MemberScheduleSummitActionSyncWorkRequest) continue;
                     $calendar_sync_info   = $request->getCalendarSyncInfo();
-                    $remote_facade        = CalendarSyncRemoteFacadeFactory::getInstance()->build($calendar_sync_info);
+                    $remote_facade        = $this->facade_factory->build($calendar_sync_info);
                     if (is_null($remote_facade)) continue;
                     $member               = $request->getOwner();
                     $request_type         = $request->getType();
@@ -128,7 +150,7 @@ implements IMemberActionsCalendarSyncProcessingService
                                 $request_type,
                                 $member->getIdentifier(),
                                 $calendar_sync_info->getId(),
-                                $calendar_sync_info->isRevoked()? 1:0
+                                $calendar_sync_info->isRevoked()? 1 : 0
                     ));
 
                     switch ($request_sub_type) {
@@ -228,28 +250,25 @@ implements IMemberActionsCalendarSyncProcessingService
                 }
                 catch(RevokedAccessException $ex2){
                     Log::warning($ex2);
-
-                    if(!is_null($calendar_sync_info) && !$calendar_sync_info->isRevoked()){
-                        // revoke it ...
-                        $calendar_sync_info->setRevoked(true);
-                        // create email request
-                        $email_request = new CalendarSyncErrorEmailRequest();
-                        $email_request->setSyncInfo($calendar_sync_info);
-                        $this->email_creation_request_repository->add($email_request);
-                    }
+                    $this->sendReSyncCalendarEmail($calendar_sync_info);
                 }
                 catch(NotFoundResourceException $ex3){
-                    Log::error($ex3);
+                    Log::warning($ex3);
                 }
-                catch(ServerErrorException $ex4){
-                    Log::error($ex4);
+                catch (ConflictException $ex4){
+                    Log::warning($ex4);
+                    if(strpos($ex4->getMessage(), self::NonExistParentConflict) != false)
+                        $this->sendReSyncCalendarEmail($calendar_sync_info);
                 }
-                catch (RateLimitExceededException $ex5){
-                    Log::critical($ex5);
+                catch(ServerErrorException $ex5){
+                    Log::error($ex5);
+                }
+                catch (RateLimitExceededException $ex6){
+                    Log::critical($ex6);
                     break;
                 }
-                catch(Exception $ex6){
-                    Log::error($ex6);
+                catch(Exception $ex7){
+                    Log::error($ex7);
                 }
             }
             return $count;
