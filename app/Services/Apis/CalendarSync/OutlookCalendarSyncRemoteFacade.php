@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Apis\CalendarSync\Exceptions\RevokedAccessException;
 use models\summit\CalendarSync\CalendarSyncInfo;
 use models\summit\CalendarSync\CalendarSyncInfoOAuth2;
 use models\summit\CalendarSync\ScheduleCalendarSyncInfo;
@@ -145,6 +146,7 @@ final class OutlookCalendarSyncRemoteFacade
     /**
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @return ScheduleCalendarSyncInfo
+     * @throws RevokedAccessException
      */
     public function addEvent(MemberEventScheduleSummitActionSyncWorkRequest $request)
     {
@@ -166,6 +168,10 @@ final class OutlookCalendarSyncRemoteFacade
             $sync_info->setLocationId($summit_event->getLocationId());
             return $sync_info;
         }
+        catch (LogicException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return null;
@@ -176,6 +182,7 @@ final class OutlookCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @return bool
+     * @throws RevokedAccessException
      */
     public function deleteEvent
     (
@@ -187,6 +194,10 @@ final class OutlookCalendarSyncRemoteFacade
             $res = $this->client->deleteEvent($schedule_sync_info->getExternalId());
             return !($res instanceof ErrorResponse);
         }
+        catch (LogicException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
+        }
         catch (Exception $ex){
             Log::error($ex);
             return false;
@@ -197,6 +208,7 @@ final class OutlookCalendarSyncRemoteFacade
      * @param MemberEventScheduleSummitActionSyncWorkRequest $request
      * @param ScheduleCalendarSyncInfo $schedule_sync_info
      * @return bool
+     * @throws RevokedAccessException
      */
     public function updateEvent
     (
@@ -215,6 +227,10 @@ final class OutlookCalendarSyncRemoteFacade
             // relationships
             $schedule_sync_info->setLocationId($summit_event->getLocationId());
             return true;
+        }
+        catch (LogicException $ex1){
+            Log::warning($ex1);
+            throw new RevokedAccessException($ex1->getMessage());
         }
         catch (Exception $ex){
             Log::error($ex);
