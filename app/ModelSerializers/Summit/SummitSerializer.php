@@ -26,12 +26,6 @@ class SummitSerializer extends SilverStripeSerializer
         'Name'                                           => 'name:json_string',
         'BeginDate'                                      => 'start_date:datetime_epoch',
         'EndDate'                                        => 'end_date:datetime_epoch',
-        'SubmissionBeginDate'                            => 'submission_begin_date:datetime_epoch',
-        'SubmissionEndDate'                              => 'submission_end_date:datetime_epoch',
-        'VotingBeginDate'                                => 'voting_begin_date:datetime_epoch',
-        'VotingEndDate'                                  => 'voting_end_date:datetime_epoch',
-        'SelectionBeginDate'                             => 'selection_begin_date:datetime_epoch',
-        'SelectionEndDate'                               => 'selection_end_date:datetime_epoch',
         'RegistrationBeginDate'                          => 'registration_begin_date:datetime_epoch',
         'RegistrationEndDate'                            => 'registration_end_date:datetime_epoch',
         'StartShowingVenuesDate'                         => 'start_showing_venues_date:datetime_epoch',
@@ -62,6 +56,7 @@ class SummitSerializer extends SilverStripeSerializer
         'ticket_types',
         'locations',
         'wifi_connections',
+        'selection_plans',
     ];
 
     /**
@@ -125,6 +120,15 @@ class SummitSerializer extends SilverStripeSerializer
                 $wifi_connections[] = SerializerRegistry::getInstance()->getSerializer($wifi_connection)->serialize($expand);
             }
             $values['wifi_connections'] = $wifi_connections;
+        }
+
+        // selection plans
+        if(in_array('selection_plans', $relations)) {
+            $selection_plans = [];
+            foreach ($summit->getSelectionPlans() as $selection_plan) {
+                $selection_plans[] = SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize($expand);
+            }
+            $values['selection_plans'] = $selection_plans;
         }
 
         if (!empty($expand)) {

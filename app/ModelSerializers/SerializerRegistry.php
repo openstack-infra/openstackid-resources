@@ -45,6 +45,7 @@ use App\ModelSerializers\Summit\RSVP\Templates\RSVPQuestionValueTemplateSerializ
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPSingleValueTemplateQuestionSerializer;
 use App\ModelSerializers\Summit\RSVPTemplateSerializer;
 use App\ModelSerializers\Summit\ScheduledSummitLocationBannerSerializer;
+use App\ModelSerializers\Summit\SelectionPlanSerializer;
 use App\ModelSerializers\Summit\SummitLocationBannerSerializer;
 use Libs\ModelSerializers\IModelSerializer;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
@@ -96,6 +97,7 @@ final class SerializerRegistry
                 self::SerializerType_Private =>  AdminSummitSerializer::class
             ];
 
+        $this->registry['SelectionPlan']              = SelectionPlanSerializer::class;
         $this->registry['SummitWIFIConnection']       = SummitWIFIConnectionSerializer::class;
         $this->registry['SummitType']                 = SummitTypeSerializer::class;
         $this->registry['SummitEventType']            = SummitEventTypeSerializer::class;

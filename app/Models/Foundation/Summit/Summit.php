@@ -13,6 +13,7 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
+use App\Models\Foundation\Summit\SelectionPlan;
 use App\Models\Foundation\Summit\TrackTagGroup;
 use App\Models\Utils\TimeZoneEntity;
 use DateTime;
@@ -81,42 +82,6 @@ class Summit extends SilverstripeBaseModel
      * @var \DateTime
      */
     private $end_date;
-
-    /**
-     * @ORM\Column(name="SubmissionBeginDate", type="datetime")
-     * @var \DateTime
-     */
-    private $submission_begin_date;
-
-    /**
-     * @ORM\Column(name="SubmissionEndDate", type="datetime")
-     * @var \DateTime
-     */
-    private $submission_end_date;
-
-    /**
-     * @ORM\Column(name="VotingBeginDate", type="datetime")
-     * @var \DateTime
-     */
-    private $voting_begin_date;
-
-    /**
-     * @ORM\Column(name="VotingEndDate", type="datetime")
-     * @var \DateTime
-     */
-    private $voting_end_date;
-
-    /**
-     * @ORM\Column(name="SelectionBeginDate", type="datetime")
-     * @var \DateTime
-     */
-    private $selection_begin_date;
-
-    /**
-     * @ORM\Column(name="SelectionEndDate", type="datetime")
-     * @var \DateTime
-     */
-    private $selection_end_date;
 
     /**
      * @ORM\Column(name="RegistrationBeginDate", type="datetime")
@@ -258,6 +223,12 @@ class Summit extends SilverstripeBaseModel
      * @var SummitAttendee[]
      */
     private $attendees;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\SelectionPlan", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @var SelectionPlan[]
+     */
+    private $selection_plans;
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\PresentationCategoryGroup", mappedBy="summit", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
@@ -573,6 +544,7 @@ class Summit extends SilverstripeBaseModel
         $this->rsvp_templates = new ArrayCollection;
         $this->track_tag_groups = new ArrayCollection;
         $this->notifications = new ArrayCollection;
+        $this->selection_plans = new ArrayCollection;
     }
 
     /**
@@ -1395,158 +1367,6 @@ SQL;
     }
 
     /**
-     * @return DateTime
-     */
-    public function getSubmissionBeginDate()
-    {
-        return $this->submission_begin_date;
-    }
-
-    /**
-     * @param DateTime $submission_begin_date
-     */
-    public function setSubmissionBeginDate(DateTime $submission_begin_date){
-        $this->submission_begin_date = $this->convertDateFromTimeZone2UTC($submission_begin_date);
-    }
-
-    /**
-     * @return $this
-     */
-    public function clearSubmissionDates(){
-        $this->submission_begin_date =  $this->submission_end_date = null;
-        return $this;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getSubmissionEndDate()
-    {
-        return $this->submission_end_date;
-    }
-
-    /**
-     * @param DateTime $submission_end_date
-     */
-    public function setSubmissionEndDate(DateTime $submission_end_date){
-        $this->submission_end_date = $this->convertDateFromTimeZone2UTC($submission_end_date);
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getVotingBeginDate()
-    {
-        return $this->voting_begin_date;
-    }
-
-    /**
-     * @param DateTime $voting_begin_date
-     */
-    public function setVotingBeginDate(DateTime $voting_begin_date){
-        $this->voting_begin_date = $this->convertDateFromTimeZone2UTC($voting_begin_date);
-    }
-
-    /**
-     * @return $this
-     */
-    public function clearVotingDates(){
-        $this->voting_begin_date = $this->voting_end_date = null;
-        return $this;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getVotingEndDate()
-    {
-        return $this->voting_end_date;
-    }
-
-    /**
-     * @param DateTime $voting_end_date
-     */
-    public function setVotingEndDate(DateTime $voting_end_date){
-        $this->voting_end_date = $this->convertDateFromTimeZone2UTC($voting_end_date);
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getSelectionBeginDate()
-    {
-        return $this->selection_begin_date;
-    }
-
-    /**
-     * @param DateTime $selection_begin_date
-     */
-    public function setSelectionBeginDate(DateTime $selection_begin_date){
-        $this->selection_begin_date = $this->convertDateFromTimeZone2UTC($selection_begin_date);
-    }
-
-    /**
-     * @return $this
-     */
-    public function clearSelectionDates(){
-        $this->selection_begin_date =  $this->selection_end_date = null;
-        return $this;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getSelectionEndDate()
-    {
-        return $this->selection_end_date;
-    }
-
-    /**
-     * @param DateTime $selection_end_date
-     */
-    public function setSelectionEndDate(DateTime $selection_end_date){
-        $this->selection_end_date = $this->convertDateFromTimeZone2UTC($selection_end_date);
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getRegistrationBeginDate()
-    {
-        return $this->registration_begin_date;
-    }
-
-    /**
-     * @param DateTime $registration_begin_date
-     */
-    public function setRegistrationBeginDate(DateTime $registration_begin_date){
-        $this->registration_begin_date = $this->convertDateFromTimeZone2UTC($registration_begin_date);
-    }
-
-    /**
-     * @return $this
-     */
-    public function clearRegistrationDates(){
-        $this->registration_begin_date = $this->registration_end_date = null;
-        return $this;
-    }
-
-    /**
-     * @return DateTime
-     */
-    public function getRegistrationEndDate()
-    {
-        return $this->registration_end_date;
-    }
-
-    /**
-     * @param DateTime $registration_end_date
-     */
-    public function setRegistrationEndDate(DateTime $registration_end_date){
-        $this->registration_end_date = $this->convertDateFromTimeZone2UTC($registration_end_date);
-    }
-
-    /**
      * @return int
      */
     public function getAttendeesCount()
@@ -2097,4 +1917,51 @@ SQL;
     {
         return $this->calendar_sync_desc;
     }
+
+    /**
+     * @return DateTime
+     */
+    public function getRegistrationBeginDate()
+    {
+        return $this->registration_begin_date;
+    }
+
+    /**
+     * @param DateTime $registration_begin_date
+     */
+    public function setRegistrationBeginDate(DateTime $registration_begin_date){
+        $this->registration_begin_date = $this->convertDateFromTimeZone2UTC($registration_begin_date);
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearRegistrationDates(){
+        $this->registration_begin_date = $this->registration_end_date = null;
+        return $this;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getRegistrationEndDate()
+    {
+        return $this->registration_end_date;
+    }
+
+    /**
+     * @param DateTime $registration_end_date
+     */
+    public function setRegistrationEndDate(DateTime $registration_end_date){
+        $this->registration_end_date = $this->convertDateFromTimeZone2UTC($registration_end_date);
+    }
+
+    /**
+     * @return SelectionPlan[]
+     */
+    public function getSelectionPlans()
+    {
+        return $this->selection_plans;
+    }
+
 }

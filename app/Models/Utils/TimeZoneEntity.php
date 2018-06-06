@@ -43,7 +43,7 @@ trait TimeZoneEntity
     public function getTimeZone()
     {
         try {
-            return new DateTimeZone($this->time_zone_id);
+            return new DateTimeZone($this->getTimeZoneId());
         } catch (\Exception $ex) {
             return null;
         }
