@@ -99,4 +99,28 @@ final class SummitSelectionPlanService
             return $selection_plan;
         });
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSelectionPlan(Summit $summit, $selection_plan_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $selection_plan_id){
+
+            $selection_plan = $summit->getSelectionPlanById($selection_plan_id);
+            if(is_null($selection_plan))
+                throw new EntityNotFoundException(trans
+                ('not_found_errors.SummitSelectionPlanService.deleteSelectionPlan.SelectionPlanNotFound',
+                    [
+                        'selection_plan_id' => $selection_plan_id,
+                        'summit_id' => $summit->getId()
+                    ]
+                ));
+
+            $summit->removeSelectionSelectionPlan($selection_plan);
+        });
+    }
 }

@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\SelectionPlan;
+use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 /**
@@ -34,6 +35,15 @@ interface ISummitSelectionPlanService
      * @param array $payload
      * @return SelectionPlan
      * @throws ValidationException
+     * @throws EntityNotFoundException
      */
     public function updateSelectionPlan(Summit $summit, $selection_plan_id, array $payload);
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deleteSelectionPlan(Summit $summit, $selection_plan_id);
 }

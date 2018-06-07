@@ -59,6 +59,83 @@ final class OAuth2SummitSelectionPlansApiController extends OAuth2ProtectedContr
 
     /**
      * @param $summit_id
+     * @param $selection_plan_id
+     * @return mixed
+     */
+    public function getSelectionPlan($summit_id, $selection_plan_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $selection_plan = $summit->getSelectionPlanById($selection_plan_id);
+            if (is_null($selection_plan)) return $this->error404();
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize(Request::input('expand', '')));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $selection_plan_id
+     * @return mixed
+     */
+    public function updateSelectionPlan($summit_id, $selection_plan_id){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+            $payload = Input::json()->all();
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $rules = SummitSelectionPlanValidationRulesFactory::build($payload, true);
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($payload, $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $selection_plan = $this->selection_plan_service->updateSelectionPlan($summit, $selection_plan_id, $payload);
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
      * @return mixed
      */
     public function addSelectionPlan($summit_id){
@@ -107,62 +184,15 @@ final class OAuth2SummitSelectionPlansApiController extends OAuth2ProtectedContr
      * @param $selection_plan_id
      * @return mixed
      */
-    public function getSelectionPlan($summit_id, $selection_plan_id){
+    public function deleteSelectionPlan($summit_id, $selection_plan_id){
         try {
 
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $selection_plan = $summit->getSelectionPlanById($selection_plan_id);
-            if (is_null($selection_plan)) return $this->error404();
+            $this->selection_plan_service->deleteSelectionPlan($summit, $selection_plan_id);
 
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize());
-        }
-        catch (ValidationException $ex1) {
-            Log::warning($ex1);
-            return $this->error412([$ex1->getMessage()]);
-        }
-        catch(EntityNotFoundException $ex2)
-        {
-            Log::warning($ex2);
-            return $this->error404(['message'=> $ex2->getMessage()]);
-        }
-        catch (Exception $ex) {
-            Log::error($ex);
-            return $this->error500($ex);
-        }
-    }
-
-    /**
-     * @param $summit_id
-     * @param $selection_plan_id
-     * @return mixed
-     */
-    public function updateSelectionPlan($summit_id, $selection_plan_id){
-        try {
-
-            if(!Request::isJson()) return $this->error400();
-            $payload = Input::json()->all();
-
-            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
-            if (is_null($summit)) return $this->error404();
-
-            $rules = SummitSelectionPlanValidationRulesFactory::build($payload, true);
-            // Creates a Validator instance and validates the data.
-            $validation = Validator::make($payload, $rules);
-
-            if ($validation->fails()) {
-                $messages = $validation->messages()->toArray();
-
-                return $this->error412
-                (
-                    $messages
-                );
-            }
-
-            $selection_plan = $this->selection_plan_service->updateSelectionPlan($summit, $selection_plan_id, $payload);
-
-            return $this->updated(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize());
+            return $this->deleted();
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
