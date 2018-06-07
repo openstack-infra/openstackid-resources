@@ -77,4 +77,5 @@ return [
     'SummitPushNotificationService.approveNotification.NotificationNotFound' => 'notification :notification_id not found on summit :summit_id',
     'SummitPushNotificationService.unApproveNotification.NotificationNotFound'=> 'notification :notification_id not found on summit :summit_id',
     'SummitPushNotificationService.deleteNotification.NotificationNotFound'=> 'notification :notification_id not found on summit :summit_id',
+    'SummitSelectionPlanService.updateSelectionPlan.SelectionPlanNotFound' => 'selection plan :selection_plan_id not found on summit :summit_id',
 ];

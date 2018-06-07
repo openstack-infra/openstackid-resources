@@ -13,6 +13,7 @@
  **/
 use App\Models\Foundation\Summit\Factories\SummitSelectionPlanFactory;
 use App\Models\Foundation\Summit\SelectionPlan;
+use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\summit\Summit;
 /**
@@ -51,6 +52,49 @@ final class SummitSelectionPlanService
             $summit->checkSelectionPlanConflicts($selection_plan);
 
             $summit->addSelectionPlan($selection_plan);
+
+            return $selection_plan;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @param array $payload
+     * @return SelectionPlan
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function updateSelectionPlan(Summit $summit, $selection_plan_id, array $payload)
+    {
+        return $this->tx_service->transaction(function() use($summit, $selection_plan_id, $payload){
+
+            $selection_plan = $summit->getSelectionPlanById($selection_plan_id);
+            if(is_null($selection_plan))
+                throw new EntityNotFoundException(trans
+                ('not_found_errors.SummitSelectionPlanService.updateSelectionPlan.SelectionPlanNotFound',
+                    [
+                        'selection_plan_id' => $selection_plan_id,
+                        'summit_id' => $summit->getId()
+                    ]
+                ));
+
+            if(isset($payload['name'])) {
+                $former_selection_plan = $summit->getSelectionPlanByName($payload['name']);
+                if ($former_selection_plan->getId() != $selection_plan_id && !is_null($former_selection_plan)) {
+                    throw new ValidationException(trans(
+                        'validation_errors.SummitSelectionPlanService.updateSelectionPlan.alreadyExistName',
+                        [
+                            'summit_id' => $summit->getId()
+                        ]
+                    ));
+                }
+            }
+
+            SummitSelectionPlanFactory::populate($selection_plan, $payload, $summit);
+
+            // validate selection plan
+            $summit->checkSelectionPlanConflicts($selection_plan);
 
             return $selection_plan;
         });

@@ -1972,16 +1972,24 @@ SQL;
      */
     public function checkSelectionPlanConflicts(SelectionPlan $selection_plan){
         foreach ($this->selection_plans as $sp){
-            $start = $selection_plan->getSelectionBeginDate();
-            $end   = $selection_plan->getSelectionEndDate();
 
-            if(!is_null($start) && !is_null($end) && DateUtils::checkTimeFramesOverlap
-            (
-                $start,
-                $end,
-                $sp->getSelectionBeginDate(),
-                $sp->getSelectionEndDate()
-            ))
+            if($sp->getId() == $selection_plan->getId()) continue;
+
+            $start1 = $selection_plan->getSelectionBeginDate();
+            $end1   = $selection_plan->getSelectionEndDate();
+            $start2 = $sp->getSelectionBeginDate();
+            $end2   = $sp->getSelectionEndDate();
+
+            if(!is_null($start1) && !is_null($end1) &&
+               !is_null($start2) && !is_null($end2)
+                && DateUtils::checkTimeFramesOverlap
+                (
+                    $start1,
+                    $end1,
+                    $start2,
+                    $end2
+                )
+            )
                 throw new ValidationException(trans(
                     'validation_errors.Summit.checkSelectionPlanConflicts.conflictOnSelectionWorkflow',
                     [
@@ -1990,15 +1998,22 @@ SQL;
                     ]
                 ));
 
-            $start = $selection_plan->getSubmissionBeginDate();
-            $end   = $selection_plan->getSubmissionEndDate();
-            if(!is_null($start) && !is_null($end) && DateUtils::checkTimeFramesOverlap
-            (
-                $start,
-                $end,
-                $sp->getSubmissionBeginDate(),
-                $sp->getSubmissionEndDate()
-            ))
+            $start1 = $selection_plan->getSubmissionBeginDate();
+            $end1   = $selection_plan->getSubmissionEndDate();
+            $start2 = $sp->getSubmissionBeginDate();
+            $end2   = $sp->getSubmissionEndDate();
+
+            if(!is_null($start1) && !is_null($end1) &&
+                !is_null($start2) && !is_null($end2) &&
+                DateUtils::checkTimeFramesOverlap
+                (
+                    $start1,
+                    $end1,
+                    $start2,
+                    $end2
+
+                )
+            )
                 throw new ValidationException(trans(
                     'validation_errors.Summit.checkSelectionPlanConflicts.conflictOnSubmissionWorkflow',
                     [
@@ -2007,16 +2022,21 @@ SQL;
                     ]
                 ));
 
-            $start = $selection_plan->getVotingBeginDate();
-            $end   = $selection_plan->getVotingEndDate();
+            $start1 = $selection_plan->getVotingBeginDate();
+            $end1   = $selection_plan->getVotingEndDate();
+            $start2 = $sp->getVotingBeginDate();
+            $end2   = $sp->getVotingEndDate();
 
-            if(!is_null($start) && !is_null($end) && DateUtils::checkTimeFramesOverlap
-            (
-                $start,
-                $end,
-                $sp->getVotingBeginDate(),
-                $sp->getVotingEndDate()
-            ))
+            if(!is_null($start1) && !is_null($end1) &&
+                !is_null($start2) && !is_null($end2) &&
+                DateUtils::checkTimeFramesOverlap
+                (
+                    $start1,
+                    $end1,
+                    $start2,
+                    $end2
+                )
+            )
                 throw new ValidationException(trans(
                     'validation_errors.Summit.checkSelectionPlanConflicts.conflictOnVotingWorkflow',
                     [
@@ -2035,7 +2055,18 @@ SQL;
      */
     public function getSelectionPlanByName($name){
         $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('name', intval($name)));
+        $criteria->where(Criteria::expr()->eq('name', trim($name)));
+        $selection_plan = $this->selection_plans->matching($criteria)->first();
+        return $selection_plan === false ? null : $selection_plan;
+    }
+
+    /**
+     * @param int $id
+     * @return null|SelectionPlan
+     */
+    public function getSelectionPlanById($id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($id)));
         $selection_plan = $this->selection_plans->matching($criteria)->first();
         return $selection_plan === false ? null : $selection_plan;
     }

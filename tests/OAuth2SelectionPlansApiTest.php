@@ -52,4 +52,49 @@ final class OAuth2SelectionPlansApiTest extends ProtectedApiTest
         $this->assertEquals($name, $selection_plan->name);
         return $selection_plan;
     }
+
+    /**
+     * @param int $summit_id
+     * @return mixed
+     */
+    public function testUpdateSelectionPlan($summit_id = 24){
+        $selection_plan = $this->testAddSelectionPlan($summit_id);
+        $params = [
+            'id' => $summit_id,
+            'selection_plan_id' => $selection_plan->id
+        ];
+
+        $start = new DateTime('now');
+        $end   = new DateTime('now');
+        $end->add(new DateInterval('P15D'));
+
+        $data = [
+            'is_enabled'  => false,
+            'submission_begin_date' => $start->getTimestamp(),
+            'submission_end_date' => $end->getTimestamp(),
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitSelectionPlansApiController@updateSelectionPlan",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $selection_plan = json_decode($content);
+        $this->assertTrue(!is_null($selection_plan));
+        $this->assertEquals(false, $selection_plan->is_enabled);
+        return $selection_plan;
+    }
 }

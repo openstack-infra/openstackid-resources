@@ -112,6 +112,9 @@ Route::group([
             // selection plans
             Route::group(['prefix' => 'selection-plans'], function () {
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSelectionPlansApiController@addSelectionPlan']);
+                Route::group(['prefix' => '{selection_plan_id}'], function () {
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSelectionPlansApiController@updateSelectionPlan']);
+                });
             });
 
             // RSVP templates

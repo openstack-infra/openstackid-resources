@@ -77,4 +77,5 @@ return [
     'Summit.checkSelectionPlanConflicts.conflictOnSubmissionWorkflow' => 'there is a conflict on submission dates with selection plan :selection_plan_id on summit :summit_id',
     'Summit.checkSelectionPlanConflicts.conflictOnVotingWorkflow' => 'there is a conflict on voting dates with selection plan :selection_plan_id on summit :summit_id',
     'SummitSelectionPlanService.addSelectionPlan.alreadyExistName' => 'there is already another selection plan with same name on summit :summit_id',
+    'SummitSelectionPlanService.updateSelectionPlan.alreadyExistName' => 'there is already another selection plan with same name on summit :summit_id',
 ];

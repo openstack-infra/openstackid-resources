@@ -27,4 +27,13 @@ interface ISummitSelectionPlanService
      * @throws ValidationException
      */
     public function addSelectionPlan(Summit $summit, array $payload);
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @param array $payload
+     * @return SelectionPlan
+     * @throws ValidationException
+     */
+    public function updateSelectionPlan(Summit $summit, $selection_plan_id, array $payload);
 }
