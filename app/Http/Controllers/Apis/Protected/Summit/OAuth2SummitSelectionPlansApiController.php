@@ -83,9 +83,40 @@ final class OAuth2SummitSelectionPlansApiController extends OAuth2ProtectedContr
                 );
             }
 
-            $template = $this->selection_plan_service->addSelectionPlan($summit, $payload);
+            $selection_plan = $this->selection_plan_service->addSelectionPlan($summit, $payload);
 
-            return $this->created(SerializerRegistry::getInstance()->getSerializer($template)->serialize());
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $selection_plan_id
+     * @return mixed
+     */
+    public function getSelectionPlan($summit_id, $selection_plan_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $selection_plan = $summit->getSelectionPlanById($selection_plan_id);
+            if (is_null($selection_plan)) return $this->error404();
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
@@ -129,9 +160,9 @@ final class OAuth2SummitSelectionPlansApiController extends OAuth2ProtectedContr
                 );
             }
 
-            $template = $this->selection_plan_service->updateSelectionPlan($summit, $selection_plan_id, $payload);
+            $selection_plan = $this->selection_plan_service->updateSelectionPlan($summit, $selection_plan_id, $payload);
 
-            return $this->updated(SerializerRegistry::getInstance()->getSerializer($template)->serialize());
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
