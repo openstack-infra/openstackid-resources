@@ -67,6 +67,7 @@ final class SummitEventTypeService
      * @return SummitEventType
      * @throws EntityNotFoundException
      * @throws ValidationException
+     * @throws \Exception
      */
     public function addEventType(Summit $summit, array $data)
     {
@@ -107,6 +108,7 @@ final class SummitEventTypeService
      * @return SummitEventType
      * @throws EntityNotFoundException
      * @throws ValidationException
+     * @throws \Exception
      */
     public function updateEventType(Summit $summit, $event_type_id, array $data)
     {
@@ -149,6 +151,7 @@ final class SummitEventTypeService
      * @return void
      * @throws EntityNotFoundException
      * @throws ValidationException
+     * @throws \Exception
      */
     public function deleteEventType(Summit $summit, $event_type_id)
     {
@@ -197,6 +200,7 @@ final class SummitEventTypeService
      * @return SummitEventType[]
      * @throws EntityNotFoundException
      * @throws ValidationException
+     * @throws \Exception
      */
     public function seedDefaultEventTypes(Summit $summit)
     {

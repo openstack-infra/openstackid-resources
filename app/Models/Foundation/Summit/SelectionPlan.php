@@ -13,6 +13,7 @@
  **/
 use App\Models\Utils\TimeZoneEntity;
 use Doctrine\Common\Collections\ArrayCollection;
+use models\summit\PresentationCategoryGroup;
 use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
@@ -85,11 +86,11 @@ class SelectionPlan extends SilverstripeBaseModel
      */
     private $selection_end_date;
 
-    /*
+    /**
      * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategoryGroup")
      * @ORM\JoinTable(name="SelectionPlan_CategoryGroups",
-     *      joinColumns={@JoinColumn(name="SelectionPlanID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@JoinColumn(name="PresentationCategoryGroupID", referencedColumnName="ID")}
+     *      joinColumns={@ORM\JoinColumn(name="SelectionPlanID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryGroupID", referencedColumnName="ID")}
      *      )
      * @var PresentationCategoryGroup[]
      */
@@ -249,7 +250,7 @@ class SelectionPlan extends SilverstripeBaseModel
     }
 
     /**
-     * @return ArrayCollection
+     * @return PresentationCategoryGroup[]
      */
     public function getCategoryGroups()
     {

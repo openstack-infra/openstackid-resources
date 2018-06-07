@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\DateUtils;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\SelectionPlan;
 use App\Models\Foundation\Summit\TrackTagGroup;
@@ -1962,6 +1963,101 @@ SQL;
     public function getSelectionPlans()
     {
         return $this->selection_plans;
+    }
+
+    /**
+     * @param SelectionPlan $selection_plan
+     * @throws ValidationException
+     * @return bool
+     */
+    public function checkSelectionPlanConflicts(SelectionPlan $selection_plan){
+        foreach ($this->selection_plans as $sp){
+            $start = $selection_plan->getSelectionBeginDate();
+            $end   = $selection_plan->getSelectionEndDate();
+
+            if(!is_null($start) && !is_null($end) && DateUtils::checkTimeFramesOverlap
+            (
+                $start,
+                $end,
+                $sp->getSelectionBeginDate(),
+                $sp->getSelectionEndDate()
+            ))
+                throw new ValidationException(trans(
+                    'validation_errors.Summit.checkSelectionPlanConflicts.conflictOnSelectionWorkflow',
+                    [
+                        'selection_plan_id' => $sp->getId(),
+                        'summit_id' => $this->getId()
+                    ]
+                ));
+
+            $start = $selection_plan->getSubmissionBeginDate();
+            $end   = $selection_plan->getSubmissionEndDate();
+            if(!is_null($start) && !is_null($end) && DateUtils::checkTimeFramesOverlap
+            (
+                $start,
+                $end,
+                $sp->getSubmissionBeginDate(),
+                $sp->getSubmissionEndDate()
+            ))
+                throw new ValidationException(trans(
+                    'validation_errors.Summit.checkSelectionPlanConflicts.conflictOnSubmissionWorkflow',
+                    [
+                        'selection_plan_id' => $sp->getId(),
+                        'summit_id' => $this->getId()
+                    ]
+                ));
+
+            $start = $selection_plan->getVotingBeginDate();
+            $end   = $selection_plan->getVotingEndDate();
+
+            if(!is_null($start) && !is_null($end) && DateUtils::checkTimeFramesOverlap
+            (
+                $start,
+                $end,
+                $sp->getVotingBeginDate(),
+                $sp->getVotingEndDate()
+            ))
+                throw new ValidationException(trans(
+                    'validation_errors.Summit.checkSelectionPlanConflicts.conflictOnVotingWorkflow',
+                    [
+                        'selection_plan_id' => $sp->getId(),
+                        'summit_id' => $this->getId()
+                    ]
+                ));
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $name
+     * @return null|SelectionPlan
+     */
+    public function getSelectionPlanByName($name){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('name', intval($name)));
+        $selection_plan = $this->selection_plans->matching($criteria)->first();
+        return $selection_plan === false ? null : $selection_plan;
+    }
+
+    /**
+     * @param SelectionPlan $selection_plan
+     * @return $this
+     */
+    public function addSelectionPlan(SelectionPlan $selection_plan){
+        $this->selection_plans->add($selection_plan);
+        $selection_plan->setSummit($this);
+        return $this;
+    }
+
+    /**
+     * @param SelectionPlan $selection_plan
+     * @return $this
+     */
+    public function removeSelectionSelectionPlan(SelectionPlan $selection_plan){
+        $this->selection_plans->removeElement($selection_plan);
+        $selection_plan->clearSummit();
+        return $this;
     }
 
 }

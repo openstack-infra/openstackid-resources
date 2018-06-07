@@ -108,7 +108,13 @@ Route::group([
         Route::group(['prefix' => '{id}'], function () {
             Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@updateSummit']);
             Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@deleteSummit']);
-            // rsvp templates
+
+            // selection plans
+            Route::group(['prefix' => 'selection-plans'], function () {
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSelectionPlansApiController@addSelectionPlan']);
+            });
+
+            // RSVP templates
             Route::group(['prefix' => 'rsvp-templates'], function () {
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitRSVPTemplatesApiController@getAllBySummit']);
 

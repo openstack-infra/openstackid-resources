@@ -73,4 +73,8 @@ return [
     // SummitPushNotificationService
     'SummitPushNotificationService.addPushNotification.MemberNotActive' => 'member :member_id is not active',
     'SummitPushNotificationService.deleteNotification.NotificationAlreadySent' => 'notification :notification_id is already sent.',
+    'Summit.checkSelectionPlanConflicts.conflictOnSelectionWorkflow' => 'there is a conflict on selection dates with selection plan :selection_plan_id on summit :summit_id',
+    'Summit.checkSelectionPlanConflicts.conflictOnSubmissionWorkflow' => 'there is a conflict on submission dates with selection plan :selection_plan_id on summit :summit_id',
+    'Summit.checkSelectionPlanConflicts.conflictOnVotingWorkflow' => 'there is a conflict on voting dates with selection plan :selection_plan_id on summit :summit_id',
+    'SummitSelectionPlanService.addSelectionPlan.alreadyExistName' => 'there is already another selection plan with same name on summit :summit_id',
 ];

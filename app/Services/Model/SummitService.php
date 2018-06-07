@@ -797,6 +797,13 @@ final class SummitService extends AbstractService implements ISummitService
         }
     }
 
+    /**
+     * @param SummitEvent $event
+     * @param SummitEventType $event_type
+     * @param array $data
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
     private function saveOrUpdatePresentationData(SummitEvent $event, SummitEventType $event_type, array $data ){
         if(!$event instanceof Presentation) return;
 
@@ -859,6 +866,7 @@ final class SummitService extends AbstractService implements ISummitService
         }
 
     }
+
     /**
      * @param Summit $summit
      * @param int $event_id

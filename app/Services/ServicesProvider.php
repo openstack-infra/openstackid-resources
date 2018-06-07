@@ -24,6 +24,7 @@ use App\Services\Model\IPresentationCategoryGroupService;
 use App\Services\Model\IRSVPTemplateService;
 use App\Services\Model\ISummitEventTypeService;
 use App\Services\Model\ISummitPushNotificationService;
+use App\Services\Model\ISummitSelectionPlanService;
 use App\Services\Model\ISummitTicketTypeService;
 use App\Services\Model\ISummitTrackService;
 use App\Services\Model\PresentationCategoryGroupService;
@@ -32,6 +33,7 @@ use App\Services\Model\MemberService;
 use App\Services\Model\RSVPTemplateService;
 use App\Services\Model\SummitPromoCodeService;
 use App\Services\Model\SummitPushNotificationService;
+use App\Services\Model\SummitSelectionPlanService;
 use App\Services\Model\SummitTicketTypeService;
 use App\Services\Model\SummitTrackService;
 use App\Services\SummitEventTypeService;
@@ -224,5 +226,11 @@ final class ServicesProvider extends ServiceProvider
                 Config::get("server.google_geocoding_api_key", null)
             );
         });
+
+
+        App::singleton(
+            ISummitSelectionPlanService::class,
+            SummitSelectionPlanService::class
+        );
     }
 }

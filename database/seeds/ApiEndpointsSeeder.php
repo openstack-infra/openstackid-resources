@@ -1603,6 +1603,40 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSummitData, $current_realm)
                 ],
             ],
+            // selection plans
+            [
+                'name' => 'get-selection-plan-by-id',
+                'route' => '/api/v1/summits/{id}/selection-plans/{selection_plan_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-selection-plan',
+                'route' => '/api/v1/summits/{id}/selection-plans/{selection_plan_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-selection-plan',
+                'route' => '/api/v1/summits/{id}/selection-plans/{selection_plan_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-selection-plan',
+                'route' => '/api/v1/summits/{id}/selection-plans',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
         ]);
     }
 
