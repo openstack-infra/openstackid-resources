@@ -123,4 +123,74 @@ final class SummitSelectionPlanService
             $summit->removeSelectionSelectionPlan($selection_plan);
         });
     }
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @param int $track_group_id
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     * @return void
+     */
+    public function addTrackGroupToSelectionPlan(Summit $summit, $selection_plan_id, $track_group_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $selection_plan_id, $track_group_id){
+
+            $selection_plan = $summit->getSelectionPlanById($selection_plan_id);
+            if(is_null($selection_plan))
+                throw new EntityNotFoundException(trans
+                ('not_found_errors.SummitSelectionPlanService.addTrackGroupToSelectionPlan.SelectionPlanNotFound',
+                    [
+                        'selection_plan_id' => $selection_plan_id,
+                        'summit_id' => $summit->getId()
+                    ]
+                ));
+
+            $track_group = $summit->getCategoryGroupById($track_group_id);
+            if(is_null($track_group))
+                throw new EntityNotFoundException(trans
+                ('not_found_errors.SummitSelectionPlanService.addTrackGroupToSelectionPlan.TrackGroupNotFound',
+                    [
+                        'track_group_id' => $track_group_id,
+                        'summit_id'      => $summit->getId()
+                    ]
+                ));
+            $selection_plan->addTrackGroup($track_group);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @param int $track_group_id
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     * @return void
+     */
+    public function deleteTrackGroupToSelectionPlan(Summit $summit, $selection_plan_id, $track_group_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $selection_plan_id, $track_group_id){
+
+            $selection_plan = $summit->getSelectionPlanById($selection_plan_id);
+            if(is_null($selection_plan))
+                throw new EntityNotFoundException(trans
+                ('not_found_errors.SummitSelectionPlanService.deleteTrackGroupToSelectionPlan.SelectionPlanNotFound',
+                    [
+                        'selection_plan_id' => $selection_plan_id,
+                        'summit_id' => $summit->getId()
+                    ]
+                ));
+
+            $track_group = $summit->getCategoryGroupById($track_group_id);
+            if(is_null($track_group))
+                throw new EntityNotFoundException(trans
+                ('not_found_errors.SummitSelectionPlanService.deleteTrackGroupToSelectionPlan.TrackGroupNotFound',
+                    [
+                        'track_group_id' => $track_group_id,
+                        'summit_id'      => $summit->getId()
+                    ]
+                ));
+            $selection_plan->removeTrackGroup($track_group);
+        });
+    }
 }

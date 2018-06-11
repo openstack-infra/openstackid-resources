@@ -208,4 +208,66 @@ final class OAuth2SummitSelectionPlansApiController extends OAuth2ProtectedContr
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @param $selection_plan_id
+     * @param $track_group_id
+     * @return mixed
+     */
+    public function addTrackGroupToSelectionPlan($summit_id, $selection_plan_id, $track_group_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->selection_plan_service->addTrackGroupToSelectionPlan($summit, $selection_plan_id, $track_group_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $selection_plan_id
+     * @param $track_group_id
+     * @return mixed
+     */
+    public function deleteTrackGroupToSelectionPlan($summit_id, $selection_plan_id, $track_group_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->selection_plan_service->deleteTrackGroupToSelectionPlan($summit, $selection_plan_id, $track_group_id);
+
+            return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

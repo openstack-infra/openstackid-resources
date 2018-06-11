@@ -46,4 +46,24 @@ interface ISummitSelectionPlanService
      * @return void
      */
     public function deleteSelectionPlan(Summit $summit, $selection_plan_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @param int $track_group_id
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     * @return void
+     */
+    public function addTrackGroupToSelectionPlan(Summit $summit, $selection_plan_id, $track_group_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $selection_plan_id
+     * @param int $track_group_id
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     * @return void
+     */
+    public function deleteTrackGroupToSelectionPlan(Summit $summit, $selection_plan_id, $track_group_id);
 }

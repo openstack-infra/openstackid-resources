@@ -49,11 +49,12 @@ final class SelectionPlanSerializer extends SilverStripeSerializer
         foreach ($selection_plan->getCategoryGroups() as $group) {
             $category_groups[] = $group->getId();
         }
+
         $values['track_groups'] = $category_groups;
 
         if (!empty($expand)) {
-            $expand = explode(',', $expand);
-            foreach ($expand as $relation) {
+            $relations = explode(',', $expand);
+            foreach ($relations as $relation) {
                 switch (trim($relation)) {
                     case 'track_groups':{
                         $category_groups  = [];

@@ -257,4 +257,20 @@ class SelectionPlan extends SilverstripeBaseModel
         return $this->category_groups;
     }
 
+    /**
+     * @param PresentationCategoryGroup $track_group
+     */
+    public function addTrackGroup(PresentationCategoryGroup $track_group){
+        if($this->category_groups->contains($track_group)) return;
+        $this->category_groups->add($track_group);
+    }
+
+    /**
+     * @param PresentationCategoryGroup $track_group
+     */
+    public function removeTrackGroup(PresentationCategoryGroup $track_group){
+        if(!$this->category_groups->contains($track_group)) return;
+        $this->category_groups->removeElement($track_group);
+    }
+
 }

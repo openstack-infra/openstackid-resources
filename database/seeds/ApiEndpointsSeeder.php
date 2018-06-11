@@ -1637,6 +1637,22 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSummitData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'add-track-group-2-selection-plan',
+                'route' => '/api/v1/summits/{id}/selection-plans/{selection_plan_id}/track-groups/{track_group_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-track-group-2-selection-plan',
+                'route' => '/api/v1/summits/{id}/selection-plans/{selection_plan_id}/track-groups/{track_group_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
         ]);
     }
 
