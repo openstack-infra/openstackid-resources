@@ -33,6 +33,7 @@ class SummitSerializer extends SilverStripeSerializer
         'Active'                                         => 'active:json_boolean',
         'TypeId'                                         => 'type_id:json_int' ,
         'DatesLabel'                                     => 'dates_label:json_string' ,
+        'MaxSubmissionAllowedPerUser'                    => 'max_submission_allowed_per_user:json_int',
         // calculated attributes
         'PresentationVotesCount'                         => 'presentation_votes_count:json_int' ,
         'PresentationVotersCount'                        => 'presentation_voters_count:json_int' ,

@@ -14,6 +14,7 @@
 use App\Models\Utils\TimeZoneEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use models\summit\PresentationCategoryGroup;
+use models\summit\Summit;
 use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
@@ -43,6 +44,12 @@ class SelectionPlan extends SilverstripeBaseModel
      * @var String
      */
     private $name;
+
+    /**
+     * @ORM\Column(name="MaxSubmissionAllowedPerUser", type="integer")
+     * @var int
+     */
+    private $max_submission_allowed_per_user;
 
     /**
      * @ORM\Column(name="Enabled", type="boolean")
@@ -245,8 +252,9 @@ class SelectionPlan extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->is_enabled = false;
-        $this->category_groups = new ArrayCollection;
+        $this->is_enabled                      = false;
+        $this->category_groups                 = new ArrayCollection;
+        $this->max_submission_allowed_per_user = Summit::DefaultMaxSubmissionAllowedPerUser;
     }
 
     /**
@@ -271,6 +279,22 @@ class SelectionPlan extends SilverstripeBaseModel
     public function removeTrackGroup(PresentationCategoryGroup $track_group){
         if(!$this->category_groups->contains($track_group)) return;
         $this->category_groups->removeElement($track_group);
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxSubmissionAllowedPerUser()
+    {
+        return $this->max_submission_allowed_per_user;
+    }
+
+    /**
+     * @param int $max_submission_allowed_per_user
+     */
+    public function setMaxSubmissionAllowedPerUser($max_submission_allowed_per_user)
+    {
+        $this->max_submission_allowed_per_user = $max_submission_allowed_per_user;
     }
 
 }

@@ -21,15 +21,16 @@ use ModelSerializers\SilverStripeSerializer;
 final class SelectionPlanSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-        'Name'                  => 'name:json_string',
-        'Enabled'               => 'is_enabled:json_boolean',
-        'SubmissionBeginDate'   => 'submission_begin_date:datetime_epoch',
-        'SubmissionEndDate'     => 'submission_end_date:datetime_epoch',
-        'VotingBeginDate'       => 'voting_begin_date:datetime_epoch',
-        'VotingEndDate'         => 'voting_end_date:datetime_epoch',
-        'SelectionBeginDate'    => 'selection_begin_date:datetime_epoch',
-        'SelectionEndDate'      => 'selection_end_date:datetime_epoch',
-        'SummitId'              => 'summit_id:json_int',
+        'Name'                        => 'name:json_string',
+        'Enabled'                     => 'is_enabled:json_boolean',
+        'SubmissionBeginDate'         => 'submission_begin_date:datetime_epoch',
+        'SubmissionEndDate'           => 'submission_end_date:datetime_epoch',
+        'MaxSubmissionAllowedPerUser' => 'max_submission_allowed_per_user:json_int',
+        'VotingBeginDate'             => 'voting_begin_date:datetime_epoch',
+        'VotingEndDate'               => 'voting_end_date:datetime_epoch',
+        'SelectionBeginDate'          => 'selection_begin_date:datetime_epoch',
+        'SelectionEndDate'            => 'selection_end_date:datetime_epoch',
+        'SummitId'                    => 'summit_id:json_int',
     ];
 
     /**

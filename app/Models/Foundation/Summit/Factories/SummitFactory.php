@@ -41,6 +41,10 @@ final class SummitFactory
             $summit->setTimeZoneId(trim($data['time_zone_id']));
         }
 
+        if(isset($data['max_submission_allowed_per_user']) ){
+            $summit->setMaxSubmissionAllowedPerUser(intval($data['max_submission_allowed_per_user']));
+        }
+
         if(isset($data['active']) ){
             $summit->setActive(boolval($data['active']));
         }

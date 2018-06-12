@@ -27,6 +27,7 @@ final class SummitSelectionPlanValidationRulesFactory
             return [
                 'name'                  => 'sometimes|string|max:255',
                 'is_enabled'            => 'sometimes|boolean',
+                'max_submission_allowed_per_user' => 'sometimes|integer|min:1',
                 'submission_begin_date' => 'nullable|date_format:U',
                 'submission_end_date'   => 'nullable|required_with:submission_begin_date|date_format:U|after_or_equal:submission_begin_date',
                 'voting_begin_date'     => 'nullable|date_format:U',
@@ -38,6 +39,7 @@ final class SummitSelectionPlanValidationRulesFactory
         return [
             'name'                  => 'required|string|max:255',
             'is_enabled'            => 'required|boolean',
+            'max_submission_allowed_per_user' => 'sometimes|integer|min:1',
             'submission_begin_date' => 'nullable|date_format:U',
             'submission_end_date'   => 'nullable|required_with:submission_begin_date|date_format:U|after_or_equal:submission_begin_date',
             'voting_begin_date'     => 'nullable|date_format:U',

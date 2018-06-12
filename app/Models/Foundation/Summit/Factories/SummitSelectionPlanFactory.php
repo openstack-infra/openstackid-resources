@@ -44,6 +44,10 @@ final class SummitSelectionPlanFactory
         if(isset($data['is_enabled']))
             $selection_plan->setIsEnabled(boolval($data['is_enabled']));
 
+        if(isset($data['max_submission_allowed_per_user']) ){
+            $selection_plan->setMaxSubmissionAllowedPerUser(intval($data['max_submission_allowed_per_user']));
+        }
+
         if(array_key_exists('submission_begin_date', $data) && array_key_exists('submission_end_date', $data)) {
             if (isset($data['submission_begin_date']) && isset($data['submission_end_date'])) {
                 $start_datetime = intval($data['submission_begin_date']);
