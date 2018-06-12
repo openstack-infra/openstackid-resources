@@ -91,11 +91,19 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'get-summit',
+                'name' => 'get-summit-cached',
                 'route' => '/api/v1/summits/{id}',
                 'http_method' => 'GET',
                 'scopes' => [
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'get-summit-non-cached',
+                'route' => '/api/v2/summits/{id}',
+                'http_method' => 'GET',
+                'scopes' => [
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ],

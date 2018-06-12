@@ -81,7 +81,7 @@ final class SummitSelectionPlanService
 
             if(isset($payload['name'])) {
                 $former_selection_plan = $summit->getSelectionPlanByName($payload['name']);
-                if ($former_selection_plan->getId() != $selection_plan_id && !is_null($former_selection_plan)) {
+                if (!is_null($former_selection_plan) && $former_selection_plan->getId() != $selection_plan_id) {
                     throw new ValidationException(trans(
                         'validation_errors.SummitSelectionPlanService.updateSelectionPlan.alreadyExistName',
                         [

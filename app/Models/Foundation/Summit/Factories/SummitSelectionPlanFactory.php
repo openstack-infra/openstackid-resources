@@ -36,6 +36,8 @@ final class SummitSelectionPlanFactory
      */
     public static function populate(SelectionPlan $selection_plan, array $data, Summit $summit){
 
+        $selection_plan->setSummit($summit);
+
         if(isset($data['name']))
             $selection_plan->setName(trim($data['name']));
 
