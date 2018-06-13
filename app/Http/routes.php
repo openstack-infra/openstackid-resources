@@ -118,7 +118,7 @@ Route::group([
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSelectionPlansApiController@deleteSelectionPlan']);
                     Route::group(['prefix' => 'track-groups'], function () {
                         Route::put('{track_group_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSelectionPlansApiController@addTrackGroupToSelectionPlan']);
-                        Route::delete('{track_group_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSelectionPlansApiController@removeTrackGroupToSelectionPlan']);
+                        Route::delete('{track_group_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSelectionPlansApiController@deleteTrackGroupToSelectionPlan']);
                     });
                 });
             });
