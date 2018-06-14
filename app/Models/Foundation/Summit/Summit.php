@@ -2061,6 +2061,31 @@ SQL;
     }
 
     /**
+     * @param string $status
+     * @return null|SelectionPlan
+     */
+    public function getCurrentSelectionPlanByStatus($status){
+        $now_utc = new \DateTime('now', new \DateTimeZone('UTC'));
+        $criteria = Criteria::create();
+        switch (strtoupper($status)){
+            case SelectionPlan::STATUS_SUBMISSION:{
+                $criteria->where(Criteria::expr()->lte('submission_begin_date', $now_utc))->andWhere(Criteria::expr()->gte('submission_end_date', $now_utc));
+            }
+            break;
+            case SelectionPlan::STATUS_VOTING:{
+                $criteria->where(Criteria::expr()->lte('voting_begin_date', $now_utc))->andWhere(Criteria::expr()->gte('voting_end_date', $now_utc));
+            }
+            break;
+            case SelectionPlan::STATUS_SELECTION:{
+                $criteria->where(Criteria::expr()->lte('selection_begin_date', $now_utc))->andWhere(Criteria::expr()->gte('selection_end_date', $now_utc));
+            }
+            break;
+        }
+        $selection_plan = $this->selection_plans->matching($criteria)->first();
+        return $selection_plan === false ? null : $selection_plan;
+    }
+
+    /**
      * @param int $id
      * @return null|SelectionPlan
      */

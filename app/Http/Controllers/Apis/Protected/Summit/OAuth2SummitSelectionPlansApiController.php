@@ -270,4 +270,32 @@ final class OAuth2SummitSelectionPlansApiController extends OAuth2ProtectedContr
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param string $status
+     * @return mixed
+     */
+    public function getCurrentSelectionPlanByStatus($status){
+        try {
+
+            $selection_plan = $this->selection_plan_service->getCurrentSelectionPlanByStatus($status);
+
+            if (is_null($selection_plan)) return $this->error404();
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($selection_plan)->serialize(Request::input('expand', '')));
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

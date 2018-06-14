@@ -66,4 +66,11 @@ interface ISummitSelectionPlanService
      * @return void
      */
     public function deleteTrackGroupToSelectionPlan(Summit $summit, $selection_plan_id, $track_group_id);
+
+
+    /**
+     * @param string $status
+     * @return SelectionPlan|null
+     */
+    public function getCurrentSelectionPlanByStatus($status);
 }

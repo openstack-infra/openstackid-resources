@@ -13,8 +13,10 @@
  **/
 use App\Models\Foundation\Summit\Factories\SummitSelectionPlanFactory;
 use App\Models\Foundation\Summit\SelectionPlan;
+use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\summit\ISummitRepository;
 use models\summit\Summit;
 /**
  * Class SummitSelectionPlanService
@@ -24,6 +26,16 @@ final class SummitSelectionPlanService
     extends AbstractService
     implements ISummitSelectionPlanService
 {
+    /**
+     * @var ISummitRepository
+     */
+    private $summit_repository;
+
+    public function __construct(ISummitRepository $summit_repository, ITransactionService $tx_service)
+    {
+        $this->summit_repository = $summit_repository;
+        parent::__construct($tx_service);
+    }
 
     /**
      * @param Summit $summit
@@ -50,6 +62,9 @@ final class SummitSelectionPlanService
 
             // validate selection plan
             $summit->checkSelectionPlanConflicts($selection_plan);
+            foreach($this->summit_repository->getCurrentAndFutureSummits() as $cur_summit){
+                $cur_summit->checkSelectionPlanConflicts($selection_plan);
+            }
 
             $summit->addSelectionPlan($selection_plan);
 
@@ -95,7 +110,9 @@ final class SummitSelectionPlanService
 
             // validate selection plan
             $summit->checkSelectionPlanConflicts($selection_plan);
-
+            foreach($this->summit_repository->getCurrentAndFutureSummits() as $cur_summit){
+                $cur_summit->checkSelectionPlanConflicts($selection_plan);
+            }
             return $selection_plan;
         });
     }
@@ -191,6 +208,26 @@ final class SummitSelectionPlanService
                     ]
                 ));
             $selection_plan->removeTrackGroup($track_group);
+        });
+    }
+
+    /**
+     * @param string $status
+     * @return SelectionPlan|null
+     * @throws \Exception
+     */
+    public function getCurrentSelectionPlanByStatus($status)
+    {
+        return $this->tx_service->transaction(function() use($status) {
+            // first get current summit plus future summits
+            $summits = $this->summit_repository->getCurrentAndFutureSummits();
+
+            foreach($summits as $summit){
+                $selection_plan = $summit->getCurrentSelectionPlanByStatus($status);
+                if(!is_null($selection_plan)) return $selection_plan;
+            }
+
+            return null;
         });
     }
 }

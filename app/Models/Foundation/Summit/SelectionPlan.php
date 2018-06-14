@@ -11,13 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Doctrine\ORM\Mapping AS ORM;
 use App\Models\Utils\TimeZoneEntity;
 use Doctrine\Common\Collections\ArrayCollection;
+use models\summit\Presentation;
 use models\summit\PresentationCategoryGroup;
 use models\summit\Summit;
 use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
-use Doctrine\ORM\Mapping AS ORM;
 use DateTime;
 /**
  * @ORM\Entity
@@ -31,13 +32,9 @@ class SelectionPlan extends SilverstripeBaseModel
 
     use TimeZoneEntity;
 
-    /**
-     * @return string
-     */
-    public function getTimeZoneId()
-    {
-        return $this->summit->getTimeZoneId();
-    }
+    const STATUS_SUBMISSION = 'SUBMISSION';
+    const STATUS_SELECTION  = 'SELECTION';
+    const STATUS_VOTING     = 'VOTING';
 
     /**
      * @ORM\Column(name="Name", type="string")
@@ -102,6 +99,20 @@ class SelectionPlan extends SilverstripeBaseModel
      * @var PresentationCategoryGroup[]
      */
     private $category_groups;
+
+    /**
+     * @ORM\OneToMany(targetEntity="models\summit\Presentation", mappedBy="selection_plan", cascade={"persist"})
+     * @var Presentation[]
+     */
+    private $presentations;
+
+    /**
+     * @return string
+     */
+    public function getTimeZoneId()
+    {
+        return $this->summit->getTimeZoneId();
+    }
 
     /**
      * @return DateTime
@@ -249,11 +260,15 @@ class SelectionPlan extends SilverstripeBaseModel
         $this->is_enabled = $is_enabled;
     }
 
+    /**
+     * SelectionPlan constructor.
+     */
     public function __construct()
     {
         parent::__construct();
         $this->is_enabled                      = false;
         $this->category_groups                 = new ArrayCollection;
+        $this->presentations                   = new ArrayCollection;
         $this->max_submission_allowed_per_user = Summit::DefaultMaxSubmissionAllowedPerUser;
     }
 
@@ -297,4 +312,20 @@ class SelectionPlan extends SilverstripeBaseModel
         $this->max_submission_allowed_per_user = $max_submission_allowed_per_user;
     }
 
+    /**
+     * @return Presentation[]
+     */
+    public function getPresentations()
+    {
+        return $this->presentations;
+    }
+
+    /**
+     * @param Presentation $presentation
+     */
+    public function addPresentation(Presentation $presentation){
+        if($this->presentations->contains($presentation)) return;
+        $this->presentations->add($presentation);
+        $presentation->setSelectedPresentations($this);
+    }
 }

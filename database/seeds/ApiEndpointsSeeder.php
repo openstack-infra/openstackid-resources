@@ -1613,6 +1613,15 @@ class ApiEndpointsSeeder extends Seeder
             ],
             // selection plans
             [
+                'name' => 'get-current-selection-plan-by-status',
+                'route' => '/api/v1/summits/all/selection-plans/current/{status}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-selection-plan-by-id',
                 'route' => '/api/v1/summits/{id}/selection-plans/{selection_plan_id}',
                 'http_method' => 'GET',

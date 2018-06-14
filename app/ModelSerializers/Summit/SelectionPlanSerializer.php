@@ -65,6 +65,11 @@ final class SelectionPlanSerializer extends SilverStripeSerializer
                         $values['track_groups'] = $category_groups;
                     }
                     break;
+                    case 'summit':{
+                        unset($values['summit_id']);
+                        $values['summit'] = SerializerRegistry::getInstance()->getSerializer($selection_plan->getSummit())->serialize();
+                    }
+                    break;
                 }
             }
         }

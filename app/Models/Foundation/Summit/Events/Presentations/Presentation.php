@@ -11,9 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
+use App\Models\Foundation\Summit\SelectionPlan;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ArrayCollection;
 use models\exceptions\ValidationException;
 
@@ -115,6 +115,13 @@ class Presentation extends SummitEvent
      * @var PresentationSpeaker
      */
     private $moderator;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Models\Foundation\Summit\SelectionPlan")
+     * @ORM\JoinColumn(name="SelectionPlanID", referencedColumnName="ID")
+     * @var SelectionPlan
+     */
+    private $selection_plan;
 
     /**
      * @ORM\OneToMany(targetEntity="models\summit\PresentationMaterial", mappedBy="presentation", cascade={"persist", "remove"}, orphanRemoval=true)
@@ -528,5 +535,25 @@ class Presentation extends SummitEvent
         }
 
         return Presentation::SelectionStatus_Alternate;
+    }
+
+    /**
+     * @return SelectionPlan
+     */
+    public function getSelectionPlan()
+    {
+        return $this->selection_plan;
+    }
+
+    /**
+     * @param SelectionPlan $selection_plan
+     */
+    public function setSelectionPlan($selection_plan)
+    {
+        $this->selection_plan = $selection_plan;
+    }
+
+    public function clearSelectionPlan(){
+        $this->selection_plan = null;
     }
 }

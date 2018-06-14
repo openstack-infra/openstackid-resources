@@ -43,6 +43,22 @@ final class DoctrineSummitRepository
     /**
      * @return Summit[]
      */
+    public function getCurrentAndFutureSummits(){
+        $now_utc = new \DateTime('now', new \DateTimeZone('UTC'));
+        return $this->getEntityManager()->createQueryBuilder()
+            ->select("s")
+            ->from(\models\summit\Summit::class, "s")
+            ->where('s.begin_date <= :now and s.end_date >= :now')
+            ->orWhere('s.begin_date >= :now')
+            ->orderBy('s.begin_date', 'DESC')
+            ->setParameter('now', $now_utc)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Summit[]
+     */
     public function getAvailables()
     {
         return $this->getEntityManager()->createQueryBuilder()

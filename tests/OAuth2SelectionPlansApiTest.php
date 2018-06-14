@@ -129,4 +129,35 @@ final class OAuth2SelectionPlansApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $this->assertResponseStatus(404);
     }
+
+    /**
+     * @param string $status
+     */
+    public function testGetCurrentSelectionPlanByStatus($status = 'submission'){
+
+        $params = [
+           'status'  => $status,
+            'expand' => 'summit,track_groups'
+        ];
+
+        $headers = [
+            "HTTP_Authorization"  => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitSelectionPlansApiController@getCurrentSelectionPlanByStatus",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $selection_plan = json_decode($content);
+        $this->assertTrue(!is_null($selection_plan));
+    }
 }

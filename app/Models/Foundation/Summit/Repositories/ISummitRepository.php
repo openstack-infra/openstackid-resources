@@ -43,4 +43,9 @@ interface ISummitRepository extends IBaseRepository
      * @return Summit
      */
     public function getByName($name);
+
+    /**
+     * @return Summit[]
+     */
+    public function getCurrentAndFutureSummits();
 }
