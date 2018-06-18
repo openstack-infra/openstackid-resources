@@ -159,11 +159,9 @@ final class AccessTokenService implements IAccessTokenService
 
         try {
             $client = new Client([
-                'defaults'            => [
-                    'timeout'         => Config::get('curl.timeout', 60),
-                    'allow_redirects' => Config::get('curl.allow_redirects', false),
-                    'verify'          => Config::get('curl.verify_ssl_cert', true)
-                ]
+                'timeout'         => Config::get('curl.timeout', 60),
+                'allow_redirects' => Config::get('curl.allow_redirects', false),
+                'verify'          => Config::get('curl.verify_ssl_cert', true)
             ]);
 
             $client_id       = Config::get('app.openstackid_client_id', '');
