@@ -64,9 +64,9 @@ final class SummitTrackService
                     throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
             }
 
-            $former_track = $summit->getPresentationCategoryByTitle($data['title']);
+            $former_track = $summit->getPresentationCategoryByTitle($data['name']);
             if (!is_null($former_track))
-                throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['title'], $summit->getId()));
+                throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['name'], $summit->getId()));
 
             $track = PresentationCategoryFactory::build($summit, $data);
 
@@ -105,10 +105,10 @@ final class SummitTrackService
                     throw new ValidationException(sprintf("track id %s already has code %s assigned on summit id %s", $former_track->getId(), $data['code'], $summit->getId()));
             }
 
-            if (isset($data['title'])) {
-                $former_track = $summit->getPresentationCategoryByTitle($data['title']);
+            if (isset($data['name'])) {
+                $former_track = $summit->getPresentationCategoryByTitle($data['name']);
                 if (!is_null($former_track) && $former_track->getId() != $track_id)
-                    throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['title'], $summit->getId()));
+                    throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['name'], $summit->getId()));
             }
 
             $track = PresentationCategoryFactory::populate($track, $data);

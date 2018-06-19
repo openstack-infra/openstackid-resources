@@ -307,7 +307,7 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
             if (is_null($summit)) return $this->error404();
 
             $rules = [
-                'title'                     => 'required|string|max:50',
+                'name'                      => 'required|string|max:50',
                 'description'               => 'required|string|max:500',
                 'code'                      => 'sometimes|string|max:5',
                 'session_count'             => 'sometimes|integer',
@@ -405,7 +405,7 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
             if (is_null($summit)) return $this->error404();
 
             $rules = [
-                'title'                     => 'sometimes|string|max:50',
+                'name'                      => 'sometimes|string|max:50',
                 'description'               => 'sometimes|string|max:500',
                 'code'                      => 'sometimes|string|max:5',
                 'session_count'             => 'sometimes|integer',

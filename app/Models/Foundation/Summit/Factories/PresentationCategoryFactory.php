@@ -36,8 +36,8 @@ final class PresentationCategoryFactory
      * @return PresentationCategory
      */
     public static function populate(PresentationCategory $track, array $data){
-        if(isset($data['title']))
-            $track->setTitle(trim($data['title']));
+        if(isset($data['name']))
+            $track->setTitle(trim($data['name']));
 
         if(isset($data['code']) && !empty($data['code']))
             $track->setCode(trim($data['code']));
