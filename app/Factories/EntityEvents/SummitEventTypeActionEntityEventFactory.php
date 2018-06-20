@@ -13,6 +13,7 @@
  **/
 
 use App\Events\SummitEventTypeAction;
+use Illuminate\Support\Facades\App;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\ISummitRepository;
