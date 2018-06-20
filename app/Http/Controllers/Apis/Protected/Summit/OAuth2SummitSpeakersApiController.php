@@ -313,6 +313,49 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
+    public function getMySpeaker(){
+        try
+        {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if(is_null($current_member_id))
+                return $this->error403();
+
+            $member = $this->member_repository->getById($current_member_id);
+            if(is_null($member))
+                return $this->error403();
+
+            $speaker = $this->speaker_repository->getByMember($member);
+            if (is_null($speaker)) return $this->error404();
+
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+
+            return $this->ok
+            (
+                SerializerRegistry::getInstance()->getSerializer($speaker, $serializer_type)->serialize
+                (
+                    Request::input('expand', ''),
+                    [],
+                    [],
+                    []
+                )
+            );
+
+        }
+        catch(ValidationException $ex1){
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * @param $speaker_id
      * @return mixed
