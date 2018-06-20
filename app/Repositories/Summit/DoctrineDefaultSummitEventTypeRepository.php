@@ -30,4 +30,12 @@ final class DoctrineDefaultSummitEventTypeRepository
     {
         return DefaultSummitEventType::class;
     }
+
+    /**
+     * @param string $type
+     * @return null|DefaultSummitEventType
+     */
+    public function getByType($type){
+        return $this->findOneBy(['type' => $type]);
+    }
 }

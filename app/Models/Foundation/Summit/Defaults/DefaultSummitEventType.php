@@ -202,4 +202,13 @@ class DefaultSummitEventType extends SilverstripeBaseModel
         return $new_type;
     }
 
+    public function __construct()
+    {
+        $this->blackout_times = false;
+        $this->use_sponsors = false;
+        $this->are_sponsors_mandatory = false;
+        $this->allows_attachment = false;
+        $this->is_private = false;
+    }
+
 }

@@ -19,6 +19,7 @@ use App\Events\SummitDeleted;
 use App\Events\SummitUpdated;
 use App\Http\Utils\FileUploader;
 use App\Models\Foundation\Summit\Factories\SummitFactory;
+use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Utils\IntervalParser;
 use App\Services\Model\AbstractService;
 use App\Services\Model\IFolderService;
@@ -156,6 +157,11 @@ final class SummitService extends AbstractService implements ISummitService
     private $summit_repository;
 
     /**
+     * @var IDefaultSummitEventTypeRepository
+     */
+    private $default_event_types_repository;
+
+    /**
      * SummitService constructor.
      * @param ISummitRepository $summit_repository
      * @param ISummitEventRepository $event_repository
@@ -171,6 +177,7 @@ final class SummitService extends AbstractService implements ISummitService
      * @param IFolderService $folder_service
      * @param ICompanyRepository $company_repository
      * @param IGroupRepository $group_repository,
+     * @param IDefaultSummitEventTypeRepository $default_event_types_repository
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -185,11 +192,12 @@ final class SummitService extends AbstractService implements ISummitService
         ITagRepository                  $tag_repository,
         IRSVPRepository                 $rsvp_repository,
         IAbstractCalendarSyncWorkRequestRepository $calendar_sync_work_request_repository,
-        IEventbriteAPI                  $eventbrite_api,
-        IFolderService                  $folder_service,
-        ICompanyRepository              $company_repository,
-        IGroupRepository                $group_repository,
-        ITransactionService             $tx_service
+        IEventbriteAPI                    $eventbrite_api,
+        IFolderService                    $folder_service,
+        ICompanyRepository                $company_repository,
+        IGroupRepository                  $group_repository,
+        IDefaultSummitEventTypeRepository $default_event_types_repository,
+        ITransactionService               $tx_service
     )
     {
         parent::__construct($tx_service);
@@ -207,6 +215,7 @@ final class SummitService extends AbstractService implements ISummitService
         $this->folder_service                        = $folder_service;
         $this->company_repository                    = $company_repository;
         $this->group_repository                      = $group_repository;
+        $this->default_event_types_repository        = $default_event_types_repository;
     }
 
     /**
@@ -1520,6 +1529,10 @@ final class SummitService extends AbstractService implements ISummitService
             }
 
             $summit = SummitFactory::build($data);
+            // seed default event types
+            foreach($this->default_event_types_repository->getAll() as $default_event_type){
+                $summit->addEventType($default_event_type->buildType($summit));
+            }
 
             $this->summit_repository->add($summit);
 

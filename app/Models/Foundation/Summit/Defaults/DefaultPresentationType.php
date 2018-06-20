@@ -266,4 +266,14 @@ class DefaultPresentationType extends DefaultSummitEventType
         $new_type->setModeratorLabel($this->moderator_label);
         return $new_type;
     }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->use_speakers = false;
+        $this->are_speakers_mandatory = false;
+        $this->use_moderator = false;
+        $this->is_moderator_mandatory = false;
+        $this->should_be_available_on_cfp = false;
+    }
 }

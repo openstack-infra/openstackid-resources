@@ -21,14 +21,11 @@ interface ISummitEventType
     // default types
 
     const HandonLabs    = 'Hand-on Labs';
-
     const Lunch_Breaks  = 'Lunch & Breaks';
-
     const EveningEvents = 'Evening Events';
-
     const GroupsEvents  = 'Groups Events';
-
     const Lunch         = 'Lunch';
-
     const Breaks        = 'Breaks';
+    const Breakfast     = 'Breakfast';
+    const MarketplaceHours = 'Marketplace Hours';
 }

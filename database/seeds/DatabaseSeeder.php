@@ -20,5 +20,7 @@ final class DatabaseSeeder extends Seeder
         $this->call('ApiSeeder');
         $this->call('ApiScopesSeeder');
         $this->call('ApiEndpointsSeeder');
+        // summit
+        $this->call('DefaultEventTypesSeeder');
     }
 }

@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
 use models\utils\IBaseRepository;
 /**
  * Interface IDefaultSummitEventTypeRepository
@@ -19,5 +20,9 @@ use models\utils\IBaseRepository;
 interface IDefaultSummitEventTypeRepository
     extends IBaseRepository
 {
-
+    /**
+     * @param string $type
+     * @return null|DefaultSummitEventType
+     */
+    public function getByType($type);
 }
