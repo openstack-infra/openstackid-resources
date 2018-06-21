@@ -72,6 +72,7 @@ final class SummitTrackService
 
             $summit->addPresentationCategory($track);
 
+            return $track;
         });
 
         Event::fire(new TrackInserted($track->getSummitId(), $track->getId()));
