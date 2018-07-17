@@ -21,7 +21,7 @@ class SilverStripeSerializer extends AbstractSerializer
     protected static $array_mappings = [
 
         'Id'         => 'id:json_int',
-        'Created'    => 'created:datetime_epoch',
-        'LastEdited' => 'last_edited:datetime_epoch',
+        'CreatedUTC' => 'created:datetime_epoch',
+        'LastEditedUTC' => 'last_edited:datetime_epoch',
     ];
 }
