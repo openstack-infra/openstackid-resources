@@ -306,14 +306,13 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
             $from_date     = Request::input('from_date', null);
             $limit         = Request::input('limit', 25);
 
-            $rules = array
-            (
+            $rules = [
                 'last_event_id' => 'sometimes|required|integer',
                 'from_date'     => 'sometimes|required|integer',
                 'limit'         => 'sometimes|required|integer',
-            );
+            ];
 
-            $data = array();
+            $data = [];
 
             if (!is_null($last_event_id))
             {
@@ -344,7 +343,7 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
 
             if (!is_null($from_date))
             {
-                $from_date = new \DateTime("@$from_date");
+                $from_date = new \DateTime("@$from_date", new \DateTimeZone("UTC"));
             }
 
             list($last_event_id, $last_event_date, $list) = $this->summit_service->getSummitEntityEvents

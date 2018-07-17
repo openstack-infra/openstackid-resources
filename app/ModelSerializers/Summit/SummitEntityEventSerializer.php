@@ -21,7 +21,7 @@ final class SummitEntityEventSerializer extends SilverStripeSerializer
     (
         'EntityId'        => 'entity_id:json_int',
         'EntityClassName' => 'class_name:json_string',
-        'Created'         => 'created:datetime_epoch',
+        'CreatedUTC'      => 'created:datetime_epoch',
         'Type'            => 'type',
     );
 
