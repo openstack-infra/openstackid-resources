@@ -27,6 +27,18 @@ class SilverstripeBaseModel extends BaseEntity
     const DefaultTimeZone = 'America/Chicago';
 
     /**
+     * @var \DateTime
+     * @ORM\Column(name="Created", type="datetime")
+     */
+    protected $created;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(name="LastEdited", type="datetime")
+     */
+    protected $last_edited;
+
+    /**
      * @return \DateTime
      */
     public function getCreated()
@@ -38,6 +50,7 @@ class SilverstripeBaseModel extends BaseEntity
      * @return \DateTime|null
      */
     public function getCreatedUTC(){
+        if(is_null($this->created)) return null;
         return $this->getDateFromLocalToUTC($this->created);
     }
 
@@ -61,6 +74,7 @@ class SilverstripeBaseModel extends BaseEntity
      * @return \DateTime|null
      */
     public function getLastEditedUTC(){
+        if(is_null($this->last_edited)) return null;
         return $this->getDateFromLocalToUTC($this->last_edited);
     }
 
@@ -85,15 +99,6 @@ class SilverstripeBaseModel extends BaseEntity
         $this->last_edited = $last_edited;
     }
 
-    /**
-     * @ORM\Column(name="Created", type="datetime")
-     */
-    protected $created;
-
-    /**
-     * @ORM\Column(name="LastEdited", type="datetime")
-     */
-    protected $last_edited;
 
     public function __construct()
     {
