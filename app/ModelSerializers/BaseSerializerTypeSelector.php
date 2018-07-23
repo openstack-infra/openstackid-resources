@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\IGroup;
 use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\main\Group;
@@ -54,7 +55,7 @@ final class BaseSerializerTypeSelector implements ISerializerTypeSelector
         $serializer_type = SerializerRegistry::SerializerType_Public;
         $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
         if(!is_null($current_member_id) && $member = $this->member_repository->getById($current_member_id)){
-            if($member->isOnGroup(Group::SummitAdministrators)){
+            if($member->isOnGroup(IGroup::SummitAdministrators)){
                 $serializer_type = SerializerRegistry::SerializerType_Private;
             }
         }

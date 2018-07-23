@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Permissions\IPermissionsManager;
+use App\Permissions\PermissionsManager;
 use App\Services\Apis\CalendarSync\ICalendarSyncRemoteFacadeFactory;
 use App\Services\Apis\GoogleGeoCodingAPI;
 use App\Services\Apis\IGeoCodingAPI;
@@ -71,6 +73,8 @@ final class ServicesProvider extends ServiceProvider
     public function register()
     {
         App::singleton(ICacheService::class, RedisCacheService::class);
+
+        App::singleton(IPermissionsManager::class, PermissionsManager::class);
 
         App::singleton(\libs\utils\ITransactionService::class, function(){
             return new \services\utils\DoctrineTransactionService('ss');

@@ -59,6 +59,12 @@ class SummitEvent extends SilverstripeBaseModel
     protected $social_summary;
 
     /**
+     * @ORM\Column(name="Occupancy", type="string")
+     * @var string
+     */
+    protected $occupancy;
+
+    /**
      * @ORM\Column(name="StartDate", type="datetime")
      * @var \DateTime
      */
@@ -906,5 +912,22 @@ class SummitEvent extends SilverstripeBaseModel
     {
         $this->rsvp_max_user_wait_list_number = $rsvp_max_user_wait_list_number;
     }
+
+    /**
+     * @return string
+     */
+    public function getOccupancy()
+    {
+        return $this->occupancy;
+    }
+
+    /**
+     * @param string $occupancy
+     */
+    public function setOccupancy($occupancy)
+    {
+        $this->occupancy = $occupancy;
+    }
+
 
 }

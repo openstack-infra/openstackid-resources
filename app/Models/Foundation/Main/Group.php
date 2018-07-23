@@ -23,10 +23,6 @@ use models\utils\SilverstripeBaseModel;
  */
 class Group extends SilverstripeBaseModel
 {
-    const AdminGroupCode        = 'administrators';
-    const CommunityMembersCode  = 'community-members';
-    const FoundationMembersCode = 'foundation-members';
-    const SummitAdministrators  = 'summit-front-end-administrators';
 
     public function __construct(){
         parent::__construct();

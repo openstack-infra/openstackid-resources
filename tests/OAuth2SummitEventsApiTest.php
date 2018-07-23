@@ -335,6 +335,43 @@ final class OAuth2SummitEventsApiTest extends ProtectedApiTest
         return $event;
     }
 
+    public function testUpdateEventOccupancy(){
+
+        $params = array
+        (
+            'id' => 23,
+            'event_id' => 20345,
+        );
+
+        $data = [
+            'occupancy' => '25%'
+        ];
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $response = $this->action
+        (
+            "PUT",
+            "OAuth2SummitEventsApiController@updateEvent",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $event = json_decode($content);
+        $this->assertTrue($event->id > 0);
+        return $event;
+    }
+
     public function testUnPublishEvent()
     {
         $event = $this->testPublishEvent(1461529800, 1461533400);

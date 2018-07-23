@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\IGroup;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use models\main\Group;
 use models\summit\ISummitEventRepository;
@@ -214,7 +215,7 @@ final class DoctrineSummitEventRepository
             $query = $query->leftJoin('sp.registration_request', "sprr", Join::LEFT_JOIN);
         }
 
-        $can_view_private_events = self::isCurrentMemberOnGroup(Group::SummitAdministrators);
+        $can_view_private_events = self::isCurrentMemberOnGroup(IGroup::SummitAdministrators);
 
         if(!$can_view_private_events){
             $query = $query
@@ -305,7 +306,7 @@ final class DoctrineSummitEventRepository
         }
 
 
-        $can_view_private_events = self::isCurrentMemberOnGroup(Group::SummitAdministrators);
+        $can_view_private_events = self::isCurrentMemberOnGroup(IGroup::SummitAdministrators);
 
         if(!$can_view_private_events){
             $query = $query

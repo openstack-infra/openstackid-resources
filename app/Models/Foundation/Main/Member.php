@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\IGroup;
 use Models\Foundation\Main\CCLA\Team;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
@@ -580,7 +581,7 @@ class Member extends SilverstripeBaseModel
      */
     public function isAdmin()
     {
-        $admin_group = $this->getGroupByCode(Group::AdminGroupCode);
+        $admin_group = $this->getGroupByCode(IGroup::Administrators);
         return $admin_group != false && !is_null($admin_group);
     }
 

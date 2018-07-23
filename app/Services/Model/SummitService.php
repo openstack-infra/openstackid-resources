@@ -21,6 +21,7 @@ use App\Http\Utils\FileUploader;
 use App\Models\Foundation\Summit\Factories\SummitFactory;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Utils\IntervalParser;
+use App\Permissions\IPermissionsManager;
 use App\Services\Model\AbstractService;
 use App\Services\Model\IFolderService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
@@ -162,6 +163,11 @@ final class SummitService extends AbstractService implements ISummitService
     private $default_event_types_repository;
 
     /**
+     * @var IPermissionsManager
+     */
+    private $permissions_manager;
+
+    /**
      * SummitService constructor.
      * @param ISummitRepository $summit_repository
      * @param ISummitEventRepository $event_repository
@@ -178,6 +184,7 @@ final class SummitService extends AbstractService implements ISummitService
      * @param ICompanyRepository $company_repository
      * @param IGroupRepository $group_repository,
      * @param IDefaultSummitEventTypeRepository $default_event_types_repository
+     * @param IPermissionsManager $permissions_manager
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -197,6 +204,7 @@ final class SummitService extends AbstractService implements ISummitService
         ICompanyRepository                $company_repository,
         IGroupRepository                  $group_repository,
         IDefaultSummitEventTypeRepository $default_event_types_repository,
+        IPermissionsManager               $permissions_manager,
         ITransactionService               $tx_service
     )
     {
@@ -216,6 +224,7 @@ final class SummitService extends AbstractService implements ISummitService
         $this->company_repository                    = $company_repository;
         $this->group_repository                      = $group_repository;
         $this->default_event_types_repository        = $default_event_types_repository;
+        $this->permissions_manager                   = $permissions_manager;
     }
 
     /**
@@ -529,11 +538,12 @@ final class SummitService extends AbstractService implements ISummitService
      * @param Summit $summit
      * @param int $event_id
      * @param array $data
+     * @param null|Member $current_member
      * @return SummitEvent
      */
-    public function updateEvent(Summit $summit, $event_id, array $data)
+    public function updateEvent(Summit $summit, $event_id, array $data, Member $current_member = null)
     {
-        return $this->saveOrUpdateEvent($summit, $data, $event_id);
+        return $this->saveOrUpdateEvent($summit, $data, $event_id, $current_member);
     }
 
     /**
@@ -616,16 +626,25 @@ final class SummitService extends AbstractService implements ISummitService
         return true;
     }
 
+
     /**
      * @param Summit $summit
      * @param array $data
      * @param null|int $event_id
+     * @param Member|null $current_member
      * @return SummitEvent
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     * @throws Exception
      */
-    private function saveOrUpdateEvent(Summit $summit, array $data, $event_id = null)
+    private function saveOrUpdateEvent(Summit $summit, array $data, $event_id = null, Member $current_member = null)
     {
 
-        return $this->tx_service->transaction(function () use ($summit, $data, $event_id) {
+        return $this->tx_service->transaction(function () use ($summit, $data, $event_id, $current_member) {
+
+            if(!is_null($current_member) && !$this->permissions_manager->canEditFields($current_member, 'SummitEvent', $data)){
+                throw new ValidationException(sprintf("user %s cant set requested summit event fields", $current_member->getId()));
+            }
 
             $event_type = null;
 
@@ -720,6 +739,9 @@ final class SummitService extends AbstractService implements ISummitService
 
             if (isset($data['social_description']))
                 $event->setSocialSummary(strip_tags(trim($data['social_description'])));
+
+            if (isset($data['occupancy']))
+                $event->setOccupancy($data['occupancy']);
 
             $event->setAllowFeedBack(isset($data['allow_feedback'])?
                 filter_var($data['allow_feedback'], FILTER_VALIDATE_BOOLEAN) :

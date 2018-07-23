@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use libs\utils\HTMLCleaner;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
@@ -62,6 +63,11 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
      */
     private $event_feedback_repository;
 
+    /**
+     * @var IMemberRepository
+     */
+    private $member_repository;
+
 
     public function __construct
     (
@@ -69,6 +75,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
+        IMemberRepository $member_repository,
         ISummitService $service,
         IResourceServerContext $resource_server_context
     ) {
@@ -77,6 +84,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
         $this->speaker_repository        = $speaker_repository;
         $this->event_repository          = $event_repository;
         $this->event_feedback_repository = $event_feedback_repository;
+        $this->member_repository         = $member_repository;
         $this->service                   = $service;
     }
 
@@ -408,6 +416,12 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
+            $current_member = null;
+            $member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (!is_null($member_id)){
+                $current_member = $this->member_repository->getById($member_id);
+            }
+
             $rules = [
                 // summit event rules
                 'title'                          => 'sometimes|string|max:100',
@@ -427,13 +441,14 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'tags'                           => 'sometimes|string_array',
                 'sponsors'                       => 'sometimes|int_array',
                 // presentation rules
-                'attendees_expected_learnt'      =>  'sometimes|string|max:1000',
-                'attending_media'                =>  'sometimes|boolean',
-                'to_record'                      =>  'sometimes|boolean',
-                'speakers'                       =>  'sometimes|int_array',
-                'moderator_speaker_id'           =>  'sometimes|integer',
+                'attendees_expected_learnt'      => 'sometimes|string|max:1000',
+                'attending_media'                => 'sometimes|boolean',
+                'to_record'                      => 'sometimes|boolean',
+                'speakers'                       => 'sometimes|int_array',
+                'moderator_speaker_id'           => 'sometimes|integer',
                 // group event
-                'groups'                         =>  'sometimes|int_array',
+                'groups'                         => 'sometimes|int_array',
+                'occupancy'                      => 'sometimes|in:EMPTY,25%,50%,75%,FULL'
             ];
 
             // Creates a Validator instance and validates the data.
@@ -454,7 +469,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'social_summary',
             ];
 
-            $event = $this->service->updateEvent($summit, $event_id, HTMLCleaner::cleanData($data->all(), $fields));
+            $event = $this->service->updateEvent($summit, $event_id, HTMLCleaner::cleanData($data->all(), $fields), $current_member);
 
             return $this->ok(SerializerRegistry::getInstance()->getSerializer($event)->serialize());
 
