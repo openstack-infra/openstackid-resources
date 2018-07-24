@@ -39,6 +39,7 @@ class SummitEventSerializer extends SilverStripeSerializer
         'RSVPMaxUserWaitListNumber' => 'rsvp_max_user_wait_list_number:json_int',
         'ExternalRSVP'              => 'rsvp_external:json_boolean',
         'CategoryId'                => 'track_id:json_int',
+        'Occupancy'                 => 'occupancy:json_string'
     ];
 
     protected static $allowed_fields = [
@@ -63,6 +64,7 @@ class SummitEventSerializer extends SilverStripeSerializer
         'rsvp_template_id',
         'rsvp_max_user_number',
         'rsvp_max_user_wait_list_number',
+        'occupancy',
     ];
 
     protected static $allowed_relations = [
