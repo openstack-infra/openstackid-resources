@@ -446,6 +446,33 @@ final class OAuth2SpeakersApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($speaker));
     }
 
+    public function testCreateMySpeaker(){
+
+        $params = [
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitSpeakersApiController@createMySpeaker",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(412);
+        $error = json_decode($content);
+        $this->assertTrue(!is_null($error));
+    }
+
+
     public function testMergeSpeakers(){
 
         $params = [
