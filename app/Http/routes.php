@@ -104,7 +104,7 @@ Route::group([
 
         Route::get('',  [ 'middleware' => 'cache:'.Config::get('cache_api_response.get_summits_response_lifetime', 600), 'uses' => 'OAuth2SummitApiController@getSummits']);
         Route::group(['prefix' => 'all'], function () {
-            Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@getAllSummits']);
+            Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators|summit-room-administrators', 'uses' => 'OAuth2SummitApiController@getAllSummits']);
             Route::group(['prefix' => 'selection-plans'], function () {
                 Route::get('current/{status}', ['uses' => 'OAuth2SummitSelectionPlansApiController@getCurrentSelectionPlanByStatus'])->where('status', 'submission|selection|voting');
             });
