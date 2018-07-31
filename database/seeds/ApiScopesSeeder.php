@@ -43,40 +43,45 @@ final class ApiScopesSeeder extends Seeder
         $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'summits']);
 
         $scopes = [
-            array(
+            [
                 'name' => sprintf(SummitScopes::ReadSummitData, $current_realm),
                 'short_description' => 'Get Summit Data',
                 'description' => 'Grants read only access for Summits Data',
-            ),
-            array(
+            ],
+            [
                 'name' => sprintf(SummitScopes::ReadAllSummitData, $current_realm),
                 'short_description' => 'Get All Summits Data',
                 'description' => 'Grants read only access for All Summits Data',
-            ),
-            array(
+            ],
+            [
                 'name' => sprintf('%s/me/read', $current_realm),
                 'short_description' => 'Get own summit member data',
                 'description' => 'Grants read only access for our own summit member data',
-            ),
-            array(
+            ],
+            [
                 'name' => sprintf('%s/me/summits/events/favorites/add', $current_realm),
                 'short_description' => 'Allows to add Summit events as favorite',
                 'description' => 'Allows to add Summit events as favorite',
-            ),
-            array(
+            ],
+            [
                 'name' => sprintf('%s/me/summits/events/favorites/delete', $current_realm),
                 'short_description' => 'Allows to remove Summit events as favorite',
                 'description' => 'Allows to remove Summit events as favorite',
-            ),
-            array(
+            ],
+            [
                 'name' => sprintf(SummitScopes::WriteSummitData, $current_realm),
                 'short_description' => 'Write Summit Data',
                 'description' => 'Grants write access for Summits Data',
-            ),
+            ],
             array(
-                'name' => sprintf('%s/summits/write-event', $current_realm),
+                'name' => sprintf(SummitScopes::WriteEventData, $current_realm),
                 'short_description' => 'Write Summit Events',
                 'description' => 'Grants write access for Summits Events',
+            ),
+            array(
+                'name' => sprintf(SummitScopes::WritePresentationData, $current_realm),
+                'short_description' => 'Write Summit Presentations',
+                'description' => 'Grants write access for Summits Presentations',
             ),
             array(
                 'name' => sprintf('%s/summits/delete-event', $current_realm),
@@ -108,11 +113,11 @@ final class ApiScopesSeeder extends Seeder
                 'short_description' => 'Allow to read summit notifications',
                 'description' => 'Allow to read summit notifications',
             ),
-            array(
+            [
                 'name' => sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 'short_description' => 'Write Speakers Data',
                 'description' => 'Grants write access for Speakers Data',
-            ),
+            ],
             [
                 'name' => sprintf(SummitScopes::WriteMySpeakersData, $current_realm),
                 'short_description' => 'Write My Speakers Profile Data',

@@ -78,4 +78,9 @@ return [
     'Summit.checkSelectionPlanConflicts.conflictOnVotingWorkflow' => 'there is a conflict on voting dates with selection plan :selection_plan_id on summit :summit_id',
     'SummitSelectionPlanService.addSelectionPlan.alreadyExistName' => 'there is already another selection plan with same name on summit :summit_id',
     'SummitSelectionPlanService.updateSelectionPlan.alreadyExistName' => 'there is already another selection plan with same name on summit :summit_id',
+    // Presentations
+    'PresentationService.saveOrUpdatePresentation.invalidPresentationType' => 'type id :type_id is not a valid presentation type',
+    'PresentationService.saveOrUpdatePresentation.notAvailableCFP' => 'type id :type_id is not a available for CFP',
+    'PresentationService.saveOrUpdatePresentation.trackDontBelongToSelectionPlan' => 'track :track_id does not belongs to selection plan :selection_plan_id',
+    'PresentationService.submitPresentation.limitReached' => 'You reached the limit :limit of presentations.',
 ];

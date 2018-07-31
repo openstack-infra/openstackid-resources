@@ -12,11 +12,13 @@
  * limitations under the License.
  **/
 use Doctrine\ORM\Mapping AS ORM;
+use App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackAnswer;
 use App\Models\Foundation\Summit\SelectionPlan;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackQuestionTemplate;
 use models\exceptions\ValidationException;
-
+use models\main\Member;
 /**
  * Class Presentation
  * @ORM\Entity
@@ -116,8 +118,16 @@ class Presentation extends SummitEvent
      */
     private $moderator;
 
+
     /**
-     * @ORM\ManyToOne(targetEntity="App\Models\Foundation\Summit\SelectionPlan")
+     * @ORM\ManyToOne(targetEntity="models\main\Member")
+     * @ORM\JoinColumn(name="CreatorID", referencedColumnName="ID", onDelete="SET NULL")
+     * @var Member
+     */
+    private $creator;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Models\Foundation\Summit\SelectionPlan", inversedBy="presentations")
      * @ORM\JoinColumn(name="SelectionPlanID", referencedColumnName="ID")
      * @var SelectionPlan
      */
@@ -150,6 +160,12 @@ class Presentation extends SummitEvent
     private $selected_presentations;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackAnswer", mappedBy="presentation", cascade={"persist"}, orphanRemoval=true, fetch="EXTRA_LAZY")
+     * @var TrackAnswer[]
+     */
+    private $answers;
+
+    /**
      * @return bool
      */
     public function isToRecord()
@@ -179,6 +195,7 @@ class Presentation extends SummitEvent
 
         $this->materials       = new ArrayCollection();
         $this->speakers        = new ArrayCollection();
+        $this->answers         = new ArrayCollection();
         $this->to_record       = false;
         $this->attending_media = false;
     }
@@ -251,6 +268,7 @@ class Presentation extends SummitEvent
      * @param PresentationSpeaker $speaker
      */
     public function addSpeaker(PresentationSpeaker $speaker){
+        if($this->speakers->contains($speaker)) return;
         $this->speakers->add($speaker);
         $speaker->addPresentation($this);
     }
@@ -556,4 +574,107 @@ class Presentation extends SummitEvent
     public function clearSelectionPlan(){
         $this->selection_plan = null;
     }
+
+    /**
+     * @return Member
+     */
+    public function getCreator()
+    {
+        return $this->creator;
+    }
+
+    /**
+     * @param Member $creator
+     */
+    public function setCreator(Member $creator)
+    {
+        $this->creator = $creator;
+    }
+
+    /**
+     * @return TrackAnswer[]
+     */
+    public function getAnswers()
+    {
+        return $this->answers;
+    }
+
+    /**
+     * @param TrackAnswer[] $answers
+     */
+    public function setAnswers($answers)
+    {
+        $this->answers = $answers;
+    }
+
+    /**
+     * @param TrackAnswer $answer
+     */
+    public function addAnswer(TrackAnswer $answer){
+        $this->answers->add($answer);
+        $answer->setPresentation($this);
+    }
+
+    /**
+     * @param string $link
+     * @return PresentationLink|null
+     */
+    public function findLink($link){
+        $links = $this->getLinks();
+
+        foreach ($links as $entity){
+           if($entity->getLink() == $link)
+               return $entity;
+        }
+        return null;
+    }
+
+    public function clearLinks(){
+        $links = $this->getLinks();
+
+        foreach ($links as $link){
+            $this->materials->removeElement($link);
+            $link->clearPresentation();
+        }
+    }
+
+    /**
+     * @param TrackQuestionTemplate $question
+     * @return TrackAnswer|null
+     */
+    public function getTrackExtraQuestionAnswer(TrackQuestionTemplate $question){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('question', $question));
+        $res = $this->answers->matching($criteria)->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCreatorId()
+    {
+        try{
+            if(is_null($this->creator)) return 0;
+            return $this->creator->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getSelectionPlanId()
+    {
+        try{
+            if(is_null($this->selection_plan)) return 0;
+            return $this->selection_plan->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
 }

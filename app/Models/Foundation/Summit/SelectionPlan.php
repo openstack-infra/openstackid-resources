@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping AS ORM;
 use App\Models\Utils\TimeZoneEntity;
 use Doctrine\Common\Collections\ArrayCollection;
 use models\summit\Presentation;
+use models\summit\PresentationCategory;
 use models\summit\PresentationCategoryGroup;
 use models\summit\Summit;
 use models\summit\SummitOwned;
@@ -327,5 +328,65 @@ class SelectionPlan extends SilverstripeBaseModel
         if($this->presentations->contains($presentation)) return;
         $this->presentations->add($presentation);
         $presentation->setSelectedPresentations($this);
+    }
+
+    public function getStageStatus($stage) {
+
+        $getStartDate = "get{$stage}BeginDate";
+        $getEndDate = "get{$stage}EndDate";
+        $start_date = $this->$getStartDate();
+        $end_date = $this->$getEndDate();
+
+        if (empty($start_date) || empty($end_date)) {
+            return null;
+        }
+
+        $utc_time_zone = new \DateTimeZone('UTC');
+        $start_date->setTimeZone($utc_time_zone);
+        $end_date->setTimeZone($utc_time_zone);
+        $now = new \DateTime('now', new \DateTimeZone(  'UTC'));
+
+        if ($now > $end_date) {
+            return Summit::STAGE_FINISHED;
+        } else if ($now < $start_date) {
+            return Summit::STAGE_UNSTARTED;
+        } else {
+            return Summit::STAGE_OPEN;
+        }
+    }
+
+    /**
+     * @param PresentationCategory $track
+     * @return bool
+     */
+    public function hasTrack(PresentationCategory $track){
+        foreach($this->category_groups as $track_group){
+            if($track_group->hasCategory($track->getIdentifier())) return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVotingOpen()
+    {
+        return $this->getStageStatus('Voting') === Summit::STAGE_OPEN;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubmissionOpen()
+    {
+        return $this->getStageStatus('Submission') === Summit::STAGE_OPEN;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSelectionOpen()
+    {
+        return $this->getStageStatus('Selection') === Summit::STAGE_OPEN;
     }
 }

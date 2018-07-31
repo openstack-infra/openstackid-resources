@@ -138,10 +138,10 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
 
     /**
      * owning side
-     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory", inversedBy="groups")
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory")
      * @ORM\JoinTable(name="PresentationCategoryGroup_Categories",
-     *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryGroupID", referencedColumnName="ID")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")}
+     *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryGroupID", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="id")}
      * )
      * @var PresentationCategory[]
      */

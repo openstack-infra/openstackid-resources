@@ -1348,6 +1348,27 @@ class ApiEndpointsSeeder extends Seeder
                 'http_method' => 'POST',
                 'scopes' => [sprintf('%s/summits/confirm-external-orders', $current_realm)],
             ),
+            // presentation submissions
+            [
+                'name' => 'submit-presentation',
+                'route' => '/api/v1/summits/{id}/presentations',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteEventData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-submit-presentation',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteEventData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationData, $current_realm)
+                ],
+            ],
             //videos
             [
                 'name' => 'get-presentation-videos',

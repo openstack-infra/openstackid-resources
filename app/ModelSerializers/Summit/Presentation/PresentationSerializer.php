@@ -30,7 +30,6 @@ class PresentationSerializer extends SummitEventSerializer
     ];
 
     protected static $allowed_fields = [
-
         'track_id',
         'moderator_speaker_id',
         'level',
@@ -47,6 +46,7 @@ class PresentationSerializer extends SummitEventSerializer
         'videos',
         'speakers',
         'links',
+        'extra_questions',
     ];
 
     /**
@@ -101,6 +101,15 @@ class PresentationSerializer extends SummitEventSerializer
                 $videos[] = $video_values;
             }
             $values['videos'] = $videos;
+        }
+
+        if(in_array('extra_questions', $relations))
+        {
+            $answers = [];
+            foreach ($presentation->getAnswers() as $answer) {
+                $answers[]= SerializerRegistry::getInstance()->getSerializer($answer)->serialize();
+            }
+            $values['extra_questions'] = $answers;
         }
 
         if (!empty($expand)) {

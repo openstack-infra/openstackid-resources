@@ -39,7 +39,7 @@ class TrackTagGroupAllowedTag extends BaseEntity
     private $tag;
 
     /**
-     * @ORM\ManyToOne(targetEntity="TrackTagGroup")
+     * @ORM\ManyToOne(targetEntity="TrackTagGroup", inversedBy="allowed_tags")
      * @ORM\JoinColumn(name="TrackTagGroupID", referencedColumnName="ID")
      * @var TrackTagGroup
      */

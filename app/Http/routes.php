@@ -270,7 +270,13 @@ Route::group([
 
             // presentations
             Route::group(['prefix' => 'presentations'], function () {
+                // opened without role CFP - valid selection plan on CFP status
+                Route::post('', 'OAuth2PresentationApiController@submitPresentation');
+
                 Route::group(['prefix' => '{presentation_id}'], function () {
+
+                    // opened without role CFP - valid selection plan on CFP status
+                    Route::put('', 'OAuth2PresentationApiController@updatePresentationSubmission');
 
                     Route::group(['prefix' => 'videos'], function () {
 

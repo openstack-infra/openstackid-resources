@@ -11,10 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping AS ORM;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackQuestionTemplate;
+use Doctrine\Common\Collections\Criteria;
 use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -153,12 +154,49 @@ class PresentationCategory extends SilverstripeBaseModel
      */
     protected $allowed_tags;
 
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackQuestionTemplate", cascade={"persist"}, inversedBy="tracks")
+     * @ORM\JoinTable(name="PresentationCategory_ExtraQuestions",
+     *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="TrackQuestionTemplateID", referencedColumnName="ID")}
+     *      )
+     * @var TrackQuestionTemplate[]
+     */
+    protected $extra_questions;
+
+
+    /**
+     * @param int $id
+     * @return TrackQuestionTemplate|null
+     */
+    public function getExtraQuestionById($id){
+        $res = $this->extra_questions->filter(function(TrackQuestionTemplate $question) use($id){
+           return $question->getIdentifier() == $id;
+        });
+        $res = $res->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
+     * @param string $name
+     * @return TrackQuestionTemplate|null
+     */
+    public function getExtraQuestionByName($name){
+        $res = $this->extra_questions->filter(function(TrackQuestionTemplate $question) use($name){
+            return $question->getName() == trim($name);
+        });
+        $res = $res->first();
+        return $res === false ? null : $res;
+    }
+
     public function __construct()
     {
         parent::__construct();
 
         $this->groups                    = new ArrayCollection;
         $this->allowed_tags              = new ArrayCollection;
+        $this->extra_questions           = new ArrayCollection;
         $this->session_count             = 0;
         $this->alternate_count           = 0;
         $this->lightning_alternate_count = 0;

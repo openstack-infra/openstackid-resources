@@ -12,9 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use models\exceptions\EntityNotFoundException;
+use models\exceptions\ValidationException;
+use models\main\Member;
+use models\summit\Presentation;
 use models\summit\PresentationVideo;
-
+use models\summit\Summit;
 /**
  * Interface IPresentationService
  * @package services\model
@@ -43,4 +46,25 @@ interface IPresentationService
      * @return void
      */
     public function deleteVideo($presentation_id, $video_id);
+
+    /**
+     * @param Summit $summit
+     * @param Member $member
+     * @param array $data
+     * @return Presentation
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function submitPresentation(Summit $summit, Member $member, array $data);
+
+    /**
+     * @param Summit $summit
+     * @param int $presentation_id
+     * @param Member $member
+     * @param array $data
+     * @return Presentation
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function updatePresentationSubmission(Summit $summit, $presentation_id, Member $member, array $data);
 }

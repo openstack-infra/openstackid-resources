@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\SelectionPlan;
 use Doctrine\ORM\Mapping AS ORM;
 use App\Events\PresentationSpeakerCreated;
 use App\Events\PresentationSpeakerDeleted;
@@ -391,6 +392,38 @@ class PresentationSpeaker extends SilverstripeBaseModel
                 $res &= is_null($summit_id)? true : $p->getSummit()->getId() == $summit_id;
                 return $res;
             });
+    }
+
+    const ROLE_SPEAKER = 'ROLE_SPEAKER';
+    const ROLE_CREATOR = 'ROLE_CREATOR';
+    const ROLE_MODERATOR ='ROLE_MODERATOR';
+
+    /**
+     * @param SelectionPlan $selectionPlan
+     * @param $role
+     * @return array
+     */
+    public function getPresentationsBySelectionPlanAndRole(SelectionPlan $selectionPlan, $role){
+
+        if($role == self::ROLE_SPEAKER){
+            $res = $this->presentations->filter(function(Presentation $presentation) use($selectionPlan){
+                if($presentation->getSelectionPlanId() != $selectionPlan->getId()) return false;
+                if($presentation->getSummit()->getId() != $selectionPlan->getSummitId()) return false;
+                if($presentation->getModeratorId() == $this->getId()) return false;
+                if($presentation->getCreatorId() == $this->getMemberId()) return false;
+            });
+            return $res->toArray();
+        }
+
+        if($role == self::ROLE_CREATOR){
+            return $selectionPlan->getSummit()->getCreatedPresentations($this, $selectionPlan);
+        }
+
+        if($role == self::ROLE_MODERATOR){
+            return $selectionPlan->getSummit()->getModeratedPresentationsBy($this, $selectionPlan);
+        }
+
+        return [];
     }
 
     /**

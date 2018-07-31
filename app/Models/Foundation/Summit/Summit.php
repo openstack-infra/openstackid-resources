@@ -20,6 +20,7 @@ use App\Models\Utils\TimeZoneEntity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\Query\Expr\Select;
 use models\exceptions\ValidationException;
 use models\main\Company;
 use models\main\File;
@@ -838,6 +839,43 @@ class Summit extends SilverstripeBaseModel
     {
         $query = $this->createQuery("SELECT p from models\summit\Presentation p JOIN p.summit s WHERE s.id = :summit_id");
         return $query->setParameter('summit_id', $this->getIdentifier())->getResult();
+    }
+
+
+    /**
+     * @param PresentationSpeaker $speaker
+     * @param SelectionPlan $selectionPlan
+     * @return array
+     */
+    public function getModeratedPresentationsBy(PresentationSpeaker $speaker, SelectionPlan $selectionPlan){
+        $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+        JOIN p.summit s
+        JOIN p.moderator m 
+        JOIN p.selection_plan sp
+        WHERE s.id = :summit_id and m.id = :moderator_id and sp.id = :selection_plan_id");
+        return $query
+                ->setParameter('summit_id', $this->getIdentifier())
+                ->setParameter('moderator_id', $speaker->getIdentifier())
+                ->setParameter('selection_plan_id', $selectionPlan->getIdentifier())
+                ->getResult();
+    }
+
+    /**
+     * @param PresentationSpeaker $speaker
+     * @param SelectionPlan $selectionPlan
+     * @return array
+     */
+    public function getCreatedPresentations(PresentationSpeaker $speaker, SelectionPlan $selectionPlan){
+        $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+        JOIN p.summit s
+        JOIN p.creator c 
+        JOIN p.selection_plan sp
+        WHERE s.id = :summit_id and c.id = :creator_id and sp.id = :selection_plan_id");
+        return $query
+            ->setParameter('summit_id', $this->getIdentifier())
+            ->setParameter('creator_id', $speaker->getMemberId())
+            ->setParameter('selection_plan_id', $selectionPlan->getIdentifier())
+            ->getResult();
     }
 
     /**
@@ -2115,5 +2153,51 @@ SQL;
         $selection_plan->clearSummit();
         return $this;
     }
+
+    /**
+     * @return SelectionPlan[]
+     */
+    public function getActiveSelectionPlans() {
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('is_enabled', 1));
+        return $this->selection_plans->matching($criteria)->toArray();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSubmissionOpen()
+    {
+        foreach ($this->getActiveSelectionPlans() as $plan) {
+            if ($plan->isSubmissionOpen())
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPresentationEditionAllowed()
+    {
+        return $this->isSubmissionOpen() || $this->isVotingOpen();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVotingOpen()
+    {
+        foreach ($this->getActiveSelectionPlans() as $plan) {
+            if ($plan->isVotingOpen()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    const STAGE_UNSTARTED = -1;
+    const STAGE_OPEN = 0;
+    const STAGE_FINISHED = 1;
 
 }

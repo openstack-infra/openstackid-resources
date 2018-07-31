@@ -199,4 +199,8 @@ abstract class PresentationMaterial extends SilverstripeBaseModel
     public function inserted($args){
         Event::fire(new PresentationMaterialCreated($this, $args));
     }
+
+    public function clearPresentation(){
+        $this->presentation = null;
+    }
 }

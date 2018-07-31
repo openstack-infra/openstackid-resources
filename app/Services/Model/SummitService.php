@@ -86,7 +86,6 @@ final class SummitService extends AbstractService implements ISummitService
      */
     const MIN_EVENT_MINUTES = 5;
 
-
     /**
      * @var ISummitEventRepository
      */

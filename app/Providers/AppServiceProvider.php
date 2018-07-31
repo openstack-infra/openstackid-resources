@@ -198,6 +198,33 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
+        Validator::extend('url_array', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('url_array', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be an array of urls", $attribute);
+            });
+            if(!is_array($value)) return false;
+            foreach($value as $element)
+            {
+                if(!filter_var($element, FILTER_VALIDATE_URL)) return false;
+            }
+            return true;
+        });
+
+        Validator::extend('entity_value_array', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('entity_value_array', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be an array of {id,value} tuple", $attribute);
+            });
+            if(!is_array($value)) return false;
+            foreach($value as $element)
+            {
+               if(!isset($element['id'])) return false;
+               if(!isset($element['value'])) return false;
+            }
+            return true;
+        });
+
         Validator::extend('team_permission', function($attribute, $value, $parameters, $validator)
         {
             $validator->addReplacer('team_permission', function($message, $attribute, $rule, $parameters) use ($validator) {

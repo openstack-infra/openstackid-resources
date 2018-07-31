@@ -12,7 +12,6 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
-use Doctrine\ORM\Mapping AS ORM;
 use App\Events\SummitEventCreated;
 use App\Events\SummitEventDeleted;
 use App\Events\SummitEventUpdated;
@@ -28,6 +27,7 @@ use DateTime;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 use Cocur\Slugify\Slugify;
+use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEventRepository")
  * @ORM\Table(name="SummitEvent")
