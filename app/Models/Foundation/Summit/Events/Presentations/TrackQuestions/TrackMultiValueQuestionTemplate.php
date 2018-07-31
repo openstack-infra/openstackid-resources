@@ -112,6 +112,19 @@ class TrackMultiValueQuestionTemplate extends TrackQuestionTemplate
     ];
 
     /**
+     * @return int
+     */
+    public function getDefaultValueId(){
+        try{
+            if(is_null($this->default_value)) return 0;
+            return $this->default_value->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
      * @return array
      */
     public static function getMetadata(){

@@ -47,18 +47,23 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
         $values      = parent::serialize($expand, $fields, $relations, $params);
         $groups      = [];
         $allowed_tag = [];
+        $extra_questions = [];
 
         foreach($category->getGroups() as $group){
             $groups[] = intval($group->getId());
         }
-        $values['track_groups'] = $groups;
 
         foreach($category->getAllowedTags() as $tag){
             $allowed_tag[] = $tag->getId();
         }
 
+        foreach($category->getExtraQuestions() as $question){
+            $extra_questions[] = intval($question->getId());
+        }
+
         $values['track_groups'] = $groups;
         $values['allowed_tag']  = $allowed_tag;
+        $values['extra_questions'] = $extra_questions;
 
         if (!empty($expand)) {
             $exp_expand = explode(',', $expand);
@@ -82,6 +87,17 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
                             $allowed_tag[] = SerializerRegistry::getInstance()->getSerializer($tag)->serialize(null, [], ['none']);
                         }
                         $values['allowed_tags'] = $allowed_tag;
+                    }
+                    break;
+                }
+                switch (trim($relation)) {
+                    case 'extra_questions': {
+                        $extra_questions = [];
+                        unset($values['extra_questions']);
+                        foreach ($category->getExtraQuestions() as $question) {
+                            $extra_questions[] = SerializerRegistry::getInstance()->getSerializer($question)->serialize(null, [], ['none']);
+                        }
+                        $values['extra_questions'] = $extra_questions;
                     }
                     break;
                 }

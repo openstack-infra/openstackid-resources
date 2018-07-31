@@ -151,9 +151,9 @@ class PresentationCategory extends SilverstripeBaseModel
      *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="TagID", referencedColumnName="ID")}
      *      )
+     * @var Tag[]
      */
     protected $allowed_tags;
-
 
     /**
      * @ORM\ManyToMany(targetEntity="App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackQuestionTemplate", cascade={"persist"}, inversedBy="tracks")
@@ -165,6 +165,13 @@ class PresentationCategory extends SilverstripeBaseModel
      */
     protected $extra_questions;
 
+
+    /**
+     * @return TrackQuestionTemplate[]|ArrayCollection
+     */
+    public function getExtraQuestions(){
+        return $this->extra_questions;
+    }
 
     /**
      * @param int $id

@@ -294,6 +294,36 @@ final class OAuth2SummitTracksApiController extends OAuth2ProtectedController
         }
     }
 
+    public function getTrackExtraQuestionsBySummit($summit_id, $track_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $track = $summit->getPresentationCategory($track_id);
+            if(is_null($track))
+                return $this->error404();
+            $extra_questions = $track->getExtraQuestions()->toArray();
+            $response = new PagingResponse(
+                count($extra_questions),
+                count($extra_questions),
+                1,
+                1,
+                $extra_questions
+            );
+
+            return $this->ok($response->toArray());
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * @param $summit_id
      * @return mixed

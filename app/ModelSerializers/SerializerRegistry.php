@@ -39,6 +39,10 @@ use App\ModelSerializers\Software\OpenStackComponentSerializer;
 use App\ModelSerializers\Software\OpenStackReleaseSerializer;
 use App\ModelSerializers\Summit\AdminSummitSerializer;
 use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackAnswerSerializer;
+use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackDropDownQuestionTemplateSerializer;
+use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackMultiValueQuestionTemplateSerializer;
+use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackQuestionValueTemplateSerializer;
+use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackSingleValueTemplateQuestionSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPDropDownQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPLiteralContentQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPMultiValueQuestionTemplateSerializer;
@@ -108,7 +112,15 @@ final class SerializerRegistry
         $this->registry['PresentationCategoryGroup']  = PresentationCategoryGroupSerializer::class;
         $this->registry['PrivatePresentationCategoryGroup'] = PrivatePresentationCategoryGroupSerializer::class;
         $this->registry['Tag']                        = TagSerializer::class;
+        // track questions
         $this->registry['TrackAnswer']                = TrackAnswerSerializer::class;
+        $this->registry['TrackQuestionValueTemplate'] = TrackQuestionValueTemplateSerializer::class;
+        $this->registry['TrackTextBoxQuestionTemplate'] = TrackSingleValueTemplateQuestionSerializer::class;
+        $this->registry['TrackCheckBoxQuestionTemplate'] = TrackSingleValueTemplateQuestionSerializer::class;
+        $this->registry['TrackDropDownQuestionTemplate'] = TrackDropDownQuestionTemplateSerializer::class;
+        $this->registry['TrackCheckBoxListQuestionTemplate'] = TrackMultiValueQuestionTemplateSerializer::class;
+        $this->registry['TrackRadioButtonListQuestionTemplate'] = TrackMultiValueQuestionTemplateSerializer::class;
+
         $this->registry['SummitEvent']                = SummitEventSerializer::class;
         $this->registry['SummitGroupEvent']           = SummitGroupEventSerializer::class;
         $this->registry['SummitEventMetricsSnapshot'] = SummitEventMetricsSnapshotSerializer::class;

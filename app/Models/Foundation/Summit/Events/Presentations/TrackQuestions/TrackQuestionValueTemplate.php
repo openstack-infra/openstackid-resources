@@ -110,4 +110,17 @@ class TrackQuestionValueTemplate extends SilverstripeBaseModel
         $this->owner = $owner;
     }
 
+    /**
+     * @return int
+     */
+    public function getOwnerId(){
+        try{
+            if(is_null($this->owner)) return 0;
+            return $this->owner->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
 }

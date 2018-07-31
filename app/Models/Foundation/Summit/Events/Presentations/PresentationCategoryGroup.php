@@ -138,10 +138,10 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
 
     /**
      * owning side
-     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory")
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory", inversedBy="groups")
      * @ORM\JoinTable(name="PresentationCategoryGroup_Categories",
-     *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryGroupID", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="id")}
+     *      joinColumns={@ORM\JoinColumn(name="PresentationCategoryGroupID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="PresentationCategoryID", referencedColumnName="ID")}
      * )
      * @var PresentationCategory[]
      */
@@ -176,10 +176,15 @@ class PresentationCategoryGroup extends SilverstripeBaseModel
      * @return PresentationCategory|null
      */
     public function getCategoryById($category_id){
-        $criteria = Criteria::create();
+        /*$criteria = Criteria::create();
         $criteria->where(Criteria::expr()->eq('id', intval($category_id)));
         $res = $this->categories->matching($criteria)->first();
-        return $res === false ? null : $res;
+        return $res === false ? null : $res;*/
+        $res = $this->categories->filter(function(PresentationCategory $t) use($category_id){
+            return $t->getId() == $category_id;
+        })->first();
+
+        return $res == false ? null : $res;
     }
 
     /**

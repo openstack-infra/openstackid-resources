@@ -1136,6 +1136,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-track-extra-questions',
+                'route' => '/api/v1/summits/{id}/tracks/{track_id}/extra-questions',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'copy-tracks-to-summit',
                 'route' => '/api/v1/summits/{id}/tracks/copy/{to_summit_id}',
                 'http_method' => 'POST',
