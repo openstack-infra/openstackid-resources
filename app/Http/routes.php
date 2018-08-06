@@ -556,7 +556,7 @@ Route::group([
     Route::group(['prefix' => 'summits'], function () {
 
         Route::group(['prefix' => '{id}'], function () {
-            Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
+            Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators|summit-room-administrators', 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
             // events
             Route::group(['prefix' => 'events'], function () {
 
