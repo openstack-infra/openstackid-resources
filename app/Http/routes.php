@@ -467,6 +467,10 @@ Route::group([
                     Route::get('', 'OAuth2SummitTracksApiController@getTrackBySummit');
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@updateTrackBySummit']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitTracksApiController@deleteTrackBySummit']);
+                    Route::group(['prefix' => 'allowed-tags'], function () {
+                        Route::get('', 'OAuth2SummitTracksApiController@getTrackAllowedTagsBySummit');
+                    });
+
                     Route::group(['prefix' => 'extra-questions'], function () {
                         Route::get('', 'OAuth2SummitTracksApiController@getTrackExtraQuestionsBySummit');
                     });

@@ -28,7 +28,7 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
             'id'       => $summit_id,
             'page'     => 1,
             'per_page' => 10,
-            'filter'   => 'title=@con',
+            'filter'   => 'name=@con',
             'order'    => '+code',
             'expand'   => 'track_groups,allowed_tags'
         ];
@@ -122,6 +122,40 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
         $extra_questions = json_decode($content);
         $this->assertTrue(!is_null($extra_questions));
         return $extra_questions;
+    }
+
+    /**
+     * @param int $summit_id
+     * @param int $track_id
+     * @return mixed
+     */
+    public function testGetTracksAllowedTagsById($summit_id = 25, $track_id = 248){
+        $params = [
+
+            'id'       => $summit_id,
+            'track_id' => $track_id,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitTracksApiController@getTrackAllowedTagsBySummit",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+        $allowes_tags = json_decode($content);
+        $this->assertTrue(!is_null($allowes_tags));
+        return $allowes_tags;
     }
 
     /**

@@ -48,6 +48,7 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
         $groups      = [];
         $allowed_tag = [];
         $extra_questions = [];
+        $summit = $category->getSummit();
 
         foreach($category->getGroups() as $group){
             $groups[] = intval($group->getId());
@@ -81,12 +82,17 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
                 }
                 switch (trim($relation)) {
                     case 'allowed_tags': {
-                        $allowed_tag = [];
+                        $allowed_tags = [];
                         unset($values['allowed_tags']);
                         foreach ($category->getAllowedTags() as $tag) {
-                            $allowed_tag[] = SerializerRegistry::getInstance()->getSerializer($tag)->serialize(null, [], ['none']);
+                            $allowed_tag = SerializerRegistry::getInstance()->getSerializer($tag)->serialize(null, [], ['none']);
+                            $track_tag_group = $summit->getTrackTagGroupForTag($tag);
+                            if(!is_null($track_tag_group)){
+                                $allowed_tag['track_tag_group'] = SerializerRegistry::getInstance()->getSerializer($track_tag_group)->serialize(null, [], ['none']);
+                            }
+                            $allowed_tags[] = $allowed_tag;
                         }
-                        $values['allowed_tags'] = $allowed_tag;
+                        $values['allowed_tags'] = $allowed_tags;
                     }
                     break;
                 }

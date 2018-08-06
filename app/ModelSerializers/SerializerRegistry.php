@@ -43,6 +43,7 @@ use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackDropDownQuestio
 use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackMultiValueQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackQuestionValueTemplateSerializer;
 use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackSingleValueTemplateQuestionSerializer;
+use App\ModelSerializers\Summit\Presentation\TrackTagGroupSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPDropDownQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPLiteralContentQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPMultiValueQuestionTemplateSerializer;
@@ -120,10 +121,11 @@ final class SerializerRegistry
         $this->registry['TrackDropDownQuestionTemplate'] = TrackDropDownQuestionTemplateSerializer::class;
         $this->registry['TrackCheckBoxListQuestionTemplate'] = TrackMultiValueQuestionTemplateSerializer::class;
         $this->registry['TrackRadioButtonListQuestionTemplate'] = TrackMultiValueQuestionTemplateSerializer::class;
-
+        // events
         $this->registry['SummitEvent']                = SummitEventSerializer::class;
         $this->registry['SummitGroupEvent']           = SummitGroupEventSerializer::class;
         $this->registry['SummitEventMetricsSnapshot'] = SummitEventMetricsSnapshotSerializer::class;
+        $this->registry['TrackTagGroup']              = TrackTagGroupSerializer::class;
         $this->registry['Presentation']               = PresentationSerializer::class;
         $this->registry['PresentationVideo']          = PresentationVideoSerializer::class;
         $this->registry['PresentationSlide']          = PresentationSlideSerializer::class;

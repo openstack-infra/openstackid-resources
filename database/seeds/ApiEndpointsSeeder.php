@@ -1145,6 +1145,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'get-track-allowed-tags',
+                'route' => '/api/v1/summits/{id}/tracks/{track_id}/allowed-tags',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'copy-tracks-to-summit',
                 'route' => '/api/v1/summits/{id}/tracks/copy/{to_summit_id}',
                 'http_method' => 'POST',

@@ -25,6 +25,7 @@ use models\exceptions\ValidationException;
 use models\main\Company;
 use models\main\File;
 use models\main\Member;
+use models\main\Tag;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
@@ -2200,4 +2201,51 @@ SQL;
     const STAGE_OPEN = 0;
     const STAGE_FINISHED = 1;
 
+
+    /**
+     * @param Tag $tag
+     * @return TrackTagGroup|null
+     */
+    public function getTrackTagGroupForTag(Tag $tag){
+        $query = <<<SQL
+SELECT tg  
+FROM  App\Models\Foundation\Summit\TrackTagGroup tg
+JOIN tg.allowed_tags t
+WHERE 
+tg.summit = :summit
+AND t.tag = :tag
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this);
+        $native_query->setParameter("tag", $tag);
+
+        $res =  $native_query->getResult();
+        return count($res) > 0 ? $res[0] : null;
+    }
+
+    /**
+     * @param int $tag_id
+     * @return TrackTagGroup|null
+     */
+    public function getTrackTagGroupForTagId($tag_id){
+        $query = <<<SQL
+SELECT tg  
+FROM  App\Models\Foundation\Summit\TrackTagGroup tg
+JOIN tg.allowed_tags tgs
+JOIN tgs.tag t
+WHERE 
+tg.summit = :summit
+AND t.id = :tag_id
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this);
+        $native_query->setParameter("tag_id", $tag_id);
+
+        $res =  $native_query->getResult();
+        return count($res) > 0 ? $res[0] : null;
+    }
 }
