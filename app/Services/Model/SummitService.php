@@ -857,7 +857,7 @@ final class SummitService extends AbstractService implements ISummitService
 
         // speakers
 
-        if($event_type instanceof PresentationType && $event_type->isUseSponsors()) {
+        if($event_type instanceof PresentationType && $event_type->isUseSpeakers()) {
             $speakers = isset($data['speakers']) ?
                         $data['speakers'] : [];
 
