@@ -51,13 +51,13 @@ final class PresentationCategoryFactory
             $track->setSessionCount(intval($data['session_count']));
 
         if(isset($data['alternate_count']))
-            $track->setSessionCount(intval($data['alternate_count']));
+            $track->setAlternateCount(intval($data['alternate_count']));
 
         if(isset($data['lightning_count']))
-            $track->setSessionCount(intval($data['lightning_count']));
+            $track->setLightningCount(intval($data['lightning_count']));
 
         if(isset($data['lightning_alternate_count']))
-            $track->setSessionCount(intval($data['lightning_alternate_count']));
+            $track->setLightningAlternateCount(intval($data['lightning_alternate_count']));
 
         if(isset($data['voting_visible']))
             $track->setVotingVisible(boolval($data['voting_visible']));
