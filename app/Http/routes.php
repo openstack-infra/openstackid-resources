@@ -532,6 +532,16 @@ Route::group([
         Route::group(['prefix' => 'me'], function(){
              Route::get('', 'OAuth2SummitSpeakersApiController@getMySpeaker');
              Route::post('', 'OAuth2SummitSpeakersApiController@createMySpeaker');
+             Route::group(['prefix' => 'presentations'], function(){
+                 Route::group(['prefix' => '{role}'], function(){
+                     Route::group(['prefix' => 'selection-plans'], function(){
+                         Route::group(['prefix' => '{selection_plan_id}'], function(){
+                            Route::get("", "OAuth2SummitSpeakersApiController@getMySpeakerPresentationsByRoleAndBySelectionPlan")
+                                ->where('role', 'creator|speaker|moderator');
+                         });
+                     });
+                 });
+             });
         });
 
         Route::group(['prefix' => '{speaker_id}'], function () {

@@ -22,7 +22,7 @@ use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
 use DateTime;
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSelectionPlanRepository")
  * @ORM\Table(name="SelectionPlan")
  * Class SelectionPlan
  * @package App\Models\Foundation\Summit
