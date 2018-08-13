@@ -1,4 +1,5 @@
 <?php namespace App\Http\Controllers;
+
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\Repositories\ISelectionPlanRepository;
+use App\Services\Model\ISummitSelectionPlanService;
 use Exception;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -25,6 +28,7 @@ use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
+use models\summit\PresentationSpeaker;
 use ModelSerializers\ISerializerTypeSelector;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISpeakerService;
@@ -32,6 +36,8 @@ use utils\FilterParser;
 use utils\OrderParser;
 use utils\PagingInfo;
 use Illuminate\Http\Request as LaravelRequest;
+use utils\PagingResponse;
+
 /**
  * Class OAuth2SummitSpeakersApiController
  * @package App\Http\Controllers
@@ -68,6 +74,12 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     private $serializer_type_selector;
 
+
+    /**
+     * @var ISelectionPlanRepository
+     */
+    private $selection_plan_repository;
+
     /**
      * OAuth2SummitSpeakersApiController constructor.
      * @param ISummitRepository $summit_repository
@@ -75,6 +87,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param ISpeakerRepository $speaker_repository
      * @param IEventFeedbackRepository $event_feedback_repository
      * @param IMemberRepository $member_repository
+     * @param ISelectionPlanRepository $selection_plan_repository
      * @param ISpeakerService $service
      * @param ISerializerTypeSelector $serializer_type_selector
      * @param IResourceServerContext $resource_server_context
@@ -86,18 +99,21 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
         IMemberRepository $member_repository,
+        ISelectionPlanRepository $selection_plan_repository,
         ISpeakerService $service,
         ISerializerTypeSelector $serializer_type_selector,
         IResourceServerContext $resource_server_context
-    ) {
+    )
+    {
         parent::__construct($resource_server_context);
-        $this->repository                = $summit_repository;
-        $this->speaker_repository        = $speaker_repository;
-        $this->event_repository          = $event_repository;
-        $this->member_repository         = $member_repository;
+        $this->repository = $summit_repository;
+        $this->speaker_repository = $speaker_repository;
+        $this->event_repository = $event_repository;
+        $this->member_repository = $member_repository;
         $this->event_feedback_repository = $event_feedback_repository;
-        $this->service                   = $service;
-        $this->serializer_type_selector  = $serializer_type_selector;
+        $this->selection_plan_repository = $selection_plan_repository;
+        $this->service = $service;
+        $this->serializer_type_selector = $serializer_type_selector;
     }
 
     /**
@@ -111,52 +127,48 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     public function getSpeakers($summit_id)
     {
         try {
-            $summit          = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $values = Input::all();
 
             $rules = array
             (
-                'page'     => 'integer|min:1',
+                'page' => 'integer|min:1',
                 'per_page' => 'required_with:page|integer|min:10|max:100',
             );
 
             $validation = Validator::make($values, $rules);
 
-            if ($validation->fails())
-            {
+            if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
 
                 return $this->error412($messages);
             }
 
             // default values
-            $page     = 1;
+            $page = 1;
             $per_page = 10;
 
-            if (Input::has('page'))
-            {
+            if (Input::has('page')) {
                 $page = intval(Input::get('page'));
                 $per_page = intval(Input::get('per_page'));
             }
 
             $filter = null;
 
-            if (Input::has('filter'))
-            {
+            if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'), [
 
                     'first_name' => ['=@', '=='],
-                    'last_name'  => ['=@', '=='],
-                    'email'      => ['=@', '=='],
-                    'id'         => ['=='],
+                    'last_name' => ['=@', '=='],
+                    'email' => ['=@', '=='],
+                    'id' => ['=='],
                 ]);
             }
 
             $order = null;
-            if (Input::has('order'))
-            {
+            if (Input::has('order')) {
                 $order = OrderParser::parse(Input::get('order'), [
                     'first_name',
                     'last_name',
@@ -166,24 +178,19 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             }
 
             $serializer_type = $this->serializer_type_selector->getSerializerType();
-            $result          = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
+            $result = $this->speaker_repository->getSpeakersBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
 
             return $this->ok
             (
-                $result->toArray(Request::input('expand', ''),[],[],['summit_id' => $summit_id, 'published' => true, 'summit' => $summit], $serializer_type)
+                $result->toArray(Request::input('expand', ''), [], [], ['summit_id' => $summit_id, 'published' => true, 'summit' => $summit], $serializer_type)
             );
-        }
-        catch(ValidationException $ex1){
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex)
-        {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -193,51 +200,48 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * get all speakers without summit
      * @return mixed
      */
-    public function getAll(){
+    public function getAll()
+    {
         try {
 
-            $values          = Input::all();
+            $values = Input::all();
             $serializer_type = $this->serializer_type_selector->getSerializerType();
-            $rules           = [
-                'page'     => 'integer|min:1',
+            $rules = [
+                'page' => 'integer|min:1',
                 'per_page' => 'required_with:page|integer|min:10|max:100',
             ];
 
             $validation = Validator::make($values, $rules);
 
-            if ($validation->fails())
-            {
+            if ($validation->fails()) {
                 $messages = $validation->messages()->toArray();
 
                 return $this->error412($messages);
             }
 
             // default values
-            $page     = 1;
+            $page = 1;
             $per_page = 10;
 
-            if (Input::has('page'))
-            {
+            if (Input::has('page')) {
                 $page = intval(Input::get('page'));
                 $per_page = intval(Input::get('per_page'));
             }
 
             $filter = null;
 
-            if (Input::has('filter'))
-            {
+            if (Input::has('filter')) {
                 $filter = FilterParser::parse(Input::get('filter'), [
 
                     'first_name' => ['=@', '=='],
-                    'last_name'  => ['=@', '=='],
-                    'email'      => ['=@', '=='],
-                    'id'         => ['=='],
+                    'last_name' => ['=@', '=='],
+                    'email' => ['=@', '=='],
+                    'id' => ['=='],
                 ]);
             }
 
             $order = null;
-            if (Input::has('order'))
-            {
+            if (Input::has('order')) {
                 $order = OrderParser::parse(Input::get('order'), [
                     'id',
                     'email',
@@ -250,20 +254,15 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             return $this->ok
             (
-                $result->toArray(Request::input('expand', ''),[] ,[], [], $serializer_type)
+                $result->toArray(Request::input('expand', ''), [], [], [], $serializer_type)
             );
-        }
-        catch(ValidationException $ex1){
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex)
-        {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -276,9 +275,8 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     public function getSummitSpeaker($summit_id, $speaker_id)
     {
-        try
-        {
-            $summit          = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
             $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check($speaker_id, $summit);
@@ -297,31 +295,27 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 )
             );
 
-        }
-        catch(ValidationException $ex1){
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
     }
 
-    public function getMySpeaker(){
-        try
-        {
+    public function getMySpeaker()
+    {
+        try {
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
-            if(is_null($current_member_id))
+            if (is_null($current_member_id))
                 return $this->error403();
 
             $member = $this->member_repository->getById($current_member_id);
-            if(is_null($member))
+            if (is_null($member))
                 return $this->error403();
 
             $speaker = $this->speaker_repository->getByMember($member);
@@ -340,17 +334,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 )
             );
 
-        }
-        catch(ValidationException $ex1){
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -359,25 +349,25 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     /**
      * @return mixed
      */
-    public function createMySpeaker(){
-        try
-        {
+    public function createMySpeaker()
+    {
+        try {
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
-            if(is_null($current_member_id))
+            if (is_null($current_member_id))
                 return $this->error403();
 
             $member = $this->member_repository->getById($current_member_id);
-            if(is_null($member))
+            if (is_null($member))
                 return $this->error403();
 
             // set data from current member ...
             $speaker = $this->service->addSpeaker([
-               'member_id'   => $member->getIdentifier(),
+                'member_id' => $member->getIdentifier(),
                 'first_name' => $member->getFirstName(),
-                'last_name'  => $member->getLastName(),
-                'bio'        => $member->getBio(),
-                'twitter'    => $member->getTwitterHandle(),
-                'irc'        => $member->getIrcHandle(),
+                'last_name' => $member->getLastName(),
+                'bio' => $member->getBio(),
+                'twitter' => $member->getTwitterHandle(),
+                'irc' => $member->getIrcHandle(),
             ]);
 
             $serializer_type = $this->serializer_type_selector->getSerializerType();
@@ -393,17 +383,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 )
             );
 
-        }
-        catch(ValidationException $ex1){
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -415,10 +401,9 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     public function getSpeaker($speaker_id)
     {
-        try
-        {
+        try {
 
-            $speaker         = $this->speaker_repository->getById($speaker_id);
+            $speaker = $this->speaker_repository->getById($speaker_id);
             if (is_null($speaker)) return $this->error404();
 
             $serializer_type = $this->serializer_type_selector->getSerializerType();
@@ -434,17 +419,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 )
             );
 
-        }
-        catch(ValidationException $ex1){
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412($ex1->getMessages());
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -454,9 +435,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $summit_id
      * @return mixed
      */
-    public function addSpeakerBySummit($summit_id){
+    public function addSpeakerBySummit($summit_id)
+    {
         try {
-            if(!Request::isJson()) return $this->error400();
+            if (!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -464,18 +446,18 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             $rules = array
             (
-                'title'             => 'required|string|max:100',
-                'first_name'        => 'required|string|max:100',
-                'last_name'         => 'required|string|max:100',
-                'bio'               => 'sometimes|string',
-                'irc'               => 'sometimes|string|max:50',
-                'twitter'           => 'sometimes|string|max:50',
-                'member_id'         => 'sometimes|integer',
-                'email'             => 'sometimes|string|max:50',
-                'on_site_phone'     => 'sometimes|string|max:50',
-                'registered'        => 'sometimes|boolean',
-                'is_confirmed'      => 'sometimes|boolean',
-                'checked_in'        => 'sometimes|boolean',
+                'title' => 'required|string|max:100',
+                'first_name' => 'required|string|max:100',
+                'last_name' => 'required|string|max:100',
+                'bio' => 'sometimes|string',
+                'irc' => 'sometimes|string|max:50',
+                'twitter' => 'sometimes|string|max:50',
+                'member_id' => 'sometimes|integer',
+                'email' => 'sometimes|string|max:50',
+                'on_site_phone' => 'sometimes|string|max:50',
+                'registered' => 'sometimes|boolean',
+                'is_confirmed' => 'sometimes|boolean',
+                'checked_in' => 'sometimes|boolean',
                 'registration_code' => 'sometimes|string',
             );
 
@@ -499,17 +481,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = $this->service->addSpeaker($summit, HTMLCleaner::cleanData($data->all(), $fields));
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($speaker)->serialize());
-        }
-        catch (ValidationException $ex1) {
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -520,9 +498,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $speaker_id
      * @return mixed
      */
-    public function updateSpeakerBySummit($summit_id, $speaker_id){
+    public function updateSpeakerBySummit($summit_id, $speaker_id)
+    {
         try {
-            if(!Request::isJson()) return $this->error400();
+            if (!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
@@ -533,18 +512,18 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             $rules = array
             (
-                'title'             => 'sometimes|string|max:100',
-                'first_name'        => 'sometimes|string|max:100',
-                'last_name'         => 'sometimes|string|max:100',
-                'bio'               => 'sometimes|string',
-                'irc'               => 'sometimes|string|max:50',
-                'twitter'           => 'sometimes|string|max:50',
-                'member_id'         => 'sometimes|integer',
-                'email'             => 'sometimes|string|max:50',
-                'on_site_phone'     => 'sometimes|string|max:50',
-                'registered'        => 'sometimes|boolean',
-                'is_confirmed'      => 'sometimes|boolean',
-                'checked_in'        => 'sometimes|boolean',
+                'title' => 'sometimes|string|max:100',
+                'first_name' => 'sometimes|string|max:100',
+                'last_name' => 'sometimes|string|max:100',
+                'bio' => 'sometimes|string',
+                'irc' => 'sometimes|string|max:50',
+                'twitter' => 'sometimes|string|max:50',
+                'member_id' => 'sometimes|integer',
+                'email' => 'sometimes|string|max:50',
+                'on_site_phone' => 'sometimes|string|max:50',
+                'registered' => 'sometimes|boolean',
+                'is_confirmed' => 'sometimes|boolean',
+                'checked_in' => 'sometimes|boolean',
                 'registration_code' => 'sometimes|string',
             );
 
@@ -568,17 +547,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = $this->service->updateSpeakerBySummit($summit, $speaker, HTMLCleaner::cleanData($data->all(), $fields));
 
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($speaker)->serialize());
-        }
-        catch (ValidationException $ex1) {
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -589,7 +564,8 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $speaker_id
      * @return mixed
      */
-    public function addSpeakerPhoto(LaravelRequest $request, $speaker_id){
+    public function addSpeakerPhoto(LaravelRequest $request, $speaker_id)
+    {
 
         try {
 
@@ -601,22 +577,16 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $res = $this->service->addSpeakerPhoto($speaker_id, $file);
 
             return !is_null($res) ? $this->created($res->getId()) : $this->error400();
-        }
-        catch (EntityNotFoundException $ex1) {
+        } catch (EntityNotFoundException $ex1) {
             Log::warning($ex1);
             return $this->error404();
-        }
-        catch(ValidationException $ex2)
-        {
+        } catch (ValidationException $ex2) {
             Log::warning($ex2);
             return $this->error412(array($ex2->getMessage()));
-        }
-        catch(\HTTP401UnauthorizedException $ex3)
-        {
+        } catch (\HTTP401UnauthorizedException $ex3) {
             Log::warning($ex3);
             return $this->error401();
-        }
-        catch (Exception $ex) {
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -627,9 +597,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $speaker_to_id
      * @return mixed
      */
-    public function merge($speaker_from_id, $speaker_to_id){
+    public function merge($speaker_from_id, $speaker_to_id)
+    {
         try {
-            if(!Request::isJson()) return $this->error400();
+            if (!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $speaker_from = $this->speaker_repository->getById($speaker_from_id);
@@ -641,17 +612,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $this->service->merge($speaker_from, $speaker_to, $data->all());
 
             return $this->updated();
-        }
-        catch (ValidationException $ex1) {
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -660,24 +627,25 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     /**
      * @return mixed
      */
-    public function addSpeaker(){
+    public function addSpeaker()
+    {
         try {
-            if(!Request::isJson()) return $this->error400();
+            if (!Request::isJson()) return $this->error400();
             $data = Input::json();
 
             $rules = [
-                'title'                    => 'required|string|max:100',
-                'first_name'               => 'required|string|max:100',
-                'last_name'                => 'required|string|max:100',
-                'bio'                      => 'sometimes|string',
-                'notes'                    => 'sometimes|string',
-                'irc'                      => 'sometimes|string|max:50',
-                'twitter'                  => 'sometimes|string|max:50',
-                'member_id'                => 'sometimes|integer',
-                'email'                    => 'sometimes|string|max:50',
-                'available_for_bureau'     => 'sometimes|boolean',
-                'funded_travel'            => 'sometimes|boolean',
-                'willing_to_travel'        => 'sometimes|boolean',
+                'title' => 'required|string|max:100',
+                'first_name' => 'required|string|max:100',
+                'last_name' => 'required|string|max:100',
+                'bio' => 'sometimes|string',
+                'notes' => 'sometimes|string',
+                'irc' => 'sometimes|string|max:50',
+                'twitter' => 'sometimes|string|max:50',
+                'member_id' => 'sometimes|integer',
+                'email' => 'sometimes|string|max:50',
+                'available_for_bureau' => 'sometimes|boolean',
+                'funded_travel' => 'sometimes|boolean',
+                'willing_to_travel' => 'sometimes|boolean',
                 'willing_to_present_video' => 'sometimes|boolean',
             ];
 
@@ -702,17 +670,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = $this->service->addSpeaker(HTMLCleaner::cleanData($data->all(), $fields));
 
             return $this->created(SerializerRegistry::getInstance()->getSerializer($speaker, SerializerRegistry::SerializerType_Private)->serialize());
-        }
-        catch (ValidationException $ex1) {
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -722,9 +686,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $speaker_id
      * @return mixed
      */
-    public function updateSpeaker($speaker_id){
+    public function updateSpeaker($speaker_id)
+    {
         try {
-            if(!Request::isJson()) return $this->error400();
+            if (!Request::isJson()) return $this->error400();
             $data = Input::json();
 
 
@@ -733,18 +698,18 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             $rules = array
             (
-                'title'                    => 'sometimes|string|max:100',
-                'first_name'               => 'sometimes|string|max:100',
-                'last_name'                => 'sometimes|string|max:100',
-                'bio'                      => 'sometimes|string',
-                'notes'                    => 'sometimes|string',
-                'irc'                      => 'sometimes|string|max:50',
-                'twitter'                  => 'sometimes|string|max:50',
-                'member_id'                => 'sometimes|integer',
-                'email'                    => 'sometimes|string|max:50',
-                'available_for_bureau'     => 'sometimes|boolean',
-                'funded_travel'            => 'sometimes|boolean',
-                'willing_to_travel'        => 'sometimes|boolean',
+                'title' => 'sometimes|string|max:100',
+                'first_name' => 'sometimes|string|max:100',
+                'last_name' => 'sometimes|string|max:100',
+                'bio' => 'sometimes|string',
+                'notes' => 'sometimes|string',
+                'irc' => 'sometimes|string|max:50',
+                'twitter' => 'sometimes|string|max:50',
+                'member_id' => 'sometimes|integer',
+                'email' => 'sometimes|string|max:50',
+                'available_for_bureau' => 'sometimes|boolean',
+                'funded_travel' => 'sometimes|boolean',
+                'willing_to_travel' => 'sometimes|boolean',
                 'willing_to_present_video' => 'sometimes|boolean',
             );
 
@@ -769,17 +734,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = $this->service->updateSpeaker($speaker, HTMLCleaner::cleanData($data->all(), $fields));
 
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($speaker, SerializerRegistry::SerializerType_Private)->serialize());
-        }
-        catch (ValidationException $ex1) {
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
-        }
-        catch (Exception $ex) {
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }
@@ -789,24 +750,80 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $speaker_id
      * @return mixed
      */
-    public function deleteSpeaker($speaker_id){
+    public function deleteSpeaker($speaker_id)
+    {
         try {
 
             $speaker = $this->speaker_repository->getById($speaker_id);
             if (is_null($speaker)) return $this->error404();
             $this->service->deleteSpeaker($speaker_id);
             return $this->deleted();
-        }
-        catch (ValidationException $ex1) {
+        } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
-        }
-        catch(EntityNotFoundException $ex2)
-        {
+        } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
         }
-        catch (Exception $ex) {
+    }
+
+    /**
+     * @param $role
+     * @param $selection_plan_id
+     * @return mixed
+     */
+    public function getMySpeakerPresentationsByRoleAndBySelectionPlan($role, $selection_plan_id)
+    {
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $member = $this->member_repository->getById($current_member_id);
+            if (is_null($member))
+                return $this->error403();
+
+            $speaker = $this->speaker_repository->getByMember($member);
+            if (is_null($speaker))
+                return $this->error403();
+
+            $selection_plan = $this->selection_plan_repository->getById($selection_plan_id);
+            if (is_null($selection_plan))
+                return $this->error404(['message' => 'missing selection plan']);
+
+            switch ($role) {
+                case 'creator':
+                    $role = PresentationSpeaker::ROLE_CREATOR;
+                    break;
+                case 'speaker':
+                    $role = PresentationSpeaker::ROLE_SPEAKER;
+                    break;
+                case 'moderator':
+                    $role = PresentationSpeaker::ROLE_MODERATOR;
+                    break;
+            }
+            $presentations = $speaker->getPresentationsBySelectionPlanAndRole($selection_plan, $role);
+
+            $response = new PagingResponse
+            (
+                count($presentations),
+                count($presentations),
+                1,
+                1,
+                $presentations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand', '')));
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

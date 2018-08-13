@@ -321,6 +321,15 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ),
             array(
+                'name' => 'get-my-speaker-presentations-by-role-by-selection-plan',
+                'route' => '/api/v1/speakers/me/presentations/{role}/selection-plans/{selection_plan_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ),
+            array(
                 'name' => 'create-my-speaker',
                 'route' => '/api/v1/speakers/me',
                 'http_method' => 'POST',

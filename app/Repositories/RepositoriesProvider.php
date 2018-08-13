@@ -18,10 +18,12 @@ use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationCategoryGroupRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
+use App\Models\Foundation\Summit\Repositories\ISelectionPlanRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationBannerRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
+use App\Models\Foundation\Summit\SelectionPlan;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
@@ -325,6 +327,13 @@ final class RepositoriesProvider extends ServiceProvider
             IPresentationCategoryGroupRepository::class,
             function(){
                 return EntityManager::getRepository(PresentationCategoryGroup::class);
+            }
+        );
+
+        App::singleton(
+            ISelectionPlanRepository::class,
+            function(){
+                return EntityManager::getRepository(SelectionPlan::class);
             }
         );
     }
