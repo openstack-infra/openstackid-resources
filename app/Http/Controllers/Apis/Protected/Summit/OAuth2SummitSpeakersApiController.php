@@ -13,7 +13,6 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Repositories\ISelectionPlanRepository;
-use App\Services\Model\ISummitSelectionPlanService;
 use Exception;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -32,6 +31,7 @@ use models\summit\PresentationSpeaker;
 use ModelSerializers\ISerializerTypeSelector;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISpeakerService;
+use services\model\ISummitService;
 use utils\FilterParser;
 use utils\OrderParser;
 use utils\PagingInfo;
@@ -80,6 +80,12 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     private $selection_plan_repository;
 
+
+    /**
+     * @var ISummitService
+     */
+    private $summit_service;
+
     /**
      * OAuth2SummitSpeakersApiController constructor.
      * @param ISummitRepository $summit_repository
@@ -89,6 +95,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param IMemberRepository $member_repository
      * @param ISelectionPlanRepository $selection_plan_repository
      * @param ISpeakerService $service
+     * @param ISummitService $summit_service
      * @param ISerializerTypeSelector $serializer_type_selector
      * @param IResourceServerContext $resource_server_context
      */
@@ -101,6 +108,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         IMemberRepository $member_repository,
         ISelectionPlanRepository $selection_plan_repository,
         ISpeakerService $service,
+        ISummitService $summit_service,
         ISerializerTypeSelector $serializer_type_selector,
         IResourceServerContext $resource_server_context
     )
@@ -113,6 +121,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         $this->event_feedback_repository = $event_feedback_repository;
         $this->selection_plan_repository = $selection_plan_repository;
         $this->service = $service;
+        $this->summit_service = $summit_service;
         $this->serializer_type_selector = $serializer_type_selector;
     }
 
@@ -829,4 +838,57 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $presentation_id
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function addSpeakerToMyPresentation($presentation_id, $speaker_id){
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $this->summit_service->addSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
+
+            return $this->updated();
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $presentation_id
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function removeSpeakerToMyPresentation($presentation_id, $speaker_id){
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $this->summit_service->removeSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
+
+            return $this->deleted();
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

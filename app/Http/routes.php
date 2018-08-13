@@ -533,6 +533,16 @@ Route::group([
              Route::get('', 'OAuth2SummitSpeakersApiController@getMySpeaker');
              Route::post('', 'OAuth2SummitSpeakersApiController@createMySpeaker');
              Route::group(['prefix' => 'presentations'], function(){
+
+                 Route::group(['prefix' => '{presentation_id}'], function(){
+                     Route::group(['prefix' => 'speakers'], function(){
+                         Route::put('{speaker_id}', 'OAuth2SummitSpeakersApiController@addSpeakerToMyPresentation');
+                         Route::delete('{speaker_id}', 'OAuth2SummitSpeakersApiController@removeSpeakerToMyPresentation');
+                     });
+                     Route::group(['prefix' => 'moderators'], function(){
+
+                     });
+                 });
                  Route::group(['prefix' => '{role}'], function(){
                      Route::group(['prefix' => 'selection-plans'], function(){
                          Route::group(['prefix' => '{selection_plan_id}'], function(){

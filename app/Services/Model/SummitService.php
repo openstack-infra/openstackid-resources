@@ -1653,4 +1653,85 @@ final class SummitService extends AbstractService implements ISummitService
 
         });
     }
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function addSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id)
+    {
+        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id) {
+            $current_member = $this->member_repository->getById($current_member_id);
+            if(is_null($current_member))
+                throw new EntityNotFoundException(sprintf("member %s not found", $current_member_id));
+
+            $current_speaker = $this->speaker_repository->getByMember($current_member);
+            if(is_null($current_speaker))
+                throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $current_member_id));
+
+            $presentation = $this->event_repository->getById($presentation_id);
+            if(is_null($presentation))
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation instanceof Presentation)
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation->canEdit($current_speaker))
+                throw new ValidationException(sprintf("member %s can not edit presentation %s",
+                    $current_member_id,
+                    $presentation_id
+                    ));
+
+            $speaker = $this->speaker_repository->getById(intval($speaker_id));
+            if (is_null($speaker))
+                throw new EntityNotFoundException(sprintf('speaker %s not found', $speaker_id));
+
+            $presentation->addSpeaker($speaker);
+        });
+    }
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function removeSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id)
+    {
+        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id) {
+
+                $current_member = $this->member_repository->getById($current_member_id);
+                if(is_null($current_member))
+                    throw new EntityNotFoundException(sprintf("member %s not found", $current_member_id));
+
+                $current_speaker = $this->speaker_repository->getByMember($current_member);
+                if(is_null($current_speaker))
+                    throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $current_member_id));
+
+                $presentation = $this->event_repository->getById($presentation_id);
+                if(is_null($presentation))
+                    throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+                if(!$presentation instanceof Presentation)
+                    throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation->canEdit($current_speaker))
+                throw new ValidationException(sprintf("member %s can not edit presentation %s",
+                    $current_member_id,
+                    $presentation_id
+                ));
+
+                $speaker = $this->speaker_repository->getById(intval($speaker_id));
+                if (is_null($speaker))
+                    throw new EntityNotFoundException(sprintf('speaker %s not found', $speaker_id));
+
+                $presentation->removeSpeaker($speaker);
+        });
+    }
 }

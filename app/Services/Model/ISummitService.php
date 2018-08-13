@@ -222,4 +222,24 @@ interface ISummitService
      * @return void
      */
     public function deleteSummit($summit_id);
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function addSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function removeSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
 }

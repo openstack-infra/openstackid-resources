@@ -345,7 +345,16 @@ class Presentation extends SummitEvent
      * @param PresentationSpeaker $speaker
      */
     public function removeSpeaker(PresentationSpeaker $speaker){
+        if(!$this->speakers->contains($speaker)) return;
         $this->speakers->removeElement($speaker);
+    }
+
+    /**
+     * @param PresentationSpeaker $speaker
+     * @return bool
+     */
+    public function isSpeaker(PresentationSpeaker $speaker){
+        return $this->speakers->contains($speaker);
     }
 
     /**
@@ -675,6 +684,17 @@ class Presentation extends SummitEvent
         catch(\Exception $ex){
             return 0;
         }
+    }
+
+    /**
+     * @param PresentationSpeaker $speaker
+     * @return bool
+     */
+    public function canEdit(PresentationSpeaker $speaker){
+        if($this->getCreatorId() == $speaker->getId()) return true;
+        if($this->getModeratorId() == $speaker->getId()) return true;
+        if($this->isSpeaker($speaker)) return true;
+        return false;
     }
 
 }

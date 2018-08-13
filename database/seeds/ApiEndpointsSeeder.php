@@ -329,6 +329,26 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ),
+            [
+                'name' => 'add-speaker-2-my-presentation',
+                'route' => '/api/v1/speakers/me/presentations/{presentation_id}/speakers/{speaker_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                    sprintf(SummitScopes::WriteMySpeakersData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'remove-speaker-2-my-presentation',
+                'route' => '/api/v1/speakers/me/presentations/{presentation_id}/speakers/{speaker_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                    sprintf(SummitScopes::WriteMySpeakersData, $current_realm)
+                ],
+            ],
             array(
                 'name' => 'create-my-speaker',
                 'route' => '/api/v1/speakers/me',
