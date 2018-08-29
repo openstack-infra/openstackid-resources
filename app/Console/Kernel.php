@@ -53,6 +53,7 @@ class Kernel extends ConsoleKernel
             22, //Boston
             23, //Sydney
             24, //Vancouver BC
+            25, //Berlin
         ];
 
         foreach ($summit_ids as $summit_id)
