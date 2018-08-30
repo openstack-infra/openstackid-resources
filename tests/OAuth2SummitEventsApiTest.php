@@ -806,22 +806,22 @@ final class OAuth2SummitEventsApiTest extends ProtectedApiTest
     public function testGetScheduleEmptySpotsBySummit()
     {
         $summit_repository   = EntityManager::getRepository(\models\summit\Summit::class);
-        $summit              = $summit_repository->getById(23);
+        $summit              = $summit_repository->getById(25);
         $summit_time_zone    = $summit->getTimeZone();
-        $start_datetime      = new DateTime( "2017-11-04 07:00:00", $summit_time_zone);
-        $end_datetime        = new DateTime("2017-11-05 18:00:00", $summit_time_zone);
+        $start_datetime      = new DateTime( "2018-11-10 07:00:00", $summit_time_zone);
+        $end_datetime        = new DateTime("2018-11-10 22:00:00", $summit_time_zone);
         $start_datetime_unix = $start_datetime->getTimestamp();
         $end_datetime_unix   = $end_datetime->getTimestamp();
 
         $params = [
 
-            'id' => 23,
+            'id' => 25,
             'filter' =>
                 [
-                    'location_id==318,location_id==320',
+                    'location_id==391',
                     'start_date>='.$start_datetime_unix,
                     'end_date<='.$end_datetime_unix,
-                    'gap==10',
+                    'gap>=30',
                 ],
         ];
 

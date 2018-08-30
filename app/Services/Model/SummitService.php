@@ -1353,8 +1353,9 @@ final class SummitService extends AbstractService implements ISummitService
                     $events_filter->addFilterCondition(FilterParser::buildFilter('published', '==', '1'));
                     $events_filter->addFilterCondition(FilterParser::buildFilter('summit_id', '==', $summit->getId()));
                     $events_filter->addFilterCondition(FilterParser::buildFilter('location_id', '==', intval($location_id)));
-                    $events_filter->addFilterCondition(FilterParser::buildFilter('start_date', '>=', $interval[0]->getTimestamp()));
-                    $events_filter->addFilterCondition(FilterParser::buildFilter('end_date', '<=', $interval[1]->getTimestamp()));
+
+                    $events_filter->addFilterCondition(FilterParser::buildFilter('start_date', '<', $interval[1]->getTimestamp()));
+                    $events_filter->addFilterCondition(FilterParser::buildFilter('end_date', '>', $interval[0]->getTimestamp()));
 
                     $paging_response = $this->event_repository->getAllByPage
                     (
