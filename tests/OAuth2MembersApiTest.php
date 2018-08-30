@@ -161,16 +161,54 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
-    public function testUpdateMemberAffiliation(){
+    public function testAddMemberAffiliation($member_id = 11624){
         $params = [
-            'member_id'      => 11624,
-            'affiliation_id' => 61749,
+            'member_id'      => $member_id,
         ];
+
+        $start_datetime      = new DateTime( "2018-11-10 00:00:00");
+        $start_datetime_unix = $start_datetime->getTimestamp();
 
         $data = [
             'is_current' => true,
-            'end_date'   => 0,
-            'job_title'  => 'test update'
+            'start_date' => $start_datetime_unix,
+            'job_title'  => 'test affiliation',
+            'organization_id' => 1
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $response = $this->action(
+            "POST",
+            "OAuth2MembersApiController@addAffiliation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            json_encode($data)
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        $affiliation = json_decode($content);
+        $this->assertTrue(!is_null($affiliation));
+        return $affiliation;
+    }
+
+    public function testUpdateMemberAffiliation($member_id = 11624){
+
+        $new_affiliation = $this->testAddMemberAffiliation($member_id);
+        $params = [
+            'member_id'      => $member_id,
+            'affiliation_id' => $new_affiliation->id,
+        ];
+
+        $data = [
+            'job_title'  => 'job title update'
         ];
 
         $headers = [
@@ -190,10 +228,37 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
         );
 
         $content = $response->getContent();
-        $this->assertResponseStatus(200);
+        $this->assertResponseStatus(201);
         $affiliation = json_decode($content);
         $this->assertTrue(!is_null($affiliation));
         return $affiliation;
+    }
+
+    public function testDeleteMemberAffiliation($member_id = 11624){
+
+        $new_affiliation = $this->testAddMemberAffiliation($member_id);
+        $params = [
+            'member_id'      => $member_id,
+            'affiliation_id' => $new_affiliation->id,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"       => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2MembersApiController@deleteAffiliation",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
     }
 
     public function testGetMemberAffiliation($member_id = 11624)

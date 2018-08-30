@@ -61,13 +61,13 @@ class Member extends SilverstripeBaseModel
     private $github_user;
 
     /**
-     * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="owner", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="models\summit\SummitEventFeedback", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
      * @var SummitEventFeedback[]
      */
     private $feedback;
 
     /**
-     * @ORM\OneToMany(targetEntity="Affiliation", mappedBy="owner", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="Affiliation", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
      * @var Affiliation[]
      */
     private $affiliations;
@@ -1019,7 +1019,7 @@ SQL;
      */
     public function getAffiliationById($affiliation_id){
         $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('id', $affiliation_id));
+        $criteria->where(Criteria::expr()->eq('id', intval($affiliation_id)));
 
         $affiliation = $this->affiliations->matching($criteria)->first();
 
@@ -1031,7 +1031,22 @@ SQL;
      * @return $this
      */
     public function removeAffiliation(Affiliation $affiliation){
-        $this->affiliations->removeElement($affiliation);
+        if($this->affiliations->contains($affiliation)) {
+            $this->affiliations->removeElement($affiliation);
+            $affiliation->clearOwner();
+        }
+        return $this;
+    }
+
+    /**
+     * @param Affiliation $affiliation
+     * @return $this
+     */
+    public function addAffiliation(Affiliation $affiliation){
+        if(!$this->affiliations->contains($affiliation)) {
+            $this->affiliations->add($affiliation);
+            $affiliation->setOwner($this);
+        }
         return $this;
     }
 

@@ -228,6 +228,53 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
         }
     }
 
+    public function addAffiliation($member_id){
+        try {
+            if(!Request::isJson()) return $this->error400();
+            $data = Input::json();
+
+            $member = $this->repository->getById($member_id);
+            if(is_null($member)) return $this->error404();
+
+            $rules = [
+                'is_current'      => 'required|boolean',
+                'start_date'      => 'required|date_format:U|valid_epoch',
+                'end_date'        => 'sometimes|date_format:U|after_or_null_epoch:start_date',
+                'organization_id' => 'required|integer',
+                'job_title'       => 'sometimes|string|max:255'
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $affiliation = $this->member_service->addAffiliation($member, $data->all());
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
     /**
      * @param int $member_id
      * @param int $affiliation_id
@@ -263,7 +310,7 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
 
             $affiliation = $this->member_service->updateAffiliation($member, $affiliation_id, $data->all());
 
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize());
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);

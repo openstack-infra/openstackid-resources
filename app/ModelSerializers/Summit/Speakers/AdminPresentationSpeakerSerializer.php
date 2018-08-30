@@ -111,6 +111,15 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
         }
         $values['organizational_roles'] = $organizational_roles;
 
+        $affiliations = [];
+        if($speaker->hasMember()) {
+            $member = $speaker->getMember();
+            foreach ($member->getAllAffiliations() as $affiliation) {
+                $affiliations[] = SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize('organization');
+            }
+        }
+        $values['affiliations'] = $affiliations;
+
         if (!empty($expand)) {
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {

@@ -63,7 +63,7 @@ final class MemberService
                 $affiliation->setIsCurrent(boolval($data['is_current']));
             if(isset($data['start_date'])) {
                 $start_date = intval($data['start_date']);
-                $affiliation->setEndDate(new DateTime("@$start_date"));
+                $affiliation->setStartDate(new DateTime("@$start_date"));
             }
             if(isset($data['end_date'])) {
                 $end_date = intval($data['end_date']);
@@ -123,6 +123,52 @@ final class MemberService
                 throw new EntityNotFoundException(sprintf("rsvp id %s does not belongs to member id %s", $rsvp_id, $member->getId()));
 
             $member->removeRsvp($rsvp);
+        });
+    }
+
+    /**
+     * @param Member $member
+     * @param array $data
+     * @return Affiliation
+     */
+    public function addAffiliation(Member $member, array $data)
+    {
+        return $this->tx_service->transaction(function() use($member, $data){
+
+            $affiliation = new Affiliation();
+
+            if(isset($data['is_current']))
+                $affiliation->setIsCurrent(boolval($data['is_current']));
+            if(isset($data['start_date'])) {
+                $start_date = intval($data['start_date']);
+                $affiliation->setStartDate(new DateTime("@$start_date"));
+            }
+            if(isset($data['end_date'])) {
+                $end_date = intval($data['end_date']);
+                $affiliation->setEndDate($end_date > 0 ? new DateTime("@$end_date") : null);
+            }
+            if(isset($data['organization_id'])) {
+                $org = $this->organization_repository->getById(intval($data['organization_id']));
+                if(is_null($org))
+                    throw new EntityNotFoundException(sprintf("organization id %s not found", $data['organization_id']));
+                $affiliation->setOrganization($org);
+            }
+
+            if(isset($data['job_title'])) {
+                $affiliation->setJobTitle(trim($data['job_title']));
+            }
+
+            if($affiliation->isCurrent() && $affiliation->getEndDate() != null)
+                throw new ValidationException
+                (
+                    sprintf
+                    (
+                        "in order to set affiliation as current end_date should be null"
+                    )
+                );
+
+            $member->addAffiliation($affiliation);
+            return $affiliation;
         });
     }
 }

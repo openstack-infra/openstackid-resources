@@ -135,6 +135,10 @@ class Affiliation extends SilverstripeBaseModel
         return $this->owner;
     }
 
+    public function clearOwner(){
+        $this->owner = null;
+    }
+
     /**
      * @param Member $owner
      */
@@ -188,5 +192,15 @@ class Affiliation extends SilverstripeBaseModel
     public function setJobTitle($job_title)
     {
         $this->job_title = $job_title;
+    }
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->is_current = false;
+        $this->start_date = null;
+        $this->end_date = null;
+        $this->organization = null;
+        $this->owner = null;
     }
 }

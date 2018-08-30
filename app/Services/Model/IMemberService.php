@@ -19,6 +19,14 @@ use models\main\Member;
  */
 interface IMemberService
 {
+
+    /**
+     * @param Member $member
+     * @param array $data
+     * @return Affiliation
+     */
+    public function addAffiliation(Member $member, array $data);
+
     /**
      * @param Member $member
      * @param int $affiliation_id
