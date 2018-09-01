@@ -83,12 +83,6 @@ final class DoctrineSummitEventRepository
                 't',
                 "t.tag :operator ':value'"
             ),
-            'location_id'=> new DoctrineJoinFilterMapping
-            (
-                'e.location',
-                'l',
-                "l.id :operator :value"
-            ),
             'summit_id'=> new DoctrineJoinFilterMapping
             (
                 'e.summit',
@@ -107,7 +101,7 @@ final class DoctrineSummitEventRepository
                 'c',
                 "c.id :operator :value"
             ),
-            'location_id' => new DoctrineJoinFilterMapping
+            'location_id' => new DoctrineLeftJoinFilterMapping
             (
                 'e.location',
                 'l',
