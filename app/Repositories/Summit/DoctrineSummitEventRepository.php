@@ -206,7 +206,7 @@ final class DoctrineSummitEventRepository
 
         if($class == \models\summit\Presentation::class) {
             $query = $query->innerJoin("e.category", "cc", Join::WITH);
-            $query = $query->innerJoin("e.location", "loc", Join::WITH);
+            $query = $query->leftJoin("e.location", "loc", Join::WITH);
             $query = $query->leftJoin("e.speakers", "sp", Join::WITH);
             $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
             $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
