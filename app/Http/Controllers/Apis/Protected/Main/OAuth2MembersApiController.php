@@ -258,16 +258,19 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
 
             $affiliation = $this->member_service->addAffiliation($member, $data->all());
 
-            return $this->created(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize());
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize
+            (
+                Input::get('expand','')
+            ));
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
-            return $this->error412(array($ex1->getMessage()));
+            return $this->error412([$ex1->getMessage()]);
         }
         catch(EntityNotFoundException $ex2)
         {
             Log::warning($ex2);
-            return $this->error404(array('message'=> $ex2->getMessage()));
+            return $this->error404(['message'=> $ex2->getMessage()]);
         }
         catch (Exception $ex) {
             Log::error($ex);
@@ -310,7 +313,9 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
 
             $affiliation = $this->member_service->updateAffiliation($member, $affiliation_id, $data->all());
 
-            return $this->updated(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize());
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($affiliation)->serialize(
+                Input::get('expand','')
+            ));
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
