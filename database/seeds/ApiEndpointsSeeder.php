@@ -33,6 +33,7 @@ class ApiEndpointsSeeder extends Seeder
         $this->seedTagsEndpoints();
         $this->seedCompaniesEndpoints();
         $this->seedGroupsEndpoints();
+        $this->seedOrganizationsEndpoints();
     }
 
     /**
@@ -1849,6 +1850,25 @@ class ApiEndpointsSeeder extends Seeder
                         sprintf(SummitScopes::ReadAllSummitData, $current_realm),
                         sprintf(SummitScopes::ReadSummitData, $current_realm),
                         sprintf('%s/companies/read', $current_realm)
+                    ],
+                ]
+            ]
+        );
+    }
+
+    private function seedOrganizationsEndpoints(){
+        $current_realm = Config::get('app.url');
+
+        $this->seedApiEndpoints('organizations', [
+                // organizations
+                [
+                    'name' => 'get-organizations',
+                    'route' => '/api/v1/organizations',
+                    'http_method' => 'GET',
+                    'scopes' => [
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                        sprintf(SummitScopes::ReadSummitData, $current_realm),
+                        sprintf('%s/organizations/read', $current_realm)
                     ],
                 ]
             ]

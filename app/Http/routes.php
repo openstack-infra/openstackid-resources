@@ -71,6 +71,11 @@ Route::group([
         Route::get('', 'OAuth2CompaniesApiController@getAll');
     });
 
+    // organizations
+    Route::group(['prefix'=>'organizations'], function(){
+        Route::get('', 'OAuth2OrganizationsApiController@getAll');
+    });
+
     // groups
     Route::group(['prefix'=>'groups'], function(){
         Route::get('', 'OAuth2GroupsApiController@getAll');

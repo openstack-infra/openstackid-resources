@@ -98,5 +98,16 @@ final class ApiSeeder extends Seeder
 
         EntityManager::flush();
 
+        // organizations
+
+        $api = new Api();
+        $api->setName('organizations');
+        $api->setActive(true);
+        $api->setDescription('Organizations API');
+
+        EntityManager::persist($api);
+
+        EntityManager::flush();
+
     }
 }

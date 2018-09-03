@@ -30,4 +30,25 @@ final class DoctrineOrganizationRepository
     {
         return Organization::class;
     }
+
+    /**
+     * @return array
+     */
+    protected function getFilterMappings()
+    {
+        return [
+            'name' => 'e.name:json_string'
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderMappings()
+    {
+        return [
+            'id'   => 'e.id',
+            'name' => 'e.name',
+        ];
+    }
 }
