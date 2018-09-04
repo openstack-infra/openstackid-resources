@@ -63,7 +63,7 @@ final class PresentationCategorySerializer extends SilverStripeSerializer
         }
 
         $values['track_groups'] = $groups;
-        $values['allowed_tag']  = $allowed_tag;
+        $values['allowed_tags'] = $allowed_tag;
         $values['extra_questions'] = $extra_questions;
 
         if (!empty($expand)) {
