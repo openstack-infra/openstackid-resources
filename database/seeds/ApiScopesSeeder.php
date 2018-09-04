@@ -17,6 +17,7 @@ use App\Models\ResourceServer\ApiScope;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use Illuminate\Support\Facades\DB;
 use App\Security\SummitScopes;
+use App\Security\OrganizationScopes;
 /**
  * Class ApiScopesSeeder
  */
@@ -34,6 +35,7 @@ final class ApiScopesSeeder extends Seeder
         $this->seedTagsScopes();
         $this->seedCompaniesScopes();
         $this->seedGroupsScopes();
+        $this->seedOrganizationScopes();
     }
 
     private function seedSummitScopes()
@@ -208,14 +210,14 @@ final class ApiScopesSeeder extends Seeder
 
     private function seedTagsScopes(){
         $current_realm = Config::get('app.url');
-        $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'tags']);
+        $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'organizations']);
 
         $scopes = [
-            array(
+            [
                 'name' => sprintf('%s/tags/read', $current_realm),
                 'short_description' => 'Get Tags Data',
                 'description' => 'Grants read only access for Tags Data',
-            ),
+            ],
         ];
 
         foreach ($scopes as $scope_info) {
@@ -232,6 +234,36 @@ final class ApiScopesSeeder extends Seeder
         EntityManager::flush();
     }
 
+    private function seedOrganizationScopes(){
+        $current_realm = Config::get('app.url');
+        $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'companies']);
+
+        $scopes = [
+            [
+                'name'              => sprintf(OrganizationScopes::ReadOrganizationData, $current_realm),
+                'short_description' => 'Get Organizations Data',
+                'description'       => 'Grants read only access for Organization Data',
+            ],
+            [
+                'name'              => sprintf(OrganizationScopes::WriteOrganizationData, $current_realm),
+                'short_description' => 'Write Companies Data',
+                'description'       => 'Grants write access for Organization Data',
+            ],
+        ];
+
+        foreach ($scopes as $scope_info) {
+            $scope = new ApiScope();
+            $scope->setName($scope_info['name']);
+            $scope->setShortDescription($scope_info['short_description']);
+            $scope->setDescription($scope_info['description']);
+            $scope->setActive(true);
+            $scope->setDefault(false);
+            $scope->setApi($api);
+            EntityManager::persist($scope);
+        }
+
+        EntityManager::flush();
+    }
 
     private function seedCompaniesScopes(){
         $current_realm = Config::get('app.url');

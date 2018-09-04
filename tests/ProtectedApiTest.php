@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Config;
 use models\oauth2\AccessToken;
 use App\Models\ResourceServer\IAccessTokenService;
 use App\Security\SummitScopes;
+use App\Security\OrganizationScopes;
 /**
  * Class AccessTokenServiceStub
  */
@@ -61,6 +62,8 @@ class AccessTokenServiceStub implements IAccessTokenService
             sprintf(SummitScopes::WriteAttendeesData, $url),
             sprintf(SummitScopes::WriteMemberData, $url),
             sprintf(SummitScopes::WritePromoCodeData, $url),
+            sprintf(OrganizationScopes::WriteOrganizationData, $url),
+            sprintf(OrganizationScopes::ReadOrganizationData, $url),
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, '1','11624', 3600, 'WEB_APPLICATION', '', '');
@@ -110,6 +113,8 @@ class AccessTokenServiceStub2 implements IAccessTokenService
             sprintf(SummitScopes::WriteAttendeesData, $url),
             sprintf(SummitScopes::WriteMemberData, $url),
             sprintf(SummitScopes::WritePromoCodeData, $url),
+            sprintf(OrganizationScopes::WriteOrganizationData, $url),
+            sprintf(OrganizationScopes::ReadOrganizationData, $url),
         );
 
         return AccessToken::createFromParams('123456789', implode(' ', $scopes), '1', $realm, null,null, 3600, 'SERVICE', '', '');

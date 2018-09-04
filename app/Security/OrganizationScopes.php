@@ -1,4 +1,4 @@
-<?php namespace models\main;
+<?php namespace App\Security;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,16 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IBaseRepository;
+
 /**
- * Interface IOrganizationRepository
- * @package models\main
+ * Class OrganizationScopes
+ * @package App\Security
  */
-interface IOrganizationRepository extends IBaseRepository
+final class OrganizationScopes
 {
-    /**
-     * @param string $name
-     * @return Organization|null
-     */
-    public function getByName($name);
+    const ReadOrganizationData     = '%s/organizations/read';
+    const WriteOrganizationData     = '%s/organizations/write';
 }

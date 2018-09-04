@@ -22,6 +22,7 @@ use App\Services\Model\IAttendeeService;
 use App\Services\Model\IFolderService;
 use App\Services\Model\ILocationService;
 use App\Services\Model\IMemberService;
+use App\Services\Model\IOrganizationService;
 use App\Services\Model\IPresentationCategoryGroupService;
 use App\Services\Model\IRSVPTemplateService;
 use App\Services\Model\ISummitEventTypeService;
@@ -29,6 +30,7 @@ use App\Services\Model\ISummitPushNotificationService;
 use App\Services\Model\ISummitSelectionPlanService;
 use App\Services\Model\ISummitTicketTypeService;
 use App\Services\Model\ISummitTrackService;
+use App\Services\Model\OrganizationService;
 use App\Services\Model\PresentationCategoryGroupService;
 use App\Services\Model\SummitLocationService;
 use App\Services\Model\MemberService;
@@ -235,6 +237,11 @@ final class ServicesProvider extends ServiceProvider
         App::singleton(
             ISummitSelectionPlanService::class,
             SummitSelectionPlanService::class
+        );
+
+        App::singleton(
+            IOrganizationService::class,
+            OrganizationService::class
         );
     }
 }

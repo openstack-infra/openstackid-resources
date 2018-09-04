@@ -83,4 +83,6 @@ return [
     'PresentationService.saveOrUpdatePresentation.notAvailableCFP' => 'type id :type_id is not a available for CFP',
     'PresentationService.saveOrUpdatePresentation.trackDontBelongToSelectionPlan' => 'track :track_id does not belongs to selection plan :selection_plan_id',
     'PresentationService.submitPresentation.limitReached' => 'You reached the limit :limit of presentations.',
+    // organizations
+    'OrganizationService.addOrganization.alreadyExistName' => 'Organization name :name already exists!',
 ];

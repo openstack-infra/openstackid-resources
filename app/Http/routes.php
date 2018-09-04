@@ -74,6 +74,7 @@ Route::group([
     // organizations
     Route::group(['prefix'=>'organizations'], function(){
         Route::get('', 'OAuth2OrganizationsApiController@getAll');
+        Route::post('', 'OAuth2OrganizationsApiController@addOrganization');
     });
 
     // groups

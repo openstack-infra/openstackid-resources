@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Config;
 use App\Models\ResourceServer\ApiEndpoint;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use App\Security\SummitScopes;
+use App\Security\OrganizationScopes;
 /**
  * Class ApiEndpointsSeeder
  */
@@ -1866,9 +1867,20 @@ class ApiEndpointsSeeder extends Seeder
                     'route' => '/api/v1/organizations',
                     'http_method' => 'GET',
                     'scopes' => [
-                        sprintf(SummitScopes::ReadAllSummitData, $current_realm),
-                        sprintf(SummitScopes::ReadSummitData, $current_realm),
-                        sprintf('%s/organizations/read', $current_realm)
+                        sprintf(OrganizationScopes::ReadOrganizationData, $current_realm)
+                    ],
+                ]
+            ]
+        );
+
+        $this->seedApiEndpoints('organizations', [
+                // organizations
+                [
+                    'name' => 'add-organizations',
+                    'route' => '/api/v1/organizations',
+                    'http_method' => 'POST',
+                    'scopes' => [
+                        sprintf(OrganizationScopes::WriteOrganizationData, $current_realm)
                     ],
                 ]
             ]

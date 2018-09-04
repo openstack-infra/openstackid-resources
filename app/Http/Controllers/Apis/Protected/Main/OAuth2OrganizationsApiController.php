@@ -11,8 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Services\Model\IOrganizationService;
 use models\main\IOrganizationRepository;
 use models\oauth2\IResourceServerContext;
+use ModelSerializers\SerializerRegistry;
 use utils\Filter;
 use utils\FilterParser;
 use utils\FilterParserException;
@@ -31,18 +33,26 @@ use Illuminate\Support\Facades\Validator;
 final class OAuth2OrganizationsApiController extends OAuth2ProtectedController
 {
     /**
-     * OAuth2MembersApiController constructor.
-     * @param IOrganizationRepository $organization_repository
+     * @var IOrganizationService
+     */
+    private $service;
+
+    /**
+     * OAuth2OrganizationsApiController constructor.
+     * @param IOrganizationRepository $company_repository
      * @param IResourceServerContext $resource_server_context
+     * @param IOrganizationService $service
      */
     public function __construct
     (
         IOrganizationRepository $company_repository,
-        IResourceServerContext $resource_server_context
+        IResourceServerContext $resource_server_context,
+        IOrganizationService $service
     )
     {
         parent::__construct($resource_server_context);
         $this->repository = $company_repository;
+        $this->service = $service;
     }
 
     public function getAll(){
@@ -122,6 +132,49 @@ final class OAuth2OrganizationsApiController extends OAuth2ProtectedController
         catch(FilterParserException $ex3){
             Log::warning($ex3);
             return $this->error412($ex3->getMessages());
+        }
+        catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
+    public function addOrganization(){
+        try {
+
+            if(!Request::isJson()) return $this->error400();
+
+            $data = Input::json();
+
+            $rules = [
+                   'name' => 'required|string|max:255',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data->all(), $rules);
+
+            if ($validation->fails()) {
+                $messages = $validation->messages()->toArray();
+
+                return $this->error412
+                (
+                    $messages
+                );
+            }
+
+            $organization = $this->service->addOrganization($data->all());
+
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($organization)->serialize());
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
         }
         catch (\Exception $ex) {
             Log::error($ex);

@@ -51,4 +51,23 @@ final class DoctrineOrganizationRepository
             'name' => 'e.name',
         ];
     }
+
+    /**
+     * @param string $name
+     * @return Organization|null
+     */
+    public function getByName($name)
+    {
+        try {
+            return $this->getEntityManager()->createQueryBuilder()
+                ->select("t")
+                ->from(\models\main\Organization::class, "o")
+                ->where('UPPER(TRIM(o.name)) = UPPER(TRIM(:name))')
+                ->setParameter('name', $name)
+                ->getQuery()->getOneOrNullResult();
+        }
+        catch(\Exception $ex){
+            return null;
+        }
+    }
 }
