@@ -195,16 +195,17 @@ final class OAuth2TracksApiTest extends ProtectedApiTest
      * @param int $summit_id
      * @return mixed
      */
-    public function testAddTrack($summit_id = 23){
+    public function testAddTrack($summit_id = 25){
         $params = [
             'id' => $summit_id,
         ];
 
         $name       = str_random(16).'_track';
         $data = [
-            'title'       => $name,
+            'name'       => $name,
             'description' => 'test desc',
             'code'        => '',
+            'allowed_tags' => ['101','Case Study', 'Demo'],
         ];
 
         $headers = [

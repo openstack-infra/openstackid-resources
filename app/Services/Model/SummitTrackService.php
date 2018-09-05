@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Event;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\ITagRepository;
 use models\summit\PresentationCategory;
 use models\summit\Summit;
 /**
@@ -37,13 +38,25 @@ final class SummitTrackService
     private $repository;
 
     /**
+     * @var ITagRepository
+     */
+    private $tag_repository;
+
+    /**
      * SummitTrackService constructor.
      * @param ISummitTrackRepository $repository
+     * @param ITagRepository $tag_repository
      * @param ITransactionService $tx_service
      */
-    public function __construct(ISummitTrackRepository $repository, ITransactionService $tx_service)
+    public function __construct
+    (
+        ISummitTrackRepository $repository,
+        ITagRepository $tag_repository,
+        ITransactionService $tx_service
+    )
     {
         parent::__construct($tx_service);
+        $this->tag_repository = $tag_repository;
         $this->repository = $repository;
     }
 
@@ -69,6 +82,18 @@ final class SummitTrackService
                 throw new ValidationException(sprintf("track id %s already has title %s assigned on summit id %s", $former_track->getId(), $data['name'], $summit->getId()));
 
             $track = PresentationCategoryFactory::build($summit, $data);
+
+            if(isset($data['allowed_tags'])){
+                foreach($data['allowed_tags'] as $tag_value) {
+                    $tackTagGroupAllowedTag = $summit->getAllowedTagOnTagTrackGroup($tag_value);
+                    if(is_null($tackTagGroupAllowedTag)){
+                        throw new ValidationException(
+                            sprintf("allowed_tags : tag value %s is not allowed on current track tag groups for summit %s", $tag_value, $summit->getId())
+                        );
+                    }
+                    $track->addAllowedTag($tackTagGroupAllowedTag->getTag());
+                }
+            }
 
             $summit->addPresentationCategory($track);
 
@@ -113,6 +138,19 @@ final class SummitTrackService
             }
 
             $track = PresentationCategoryFactory::populate($track, $data);
+
+            if(isset($data['allowed_tags'])){
+                $track->clearAllowedTags();
+                foreach($data['allowed_tags'] as $tag_value) {
+                    $tackTagGroupAllowedTag = $summit->getAllowedTagOnTagTrackGroup($tag_value);
+                    if(is_null($tackTagGroupAllowedTag)){
+                        throw new ValidationException(
+                            sprintf("allowed_tags : tag value %s is not allowed on current track tag groups for summit %s", $tag_value, $summit->getId())
+                        );
+                    }
+                    $track->addAllowedTag($tackTagGroupAllowedTag->getTag());
+                }
+            }
 
             Event::fire(new TrackUpdated($track->getSummitId(), $track->getId()));
 

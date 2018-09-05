@@ -16,6 +16,7 @@ use App\Http\Utils\DateUtils;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\SelectionPlan;
 use App\Models\Foundation\Summit\TrackTagGroup;
+use App\Models\Foundation\Summit\TrackTagGroupAllowedTag;
 use App\Models\Utils\TimeZoneEntity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -2220,6 +2221,56 @@ SQL;
 
         $native_query->setParameter("summit", $this);
         $native_query->setParameter("tag", $tag);
+
+        $res =  $native_query->getResult();
+        return count($res) > 0 ? $res[0] : null;
+    }
+
+    /**
+     * @param string $tag_value
+     * @return bool
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function isTagValueAllowedOnTrackTagGroups($tag_value){
+        $query = <<<SQL
+SELECT COUNT(tg.id) 
+FROM  App\Models\Foundation\Summit\TrackTagGroup tg
+JOIN tg.allowed_tags t
+JOIN t.tag tag
+WHERE 
+tg.summit = :summit
+AND tag.tag = :tag_value
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this);
+        $native_query->setParameter("tag_value", $tag_value);
+
+        $res =  $native_query->getSingleScalarResult();
+        return $res > 0;
+    }
+
+    /**
+     * @param string $tag_value
+     * @return null|TrackTagGroupAllowedTag
+     */
+    public function getAllowedTagOnTagTrackGroup($tag_value){
+        $query = <<<SQL
+SELECT allowed_tag 
+FROM   App\Models\Foundation\Summit\TrackTagGroupAllowedTag allowed_tag
+JOIN allowed_tag.track_tag_group tg
+JOIN allowed_tag.tag tag
+WHERE 
+tg.summit = :summit
+AND tag.tag = :tag_value
+SQL;
+
+        $native_query = $this->getEM()->createQuery($query);
+
+        $native_query->setParameter("summit", $this);
+        $native_query->setParameter("tag_value", $tag_value);
 
         $res =  $native_query->getResult();
         return count($res) > 0 ? $res[0] : null;

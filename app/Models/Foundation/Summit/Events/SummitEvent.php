@@ -665,6 +665,7 @@ class SummitEvent extends SilverstripeBaseModel
      */
     public function addTag(Tag $tag)
     {
+        if($this->tags->contains($tag)) return;
         $this->tags->add($tag);
     }
 

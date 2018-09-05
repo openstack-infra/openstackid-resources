@@ -248,6 +248,18 @@ class PresentationCategory extends SilverstripeBaseModel
         return $this->allowed_tags;
     }
 
+    public function clearAllowedTags(){
+        $this->allowed_tags->clear();
+    }
+
+    /**
+     * @param Tag $tag
+     */
+    public function addAllowedTag(Tag $tag){
+        if($this->allowed_tags->contains($tag)) return;
+        $this->allowed_tags->add($tag);
+    }
+
     /**
      * @param int $group_id
      * @return PresentationCategoryGroup|null
