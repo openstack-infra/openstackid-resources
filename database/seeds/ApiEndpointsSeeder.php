@@ -1757,6 +1757,15 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSummitData, $current_realm)
                 ],
             ],
+            // track tag groups
+            [
+                'name' => 'get-track-tag-groups-allowed-tags',
+                'route' => '/api/v1/summits/{id}/track-tag-groups/all/allowed-tags',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ]
         ]);
     }
 

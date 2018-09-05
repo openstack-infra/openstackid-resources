@@ -53,6 +53,7 @@ use App\ModelSerializers\Summit\RSVPTemplateSerializer;
 use App\ModelSerializers\Summit\ScheduledSummitLocationBannerSerializer;
 use App\ModelSerializers\Summit\SelectionPlanSerializer;
 use App\ModelSerializers\Summit\SummitLocationBannerSerializer;
+use App\ModelSerializers\Summit\TrackTagGroups\TrackTagGroupAllowedTagSerializer;
 use Libs\ModelSerializers\IModelSerializer;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
@@ -187,6 +188,11 @@ final class SerializerRegistry
         $this->registry['SummitLocationImage']           = SummitLocationImageSerializer::class;
         $this->registry['SummitLocationBanner']          = SummitLocationBannerSerializer::class;
         $this->registry['ScheduledSummitLocationBanner'] = ScheduledSummitLocationBannerSerializer::class;
+        // track tag grousp
+        $this->registry['TrackTagGroup'] = TrackTagGroupSerializer::class;
+        $this->registry['TrackTagGroupAllowedTag'] = TrackTagGroupAllowedTagSerializer::class;
+
+
         // member
         $this->registry['Member']                          = [
             self::SerializerType_Public  => PublicMemberSerializer::class,

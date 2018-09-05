@@ -18,7 +18,7 @@ use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineTrackTagGroupAllowedTagsRepository")
  * @ORM\Table(name="TrackTagGroup_AllowedTags")
  * Class TrackTagGroupAllowedTag
  * @package models\summit\TrackTagGroupAllowedTag
@@ -44,6 +44,43 @@ class TrackTagGroupAllowedTag extends BaseEntity
      * @var TrackTagGroup
      */
     private $track_tag_group;
+
+    /**
+     * @return int
+     */
+    public function getTrackTagGroupId(){
+        try {
+            return is_null($this->track_tag_group) ? 0 : $this->track_tag_group->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getSummitId(){
+        try {
+            return is_null($this->track_tag_group) ? 0 : $this->track_tag_group->getSummitId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function getTagId(){
+        try {
+            return is_null($this->tag) ? 0 : $this->tag->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
 
     /**
      * @return bool

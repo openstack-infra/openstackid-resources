@@ -80,7 +80,6 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     private $selection_plan_repository;
 
-
     /**
      * @var ISummitService
      */
@@ -316,6 +315,9 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getMySpeaker()
     {
         try {

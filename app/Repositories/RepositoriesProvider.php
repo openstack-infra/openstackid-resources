@@ -23,7 +23,9 @@ use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationBannerRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
+use App\Models\Foundation\Summit\Repositories\ITrackTagGroupAllowedTagsRepository;
 use App\Models\Foundation\Summit\SelectionPlan;
+use App\Models\Foundation\Summit\TrackTagGroupAllowedTag;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\ServiceProvider;
 use LaravelDoctrine\ORM\Facades\EntityManager;
@@ -336,5 +338,13 @@ final class RepositoriesProvider extends ServiceProvider
                 return EntityManager::getRepository(SelectionPlan::class);
             }
         );
+
+        App::singleton(
+            ITrackTagGroupAllowedTagsRepository::class,
+            function(){
+                return EntityManager::getRepository(TrackTagGroupAllowedTag::class);
+            }
+        );
+
     }
 }

@@ -142,5 +142,4 @@ class TrackTagGroup extends SilverstripeBaseModel
         $this->allowed_tags = new ArrayCollection;
     }
 
-
 }

@@ -434,7 +434,7 @@ Route::group([
                 Route::post('{external_order_id}/external-attendees/{external_attendee_id}/confirm', 'OAuth2SummitApiController@confirmExternalOrderAttendee');
             });
 
-            // member
+            // members
             Route::group(array('prefix' => 'members'), function () {
                 Route::group(array('prefix' => '{member_id}'), function () {
                     Route::get('', 'OAuth2SummitMembersApiController@getMyMember')->where('member_id', 'me');
@@ -524,6 +524,15 @@ Route::group([
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@updatePromoCodeBySummit']);
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@deletePromoCodeBySummit']);
                     Route::post('mail', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitPromoCodesApiController@sendPromoCodeMail']);
+                });
+            });
+
+            Route::group(['prefix' => 'track-tag-groups'], function(){
+                Route::group(['prefix' => 'all'], function(){
+                    Route::group(['prefix' => 'allowed-tags'], function(){
+                        Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                            'uses' => 'OAuth2SummitTrackTagGroupsApiController@getAllowedTags']);
+                    });
                 });
             });
 
