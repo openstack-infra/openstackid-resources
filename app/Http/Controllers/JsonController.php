@@ -127,10 +127,11 @@ abstract class JsonController extends Controller
      * @param string $filename
      * @param array $items
      * @param array $formatters
+     * @param array $columns
      * @return \Illuminate\Http\Response
      */
-    protected function export($format, $filename, array $items, array $formatters = []){
-        if($format == 'csv') return $this->csv($filename, $items, $formatters);
+    protected function export($format, $filename, array $items, array $formatters = [], array $columns = []){
+        if($format == 'csv') return $this->csv($filename, $items, $formatters,  ",",  'application/vnd.ms-excel', $columns);
     }
 
     /**
@@ -139,9 +140,10 @@ abstract class JsonController extends Controller
      * @param array $formatters
      * @param string $field_separator
      * @param string $mime_type
+     * @param array $columns
      * @return \Illuminate\Http\Response
      */
-    private function csv($filename, array $items,  array $formatters = [], $field_separator = ",", $mime_type = 'application/vnd.ms-excel'){
+    private function csv($filename, array $items,  array $formatters = [], $field_separator = ",", $mime_type = 'application/vnd.ms-excel', array $columns = []){
         $headers = [
             'Cache-Control'             => 'must-revalidate, post-check=0, pre-check=0',
             'Content-type'              => $mime_type,
@@ -151,6 +153,6 @@ abstract class JsonController extends Controller
             'Pragma'                    => 'public',
         ];
 
-        return Response::make(CSVExporter::getInstance()->export($items, $field_separator, [] , $formatters), 200, $headers);
+        return Response::make(CSVExporter::getInstance()->export($items, $field_separator, $columns, $formatters), 200, $headers);
     }
 }

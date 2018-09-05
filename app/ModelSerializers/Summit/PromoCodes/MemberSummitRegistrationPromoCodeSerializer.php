@@ -60,6 +60,18 @@ class MemberSummitRegistrationPromoCodeSerializer
                         }
                     }
                     break;
+                    case 'owner_name': {
+                        if($code->hasOwner()){
+                            $values['owner_name'] = $code->getOwner()->getFullName();
+                        }
+                    }
+                    break;
+                    case 'owner_email': {
+                        if($code->hasOwner()){
+                            $values['owner_email'] = $code->getOwner()->getEmail();
+                        }
+                    }
+                    break;
                 }
             }
         }

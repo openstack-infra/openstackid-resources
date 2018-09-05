@@ -58,6 +58,10 @@ extends MemberSummitRegistrationPromoCodeSerializer
                         }
                     }
                         break;
+                    case 'sponsor_name':{
+                        $values['sponsor_name'] = $code->getSponsor()->getName();
+                    }
+                    break;
                 }
             }
         }

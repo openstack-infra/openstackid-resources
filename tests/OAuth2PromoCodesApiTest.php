@@ -82,9 +82,11 @@ final class OAuth2PromoCodesApiTest extends ProtectedApiTest
     public function testGetPromoCodesByClassNameSpeakerSummitRegistrationPromoCodeCSV(){
         $params = [
 
-            'id'       => 23,
-            'filter'   => 'class_name=='.\models\summit\SpeakerSummitRegistrationPromoCode::ClassName,
-            'order'    => '+code'
+            'id'       => 25,
+            //'filter'   => 'class_name=='.\models\summit\SpeakerSummitRegistrationPromoCode::ClassName,
+            'order'    => '+code',
+            'columns'  => 'code,type,owner_name,owner_email,sponsor_name,redeemed,email_sent',
+            'expand'   => 'owner_name,owner_email,sponsor_name',
         ];
 
         $headers = [

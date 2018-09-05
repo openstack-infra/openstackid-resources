@@ -56,6 +56,18 @@ final class SpeakerSummitRegistrationPromoCodeSerializer
                             )->serialize($expand);
                         }
                     }
+                    case 'owner_name': {
+                        if($code->hasSpeaker()){
+                            $values['owner_name'] = $code->getSpeaker()->getFullName();
+                        }
+                    }
+                        break;
+                    case 'owner_email': {
+                        if($code->hasSpeaker()){
+                            $values['owner_email'] = $code->getSpeaker()->getEmail();
+                        }
+                    }
+                        break;
                     break;
                 }
             }

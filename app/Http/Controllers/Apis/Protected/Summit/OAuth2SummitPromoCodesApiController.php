@@ -210,7 +210,23 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
      */
     public function getAllBySummitCSV($summit_id){
         $values = Input::all();
-        $rules  = [
+        $rules  = [];
+        $allowed_columns = [
+            "id",
+            "created",
+            "last_edited",
+            "code",
+            "redeemed",
+            "email_sent",
+            "source",
+            "summit_id",
+            "creator_id",
+            "class_name",
+            "type",
+            "speaker_id",
+            "owner_name",
+            "owner_email",
+            "sponsor_name"
         ];
 
         try {
@@ -281,10 +297,19 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                     'code',
                 ]);
             }
+            $columns_param = Input::get("columns", "");
+            $columns = [];
+            if(!empty($columns_param))
+                $columns  = explode(',', $columns_param);
+            $diff     = array_diff($columns, $allowed_columns);
+            if(count($diff) > 0){
+                throw new ValidationException(sprintf("columns %s are not allowed!", implode(",", $diff)));
+            }
 
             $data     = $this->promo_code_repository->getBySummit($summit, new PagingInfo($page, $per_page), $filter, $order);
             $filename = "promocodes-" . date('Ymd');
-            $list     =  $data->toArray();
+            $list     = $data->toArray(Input::get("expand", ""));
+
             return $this->export
             (
                 'csv',
@@ -295,9 +320,9 @@ final class OAuth2SummitPromoCodesApiController extends OAuth2ProtectedControlle
                     'last_edited' => new EpochCellFormatter,
                     'redeemed'    => new BooleanCellFormatter,
                     'email_sent'  => new BooleanCellFormatter,
-                ]
+                ],
+                $columns
             );
-
         }
         catch (ValidationException $ex1)
         {
