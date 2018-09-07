@@ -43,7 +43,6 @@ use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackDropDownQuestio
 use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackMultiValueQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackQuestionValueTemplateSerializer;
 use App\ModelSerializers\Summit\Presentation\TrackQuestions\TrackSingleValueTemplateQuestionSerializer;
-use App\ModelSerializers\Summit\Presentation\TrackTagGroupSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPDropDownQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPLiteralContentQuestionTemplateSerializer;
 use App\ModelSerializers\Summit\RSVP\Templates\RSVPMultiValueQuestionTemplateSerializer;
@@ -54,6 +53,7 @@ use App\ModelSerializers\Summit\ScheduledSummitLocationBannerSerializer;
 use App\ModelSerializers\Summit\SelectionPlanSerializer;
 use App\ModelSerializers\Summit\SummitLocationBannerSerializer;
 use App\ModelSerializers\Summit\TrackTagGroups\TrackTagGroupAllowedTagSerializer;
+use App\ModelSerializers\Summit\TrackTagGroups\TrackTagGroupSerializer;
 use Libs\ModelSerializers\IModelSerializer;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
@@ -188,7 +188,7 @@ final class SerializerRegistry
         $this->registry['SummitLocationImage']           = SummitLocationImageSerializer::class;
         $this->registry['SummitLocationBanner']          = SummitLocationBannerSerializer::class;
         $this->registry['ScheduledSummitLocationBanner'] = ScheduledSummitLocationBannerSerializer::class;
-        // track tag grousp
+        // track tag groups
         $this->registry['TrackTagGroup'] = TrackTagGroupSerializer::class;
         $this->registry['TrackTagGroupAllowedTag'] = TrackTagGroupAllowedTagSerializer::class;
 

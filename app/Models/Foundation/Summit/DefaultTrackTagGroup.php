@@ -11,23 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\IOrderableEntity;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Cache;
-use models\main\Tag;
-use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
- * @ORM\Entity
- * @ORM\Table(name="TrackTagGroup")
- * Class TrackTagGroup
- * @package models\summit\TrackTagGroup
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineDefaultTrackTagGroupRepository")
+ * @ORM\Table(name="DefaultTrackTagGroup")
+ * Class DefaultTrackTagGroup
+ * @package models\summit\DefaultTrackTagGroup
  */
-class TrackTagGroup extends SilverstripeBaseModel implements IOrderableEntity
+class DefaultTrackTagGroup extends SilverstripeBaseModel
 {
-    use SummitOwned;
-
     /**
      * @ORM\Column(name="Name", type="string")
      * @var string
@@ -53,8 +47,8 @@ class TrackTagGroup extends SilverstripeBaseModel implements IOrderableEntity
     private $is_mandatory;
 
     /**
-     * @ORM\OneToMany(targetEntity="TrackTagGroupAllowedTag", mappedBy="track_tag_group", cascade={"persist"}, orphanRemoval=true)
-     * @var TrackTagGroupAllowedTag[]
+     * @ORM\OneToMany(targetEntity="DefaultTrackTagGroupAllowedTag", mappedBy="track_tag_group", cascade={"persist"}, orphanRemoval=true)
+     * @var DefaultTrackTagGroupAllowedTag[]
      */
     private $allowed_tags;
 
@@ -123,7 +117,7 @@ class TrackTagGroup extends SilverstripeBaseModel implements IOrderableEntity
     }
 
     /**
-     * @return TrackTagGroupAllowedTag[]
+     * @return DefaultTrackTagGroupAllowedTag[]
      */
     public function getAllowedTags()
     {
@@ -131,7 +125,7 @@ class TrackTagGroup extends SilverstripeBaseModel implements IOrderableEntity
     }
 
     /**
-     * @param TrackTagGroupAllowedTag[] $allowed_tags
+     * @param DefaultTrackTagGroupAllowedTag[] $allowed_tags
      */
     public function setAllowedTags($allowed_tags)
     {
@@ -143,24 +137,6 @@ class TrackTagGroup extends SilverstripeBaseModel implements IOrderableEntity
         parent::__construct();
         $this->allowed_tags = new ArrayCollection;
         $this->is_mandatory = false;
-    }
-
-    public function clearAllowedTags()
-    {
-        $this->allowed_tags->clear();
-    }
-
-    /**
-     * @param Tag $tag
-     * @param bool $is_default
-     */
-    public function addTag(Tag $tag, $is_default = false)
-    {
-        $allowed_tag = new TrackTagGroupAllowedTag();
-        $allowed_tag->setTag($tag);
-        $allowed_tag->setTrackTagGroup($this);
-        $allowed_tag->setIsDefault($is_default);
-        $this->allowed_tags->add($allowed_tag);
     }
 
 }

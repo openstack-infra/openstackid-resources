@@ -12,9 +12,11 @@
  * limitations under the License.
  **/
 use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
+use App\Models\Foundation\Summit\DefaultTrackTagGroup;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
+use App\Models\Foundation\Summit\Repositories\IDefaultTrackTagGroupRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationCategoryGroupRepository;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
@@ -343,6 +345,13 @@ final class RepositoriesProvider extends ServiceProvider
             ITrackTagGroupAllowedTagsRepository::class,
             function(){
                 return EntityManager::getRepository(TrackTagGroupAllowedTag::class);
+            }
+        );
+
+        App::singleton(
+            IDefaultTrackTagGroupRepository::class,
+            function(){
+                return EntityManager::getRepository(DefaultTrackTagGroup::class);
             }
         );
 

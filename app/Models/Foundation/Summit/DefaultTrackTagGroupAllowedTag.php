@@ -12,18 +12,16 @@
  * limitations under the License.
  **/
 use App\Models\Utils\BaseEntity;
-use Doctrine\ORM\Cache;
 use models\main\Tag;
-use models\summit\SummitOwned;
-use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
- * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineTrackTagGroupAllowedTagsRepository")
- * @ORM\Table(name="TrackTagGroup_AllowedTags")
- * Class TrackTagGroupAllowedTag
- * @package models\summit\TrackTagGroupAllowedTag
+ * @ORM\Entity
+ * @ORM\Table(name="DefaultTrackTagGroup_AllowedTags")
+ * Class DefaultTrackTagGroupAllowedTag
+ * @package models\summit\DefaultTrackTagGroupAllowedTag
  */
-class TrackTagGroupAllowedTag extends BaseEntity
+
+class DefaultTrackTagGroupAllowedTag extends BaseEntity
 {
     /**
      * @ORM\Column(name="IsDefault", type="boolean")
@@ -32,16 +30,16 @@ class TrackTagGroupAllowedTag extends BaseEntity
     private $is_default;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\Tag", cascade={"persist"})
+     * @ORM\ManyToOne(targetEntity="models\main\Tag")
      * @ORM\JoinColumn(name="TagID", referencedColumnName="ID")
      * @var Tag
      */
     private $tag;
 
     /**
-     * @ORM\ManyToOne(targetEntity="TrackTagGroup", inversedBy="allowed_tags")
+     * @ORM\ManyToOne(targetEntity="DefaultTrackTagGroup", inversedBy="allowed_tags")
      * @ORM\JoinColumn(name="TrackTagGroupID", referencedColumnName="ID")
-     * @var TrackTagGroup
+     * @var DefaultTrackTagGroup
      */
     private $track_tag_group;
 
@@ -51,18 +49,6 @@ class TrackTagGroupAllowedTag extends BaseEntity
     public function getTrackTagGroupId(){
         try {
             return is_null($this->track_tag_group) ? 0 : $this->track_tag_group->getId();
-        }
-        catch(\Exception $ex){
-            return 0;
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getSummitId(){
-        try {
-            return is_null($this->track_tag_group) ? 0 : $this->track_tag_group->getSummitId();
         }
         catch(\Exception $ex){
             return 0;
@@ -115,7 +101,7 @@ class TrackTagGroupAllowedTag extends BaseEntity
     }
 
     /**
-     * @return TrackTagGroup
+     * @return DefaultTrackTagGroup
      */
     public function getTrackTagGroup()
     {
@@ -123,9 +109,9 @@ class TrackTagGroupAllowedTag extends BaseEntity
     }
 
     /**
-     * @param TrackTagGroup $track_tag_group
+     * @param DefaultTrackTagGroup $track_tag_group
      */
-    public function setTrackTagGroup(TrackTagGroup $track_tag_group)
+    public function setTrackTagGroup(DefaultTrackTagGroup $track_tag_group)
     {
         $this->track_tag_group = $track_tag_group;
     }

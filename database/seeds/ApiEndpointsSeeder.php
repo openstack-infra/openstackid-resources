@@ -1759,12 +1759,64 @@ class ApiEndpointsSeeder extends Seeder
             ],
             // track tag groups
             [
+                'name' => 'get-track-tag-groups',
+                'route' => '/api/v1/summits/{id}/track-tag-groups',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-track-tag-groups-allowed-tags',
                 'route' => '/api/v1/summits/{id}/track-tag-groups/all/allowed-tags',
                 'http_method' => 'GET',
                 'scopes' => [
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
+            ],
+            [
+                'name' => 'get-track-tag-group',
+                'route' => '/api/v1/summits/{id}/track-tag-groups/{track_tag_group_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'seed-default-track-tag-groups',
+                'route' => '/api/v1/summits/{id}/track-tag-groups/seed-defaults',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteTrackTagGroupsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-track-tag-group',
+                'route' => '/api/v1/summits/{id}/track-tag-groups',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteTrackTagGroupsData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-track-tag-group',
+                'route' => '/api/v1/summits/{id}/track-tag-groups/{track_tag_group_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteTrackTagGroupsData, $current_realm)
+                ]
+            ],
+            [
+                'name' => 'delete-track-tag-group',
+                'route' => '/api/v1/summits/{id}/track-tag-groups/{track_tag_group_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteTrackTagGroupsData, $current_realm)
+                ]
             ]
         ]);
     }

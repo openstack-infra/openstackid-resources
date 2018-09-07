@@ -85,4 +85,9 @@ return [
     'PresentationService.submitPresentation.limitReached' => 'You reached the limit :limit of presentations.',
     // organizations
     'OrganizationService.addOrganization.alreadyExistName' => 'Organization name :name already exists!',
+    // track tag groups
+    'SummitTrackTagGroupService.addTrackTagGroup.TrackTagGroupLabelAlreadyExists' => 'track tag group label already exist on summit :summit_id',
+    'SummitTrackTagGroupService.addTrackTagGroup.TrackTagGroupNameAlreadyExists' => 'track tag group name already exist on summit :summit_id',
+    'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupLabelAlreadyExists' => 'track tag group label already exist on summit :summit_id',
+    'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupNameAlreadyExists' => 'track tag group name already exist on summit :summit_id',
 ];

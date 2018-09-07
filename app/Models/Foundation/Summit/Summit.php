@@ -13,6 +13,7 @@
  * limitations under the License.
  **/
 use App\Http\Utils\DateUtils;
+use App\Models\Foundation\RecalculateOrderStrategy;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\SelectionPlan;
 use App\Models\Foundation\Summit\TrackTagGroup;
@@ -1734,7 +1735,6 @@ SQL;
      */
     public function recalculateLocationOrder(SummitAbstractLocation $location, $new_order){
 
-        $former_order = $location->getOrder();
         $criteria     = Criteria::create();
         $criteria->orderBy(['order'=> 'ASC']);
         $filtered_locations = [];
@@ -1744,26 +1744,8 @@ SQL;
                 $filtered_locations[] = $l;
         }
 
-        $filtered_locations = array_slice($filtered_locations,0, count($filtered_locations), false);
-        $max_order          = count($filtered_locations);
-
-        if($new_order > $max_order)
-            throw new ValidationException(sprintf("max order is %s", $max_order));
-
-        unset($filtered_locations[$former_order - 1]);
-
-        $filtered_locations = array_merge
-        (
-            array_slice($filtered_locations, 0, $new_order -1 , true) ,
-            [$location] ,
-            array_slice($filtered_locations, $new_order -1 , count($filtered_locations), true)
-        );
-
-        $order = 1;
-        foreach($filtered_locations as $l){
-            $l->setOrder($order);
-            $order++;
-        }
+        $strategy = new RecalculateOrderStrategy();
+        $strategy->recalculateOrder($filtered_locations, $location, $new_order);
     }
 
     /**
@@ -2298,5 +2280,92 @@ SQL;
 
         $res =  $native_query->getResult();
         return count($res) > 0 ? $res[0] : null;
+    }
+
+    /**
+     * @param string $name
+     * @return null|TrackTagGroup
+     */
+    public function getTrackTagGroupByName($name){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('name', $name));
+        $track_tag_group = $this->track_tag_groups->matching($criteria)->first();
+        return !$track_tag_group ? null : $track_tag_group;
+    }
+
+    /**
+     * @return TrackTagGroup[]|ArrayCollection
+     */
+    public function getTrackTagGroups(){
+        return $this->track_tag_groups;
+    }
+
+    /**
+     * @param string $label
+     * @return null|TrackTagGroup
+     */
+    public function getTrackTagGroupByLabel($label){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('label', $label));
+        $track_tag_group = $this->track_tag_groups->matching($criteria)->first();
+        return !$track_tag_group ? null :  $track_tag_group;
+    }
+
+    /**
+     * @param TrackTagGroup $track_tag_group
+     * @return $this
+     */
+    public function addTrackTagGroup(TrackTagGroup $track_tag_group)
+    {
+        if($this->track_tag_groups->contains($track_tag_group)) return $this;
+        $this->track_tag_groups->add($track_tag_group);
+        $track_tag_group->setSummit($this);
+        $track_tag_group->setOrder($this->getTrackTagGroupMaxOrder() + 1);
+        return $this;
+    }
+
+    /**
+     * @param TrackTagGroup $track_tag_group
+     * @return $this
+     */
+    public function removeTrackTagGroup(TrackTagGroup $track_tag_group){
+        if(!$this->track_tag_groups->contains($track_tag_group)) return $this;
+        $this->track_tag_groups->removeElement($track_tag_group);
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    private function getTrackTagGroupMaxOrder(){
+        $criteria = Criteria::create();
+        $criteria->orderBy(['order' => 'DESC']);
+        $group = $this->track_tag_groups->matching($criteria)->first();
+        return $group === false ? 0 : $group->getOrder();
+    }
+
+    /**
+     * @param TrackTagGroup $track_tag_group
+     * @param int $new_order
+     * @throws ValidationException
+     */
+    public function recalculateTrackTagGroupOrder(TrackTagGroup $track_tag_group, $new_order){
+
+        $criteria = Criteria::create();
+        $criteria->orderBy(['order'=> 'ASC']);
+        $strategy = new RecalculateOrderStrategy();
+        $strategy->recalculateOrder($this->track_tag_groups->matching($criteria)->toArray(), $track_tag_group, $new_order);
+    }
+
+    /**
+     * @param int $track_tag_group_id
+     * @return TrackTagGroup|null
+     */
+    public function getTrackTagGroup($track_tag_group_id)
+    {
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($track_tag_group_id)));
+        $track_tag_group = $this->track_tag_groups->matching($criteria)->first();
+        return $track_tag_group === false ? null : $track_tag_group;
     }
 }

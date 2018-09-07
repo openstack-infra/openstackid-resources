@@ -1,4 +1,4 @@
-<?php namespace App\ModelSerializers\Summit\Presentation;
+<?php namespace App\Models\Foundation\Summit\Repositories;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,19 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use ModelSerializers\SilverStripeSerializer;
+use models\utils\IBaseRepository;
 /**
- * Class TrackTagGroupSerializer
- * @package App\ModelSerializers\Summit\Presentation
+ * Interface IDefaultTrackTagGroup
+ * @package App\Models\Foundation\Summit\Repositories
  */
-final class TrackTagGroupSerializer extends SilverStripeSerializer
+interface IDefaultTrackTagGroupRepository extends IBaseRepository
 {
-    protected static $array_mappings = array
-    (
-        'Name'         => 'name:json_text',
-        'Label'        => 'label:json_text',
-        'Mandatory'    => 'is_mandatory:json_boolean',
-        'Order'        => 'order:json_int',
-        'SummitId'     => 'summit_id:json_int',
-    );
+
 }

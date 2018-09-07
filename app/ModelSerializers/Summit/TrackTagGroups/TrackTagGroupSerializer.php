@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Summit\TrackTagGroup;
+use ModelSerializers\SerializerRegistry;
 use ModelSerializers\SilverStripeSerializer;
 
 /**
@@ -38,6 +40,30 @@ final class TrackTagGroupSerializer extends SilverStripeSerializer
     {
         $values = parent::serialize($expand, $fields, $relations, $params);
         $track_tag_group = $this->object;
+        if (!$track_tag_group instanceof TrackTagGroup) return [];
+        $allowed_tags = [];
+        foreach($track_tag_group->getAllowedTags() as $allowed_tag){
+            $allowed_tags[] = $allowed_tag->getId();
+        }
+        $values['allowed_tags'] = $allowed_tags;
+
+        if (!empty($expand)) {
+            $relations = explode(',', $expand);
+            foreach ($relations as $relation) {
+                switch (trim($relation)) {
+
+                    case 'allowed_tags':{
+                        unset($values['allowed_tags']);
+                        $allowed_tags = [];
+                        foreach($track_tag_group->getAllowedTags() as $allowed_tag){
+                            $allowed_tags[] = SerializerRegistry::getInstance()->getSerializer($allowed_tag)->serialize($expand);
+                        }
+                        $values['allowed_tags'] = $allowed_tags;
+                    }
+                    break;
+                }
+            }
+        }
         return $values;
     }
 }
