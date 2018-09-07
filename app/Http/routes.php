@@ -528,10 +528,28 @@ Route::group([
             });
 
             Route::group(['prefix' => 'track-tag-groups'], function(){
+
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                    'uses' => 'OAuth2SummitTrackTagGroupsApiController@addTrackTagGroup']);
+
+                Route::put('seed-defaults', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                    'uses' => 'OAuth2SummitTrackTagGroupsApiController@seedDefaultTrackTagGroups']);
+
+                Route::group(['prefix' => '{track_tag_group_id}'], function(){
+                    Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                        'uses' => 'OAuth2SummitTrackTagGroupsApiController@getTrackTagGroup']);
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                        'uses' => 'OAuth2SummitTrackTagGroupsApiController@updateTrackTagGroup']);
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                        'uses' => 'OAuth2SummitTrackTagGroupsApiController@deleteTrackTagGroup']);
+
+                });
+
                 Route::group(['prefix' => 'all'], function(){
                     Route::group(['prefix' => 'allowed-tags'], function(){
                         Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
                             'uses' => 'OAuth2SummitTrackTagGroupsApiController@getAllowedTags']);
+
                     });
                 });
             });
@@ -601,7 +619,6 @@ Route::group([
                    Route::put('/feedback', 'OAuth2SummitEventsApiController@updateEventFeedbackByMember');
                 });
             });
-
         });
     });
 });

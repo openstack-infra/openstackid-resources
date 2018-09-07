@@ -87,4 +87,7 @@ return [
     'PresentationService.saveOrUpdatePresentation.trackNotFound' => 'track :track_id not found.',
     'PresentationService.submitPresentation.eventTypeNotFound' => 'event type :type_id not found.',
     'PresentationService.saveOrUpdatePresentation.trackQuestionNotFound' => 'extra question :question_id not found.',
+    // track tag groups
+    'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupNotFound' => 'track tag group :track_tag_group_id not found on summit :summit_id',
+    'SummitTrackTagGroupService.deleteTrackTagGroup.TrackTagGroupNotFound' => 'track tag group :track_tag_group_id not found on summit :summit_id'
 ];
