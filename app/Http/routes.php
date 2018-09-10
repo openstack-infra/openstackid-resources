@@ -197,7 +197,11 @@ Route::group([
                     Route::group(array('prefix' => 'tickets'), function ()
                     {
                         Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@addAttendeeTicket']);
-                        Route::delete('{ticket_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@deleteAttendeeTicket']);
+                        Route::group(array('prefix' => '{ticket_id}'), function (){
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@deleteAttendeeTicket']);
+                            Route::put('reassign/{other_member_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@reassignAttendeeTicket']);
+                        });
+
                     });
                 });
             });

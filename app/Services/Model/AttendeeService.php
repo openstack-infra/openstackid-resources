@@ -16,6 +16,7 @@ use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\IMemberRepository;
+use models\main\Member;
 use models\summit\factories\SummitAttendeeFactory;
 use models\summit\factories\SummitAttendeeTicketFactory;
 use models\summit\ISummitAttendeeRepository;
@@ -291,6 +292,39 @@ final class AttendeeService extends AbstractService implements IAttendeeService
             }
 
             return $has_more_items;
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param SummitAttendee $attendee
+     * @param Member $other_member
+     * @param int $ticket_id
+     * @return SummitAttendeeTicket
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function reassignAttendeeTicket(Summit $summit, SummitAttendee $attendee, Member $other_member, $ticket_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $attendee, $other_member, $ticket_id){
+            $ticket = $this->ticket_repository->getById($ticket_id);
+            if(is_null($ticket)){
+                throw new EntityNotFoundException("ticket not found");
+            }
+            $new_owner = $this->attendee_repository->getBySummitAndMember($summit, $other_member);
+            if(is_null($new_owner)){
+                $new_owner = SummitAttendeeFactory::build($summit, $other_member, []);
+                $this->attendee_repository->add($new_owner);
+            }
+            if($new_owner->hasTickets()){
+                throw new ValidationException('This member is already assigned to another ticket');
+            }
+            $attendee->removeTicket($ticket);
+            if(!$attendee->hasTickets()){
+                $this->attendee_repository->delete($attendee);
+            }
+            $new_owner->addTicket($ticket);
+            return $ticket;
         });
     }
 }

@@ -175,6 +175,7 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
             ],
@@ -183,6 +184,7 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}',
                 'http_method' => 'PUT',
                 'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
             ],
@@ -218,6 +220,7 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/attendees',
                 'http_method' => 'POST',
                 'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
             ),
@@ -226,17 +229,28 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/tickets',
                 'http_method' => 'POST',
                 'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
             ),
-            array(
+            [
                 'name' => 'delete-attendee-ticket',
                 'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/tickets/{ticket_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteAttendeesData, $current_realm),
                 ],
-            ),
+            ],
+            [
+                'name' => 'reassign-attendee-ticket',
+                'route' => '/api/v1/summits/{id}/attendees/{attendee_id}/tickets/{ticket_id}/reassign/{other_member_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteAttendeesData, $current_realm),
+                ],
+            ],
             // speakers
             array(
                 'name' => 'get-speakers',

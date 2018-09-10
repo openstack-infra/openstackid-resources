@@ -13,6 +13,7 @@
  **/
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\Member;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
 use models\summit\SummitAttendeeTicket;
@@ -74,4 +75,15 @@ interface IAttendeeService
      * @return mixed
      */
     public function updateRedeemedPromoCodes(Summit $summit, $page_nbr = 1);
+
+    /**
+     * @param Summit $summit
+     * @param SummitAttendee $attendee
+     * @param Member $other_member
+     * @param int $ticket_id
+     * @return SummitAttendeeTicket
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function reassignAttendeeTicket(Summit $summit,SummitAttendee $attendee, Member $other_member, $ticket_id);
 }

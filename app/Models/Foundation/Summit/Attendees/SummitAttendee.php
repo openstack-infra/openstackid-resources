@@ -258,4 +258,11 @@ class SummitAttendee extends SilverstripeBaseModel
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function hasTickets(){
+        return $this->tickets->count() > 0;
+    }
+
 }

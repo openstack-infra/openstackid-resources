@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\IMemberRepository;
 use models\oauth2\IResourceServerContext;
 use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
@@ -68,12 +69,18 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
     private $attendee_repository;
 
     /**
+     * @var IMemberRepository
+     */
+    private $member_repository;
+
+    /**
      * OAuth2SummitAttendeesApiController constructor.
      * @param ISummitAttendeeRepository $attendee_repository
      * @param ISummitRepository $summit_repository
      * @param ISummitEventRepository $event_repository
      * @param ISpeakerRepository $speaker_repository
      * @param IEventFeedbackRepository $event_feedback_repository
+     * @param IMemberRepository $member_repository
      * @param ISummitService $summit_service
      * @param IAttendeeService $attendee_service
      * @param IResourceServerContext $resource_server_context
@@ -85,6 +92,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         ISummitEventRepository $event_repository,
         ISpeakerRepository $speaker_repository,
         IEventFeedbackRepository $event_feedback_repository,
+        IMemberRepository $member_repository,
         ISummitService $summit_service,
         IAttendeeService $attendee_service,
         IResourceServerContext $resource_server_context
@@ -95,6 +103,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
         $this->speaker_repository        = $speaker_repository;
         $this->event_repository          = $event_repository;
         $this->event_feedback_repository = $event_feedback_repository;
+        $this->member_repository         = $member_repository;
         $this->summit_service            = $summit_service;
         $this->attendee_service          = $attendee_service;
     }
@@ -639,6 +648,44 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $ticket = $this->attendee_service->deleteAttendeeTicket($attendee, $ticket_id);
 
             return $this->deleted();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(array('message'=> $ex2->getMessage()));
+        }
+        catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $attendee_id
+     * @param $ticket_id
+     * @param $other_member_id
+     * @return mixed
+     */
+    public function reassignAttendeeTicket($summit_id, $attendee_id, $ticket_id, $other_member_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $attendee = $this->attendee_repository->getById($attendee_id);
+            if(is_null($attendee)) return $this->error404();
+
+            $other_member = $this->member_repository->getById($other_member_id);
+            if(is_null($other_member)) return $this->error404();
+
+            $ticket = $this->attendee_service->reassignAttendeeTicket($summit, $attendee, $other_member_id, $ticket_id);
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($ticket)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
