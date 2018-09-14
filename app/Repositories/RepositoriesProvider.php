@@ -13,6 +13,7 @@
  **/
 use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
 use App\Models\Foundation\Summit\DefaultTrackTagGroup;
+use App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackQuestionTemplate;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
@@ -25,6 +26,7 @@ use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationBannerRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
+use App\Models\Foundation\Summit\Repositories\ITrackQuestionTemplateRepository;
 use App\Models\Foundation\Summit\Repositories\ITrackTagGroupAllowedTagsRepository;
 use App\Models\Foundation\Summit\SelectionPlan;
 use App\Models\Foundation\Summit\TrackTagGroupAllowedTag;
@@ -352,6 +354,14 @@ final class RepositoriesProvider extends ServiceProvider
             IDefaultTrackTagGroupRepository::class,
             function(){
                 return EntityManager::getRepository(DefaultTrackTagGroup::class);
+            }
+        );
+
+
+        App::singleton(
+            ITrackQuestionTemplateRepository::class,
+            function(){
+                return EntityManager::getRepository(TrackQuestionTemplate::class);
             }
         );
 

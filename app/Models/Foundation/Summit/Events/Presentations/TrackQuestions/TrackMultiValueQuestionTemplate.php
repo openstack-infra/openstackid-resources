@@ -11,8 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\OrderableChilds;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
+use models\exceptions\ValidationException;
+
 /**
  * @ORM\Entity
  * @ORM\Table(name="TrackMultiValueQuestionTemplate")
@@ -129,6 +133,72 @@ class TrackMultiValueQuestionTemplate extends TrackQuestionTemplate
      */
     public static function getMetadata(){
         return array_merge(TrackQuestionTemplate::getMetadata(), self::$metadata);
+    }
+
+    /**
+     * @param  int $id
+     * @return TrackQuestionValueTemplate
+     */
+    public function getValueById($id){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('id', intval($id)));
+        $res = $this->values->matching($criteria)->first();
+        return $res ? $res : null;
+    }
+
+    /**
+     * @param  string $value
+     * @return TrackQuestionValueTemplate
+     */
+    public function getValueByValue($value){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('LOWER(value)', strtolower(trim($value))));
+        $res = $this->values->matching($criteria)->first();
+        return $res ? $res : null;
+    }
+
+    /**
+     * @param  string $label
+     * @return TrackQuestionValueTemplate
+     */
+    public function getValueByLabel($label){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('LOWER(label)', strtolower(trim($label))));
+        $res = $this->values->matching($criteria)->first();
+        return $res ? $res : null;
+    }
+
+    /**
+     * @param TrackQuestionValueTemplate $value
+     * @return $this
+     */
+    public function addValue(TrackQuestionValueTemplate $value){
+        $values = $this->getValues();
+        $this->values->add($value);
+        $value->setOwner($this);
+        $value->setOrder(count($values) + 1);
+        return $this;
+    }
+
+    use OrderableChilds;
+
+    /**
+     * @param TrackQuestionValueTemplate $value
+     * @param int $new_order
+     * @throws ValidationException
+     */
+    public function recalculateValueOrder(TrackQuestionValueTemplate $value, $new_order){
+        self::recalculateOrderForSelectable($this->values, $value, $new_order);
+    }
+
+    /**
+     * @param TrackQuestionValueTemplate $value
+     * @return $this
+     */
+    public function removeValue(TrackQuestionValueTemplate $value){
+        $this->values->removeElement($value);
+        $value->clearOwner();
+        return $this;
     }
 
 }

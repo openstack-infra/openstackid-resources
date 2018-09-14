@@ -89,5 +89,15 @@ return [
     'PresentationService.saveOrUpdatePresentation.trackQuestionNotFound' => 'extra question :question_id not found.',
     // track tag groups
     'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupNotFound' => 'track tag group :track_tag_group_id not found on summit :summit_id',
-    'SummitTrackTagGroupService.deleteTrackTagGroup.TrackTagGroupNotFound' => 'track tag group :track_tag_group_id not found on summit :summit_id'
+    'SummitTrackTagGroupService.deleteTrackTagGroup.TrackTagGroupNotFound' => 'track tag group :track_tag_group_id not found on summit :summit_id',
+    // track question templates
+    'TrackQuestionTemplateService.updateTrackQuestionTemplate.TrackQuestionTemplateNotFound' => 'track question template :track_question_template_id not found',
+    'TrackQuestionTemplateService.deleteTrackQuestionTemplate.TrackQuestionTemplateNotFound' => 'track question template :track_question_template_id not found',
+    'TrackQuestionTemplateService.addTrackQuestionValueTemplate.TrackQuestionTemplateNotFound' => 'track question template :track_question_template_id not found',
+    'TrackQuestionTemplateService.updateTrackQuestionValueTemplate.TrackQuestionTemplateNotFound' => 'track question template :track_question_template_id not found',
+    'TrackQuestionTemplateService.updateTrackQuestionValueTemplate.TrackQuestionTemplateValueNotFound' => 'track question template value :track_question_value_template_id not found',
+    'TrackQuestionTemplateService.deleteTrackQuestionValueTemplate.TrackQuestionTemplateNotFound' => 'track question template :track_question_template_id not found',
+    'TrackQuestionTemplateService.deleteTrackQuestionValueTemplate.TrackQuestionTemplateValueNotFound' => 'track question template value :track_question_value_template_id not found',
+    'TrackQuestionTemplateService.addTrackQuestionTemplate.TrackNotFound' => 'track :track_id not found',
+    'TrackQuestionTemplateService.updateTrackQuestionTemplate.TrackNotFound' => 'track :track_id not found',
 ];

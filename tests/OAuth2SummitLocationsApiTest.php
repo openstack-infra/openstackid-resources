@@ -460,10 +460,10 @@ final class OAuth2SummitLocationsApiTest extends ProtectedApiTest
 
         $data = [
             'name'        => $name,
-            'address1'    => 'Nazar 612',
+            'address_1'    => 'Nazar 612',
             'city'        => 'Lanus',
             'state'       => 'Buenos Aires',
-            'country'     => 'Argentina',
+            'country'     => 'AR',
             'class_name'  => \models\summit\SummitVenue::ClassName,
             'description' => 'test location',
         ];

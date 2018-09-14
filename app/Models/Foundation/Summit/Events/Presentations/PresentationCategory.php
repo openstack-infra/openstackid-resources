@@ -174,6 +174,33 @@ class PresentationCategory extends SilverstripeBaseModel
     }
 
     /**
+     * @param TrackQuestionTemplate $extra_question
+     * @return $this
+     */
+    public function addExtraQuestion(TrackQuestionTemplate $extra_question){
+        if($this->extra_questions->contains($extra_question)) return $this;
+        $this->extra_questions->add($extra_question);
+        return $this;
+    }
+
+    /**
+     * @param TrackQuestionTemplate $extra_question
+     * @return $this
+     */
+    public function removeExtraQuestion(TrackQuestionTemplate $extra_question){
+        if(!$this->extra_questions->contains($extra_question)) return $this;
+        $this->extra_questions->removeElement($extra_question);
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearExtraQuestions(){
+        $this->extra_questions->clear();
+        return $this;
+    }
+    /**
      * @param int $id
      * @return TrackQuestionTemplate|null
      */

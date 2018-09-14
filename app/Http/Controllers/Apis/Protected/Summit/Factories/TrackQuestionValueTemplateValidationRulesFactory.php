@@ -1,4 +1,4 @@
-<?php namespace App\Models;
+<?php namespace App\Http\Controllers;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,19 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\IOrderableEntity;
-use models\exceptions\ValidationException;
+
 /**
- * Interface IRecalculateOrderStrategy
- * @package App\Models
+ * Class TrackQuestionValueTemplateValidationRulesFactory
+ * @package App\Http\Controllers
  */
-interface IRecalculateOrderStrategy
+final class TrackQuestionValueTemplateValidationRulesFactory
 {
-    /**
-     * @param array $collection
-     * @param IOrderableEntity $entity
-     * @param int $new_order
-     * @throws ValidationException
-     */
-    public function recalculateOrder(array $collection , IOrderableEntity $entity, $new_order);
+    public static function build(array $data, $update = false){
+        if($update){
+            return [
+                'value' => 'sometimes|string|max:255',
+                'label' => 'sometimes|string',
+                'order' => 'sometimes|integer|min:1',
+            ];
+        }
+        return [
+            'value' => 'required|string|max:255',
+            'label' => 'required|string',
+        ];
+    }
 }

@@ -16,7 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use models\summit\PresentationCategory;
 use models\utils\SilverstripeBaseModel;
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineTrackQuestionTemplateRepository")
  * @ORM\Table(name="TrackQuestionTemplate")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")
@@ -65,7 +65,6 @@ class TrackQuestionTemplate extends SilverstripeBaseModel
      * @var string
      */
     protected $after_question;
-
 
     /**
      * @ORM\ManyToMany(targetEntity="models\summit\PresentationCategory", mappedBy="extra_questions")
@@ -208,6 +207,42 @@ class TrackQuestionTemplate extends SilverstripeBaseModel
     public function setTracks($tracks)
     {
         $this->tracks = $tracks;
+    }
+
+    /**
+     * @return $this
+     */
+    public function clearTracks(){
+
+        foreach($this->tracks as $track)
+            $track->removeExtraQuestion($this);
+        $this->tracks->clear();
+        return $this;
+    }
+
+    /**
+     * @param PresentationCategory $track
+     * @return $this
+     */
+    public function addTrack(PresentationCategory $track){
+
+        if($this->tracks->contains($track))
+            return $this;
+        $this->tracks->add($track);
+        $track->addExtraQuestion($this);
+        return $this;
+    }
+
+    /**
+     * @param PresentationCategory $track
+     * @return $this
+     */
+    public function removeTrack(PresentationCategory $track){
+        if(!$this->tracks->contains($track))
+            return $this;
+        $track->removeExtraQuestion($this);
+        $this->tracks->removeElement($track);
+        return $this;
     }
 
     /**

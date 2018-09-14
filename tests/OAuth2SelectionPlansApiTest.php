@@ -137,7 +137,7 @@ final class OAuth2SelectionPlansApiTest extends ProtectedApiTest
 
         $params = [
            'status'  => $status,
-            'expand' => 'summit,track_groups'
+            'expand' => 'track_groups,summit'
         ];
 
         $headers = [

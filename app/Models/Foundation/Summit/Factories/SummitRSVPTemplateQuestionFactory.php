@@ -37,59 +37,45 @@ final class SummitRSVPTemplateQuestionFactory
      */
     public static function build(array $data){
         if(!isset($data['class_name'])) throw new ValidationException("missing class_name param");
-        $location = null;
+        $question = null;
         switch($data['class_name']){
             case RSVPMemberEmailQuestionTemplate::ClassName :{
-                $location = self::populateRSVPSingleValueTemplateQuestion(new RSVPMemberEmailQuestionTemplate, $data);
+                $question = self::populateRSVPSingleValueTemplateQuestion(new RSVPMemberEmailQuestionTemplate, $data);
             }
             break;
             case RSVPMemberFirstNameQuestionTemplate::ClassName :{
-                $location = self::populateRSVPSingleValueTemplateQuestion(new RSVPMemberFirstNameQuestionTemplate, $data);
+                $question = self::populateRSVPSingleValueTemplateQuestion(new RSVPMemberFirstNameQuestionTemplate, $data);
             }
             break;
             case RSVPMemberLastNameQuestionTemplate::ClassName :{
-                $location = self::populateRSVPSingleValueTemplateQuestion(new RSVPMemberLastNameQuestionTemplate, $data);
+                $question = self::populateRSVPSingleValueTemplateQuestion(new RSVPMemberLastNameQuestionTemplate, $data);
             }
             break;
             case RSVPTextBoxQuestionTemplate::ClassName :{
-                $location = self::populateRSVPSingleValueTemplateQuestion(new RSVPTextBoxQuestionTemplate, $data);
+                $question = self::populateRSVPSingleValueTemplateQuestion(new RSVPTextBoxQuestionTemplate, $data);
             }
             break;
             case RSVPTextAreaQuestionTemplate::ClassName :{
-                $location = self::populateRSVPSingleValueTemplateQuestion(new RSVPTextAreaQuestionTemplate, $data);
+                $question = self::populateRSVPSingleValueTemplateQuestion(new RSVPTextAreaQuestionTemplate, $data);
             }
             break;
             case RSVPCheckBoxListQuestionTemplate::ClassName :{
-                $location = self::populateRSVPMultiValueQuestionTemplate(new RSVPCheckBoxListQuestionTemplate, $data);
+                $question = self::populateRSVPMultiValueQuestionTemplate(new RSVPCheckBoxListQuestionTemplate, $data);
             }
             break;
             case RSVPRadioButtonListQuestionTemplate::ClassName :{
-                $location = self::populateRSVPMultiValueQuestionTemplate(new RSVPRadioButtonListQuestionTemplate, $data);
+                $question = self::populateRSVPMultiValueQuestionTemplate(new RSVPRadioButtonListQuestionTemplate, $data);
             }
             break;
             case RSVPDropDownQuestionTemplate::ClassName :{
-                $location = self::populateRSVPDropDownQuestionTemplate(new RSVPDropDownQuestionTemplate, $data);
+                $question = self::populateRSVPDropDownQuestionTemplate(new RSVPDropDownQuestionTemplate, $data);
             }
             break;
             case RSVPLiteralContentQuestionTemplate::ClassName :{
-                $location = self::populateRSVPLiteralContentQuestionTemplate(new RSVPLiteralContentQuestionTemplate, $data);
+                $question = self::populateRSVPLiteralContentQuestionTemplate(new RSVPLiteralContentQuestionTemplate, $data);
             }
             break;
         }
-        return $location;
-    }
-
-    /**
-     * @param RSVPSingleValueTemplateQuestion $question
-     * @param array $data
-     * @return RSVPQuestionTemplate
-     */
-    private static function populateRSVPSingleValueTemplateQuestion(RSVPSingleValueTemplateQuestion $question, array $data){
-        if(isset($data['initial_value']))
-            $question->setInitialValue(trim($data['initial_value']));
-
-        $question = self::populateRSVPQuestionTemplate($question, $data);
-
         return $question;
     }
 
@@ -116,22 +102,34 @@ final class SummitRSVPTemplateQuestionFactory
     }
 
     /**
+     * @param RSVPSingleValueTemplateQuestion $question
+     * @param array $data
+     * @return RSVPQuestionTemplate
+     */
+    private static function populateRSVPSingleValueTemplateQuestion(RSVPSingleValueTemplateQuestion $question, array $data){
+        if(isset($data['initial_value']))
+            $question->setInitialValue(trim($data['initial_value']));
+
+        return self::populateRSVPQuestionTemplate($question, $data);
+    }
+
+    /**
      * @param RSVPMultiValueQuestionTemplate $question
      * @param array $data
-     * @return RSVPMultiValueQuestionTemplate
+     * @return RSVPQuestionTemplate
      */
     private static function populateRSVPMultiValueQuestionTemplate(RSVPMultiValueQuestionTemplate $question, array $data){
 
         if(isset($data['empty_string']))
             $question->setEmptyString(trim($data['empty_string']));
 
-        return $question;
+        return self::populateRSVPQuestionTemplate($question, $data);
     }
 
     /**
      * @param RSVPDropDownQuestionTemplate $question
      * @param array $data
-     * @return RSVPDropDownQuestionTemplate
+     * @return RSVPQuestionTemplate
      */
     private static function populateRSVPDropDownQuestionTemplate(RSVPDropDownQuestionTemplate $question, array $data){
 
@@ -144,18 +142,18 @@ final class SummitRSVPTemplateQuestionFactory
         if(isset($data['use_chosen_plugin']))
             $question->setUseChosenPlugin(boolval($data['use_chosen_plugin']));
 
-        return $question;
+        return self::populateRSVPMultiValueQuestionTemplate($question, $data);
     }
 
     /**
      * @param RSVPLiteralContentQuestionTemplate $question
      * @param array $data
-     * @return RSVPLiteralContentQuestionTemplate
+     * @return RSVPQuestionTemplate
      */
     private static function populateRSVPLiteralContentQuestionTemplate(RSVPLiteralContentQuestionTemplate $question, array $data){
         if(isset($data['content']))
             $question->setContent(trim($data['content']));
-        return $question;
+        return self::populateRSVPQuestionTemplate($question, $data);
     }
 
     /**

@@ -14,7 +14,6 @@
 use App\Models\Foundation\Main\OrderableChilds;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping AS ORM;
-use Doctrine\ORM\Query;
 use Doctrine\Common\Collections\ArrayCollection;
 use models\exceptions\ValidationException;
 use models\main\File;
@@ -214,7 +213,7 @@ class SummitVenueFloor extends SilverstripeBaseModel
      * @throws ValidationException
      */
     public function recalculateRoomsOrder(SummitVenueRoom $room, $new_order){
-        self::recalculateOrderFor($this->rooms, $room, $new_order);
+        self::recalculateOrderForSelectable($this->rooms, $room, $new_order);
     }
 
 }
