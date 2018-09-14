@@ -2120,6 +2120,14 @@ class ApiEndpointsSeeder extends Seeder
                     ],
                 ],
                 [
+                    'name' => 'get-track-question-templates',
+                    'route' => '/api/v1/track-question-templates/{track_question_template_id}',
+                    'http_method' => 'GET',
+                    'scopes' => [
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                    ],
+                ],
+                [
                     'name' => 'get-track-question-templates-metadata',
                     'route' => '/api/v1/track-question-templates/metadata',
                     'http_method' => 'GET',

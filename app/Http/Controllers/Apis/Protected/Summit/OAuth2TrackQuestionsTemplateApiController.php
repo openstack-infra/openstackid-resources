@@ -215,7 +215,9 @@ final class OAuth2TrackQuestionsTemplateApiController extends OAuth2ProtectedCon
             $track_question_template = $this->track_question_template_repository->getById($track_question_template_id);
             if (is_null($track_question_template)) return $this->error404();
 
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($track_question_template)->serialize());
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($track_question_template)->serialize(
+                Request::input('expand', '')
+            ));
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
