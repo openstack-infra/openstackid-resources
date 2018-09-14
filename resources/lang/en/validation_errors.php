@@ -90,4 +90,13 @@ return [
     'SummitTrackTagGroupService.addTrackTagGroup.TrackTagGroupNameAlreadyExists' => 'track tag group name already exist on summit :summit_id',
     'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupLabelAlreadyExists' => 'track tag group label already exist on summit :summit_id',
     'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupNameAlreadyExists' => 'track tag group name already exist on summit :summit_id',
+    // track question templates
+    'TrackQuestionTemplateService.addTrackQuestionTemplate.TrackQuestionTemplateLabelAlreadyExist' => 'track question template label already exists',
+    'TrackQuestionTemplateService.addTrackQuestionTemplate.TrackQuestionTemplateNameAlreadyExist' => 'track question template name already exists',
+    'TrackQuestionTemplateService.updateTrackQuestionTemplate.TrackQuestionTemplateLabelAlreadyExist' => 'track question template label already exists',
+    'TrackQuestionTemplateService.updateTrackQuestionTemplate.TrackQuestionTemplateNameAlreadyExist' => 'track question template name already exists',
+    'TrackQuestionTemplateService.addTrackQuestionValueTemplate.ValueAlreadyExist' => 'value :value already exists on track question template :track_question_template_id',
+    'TrackQuestionTemplateService.addTrackQuestionValueTemplate.LabelAlreadyExist' => 'label :label already exists on track question template :track_question_template_id',
+    'TrackQuestionTemplateService.updateTrackQuestionValueTemplate.ValueAlreadyExist' => 'value :value already exists on track question template :track_question_template_id',
+    'TrackQuestionTemplateService.updateTrackQuestionValueTemplate.LabelAlreadyExist' => 'label :label already exists on track question template :track_question_template_id'
 ];

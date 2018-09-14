@@ -79,7 +79,7 @@ class SummitVenue extends SummitGeoLocatedLocation
      * @throws ValidationException
      */
     public function recalculateRoomsOrder(SummitVenueRoom $room, $new_order){
-        self::recalculateOrderFor($this->rooms, $room, $new_order);
+        self::recalculateOrderForSelectable($this->rooms, $room, $new_order);
     }
 
     /**

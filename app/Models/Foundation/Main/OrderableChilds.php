@@ -21,41 +21,51 @@ use models\exceptions\ValidationException;
 trait OrderableChilds
 {
     /**
+     * @param array $collection
+     * @param IOrderable $entity
+     * @param int $new_order
+     * @throws ValidationException
+     */
+    private static function recalculateOrderForCollection(array $collection , IOrderable $entity, $new_order){
+
+        $former_order = 1;
+
+        foreach ($collection as $e){
+            if($e->getId() == $entity->getId()) break;
+            $former_order++;
+        }
+
+        $collection = array_slice($collection,0, count($collection), false);
+        $max_order  = count($collection);
+
+        if($new_order > $max_order)
+            throw new ValidationException(sprintf("max order is %s", $max_order));
+
+        unset($collection[$former_order - 1]);
+
+        $collection = array_merge
+        (
+            array_slice($collection, 0, $new_order-1 , true) ,
+            [$entity] ,
+            array_slice($collection, $new_order -1 , count($collection), true)
+        );
+
+        $order = 1;
+        foreach($collection as $e){
+            $e->setOrder($order);
+            $order++;
+        }
+    }
+    /**
      * @param Selectable $collection
      * @param IOrderable $element
      * @param $new_order
      * @throws ValidationException
      */
-    private static function recalculateOrderFor(Selectable $collection, IOrderable $element, $new_order){
+    private static function recalculateOrderForSelectable(Selectable $collection, IOrderable $element, $new_order){
         $criteria     = Criteria::create();
         $criteria->orderBy(['order'=> 'ASC']);
 
-        $elements     = $collection->matching($criteria)->toArray();
-        $elements     = array_slice($elements,0, count($elements), false);
-        $max_order    = count($elements);
-        $former_order = 1;
-
-        foreach ($elements as $e){
-            if($e->getId() == $element->getId()) break;
-            $former_order++;
-        }
-
-        if($new_order > $max_order)
-            throw new ValidationException(sprintf("max order is %s", $max_order));
-
-        unset($elements[$former_order - 1]);
-
-        $elements = array_merge
-        (
-            array_slice($elements, 0, $new_order -1 , true) ,
-            [$element] ,
-            array_slice($elements, $new_order -1 , count($elements), true)
-        );
-
-        $order = 1;
-        foreach($elements as $e){
-            $e->setOrder($order);
-            $order++;
-        }
+        self::recalculateOrderForCollection( $collection->matching($criteria)->toArray(), $element, $new_order);
     }
 }

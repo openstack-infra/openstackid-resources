@@ -531,6 +531,7 @@ Route::group([
                 });
             });
 
+            // track tag groups
             Route::group(['prefix' => 'track-tag-groups'], function(){
 
                 Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
@@ -539,7 +540,7 @@ Route::group([
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
                     'uses' => 'OAuth2SummitTrackTagGroupsApiController@addTrackTagGroup']);
 
-                Route::put('seed-defaults', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                Route::post('seed-defaults', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
                     'uses' => 'OAuth2SummitTrackTagGroupsApiController@seedDefaultTrackTagGroups']);
 
                 Route::group(['prefix' => '{track_tag_group_id}'], function(){
@@ -599,6 +600,47 @@ Route::group([
             Route::delete('',[ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@deleteSpeaker'])->where('speaker_id', 'me|[0-9]+');
             Route::get('', 'OAuth2SummitSpeakersApiController@getSpeaker');
             Route::post('/photo', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeakerPhoto']);
+        });
+    });
+
+    // track question templates
+    Route::group(['prefix' => 'track-question-templates'], function () {
+
+        Route::get('', [
+            'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+            'uses' => 'OAuth2TrackQuestionsTemplateApiController@getTrackQuestionTemplates']);
+        Route::get('metadata', [
+            'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+            'uses' => 'OAuth2TrackQuestionsTemplateApiController@getTrackQuestionTemplateMetadata'
+        ]);
+
+        Route::post('', [
+            'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+            'uses' => 'OAuth2TrackQuestionsTemplateApiController@addTrackQuestionTemplate']);
+
+        Route::group(['prefix' => '{track_question_template_id}'], function () {
+
+            Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                'uses' => 'OAuth2TrackQuestionsTemplateApiController@getTrackQuestionTemplate']);
+
+            Route::put('', [
+                'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                'uses' => 'OAuth2TrackQuestionsTemplateApiController@updateTrackQuestionTemplate']);
+
+            Route::delete('', [
+                'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                'uses' => 'OAuth2TrackQuestionsTemplateApiController@deleteTrackQuestionTemplate']);
+
+            // multi values questions
+            Route::group(['prefix' => 'values'], function () {
+                Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2TrackQuestionsTemplateApiController@addTrackQuestionTemplateValue']);
+                Route::group(['prefix' => '{track_question_template_value_id}'], function () {
+                    Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2TrackQuestionsTemplateApiController@getTrackQuestionTemplateValue']);
+                    Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2TrackQuestionsTemplateApiController@updateTrackQuestionTemplateValue']);
+                    Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2TrackQuestionsTemplateApiController@deleteTrackQuestionTemplateValue']);
+                });
+            });
+
         });
     });
 });

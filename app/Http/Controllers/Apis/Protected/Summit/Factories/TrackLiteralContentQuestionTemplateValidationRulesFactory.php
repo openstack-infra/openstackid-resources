@@ -1,4 +1,4 @@
-<?php namespace App\Models\Foundation;
+<?php namespace App\Http\Controllers;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,19 +12,22 @@
  * limitations under the License.
  **/
 
+
 /**
- * Interface IOrderableEntity
- * @package App\Models\Foundation
+ * Class TrackLiteralContentQuestionTemplateValidationRulesFactory
+ * @package App\Http\Controllers
  */
-interface IOrderableEntity
+final class TrackLiteralContentQuestionTemplateValidationRulesFactory
 {
     /**
-     * @return int
+     * @param array $data
+     * @param bool $update
+     * @return array
      */
-    public function getOrder();
-
-    /**
-     * @param int $order
-     */
-    public function setOrder($order);
+    public static function build(array $data, $update = false){
+        if($update){
+            return ['content' => 'sometimes|string'];
+        }
+        return ['content' => 'required|string'];
+    }
 }

@@ -150,6 +150,11 @@ final class ApiScopesSeeder extends Seeder
                 'short_description' => 'Write Summit Track Tag Groups Data',
                 'description' => 'Grants write access for Summit Track Tag Groups Data',
             ],
+            [
+                'name' => sprintf(SummitScopes::WriteTrackQuestionTemplateData, $current_realm),
+                'short_description' => 'Write Summit Track Question Template Data',
+                'description' => 'Grants write access for Summit Track Question Template Data',
+            ],
         ];
 
         foreach ($scopes as $scope_info) {

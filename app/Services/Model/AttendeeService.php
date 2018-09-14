@@ -316,14 +316,11 @@ final class AttendeeService extends AbstractService implements IAttendeeService
                 $new_owner = SummitAttendeeFactory::build($summit, $other_member, []);
                 $this->attendee_repository->add($new_owner);
             }
-            if($new_owner->hasTickets()){
-                throw new ValidationException('This member is already assigned to another ticket');
-            }
+            $new_owner->addTicket($ticket);
             $attendee->removeTicket($ticket);
             if(!$attendee->hasTickets()){
                 $this->attendee_repository->delete($attendee);
             }
-            $new_owner->addTicket($ticket);
             return $ticket;
         });
     }

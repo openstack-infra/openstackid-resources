@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\IOrderableEntity;
+use App\Models\Foundation\Main\IOrderable;
 use App\Models\Foundation\Summit\Locations\Banners\ScheduledSummitLocationBanner;
 use App\Models\Foundation\Summit\Locations\Banners\SummitLocationBanner;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -38,7 +38,7 @@ use Doctrine\ORM\Mapping AS ORM;
  * Class SummitAbstractLocation
  * @package models\summit
  */
-class SummitAbstractLocation extends SilverstripeBaseModel implements IOrderableEntity
+class SummitAbstractLocation extends SilverstripeBaseModel implements IOrderable
 {
     const TypeExternal = 'External';
     const TypeInternal = 'Internal';

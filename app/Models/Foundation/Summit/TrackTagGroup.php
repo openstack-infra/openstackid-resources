@@ -11,9 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Models\Foundation\IOrderableEntity;
+use App\Models\Foundation\Main\IOrderable;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Cache;
 use models\main\Tag;
 use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
@@ -24,7 +23,7 @@ use Doctrine\ORM\Mapping AS ORM;
  * Class TrackTagGroup
  * @package models\summit\TrackTagGroup
  */
-class TrackTagGroup extends SilverstripeBaseModel implements IOrderableEntity
+class TrackTagGroup extends SilverstripeBaseModel implements IOrderable
 {
     use SummitOwned;
 

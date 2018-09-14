@@ -1,4 +1,4 @@
-<?php namespace App\Models\Foundation\Main;
+<?php namespace App\Http\Controllers;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,21 +11,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\IEntity;
+
 /**
- * Interface IOrderable
- * @package App\Models\Foundation\Main
+ * Class TrackMultiValueQuestionTemplateValidationRulesFactory
+ * @package App\Http\Controllers
  */
-interface IOrderable extends IEntity
+final class TrackMultiValueQuestionTemplateValidationRulesFactory
 {
     /**
-     * @param int $order
-     * @return void
+     * @param array $data
+     * @param bool $update
+     * @return array
      */
-    public function setOrder($order);
-
-    /**
-     * @return int
-     */
-    public function getOrder();
+    public static function build(array $data, $update = false){
+        if($update){
+            return [
+                'empty_string' => 'sometimes|string',
+                'default_value' => 'sometimes|integer',
+            ];
+        }
+        return [
+            'empty_string' => 'required|string'
+        ];
+    }
 }

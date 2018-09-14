@@ -109,5 +109,16 @@ final class ApiSeeder extends Seeder
 
         EntityManager::flush();
 
+        // track question templates
+
+        $api = new Api();
+        $api->setName('track-question-templates');
+        $api->setActive(true);
+        $api->setDescription('Track Question Templates API');
+
+        EntityManager::persist($api);
+
+        EntityManager::flush();
+
     }
 }

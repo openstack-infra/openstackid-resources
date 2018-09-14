@@ -683,7 +683,7 @@ final class OAuth2SummitAttendeesApiController extends OAuth2ProtectedController
             $other_member = $this->member_repository->getById($other_member_id);
             if(is_null($other_member)) return $this->error404();
 
-            $ticket = $this->attendee_service->reassignAttendeeTicket($summit, $attendee, $other_member_id, $ticket_id);
+            $ticket = $this->attendee_service->reassignAttendeeTicket($summit, $attendee, $other_member, $ticket_id);
 
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($ticket)->serialize());
         }

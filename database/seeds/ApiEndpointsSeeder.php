@@ -35,6 +35,7 @@ class ApiEndpointsSeeder extends Seeder
         $this->seedCompaniesEndpoints();
         $this->seedGroupsEndpoints();
         $this->seedOrganizationsEndpoints();
+        $this->seedTrackQuestionTemplateEndpoints();
     }
 
     /**
@@ -1799,7 +1800,7 @@ class ApiEndpointsSeeder extends Seeder
             [
                 'name' => 'seed-default-track-tag-groups',
                 'route' => '/api/v1/summits/{id}/track-tag-groups/seed-defaults',
-                'http_method' => 'PUT',
+                'http_method' => 'POST',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteTrackTagGroupsData, $current_realm)
@@ -2074,6 +2075,93 @@ class ApiEndpointsSeeder extends Seeder
                     'http_method' => 'DELETE',
                     'scopes' => [sprintf('%s/members/invitations/write', $current_realm)],
                 ),
+            ]
+        );
+    }
+
+    public function seedTrackQuestionTemplateEndpoints(){
+        $current_realm = Config::get('app.url');
+
+        $this->seedApiEndpoints('track-question-templates', [
+                // track question templates
+                [
+                    'name' => 'get-track-question-templates',
+                    'route' => '/api/v1/track-question-templates',
+                    'http_method' => 'GET',
+                    'scopes' => [
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm),
+                    ],
+                ],
+                [
+                    'name' => 'add-track-question-templates',
+                    'route' => '/api/v1/track-question-templates',
+                    'http_method' => 'POST',
+                    'scopes' => [
+                        sprintf(SummitScopes::WriteSummitData, $current_realm),
+                        sprintf(SummitScopes::WriteTrackQuestionTemplateData, $current_realm),
+                    ],
+                ],
+                [
+                    'name' => 'update-track-question-templates',
+                    'route' => '/api/v1/track-question-templates/{track_question_template_id}',
+                    'http_method' => 'PUT',
+                    'scopes' => [
+                        sprintf(SummitScopes::WriteSummitData, $current_realm),
+                        sprintf(SummitScopes::WriteTrackQuestionTemplateData, $current_realm),
+                    ],
+                ],
+                [
+                    'name' => 'delete-track-question-templates',
+                    'route' => '/api/v1/track-question-templates/{track_question_template_id}',
+                    'http_method' => 'DELETE',
+                    'scopes' => [
+                        sprintf(SummitScopes::WriteSummitData, $current_realm),
+                        sprintf(SummitScopes::WriteTrackQuestionTemplateData, $current_realm),
+                    ],
+                ],
+                [
+                    'name' => 'get-track-question-templates-metadata',
+                    'route' => '/api/v1/track-question-templates/metadata',
+                    'http_method' => 'GET',
+                    'scopes' => [
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                    ],
+                ],
+                [
+                    'name' => 'add-track-question-template-value',
+                    'route' => '/api/v1/track-question-templates/{track_question_template_id}/values',
+                    'http_method' => 'POST',
+                    'scopes' => [
+                        sprintf(SummitScopes::WriteSummitData, $current_realm),
+                        sprintf(SummitScopes::WriteTrackQuestionTemplateData, $current_realm),
+                    ],
+                ],
+                [
+                    'name' => 'update-track-question-template-value',
+                    'route' => '/api/v1/track-question-templates/{track_question_template_id}/values/{track_question_template_value_id}',
+                    'http_method' => 'PUT',
+                    'scopes' => [
+                        sprintf(SummitScopes::WriteSummitData, $current_realm),
+                        sprintf(SummitScopes::WriteTrackQuestionTemplateData, $current_realm),
+                    ],
+                ],
+                [
+                    'name' => 'delete-track-question-template-value',
+                    'route' => '/api/v1/track-question-templates/{track_question_template_id}/values/{track_question_template_value_id}',
+                    'http_method' => 'DELETE',
+                    'scopes' => [
+                        sprintf(SummitScopes::WriteSummitData, $current_realm),
+                        sprintf(SummitScopes::WriteTrackQuestionTemplateData, $current_realm),
+                    ],
+                ],
+                [
+                    'name' => 'get-track-question-template-value',
+                    'route' => '/api/v1/track-question-templates/{track_question_template_id}/values/{track_question_template_value_id}',
+                    'http_method' => 'GET',
+                    'scopes' => [
+                        sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                    ],
+                ],
             ]
         );
     }

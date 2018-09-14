@@ -187,7 +187,7 @@ class RSVPTemplate extends SilverstripeBaseModel
      * @throws ValidationException
      */
     public function recalculateQuestionOrder(RSVPQuestionTemplate $question, $new_order){
-        self::recalculateOrderFor($this->questions, $question, $new_order);
+        self::recalculateOrderForSelectable($this->questions, $question, $new_order);
     }
 
     /**

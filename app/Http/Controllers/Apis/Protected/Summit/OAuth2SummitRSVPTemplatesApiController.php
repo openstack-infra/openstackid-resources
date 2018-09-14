@@ -643,7 +643,7 @@ final class OAuth2SummitRSVPTemplatesApiController extends OAuth2ProtectedContro
 
             $value = $this->rsvp_template_service->updateQuestionValue($summit, $template_id, $question_id, $value_id, $payload);
 
-            return $this->created(SerializerRegistry::getInstance()->getSerializer($value)->serialize());
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($value)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);

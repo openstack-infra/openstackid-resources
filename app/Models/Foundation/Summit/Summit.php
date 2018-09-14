@@ -13,7 +13,7 @@
  * limitations under the License.
  **/
 use App\Http\Utils\DateUtils;
-use App\Models\Foundation\RecalculateOrderStrategy;
+use App\Models\Foundation\Main\OrderableChilds;
 use App\Models\Foundation\Summit\Events\RSVP\RSVPTemplate;
 use App\Models\Foundation\Summit\SelectionPlan;
 use App\Models\Foundation\Summit\TrackTagGroup;
@@ -22,7 +22,6 @@ use App\Models\Utils\TimeZoneEntity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
-use Doctrine\ORM\Query\Expr\Select;
 use models\exceptions\ValidationException;
 use models\main\Company;
 use models\main\File;
@@ -1728,6 +1727,8 @@ SQL;
         return $this;
     }
 
+    use OrderableChilds;
+
     /**
      * @param SummitAbstractLocation $location
      * @param int $new_order
@@ -1744,8 +1745,7 @@ SQL;
                 $filtered_locations[] = $l;
         }
 
-        $strategy = new RecalculateOrderStrategy();
-        $strategy->recalculateOrder($filtered_locations, $location, $new_order);
+        self::recalculateOrderForCollection($filtered_locations, $location, $new_order);
     }
 
     /**
@@ -2350,11 +2350,7 @@ SQL;
      * @throws ValidationException
      */
     public function recalculateTrackTagGroupOrder(TrackTagGroup $track_tag_group, $new_order){
-
-        $criteria = Criteria::create();
-        $criteria->orderBy(['order'=> 'ASC']);
-        $strategy = new RecalculateOrderStrategy();
-        $strategy->recalculateOrder($this->track_tag_groups->matching($criteria)->toArray(), $track_tag_group, $new_order);
+        self::recalculateOrderForSelectable($this->track_tag_groups, $track_tag_group, $new_order);
     }
 
     /**

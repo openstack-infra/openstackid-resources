@@ -251,6 +251,23 @@ final class RSVPTemplateService
                     )
                 );
 
+            $class_name = $data['class_name'];
+            $reflect = new \ReflectionClass($question);
+            if ($reflect->getShortName() !== $class_name) {
+                throw new EntityNotFoundException
+                (
+                    trans
+                    (
+                        'not_found_errors.RSVPTemplateService.updateQuestion.QuestionNotFound',
+                        [
+                            'summit_id'   => $summit->getId(),
+                            'template_id' => $template_id,
+                            'question_id' => $question_id,
+                        ]
+                    )
+                );
+            }
+
             if(isset($data['name'])) {
                 $former_question = $template->getQuestionByName($data['name']);
                 if (!is_null($former_question) && $former_question->getId() != $question_id) {

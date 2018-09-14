@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\IOrderable;
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
 /**
@@ -19,7 +20,7 @@ use models\utils\SilverstripeBaseModel;
  * Class TrackQuestionValueTemplate
  * @package App\Models\Foundation\Summit\Events\Presentations\TrackQuestions
  */
-class TrackQuestionValueTemplate extends SilverstripeBaseModel
+class TrackQuestionValueTemplate extends SilverstripeBaseModel implements IOrderable
 {
     /**
      * @ORM\Column(name="Value", type="string")
@@ -34,7 +35,7 @@ class TrackQuestionValueTemplate extends SilverstripeBaseModel
     private $label;
 
     /**
-     * @ORM\Column(name="Order", type="integer")
+     * @ORM\Column(name="`Order`", type="integer")
      * @var int
      */
     private $order;
@@ -108,6 +109,10 @@ class TrackQuestionValueTemplate extends SilverstripeBaseModel
     public function setOwner($owner)
     {
         $this->owner = $owner;
+    }
+
+    public function clearOwner(){
+        $this->owner = null;
     }
 
     /**

@@ -184,7 +184,7 @@ class RSVPMultiValueQuestionTemplate extends RSVPQuestionTemplate
      * @throws ValidationException
      */
     public function recalculateValueOrder(RSVPQuestionValueTemplate $value, $new_order){
-        self::recalculateOrderFor($this->values, $value, $new_order);
+        self::recalculateOrderForSelectable($this->values, $value, $new_order);
     }
 
     /**
