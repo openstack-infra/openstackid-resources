@@ -1191,6 +1191,24 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
+                'name' => 'add-track-extra-questions',
+                'route' => '/api/v1/summits/{id}/tracks/{track_id}/extra-questions/{question_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTracksData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'remove-track-extra-questions',
+                'route' => '/api/v1/summits/{id}/tracks/{track_id}/extra-questions/{question_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteTracksData, $current_realm),
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
                 'name' => 'get-track-allowed-tags',
                 'route' => '/api/v1/summits/{id}/tracks/{track_id}/allowed-tags',
                 'http_method' => 'GET',

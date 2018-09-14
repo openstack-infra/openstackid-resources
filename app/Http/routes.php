@@ -484,6 +484,18 @@ Route::group([
 
                     Route::group(['prefix' => 'extra-questions'], function () {
                         Route::get('', 'OAuth2SummitTracksApiController@getTrackExtraQuestionsBySummit');
+                        Route::group(['prefix' => '{question_id}'], function () {
+
+                            Route::put('', [
+                                'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                                'uses' => 'OAuth2SummitTracksApiController@addTrackExtraQuestion']
+                            );
+
+                            Route::delete('', [
+                                'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                                'uses' => 'OAuth2SummitTracksApiController@removeTrackExtraQuestion'
+                            ]);
+                        });
                     });
                 });
             });

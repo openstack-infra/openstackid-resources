@@ -158,6 +158,54 @@ final class OAuth2TrackQuestionsTemplateTest
         return $track_question_template;
     }
 
+    public function testAddTrackExtraQuestion(){
+        $new_track_extra_question = $this->testAddTrackQuestionTemplate();
+
+        $params = [
+            'summit_id' => 25,
+            'track_id' => 246,
+            'question_id' => $new_track_extra_question->id,
+        ];
+
+        $headers = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitTracksApiController@addTrackExtraQuestion",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(201);
+        return $new_track_extra_question;
+    }
+
+    public function testRemoveTrackExtraQuestion(){
+        $new_track_extra_question = $this->testAddTrackExtraQuestion();
+
+        $params = [
+            'summit_id' => 25,
+            'track_id' => 246,
+            'question_id' => $new_track_extra_question->id,
+        ];
+
+        $headers = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "DELETE",
+            "OAuth2SummitTracksApiController@removeTrackExtraQuestion",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
+    }
 
     public function testDeleteTrackQuestionTemplate(){
         $new_track_question_template = $this->testAddTrackQuestionTemplate();

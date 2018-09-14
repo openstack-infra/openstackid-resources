@@ -58,4 +58,23 @@ interface ISummitTrackService
      */
     public function copyTracks(Summit $from_summit, Summit $to_summit);
 
+    /**
+     * @param int $track_id
+     * @param int $question_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addTrackExtraQuestion($track_id, $question_id);
+
+
+    /**
+     * @param int $track_id
+     * @param int $question_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function removeTrackExtraQuestion($track_id, $question_id);
+
 }

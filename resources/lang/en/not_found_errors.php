@@ -100,5 +100,10 @@ return [
     'TrackQuestionTemplateService.deleteTrackQuestionValueTemplate.TrackQuestionTemplateValueNotFound' => 'track question template value :track_question_value_template_id not found',
     'TrackQuestionTemplateService.addTrackQuestionTemplate.TrackNotFound' => 'track :track_id not found',
     'TrackQuestionTemplateService.updateTrackQuestionTemplate.TrackNotFound' => 'track :track_id not found',
-    'TrackQuestionTemplateService.updateTrackQuestionTemplate.DefaultValueNotFound' => 'default value :default_value not found'
+    'TrackQuestionTemplateService.updateTrackQuestionTemplate.DefaultValueNotFound' => 'default value :default_value not found',
+    // tracks
+    'SummitTrackService.addTrackExtraQuestion.TrackNotFound' => 'track :track_id not found',
+    'SummitTrackService.addTrackExtraQuestion.QuestionNotFound' => 'question :question_id not found',
+    'SummitTrackService.removeTrackExtraQuestion.TrackNotFound' => 'track :track_id not found',
+    'SummitTrackService.removeTrackExtraQuestion.QuestionNotFound' => 'question :question_id not found',
 ];

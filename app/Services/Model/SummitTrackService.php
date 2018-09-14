@@ -17,6 +17,7 @@ use App\Events\TrackInserted;
 use App\Events\TrackUpdated;
 use App\Models\Foundation\Summit\Factories\PresentationCategoryFactory;
 use App\Models\Foundation\Summit\Repositories\ISummitTrackRepository;
+use App\Models\Foundation\Summit\Repositories\ITrackQuestionTemplateRepository;
 use Illuminate\Support\Facades\Event;
 use libs\utils\ITransactionService;
 use models\exceptions\EntityNotFoundException;
@@ -35,7 +36,7 @@ final class SummitTrackService
     /**
      * @var ISummitTrackRepository
      */
-    private $repository;
+    private $track_repository;
 
     /**
      * @var ITagRepository
@@ -43,21 +44,29 @@ final class SummitTrackService
     private $tag_repository;
 
     /**
+     * @var ITrackQuestionTemplateRepository
+     */
+    private $track_question_template_repository;
+
+    /**
      * SummitTrackService constructor.
-     * @param ISummitTrackRepository $repository
+     * @param ISummitTrackRepository $track_repository
      * @param ITagRepository $tag_repository
+     * @param ITrackQuestionTemplateRepository $track_question_template_repository
      * @param ITransactionService $tx_service
      */
     public function __construct
     (
-        ISummitTrackRepository $repository,
+        ISummitTrackRepository $track_repository,
         ITagRepository $tag_repository,
+        ITrackQuestionTemplateRepository $track_question_template_repository,
         ITransactionService $tx_service
     )
     {
         parent::__construct($tx_service);
         $this->tag_repository = $tag_repository;
-        $this->repository = $repository;
+        $this->track_repository = $track_repository;
+        $this->track_question_template_repository = $track_question_template_repository;
     }
 
     /**
@@ -189,7 +198,7 @@ final class SummitTrackService
 
             Event::fire(new TrackDeleted($track->getSummitId(), $track->getId()));
 
-            $this->repository->delete($track);
+            $this->track_repository->delete($track);
         });
     }
 
@@ -248,5 +257,75 @@ final class SummitTrackService
         }
 
         return $added_tracks;
+    }
+
+    /**
+     * @param int $track_id
+     * @param int $question_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function addTrackExtraQuestion($track_id, $question_id)
+    {
+        return $this->tx_service->transaction(function() use($track_id, $question_id){
+            $track = $this->track_repository->getById($track_id);
+            if(is_null($track))
+                throw new EntityNotFoundException(
+                    trans
+                    (
+                        'not_found_errors.SummitTrackService.addTrackExtraQuestion.TrackNotFound',
+                        ['track_id' => $track_id ]
+                    )
+                );
+
+            $track_question_template = $this->track_question_template_repository->getById($question_id);
+
+            if(is_null($track_question_template))
+                throw new EntityNotFoundException(
+                    trans
+                    (
+                        'not_found_errors.SummitTrackService.addTrackExtraQuestion.QuestionNotFound',
+                        ['question_id' => $question_id ]
+                    )
+                );
+
+            $track->addExtraQuestion($track_question_template);
+        });
+    }
+
+    /**
+     * @param int $track_id
+     * @param int $question_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function removeTrackExtraQuestion($track_id, $question_id)
+    {
+        return $this->tx_service->transaction(function() use($track_id, $question_id){
+            $track = $this->track_repository->getById($track_id);
+            if(is_null($track))
+                throw new EntityNotFoundException(
+                    trans
+                    (
+                        'not_found_errors.SummitTrackService.removeTrackExtraQuestion.TrackNotFound',
+                        ['track_id' => $track_id ]
+                    )
+                );
+
+            $track_question_template = $this->track_question_template_repository->getById($question_id);
+
+            if(is_null($track_question_template))
+                throw new EntityNotFoundException(
+                    trans
+                    (
+                        'not_found_errors.SummitTrackService.removeTrackExtraQuestion.QuestionNotFound',
+                        ['question_id' => $question_id ]
+                    )
+                );
+
+            $track->removeExtraQuestion($track_question_template);
+        });
     }
 }
