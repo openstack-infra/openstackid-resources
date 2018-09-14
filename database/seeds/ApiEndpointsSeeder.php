@@ -2120,7 +2120,7 @@ class ApiEndpointsSeeder extends Seeder
                     ],
                 ],
                 [
-                    'name' => 'get-track-question-templates',
+                    'name' => 'get-track-question-template',
                     'route' => '/api/v1/track-question-templates/{track_question_template_id}',
                     'http_method' => 'GET',
                     'scopes' => [
