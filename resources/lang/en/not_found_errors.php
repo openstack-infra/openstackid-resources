@@ -90,6 +90,9 @@ return [
     // track tag groups
     'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupNotFound' => 'track tag group :track_tag_group_id not found on summit :summit_id',
     'SummitTrackTagGroupService.deleteTrackTagGroup.TrackTagGroupNotFound' => 'track tag group :track_tag_group_id not found on summit :summit_id',
+    'SummitTrackTagGroupService.seedTagOnAllTrack.TagNotFound' => 'tag :tag_id not found',
+    'SummitTrackTagGroupService.seedTagTrackGroupTagsOnTrack.TrackTagGroupNotFound' =>  'track tag group :track_tag_group_id not found on summit :summit_id',
+    'SummitTrackTagGroupService.seedTagTrackGroupTagsOnTrack.TrackNotFound' => 'track :track_id not found on summit :summit_id',
     // track question templates
     'TrackQuestionTemplateService.updateTrackQuestionTemplate.TrackQuestionTemplateNotFound' => 'track question template :track_question_template_id not found',
     'TrackQuestionTemplateService.deleteTrackQuestionTemplate.TrackQuestionTemplateNotFound' => 'track question template :track_question_template_id not found',

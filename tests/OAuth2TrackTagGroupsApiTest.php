@@ -206,4 +206,87 @@ final class OAuth2TrackTagGroupsApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($tags));
         $this->assertResponseStatus(200);
     }
+
+    public function testSeedDefaultTrackTagGroups($summit_id = 25)
+    {
+
+        $params = [
+            'id' => $summit_id,
+        ];
+
+        $headers = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitTrackTagGroupsApiController@seedDefaultTrackTagGroups",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $tags = json_decode($content);
+        $this->assertTrue(!is_null($tags));
+        $this->assertResponseStatus(200);
+    }
+
+    /**
+     * @param int $summit_id
+     * @param int $tag_id
+     */
+    public function testSeedTagOnAllTracks($summit_id = 25, $tag_id = 4590)
+    {
+
+        $params = [
+            'id' => $summit_id,
+            'tag_id' => $tag_id,
+        ];
+
+        $headers = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitTrackTagGroupsApiController@seedTagOnAllTracks",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $response = json_decode($content);
+        $this->assertResponseStatus(201);
+    }
+
+    /**
+     * @param int $summit_id
+     * @param int $track_tag_group_id
+     * @param $track_id
+     */
+    public function testSeedTagTrackGroupOnTrack($summit_id = 25, $track_tag_group_id = 6, $track_id = 268)
+    {
+
+        $params = [
+            'id' => $summit_id,
+            'track_tag_group_id' => $track_tag_group_id,
+            'track_id' => $track_id,
+        ];
+
+        $headers = ["HTTP_Authorization" => " Bearer " . $this->access_token];
+        $response = $this->action(
+            "POST",
+            "OAuth2SummitTrackTagGroupsApiController@seedTagTrackGroupOnTrack",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $response = json_decode($content);
+        $this->assertResponseStatus(201);
+    }
+
 }

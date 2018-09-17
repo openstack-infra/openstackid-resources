@@ -256,16 +256,22 @@ class PresentationCategory extends SilverstripeBaseModel
 
     /**
      * @param PresentationCategoryGroup $group
+     * @return $this
      */
     public function addToGroup(PresentationCategoryGroup $group){
+        if($this->groups->contains($group)) return $this;
         $this->groups->add($group);
+        return $this;
     }
 
     /**
      * @param PresentationCategoryGroup $group
+     * @return $this
      */
     public function removeFromGroup(PresentationCategoryGroup $group){
+        if(!$this->groups->contains($group)) return $this;
         $this->groups->removeElement($group);
+        return $this;
     }
 
     /**
@@ -281,10 +287,12 @@ class PresentationCategory extends SilverstripeBaseModel
 
     /**
      * @param Tag $tag
+     * @return $this
      */
     public function addAllowedTag(Tag $tag){
-        if($this->allowed_tags->contains($tag)) return;
+        if($this->allowed_tags->contains($tag)) return $this;
         $this->allowed_tags->add($tag);
+        return $this;
     }
 
     /**

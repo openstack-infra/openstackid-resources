@@ -1804,7 +1804,16 @@ class ApiEndpointsSeeder extends Seeder
                 'route' => '/api/v1/summits/{id}/track-tag-groups/all/allowed-tags',
                 'http_method' => 'GET',
                 'scopes' => [
-                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                    sprintf(SummitScopes::WriteSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'seed-track-tag-groups-allowed-tags',
+                'route' => '/api/v1/summits/{id}/track-tag-groups/all/allowed-tags/{tag_id}/seed-on-tracks',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteTracksData, $current_realm),
                 ],
             ],
             [
@@ -1850,7 +1859,16 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSummitData, $current_realm),
                     sprintf(SummitScopes::WriteTrackTagGroupsData, $current_realm)
                 ]
-            ]
+            ],
+            [
+                'name' => 'copy-track-tag-group-allowed-tags-to-track',
+                'route' => '/api/v1/summits/{id}/track-tag-groups/{track_tag_group_id}/allowed-tags/all/copy/tracks/{track_id}',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteTracksData, $current_realm)
+                ]
+            ],
         ]);
     }
 

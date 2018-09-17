@@ -90,6 +90,7 @@ return [
     'SummitTrackTagGroupService.addTrackTagGroup.TrackTagGroupNameAlreadyExists' => 'track tag group name already exist on summit :summit_id',
     'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupLabelAlreadyExists' => 'track tag group label already exist on summit :summit_id',
     'SummitTrackTagGroupService.updateTrackTagGroup.TrackTagGroupNameAlreadyExists' => 'track tag group name already exist on summit :summit_id',
+    'SummitTrackTagGroupService.seedTagOnAllTrack.TagDoesNotBelongToTrackTagGroup' => 'tag :tag_id does not belongs to any track tag group on summit :summit_id',
     // track question templates
     'TrackQuestionTemplateService.addTrackQuestionTemplate.TrackQuestionTemplateLabelAlreadyExist' => 'track question template label already exists',
     'TrackQuestionTemplateService.addTrackQuestionTemplate.TrackQuestionTemplateNameAlreadyExist' => 'track question template name already exists',

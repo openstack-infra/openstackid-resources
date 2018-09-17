@@ -563,12 +563,29 @@ Route::group([
                     Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
                         'uses' => 'OAuth2SummitTrackTagGroupsApiController@deleteTrackTagGroup']);
 
+                    Route::group(['prefix' => 'allowed-tags'], function(){
+
+                        Route::group(['prefix' => 'all'], function(){
+                            Route::post('copy/tracks/{track_id}',
+                                [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                                    'uses' => 'OAuth2SummitTrackTagGroupsApiController@seedTagTrackGroupOnTrack']);
+                        });
+                    });
+
                 });
 
                 Route::group(['prefix' => 'all'], function(){
                     Route::group(['prefix' => 'allowed-tags'], function(){
+
                         Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
                             'uses' => 'OAuth2SummitTrackTagGroupsApiController@getAllowedTags']);
+
+
+                        Route::group(['prefix' => '{tag_id}'], function(){
+                            Route::post('seed-on-tracks',
+                                [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
+                                    'uses' => 'OAuth2SummitTrackTagGroupsApiController@seedTagOnAllTracks']);
+                        });
                     });
                 });
             });

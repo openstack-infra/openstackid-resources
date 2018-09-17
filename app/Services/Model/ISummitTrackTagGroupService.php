@@ -54,6 +54,28 @@ interface ISummitTrackTagGroupService
     /**
      * @param Summit $summit
      * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
      */
     public function seedDefaultTrackTagGroups(Summit $summit);
+
+    /**
+     * @param Summit $summit
+     * @param int $tag_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function seedTagOnAllTrack(Summit $summit, $tag_id);
+
+    /**
+     * @param Summit $summit
+     * @param int $track_tag_group_id
+     * @param int $track_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function seedTagTrackGroupTagsOnTrack(Summit $summit, $track_tag_group_id, $track_id);
+
 }

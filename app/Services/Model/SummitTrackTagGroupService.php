@@ -208,7 +208,7 @@ implements ISummitTrackTagGroupService
 
     /**
      * @param Summit $summit
-     * @return void
+     * @throws \Exception
      */
     public function seedDefaultTrackTagGroups(Summit $summit)
     {
@@ -230,6 +230,90 @@ implements ISummitTrackTagGroupService
                     $new_group->addTag($default_allowed_tag->getTag());
                 }
             }
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $tag_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function seedTagOnAllTrack(Summit $summit, $tag_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $tag_id) {
+
+            $tag = $this->tag_repository->getById($tag_id);
+            if(is_null($tag))
+                throw new EntityNotFoundException(
+                    trans(
+                        "not_found_errors.SummitTrackTagGroupService.seedTagOnAllTrack.TagNotFound",
+                        [
+                           'tag_id' => $tag_id
+                        ]
+                    )
+                );
+
+            $tag_track_group = $summit->getTrackTagGroupForTag($tag);
+
+            if(is_null($tag_track_group))
+                throw new ValidationException(
+                    trans(
+                        'validation_errors.SummitTrackTagGroupService.seedTagOnAllTrack.TagDoesNotBelongToTrackTagGroup',
+                        [
+                            'tag_id' => $tag_id,
+                            'summit_id' => $summit->getId()
+                        ]
+                    )
+                );
+
+            foreach ($summit->getPresentationCategories() as $track){
+                $track->addAllowedTag($tag);
+            }
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $track_tag_group_id
+     * @param int $track_id
+     * @return void
+     * @throws EntityNotFoundException
+     * @throws ValidationException
+     */
+    public function seedTagTrackGroupTagsOnTrack(Summit $summit, $track_tag_group_id, $track_id)
+    {
+        return $this->tx_service->transaction(function() use($summit, $track_tag_group_id, $track_id) {
+
+            $track_tag_group = $summit->getTrackTagGroup($track_tag_group_id);
+
+            if(is_null($track_tag_group)){
+                throw new EntityNotFoundException
+                (
+                    trans("not_found_errors.SummitTrackTagGroupService.seedTagTrackGroupTagsOnTrack.TrackTagGroupNotFound", [
+                        'summit_id' => $summit->getId(),
+                        'track_tag_group_id' => $track_tag_group_id,
+                    ])
+                );
+            }
+
+            $track = $summit->getPresentationCategory($track_id);
+
+            if(is_null($track)){
+                throw new EntityNotFoundException
+                (
+                    trans("not_found_errors.SummitTrackTagGroupService.seedTagTrackGroupTagsOnTrack.TrackNotFound", [
+                        'summit_id' => $summit->getId(),
+                        'track_id' => $track_id,
+                    ])
+                );
+            }
+
+            foreach ($track_tag_group->getAllowedTags() as $allowedTag){
+                $track->addAllowedTag($allowedTag->getTag());
+            }
+
         });
     }
 }

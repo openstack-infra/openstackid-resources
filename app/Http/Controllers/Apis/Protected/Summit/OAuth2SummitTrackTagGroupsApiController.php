@@ -387,4 +387,59 @@ final class OAuth2SummitTrackTagGroupsApiController extends OAuth2ProtectedContr
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $summit_id
+     * @param $tag_id
+     * @return mixed
+     */
+    public function seedTagOnAllTracks($summit_id, $tag_id){
+        try{
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $this->track_tag_group_service->seedTagOnAllTrack($summit, $tag_id);
+            return $this->updated();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $track_tag_group_id
+     * @param $track_id
+     * @return mixed
+     */
+    public function seedTagTrackGroupOnTrack($summit_id, $track_tag_group_id, $track_id){
+        try{
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+            $this->track_tag_group_service->seedTagTrackGroupTagsOnTrack($summit, $track_tag_group_id, $track_id);
+            return $this->updated();
+        }
+        catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412([$ex1->getMessage()]);
+        }
+        catch(EntityNotFoundException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error404(['message'=> $ex2->getMessage()]);
+        }
+        catch (\Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }
