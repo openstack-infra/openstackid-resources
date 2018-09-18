@@ -241,5 +241,25 @@ interface ISummitService
      * @throws EntityNotFoundException
      * @return void
      */
-    public function removeSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
+    public function addModerator2Presentation($current_member_id, $speaker_id, $presentation_id);
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function removeSpeakerFromPresentation($current_member_id, $speaker_id, $presentation_id);
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function removeSpeakerFromModerator($current_member_id, $speaker_id, $presentation_id);
 }

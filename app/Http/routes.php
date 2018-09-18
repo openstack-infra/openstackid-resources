@@ -607,10 +607,11 @@ Route::group([
                  Route::group(['prefix' => '{presentation_id}'], function(){
                      Route::group(['prefix' => 'speakers'], function(){
                          Route::put('{speaker_id}', 'OAuth2SummitSpeakersApiController@addSpeakerToMyPresentation');
-                         Route::delete('{speaker_id}', 'OAuth2SummitSpeakersApiController@removeSpeakerToMyPresentation');
+                         Route::delete('{speaker_id}', 'OAuth2SummitSpeakersApiController@removeSpeakerFromMyPresentation');
                      });
                      Route::group(['prefix' => 'moderators'], function(){
-
+                         Route::put('{speaker_id}', 'OAuth2SummitSpeakersApiController@addModeratorToMyPresentation');
+                         Route::delete('{speaker_id}', 'OAuth2SummitSpeakersApiController@removeModeratorFromMyPresentation');
                      });
                  });
                  Route::group(['prefix' => '{role}'], function(){

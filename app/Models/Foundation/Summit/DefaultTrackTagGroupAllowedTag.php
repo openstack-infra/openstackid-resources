@@ -24,12 +24,6 @@ use Doctrine\ORM\Mapping AS ORM;
 class DefaultTrackTagGroupAllowedTag extends BaseEntity
 {
     /**
-     * @ORM\Column(name="IsDefault", type="boolean")
-     * @var boolean
-     */
-    private $is_default;
-
-    /**
      * @ORM\ManyToOne(targetEntity="models\main\Tag")
      * @ORM\JoinColumn(name="TagID", referencedColumnName="ID")
      * @var Tag
@@ -38,7 +32,7 @@ class DefaultTrackTagGroupAllowedTag extends BaseEntity
 
     /**
      * @ORM\ManyToOne(targetEntity="DefaultTrackTagGroup", inversedBy="allowed_tags")
-     * @ORM\JoinColumn(name="TrackTagGroupID", referencedColumnName="ID")
+     * @ORM\JoinColumn(name="DefaultTrackTagGroupID", referencedColumnName="ID")
      * @var DefaultTrackTagGroup
      */
     private $track_tag_group;
@@ -65,23 +59,6 @@ class DefaultTrackTagGroupAllowedTag extends BaseEntity
         catch(\Exception $ex){
             return 0;
         }
-    }
-
-
-    /**
-     * @return bool
-     */
-    public function isDefault()
-    {
-        return $this->is_default;
-    }
-
-    /**
-     * @param bool $is_default
-     */
-    public function setIsDefault($is_default)
-    {
-        $this->is_default = $is_default;
     }
 
     /**

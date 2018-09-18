@@ -872,13 +872,40 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      * @param $speaker_id
      * @return mixed
      */
-    public function removeSpeakerToMyPresentation($presentation_id, $speaker_id){
+    public function addModeratorToMyPresentation($presentation_id, $speaker_id){
         try {
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
             if (is_null($current_member_id))
                 return $this->error403();
 
-            $this->summit_service->removeSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
+            $this->summit_service->addModerator2Presentation($current_member_id, $speaker_id, $presentation_id);
+
+            return $this->updated();
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $presentation_id
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function removeSpeakerFromMyPresentation($presentation_id, $speaker_id){
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $this->summit_service->removeSpeakerFromPresentation($current_member_id, $speaker_id, $presentation_id);
 
             return $this->deleted();
 
@@ -893,4 +920,33 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $presentation_id
+     * @param $speaker_id
+     * @return mixed
+     */
+    public function removeModeratorFromMyPresentation($presentation_id, $speaker_id){
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $this->summit_service->removeModeratorFromPresentation($current_member_id, $speaker_id, $presentation_id);
+
+            return $this->deleted();
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+
 }

@@ -207,7 +207,7 @@ final class OAuth2TrackTagGroupsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
-    public function testSeedDefaultTrackTagGroups($summit_id = 25)
+    public function testSeedDefaultTrackTagGroups($summit_id = 26)
     {
 
         $params = [
@@ -228,7 +228,7 @@ final class OAuth2TrackTagGroupsApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $tags = json_decode($content);
         $this->assertTrue(!is_null($tags));
-        $this->assertResponseStatus(200);
+        $this->assertResponseStatus(201);
     }
 
     /**

@@ -357,8 +357,28 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'remove-speaker-2-my-presentation',
+                'name' => 'remove-speaker-from-my-presentation',
                 'route' => '/api/v1/speakers/me/presentations/{presentation_id}/speakers/{speaker_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                    sprintf(SummitScopes::WriteMySpeakersData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'add-moderator-2-my-presentation',
+                'route' => '/api/v1/speakers/me/presentations/{presentation_id}/moderators/{speaker_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteSpeakersData, $current_realm),
+                    sprintf(SummitScopes::WriteMySpeakersData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'remove-moderators-from-my-presentation',
+                'route' => '/api/v1/speakers/me/presentations/{presentation_id}/moderators/{speaker_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSummitData, $current_realm),
