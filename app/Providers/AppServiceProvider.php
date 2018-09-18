@@ -251,7 +251,9 @@ class AppServiceProvider extends ServiceProvider
             if(is_null($value) || intval($value) == 0 ) return true;
             if(isset($data[$parameters[0]])){
                 $compare_to = $data[$parameters[0]];
-                return intval($compare_to) < intval($value);
+                $parsed = date_parse_from_format('U', $value);
+                $valid =  $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
+                return $valid && intval($compare_to) < intval($value);
             }
             return true;
         });

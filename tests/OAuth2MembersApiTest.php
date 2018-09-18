@@ -173,6 +173,7 @@ final class OAuth2MembersApiTest extends ProtectedApiTest
             'is_current' => true,
             'start_date' => $start_datetime_unix,
             'job_title'  => 'test affiliation',
+            'end_date'   => null,
             'organization_id' => 1
         ];
 

@@ -239,7 +239,7 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             $rules = [
                 'is_current'      => 'required|boolean',
                 'start_date'      => 'required|date_format:U|valid_epoch',
-                'end_date'        => 'sometimes|date_format:U|after_or_null_epoch:start_date',
+                'end_date'        => 'sometimes|after_or_null_epoch:start_date',
                 'organization_id' => 'required|integer',
                 'job_title'       => 'sometimes|string|max:255'
             ];
@@ -294,7 +294,7 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             $rules = [
                 'is_current'      => 'sometimes|boolean',
                 'start_date'      => 'sometimes|date_format:U|valid_epoch',
-                'end_date'        => 'sometimes|date_format:U|after_or_null_epoch:start_date',
+                'end_date'        => 'sometimes|after_or_null_epoch:start_date',
                 'organization_id' => 'sometimes|integer',
                 'job_title'       => 'sometimes|string|max:255'
             ];
