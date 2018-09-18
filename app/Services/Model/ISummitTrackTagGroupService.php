@@ -53,7 +53,7 @@ interface ISummitTrackTagGroupService
 
     /**
      * @param Summit $summit
-     * @return void
+     * @return TrackTagGroup[]
      * @throws EntityNotFoundException
      * @throws ValidationException
      */

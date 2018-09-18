@@ -208,28 +208,31 @@ implements ISummitTrackTagGroupService
 
     /**
      * @param Summit $summit
+     * @return TrackTagGroup[]
      * @throws \Exception
      */
     public function seedDefaultTrackTagGroups(Summit $summit)
     {
-        $this->tx_service->transaction(function() use($summit) {
+        return $this->tx_service->transaction(function() use($summit) {
+            $added_track_tag_groups = [];
             $default_groups = $this->default_track_tag_group_repository->getAll();
             foreach($default_groups as $default_track_tag_group){
                 // if already exists ...
                 if($summit->getTrackTagGroupByLabel($default_track_tag_group->getLabel()))
                     continue;
 
-                $new_group            = new TrackTagGroup();
+                $new_group = new TrackTagGroup();
                 $new_group->setName($default_track_tag_group->getName());
                 $new_group->setLabel($default_track_tag_group->getLabel());
                 $new_group->setOrder($default_track_tag_group->getOrder());
                 $new_group->setIsMandatory($default_track_tag_group->isMandatory());
                 $summit->addTrackTagGroup($new_group);
-
+                $added_track_tag_groups[] = $new_group;
                 foreach ($default_track_tag_group->getAllowedTags() as $default_allowed_tag){
                     $new_group->addTag($default_allowed_tag->getTag());
                 }
             }
+            return $added_track_tag_groups;
         });
     }
 

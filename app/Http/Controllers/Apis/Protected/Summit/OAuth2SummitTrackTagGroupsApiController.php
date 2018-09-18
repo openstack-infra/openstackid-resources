@@ -370,8 +370,18 @@ final class OAuth2SummitTrackTagGroupsApiController extends OAuth2ProtectedContr
         try{
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
-            $this->track_tag_group_service->seedDefaultTrackTagGroups($summit);
-            return $this->updated();
+            $track_tag_groups = $this->track_tag_group_service->seedDefaultTrackTagGroups($summit);
+
+            $response = new PagingResponse
+            (
+                count($track_tag_groups),
+                count($track_tag_groups),
+                1,
+                1,
+                $track_tag_groups
+            );
+            return $this->created($response->toArray());
+
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
