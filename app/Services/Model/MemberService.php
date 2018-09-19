@@ -59,16 +59,20 @@ final class MemberService
             if(is_null($affiliation))
                 throw new EntityNotFoundException(sprintf("affiliation id %s does not belongs to member id %s", $affiliation_id, $member->getId()));
 
-            if(isset($data['is_current']))
+            if(isset($data['is_current'])) {
                 $affiliation->setIsCurrent(boolval($data['is_current']));
+            }
+
             if(isset($data['start_date'])) {
                 $start_date = intval($data['start_date']);
                 $affiliation->setStartDate(new DateTime("@$start_date"));
             }
-            if(isset($data['end_date'])) {
+
+            if(!$affiliation->isCurrent() && isset($data['end_date'])) {
                 $end_date = intval($data['end_date']);
                 $affiliation->setEndDate($end_date > 0 ? new DateTime("@$end_date") : null);
             }
+
             if(isset($data['organization_id'])) {
                 $org = $this->organization_repository->getById(intval($data['organization_id']));
                 if(is_null($org))
@@ -80,15 +84,9 @@ final class MemberService
                 $affiliation->setJobTitle(trim($data['job_title']));
             }
 
-            if($affiliation->isCurrent() && $affiliation->getEndDate() != null)
-                throw new ValidationException
-                (
-                    sprintf
-                    (
-                        "in order to set affiliation id %s as current end_date should be null",
-                        $affiliation_id
-                    )
-                );
+            if($affiliation->isCurrent()){
+                $affiliation->clearEndDate();
+            }
 
             return $affiliation;
         });

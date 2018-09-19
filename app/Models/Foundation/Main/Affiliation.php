@@ -194,6 +194,14 @@ class Affiliation extends SilverstripeBaseModel
         $this->job_title = $job_title;
     }
 
+    public function clearEndDate(){
+        $this->end_date = null;
+    }
+
+    public function clearStartDate(){
+        $this->start_date = null;
+    }
+
     public function __construct()
     {
         parent::__construct();
