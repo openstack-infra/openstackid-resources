@@ -1784,7 +1784,7 @@ final class SummitService extends AbstractService implements ISummitService
      * @throws EntityNotFoundException
      * @return void
      */
-    public function removeSpeakerFromModerator($current_member_id, $speaker_id, $presentation_id)
+    public function removeModeratorFromPresentation($current_member_id, $speaker_id, $presentation_id)
     {
         return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id) {
 
@@ -1816,4 +1816,5 @@ final class SummitService extends AbstractService implements ISummitService
             $presentation->unsetModerator();
         });
     }
+
 }

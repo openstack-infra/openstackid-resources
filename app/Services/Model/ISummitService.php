@@ -261,5 +261,6 @@ interface ISummitService
      * @throws EntityNotFoundException
      * @return void
      */
-    public function removeSpeakerFromModerator($current_member_id, $speaker_id, $presentation_id);
+    public function removeModeratorFromPresentation($current_member_id, $speaker_id, $presentation_id);
+
 }

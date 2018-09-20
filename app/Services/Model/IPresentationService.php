@@ -67,4 +67,13 @@ interface IPresentationService
      * @throws EntityNotFoundException
      */
     public function updatePresentationSubmission(Summit $summit, $presentation_id, Member $member, array $data);
+
+    /**
+     * @param Member $member
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deletePresentation(Member $member, $presentation_id);
 }

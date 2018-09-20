@@ -84,6 +84,11 @@ return [
     'PresentationService.saveOrUpdatePresentation.trackDontBelongToSelectionPlan' => 'track :track_id does not belongs to selection plan :selection_plan_id',
     'PresentationService.submitPresentation.limitReached' => 'You reached the limit :limit of presentations.',
     'PresentationService.saveOrUpdatePresentation.MaxAllowedLinks' => 'max. links quantity allowed is :max_allowed_links.',
+    'PresentationService.submitPresentation.NotValidSpeaker' => 'Current Member not has a valid speaker profile',
+    'PresentationService.submitPresentation.NotValidSelectionPlan' => 'Current Summit not has a valid selection plan',
+    'PresentationService.updatePresentationSubmission.NotValidSpeaker' => 'Current Member not has a valid speaker profile',
+    'PresentationService.updatePresentationSubmission.NotValidSelectionPlan' => 'Current Summit not has a valid selection plan',
+    'PresentationService.updatePresentationSubmission.CurrentSpeakerCanNotEditPresentation' => 'Current Speaker can not edit :presentation_id presentation',
     // organizations
     'OrganizationService.addOrganization.alreadyExistName' => 'Organization name :name already exists!',
     // track tag groups
