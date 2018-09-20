@@ -173,15 +173,15 @@ final class TrackQuestionTemplateService
             }
 
             if($track_question_template instanceof TrackMultiValueQuestionTemplate){
-                if(isset($payload['default_value'])){
-                    $default_value = $track_question_template->getValueById(intval($payload['default_value']));
+                if(isset($payload['default_value_id'])){
+                    $default_value = $track_question_template->getValueById(intval($payload['default_value_id']));
                     if(is_null($default_value))
                         throw new EntityNotFoundException(
                             trans(
                                 "not_found_errors.TrackQuestionTemplateService.updateTrackQuestionTemplate.DefaultValueNotFound"
                                 ,
                                 [
-                                    'default_value' => $payload['default_value']
+                                    'default_value_id' => $payload['default_value_id']
                                 ]
                             )
                         );

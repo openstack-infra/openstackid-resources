@@ -27,7 +27,7 @@ final class TrackMultiValueQuestionTemplateValidationRulesFactory
         if($update){
             return [
                 'empty_string' => 'sometimes|string',
-                'default_value' => 'sometimes|integer',
+                'default_value_id' => 'sometimes|integer',
             ];
         }
         return [
