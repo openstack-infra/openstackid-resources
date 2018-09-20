@@ -311,13 +311,17 @@ final class AttendeeService extends AbstractService implements IAttendeeService
             if(is_null($ticket)){
                 throw new EntityNotFoundException("ticket not found");
             }
+
             $new_owner = $this->attendee_repository->getBySummitAndMember($summit, $other_member);
             if(is_null($new_owner)){
                 $new_owner = SummitAttendeeFactory::build($summit, $other_member, []);
                 $this->attendee_repository->add($new_owner);
             }
-            $new_owner->addTicket($ticket);
+
             $attendee->removeTicket($ticket);
+
+            $new_owner->addTicket($ticket);
+
             if(!$attendee->hasTickets()){
                 $this->attendee_repository->delete($attendee);
             }

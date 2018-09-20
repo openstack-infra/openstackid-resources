@@ -201,7 +201,6 @@ Route::group([
                             Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@deleteAttendeeTicket']);
                             Route::put('reassign/{other_member_id}', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitAttendeesApiController@reassignAttendeeTicket']);
                         });
-
                     });
                 });
             });

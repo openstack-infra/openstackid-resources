@@ -118,7 +118,7 @@ class SummitAttendee extends SilverstripeBaseModel
     }
 
     /**
-     * @ORM\OneToMany(targetEntity="SummitAttendeeTicket", mappedBy="owner", cascade={"persist"}, orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="SummitAttendeeTicket", mappedBy="owner", cascade={"persist", "remove"})
      * @var SummitAttendeeTicket[]
      */
     private $tickets;
