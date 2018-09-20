@@ -1471,6 +1471,16 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WritePresentationData, $current_realm)
                 ],
             ],
+            [
+                'name' => 'delete-submit-presentation',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteSummitData, $current_realm),
+                    sprintf(SummitScopes::WriteEventData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationData, $current_realm)
+                ],
+            ],
             //videos
             [
                 'name' => 'get-presentation-videos',

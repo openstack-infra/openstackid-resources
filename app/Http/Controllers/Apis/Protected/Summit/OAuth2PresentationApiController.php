@@ -404,4 +404,35 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
+    /**
+     * @param $presentation_id
+     * @return mixed
+     */
+    public function deletePresentation($presentation_id){
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $member = $this->member_repository->getById($current_member_id);
+
+            if(is_null($member))
+                return $this->error403();
+
+            $this->presentation_service->deletePresentation($member, $presentation_id);
+
+            return $this->deleted();
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
 }

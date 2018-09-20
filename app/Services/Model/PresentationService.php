@@ -211,10 +211,14 @@ final class PresentationService
             $current_speaker = $this->speaker_repository->getByMember($member);
 
             if (is_null($current_speaker))
-                throw new ValidationException(trans());
+                throw new ValidationException(trans(
+                    'validation_errors.PresentationService.submitPresentation.NotValidSpeaker'
+                ));
 
             if (is_null($current_selection_plan))
-                throw new ValidationException(trans());
+                throw new ValidationException(trans(
+                    'validation_errors.PresentationService.submitPresentation.NotValidSelectionPlan'
+                ));
 
             // check qty
 
@@ -267,15 +271,29 @@ final class PresentationService
             $current_speaker = $this->speaker_repository->getByMember($member);
 
             if (is_null($current_speaker))
-                throw new ValidationException(trans());
+                throw new ValidationException(trans(
+                    'validation_errors.PresentationService.updatePresentationSubmission.NotValidSpeaker'
+                ));
 
             if (is_null($current_selection_plan))
-                throw new ValidationException(trans());
+                throw new ValidationException(trans(
+                    'validation_errors.PresentationService.updatePresentationSubmission.NotValidSelectionPlan'
+                ));
 
             $presentation = $summit->getEvent($presentation_id);
 
-            if (is_null($current_selection_plan))
-                throw new EntityNotFoundException(trans());
+            if (is_null($presentation))
+                throw new EntityNotFoundException(trans(
+                    'not_found_errors.PresentationService.updatePresentationSubmission.PresentationNotFound',
+                    ['presentation_id' => $presentation_id]
+                ));
+
+            if(!$presentation->canEdit($current_speaker))
+                throw new ValidationException(trans(
+                    'validation_errors.PresentationService.updatePresentationSubmission.CurrentSpeakerCanNotEditPresentation',
+                    ['presentation_id' => $presentation_id]
+                ));
+
 
             return $this->saveOrUpdatePresentation
             (
@@ -415,6 +433,38 @@ final class PresentationService
                 }
             }
             return $presentation;
+        });
+    }
+
+    /**
+     * @param Member $member
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function deletePresentation(Member $member, $presentation_id)
+    {
+        return $this->tx_service->transaction(function () use ($member, $presentation_id) {
+
+            $current_speaker = $this->speaker_repository->getByMember($member);
+            if(is_null($current_speaker))
+                throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $member->getId()));
+
+            $presentation = $this->event_repository->getById($presentation_id);
+            if(is_null($presentation))
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation instanceof Presentation)
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation->canEdit($current_speaker))
+                throw new ValidationException(sprintf("member %s can not edit presentation %s",
+                    $member->getId(),
+                    $presentation_id
+                ));
+
+            $this->event_repository->delete($presentation);
         });
     }
 }

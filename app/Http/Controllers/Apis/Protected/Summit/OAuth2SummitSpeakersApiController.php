@@ -74,7 +74,6 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
      */
     private $serializer_type_selector;
 
-
     /**
      * @var ISelectionPlanRepository
      */
@@ -947,6 +946,5 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
-
 
 }
