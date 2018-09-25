@@ -371,6 +371,15 @@ final class PresentationService
 
             if (isset($data['links'])) {
                 $presentation->clearLinks();
+
+                if(count($data['links']) > Presentation::MaxAllowedLinks){
+                    throw new ValidationException(trans(
+                        'validation_errors.PresentationService.saveOrUpdatePresentation.MaxAllowedLinks',
+                        [
+                            'max_allowed_links' => Presentation::MaxAllowedLinks
+                        ]));
+                }
+
                 foreach ($data['links'] as $link) {
                     $presentationLink = new PresentationLink();
                     $presentationLink->setName(trim($link));

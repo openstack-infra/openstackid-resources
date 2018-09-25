@@ -282,7 +282,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'type_id'                   => 'required|integer',
                 'track_id'                  => 'required|integer',
                 'attending_media'           => 'required|boolean',
-                'links'                     => 'required|url_array',
+                'links'                     => 'sometimes|url_array',
                 'extra_questions'           => 'sometimes|entity_value_array',
             ];
 

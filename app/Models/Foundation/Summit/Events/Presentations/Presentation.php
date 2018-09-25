@@ -69,6 +69,8 @@ class Presentation extends SummitEvent
 
     const ClassNamePresentation = 'Presentation';
 
+    const MaxAllowedLinks = 5;
+
     /**
      * @ORM\Column(name="Level", type="string")
      * @var string
