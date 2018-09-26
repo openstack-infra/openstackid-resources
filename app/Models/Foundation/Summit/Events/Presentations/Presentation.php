@@ -464,6 +464,32 @@ class Presentation extends SummitEvent
     }
 
     /**
+     * @return string
+     */
+    public function getProgressNice(){
+        switch($this->progress){
+            case self::PHASE_NEW:
+                return 'NEW';
+            break;
+            case self::PHASE_SUMMARY:
+                return 'SUMMARY';
+                break;
+            case self::PHASE_TAGS:
+                return 'TAGS';
+                break;
+            case self::PHASE_SPEAKERS:
+                return 'SPEAKERS';
+                break;
+            case self::PHASE_COMPLETE:
+                return 'COMPLETE';
+                break;
+            default:
+                return 'NEW';
+                break;
+        }
+    }
+
+    /**
      * @return mixed
      */
     public function getProgress()
@@ -472,7 +498,7 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @param mixed $progress
+     * @param int $progress
      */
     public function setProgress($progress)
     {

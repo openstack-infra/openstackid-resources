@@ -288,6 +288,8 @@ Route::group([
                     // opened without role CFP - valid selection plan on CFP status
                     Route::put('', 'OAuth2PresentationApiController@updatePresentationSubmission');
 
+                    Route::put('completed', 'OAuth2PresentationApiController@completePresentationSubmission');
+
                     Route::delete('', 'OAuth2PresentationApiController@deletePresentation');
 
                     Route::group(['prefix' => 'videos'], function () {

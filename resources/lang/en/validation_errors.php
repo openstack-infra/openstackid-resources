@@ -89,6 +89,7 @@ return [
     'PresentationService.updatePresentationSubmission.NotValidSpeaker' => 'Current Member not has a valid speaker profile',
     'PresentationService.updatePresentationSubmission.NotValidSelectionPlan' => 'Current Summit not has a valid selection plan',
     'PresentationService.updatePresentationSubmission.CurrentSpeakerCanNotEditPresentation' => 'Current Speaker can not edit :presentation_id presentation',
+    'PresentationService.saveOrUpdatePresentation.TagNotAllowed' => 'tag :tag is not allowed on track :track_id',
     // organizations
     'OrganizationService.addOrganization.alreadyExistName' => 'Organization name :name already exists!',
     // track tag groups

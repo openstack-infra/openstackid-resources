@@ -286,6 +286,17 @@ class PresentationCategory extends SilverstripeBaseModel
     }
 
     /**
+     * @param string $tag_value
+     * @return Tag|null
+     */
+    public function getAllowedTagByVal($tag_value){
+        $criteria = Criteria::create();
+        $criteria->where(Criteria::expr()->eq('tag', trim($tag_value)));
+        $res = $this->allowed_tags->matching($criteria)->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
      * @param Tag $tag
      * @return $this
      */

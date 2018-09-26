@@ -27,6 +27,7 @@ class PresentationSerializer extends SummitEventSerializer
         'ToRecord'                => 'to_record:json_boolean',
         'AttendingMedia'          => 'attending_media:json_boolean',
         'StatusNice'              => 'status:json_string',
+        'ProgressNice'            => 'progress:json_string',
     ];
 
     protected static $allowed_fields = [
@@ -38,6 +39,7 @@ class PresentationSerializer extends SummitEventSerializer
         'to_record',
         'attending_media',
         'status',
+        'progress',
     ];
 
     protected static $allowed_relations = [

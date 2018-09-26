@@ -284,6 +284,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'attending_media'           => 'required|boolean',
                 'links'                     => 'sometimes|url_array',
                 'extra_questions'           => 'sometimes|entity_value_array',
+                'tags'                      => 'sometimes|string_array',
             ];
 
             $data = $data->all();
@@ -360,6 +361,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                     'attending_media'           => 'sometimes|boolean',
                     'links'                     => 'sometimes|url_array',
                     'extra_questions'           => 'sometimes|entity_value_array',
+                    'tags'                      => 'sometimes|string_array',
                 ];
 
             $data = $data->all();
@@ -405,6 +407,51 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @return mixed
+     */
+    public function completePresentationSubmission($summit_id, $presentation_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if(is_null($member_id))
+                return $this->error403();
+
+            $member = $this->member_repository->getById($member_id);
+
+            if(is_null($member))
+                return $this->error403();
+
+            $presentation = $this->presentation_service->completePresentationSubmission
+            (
+                $summit,
+                $presentation_id,
+                $member
+            );
+
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($presentation)->serialize());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
     /**
      * @param $presentation_id
      * @return mixed

@@ -20,6 +20,7 @@ use App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackAnswer
 use Illuminate\Support\Facades\Event;
 use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
+use models\main\ITagRepository;
 use models\main\Member;
 use models\summit\factories\IPresentationVideoFactory;
 use models\summit\ISpeakerRepository;
@@ -49,23 +50,38 @@ final class PresentationService
      */
     private $video_factory;
 
-
     /**
      * @var ISpeakerRepository
      */
     private $speaker_repository;
 
+    /**
+     * @var ITagRepository
+     */
+    private $tag_repository;
+
+
+    /**
+     * PresentationService constructor.
+     * @param IPresentationVideoFactory $video_factory
+     * @param ISummitEventRepository $presentation_repository
+     * @param ISpeakerRepository $speaker_repository
+     * @param ITagRepository $tag_repository
+     * @param ITransactionService $tx_service
+     */
     public function __construct
     (
         IPresentationVideoFactory $video_factory,
         ISummitEventRepository $presentation_repository,
         ISpeakerRepository $speaker_repository,
+        ITagRepository $tag_repository,
         ITransactionService $tx_service
     )
     {
         parent::__construct($tx_service);
         $this->presentation_repository = $presentation_repository;
         $this->speaker_repository = $speaker_repository;
+        $this->tag_repository = $tag_repository;
         $this->video_factory = $video_factory;
     }
 
@@ -282,7 +298,14 @@ final class PresentationService
 
             $presentation = $summit->getEvent($presentation_id);
 
+
             if (is_null($presentation))
+                throw new EntityNotFoundException(trans(
+                    'not_found_errors.PresentationService.updatePresentationSubmission.PresentationNotFound',
+                    ['presentation_id' => $presentation_id]
+                ));
+
+            if (!$presentation instanceof Presentation)
                 throw new EntityNotFoundException(trans(
                     'not_found_errors.PresentationService.updatePresentationSubmission.PresentationNotFound',
                     ['presentation_id' => $presentation_id]
@@ -293,7 +316,6 @@ final class PresentationService
                     'validation_errors.PresentationService.updatePresentationSubmission.CurrentSpeakerCanNotEditPresentation',
                     ['presentation_id' => $presentation_id]
                 ));
-
 
             return $this->saveOrUpdatePresentation
             (
@@ -387,6 +409,31 @@ final class PresentationService
             // add me as speaker
             $presentation->addSpeaker($current_speaker);
 
+            if (isset($data['tags'])) {
+                $presentation->clearTags();
+
+                if(count($data['tags']) > 0){
+                    if($presentation->getProgress() == Presentation::PHASE_SUMMARY)
+                        $presentation->setProgress(Presentation::PHASE_TAGS);
+                }
+
+                foreach ($data['tags'] as $tag_value) {
+                    $tag = $track->getAllowedTagByVal($tag_value);
+                    if(is_null($tag)){
+                        throw new ValidationException(
+                            trans(
+                                'validation_errors.PresentationService.saveOrUpdatePresentation.TagNotAllowed',
+                                [
+                                    'tag' => $tag_value,
+                                    'track_id' => $track->getId()
+                                ]
+                            )
+                        );
+                    }
+                    $presentation->addTag($tag);
+                }
+            }
+
             if (isset($data['links'])) {
                 $presentation->clearLinks();
 
@@ -474,6 +521,48 @@ final class PresentationService
                 ));
 
             $this->event_repository->delete($presentation);
+        });
+    }
+
+    /**
+     * @param Summit $summit
+     * @param int $presentation_id
+     * @param Member $member
+     * @return Presentation
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function completePresentationSubmission(Summit $summit, $presentation_id, Member $member)
+    {
+        return $this->tx_service->transaction(function () use ($summit, $member, $presentation_id) {
+
+            $current_speaker = $this->speaker_repository->getByMember($member);
+            if(is_null($current_speaker))
+                throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $member->getId()));
+
+            $presentation = $summit->getEvent($presentation_id);
+            if(is_null($presentation))
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation instanceof Presentation)
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation->canEdit($current_speaker))
+                throw new ValidationException(sprintf("member %s can not edit presentation %s",
+                    $member->getId(),
+                    $presentation_id
+                ));
+
+           if($presentation->getProgress() != Presentation::PHASE_SPEAKERS){
+               throw new ValidationException
+               (
+                sprintf("presentation %s is not allowed to mark as completed", $presentation_id)
+               );
+           }
+
+           $presentation->setProgress(Presentation::PHASE_COMPLETE);
+
+           return $presentation;
         });
     }
 }

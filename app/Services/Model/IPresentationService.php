@@ -68,6 +68,17 @@ interface IPresentationService
      */
     public function updatePresentationSubmission(Summit $summit, $presentation_id, Member $member, array $data);
 
+
+    /**
+     * @param Summit $summit
+     * @param int $presentation_id
+     * @param Member $member
+     * @return Presentation
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     */
+    public function completePresentationSubmission(Summit $summit, $presentation_id, Member $member);
+
     /**
      * @param Member $member
      * @param int $presentation_id
