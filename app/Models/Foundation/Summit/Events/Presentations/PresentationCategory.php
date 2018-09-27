@@ -290,10 +290,10 @@ class PresentationCategory extends SilverstripeBaseModel
      * @return Tag|null
      */
     public function getAllowedTagByVal($tag_value){
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('tag', trim($tag_value)));
-        $res = $this->allowed_tags->matching($criteria)->first();
-        return $res === false ? null : $res;
+        $res = $this->allowed_tags->filter(function($e) use($tag_value){
+            return strtolower(trim($e->getTag())) == strtolower(trim($tag_value));
+        });
+        return $res->count() > 0 ? $res->first() : null;
     }
 
     /**

@@ -31,7 +31,7 @@ class OAuth2PresentationSubmissionTest extends ProtectedApiTest
             'level'  => 'N/A',
             'attendees_expected_learnt'  => 'super duper',
             'type_id'  => 171,
-            'track_id'  => 248,
+            'track_id'  => 262,
             'attending_media' => true,
             'links' => ['https://www.google.com'],
             'extra_questions' => [
@@ -39,7 +39,8 @@ class OAuth2PresentationSubmissionTest extends ProtectedApiTest
                     'id' => 24,
                     'value' => 'test',
                 ]
-            ]
+            ],
+            'tags' => ['Upstream Development']
         ];
 
         $headers = [
