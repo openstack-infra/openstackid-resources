@@ -92,9 +92,9 @@ class SummitSerializer extends SilverStripeSerializer
         // pages info
         $main_page                             = $summit->getMainPage();
         $schedule_page                         = $summit->getSchedulePage();
-        $values['page_url']                    = sprintf("%ssummit/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page);
-        $values['schedule_page_url']           = sprintf("%ssummit/%s/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page, $schedule_page);
-        $values['schedule_event_detail_url']   = sprintf("%ssummit/%s/%s/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page, $schedule_page, 'events/:event_id/:event_title');
+        $values['page_url']                    = sprintf("%s%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $main_page);
+        $values['schedule_page_url']           = sprintf("%s%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $schedule_page);
+        $values['schedule_event_detail_url']   = sprintf("%s%s/%s", Config::get("server.assets_base_url", 'https://www.openstack.org/'), $schedule_page, 'events/:event_id/:event_title');
 
         // tickets
         if(in_array('ticket_types', $relations)) {

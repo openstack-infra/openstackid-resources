@@ -74,7 +74,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
-    public function testGetSummit($summit_id = 24)
+    public function testGetSummit($summit_id = 25)
     {
 
         $params = array
