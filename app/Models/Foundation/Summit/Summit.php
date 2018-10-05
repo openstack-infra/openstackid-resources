@@ -1248,21 +1248,10 @@ class Summit extends SilverstripeBaseModel
      */
     public function getMainPage()
     {
-        try {
-            $sql = <<<SQL
-SELECT URLSegment FROM SiteTree
-INNER JOIN
-SummitPage ON SummitPage.ID = SiteTree.ID 
-WHERE SummitID = :summit_id AND ClassName IN ('SummitStaticAboutBostonPage', 'SummitStaticAboutPage','SummitNewStaticAboutPage','SummitHighlightsPage', 'SummitAboutPage');
-SQL;
-            $stmt = $this->prepareRawSQL($sql);
-            $stmt->execute(['summit_id' => $this->id]);
-            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-            return count($res) > 0 ? $res[0] : '';
-        } catch (\Exception $ex) {
-
-        }
-        return '';
+        $path = $this->getSchedulePage();
+        $paths = explode("/", $path);
+        array_pop($paths);
+        return join("/", $paths);
     }
 
     /**
@@ -1270,21 +1259,40 @@ SQL;
      */
     public function getSchedulePage()
     {
+        $paths = [];
         try {
             $sql = <<<SQL
-    SELECT URLSegment FROM SiteTree
+    SELECT URLSegment,ParentID FROM SiteTree
     INNER JOIN
     SummitPage ON SummitPage.ID = SiteTree.ID 
     WHERE SummitID = :summit_id AND ClassName = 'SummitAppSchedPage';
 SQL;
             $stmt = $this->prepareRawSQL($sql);
             $stmt->execute(['summit_id' => $this->id]);
-            $res = $stmt->fetchAll(\PDO::FETCH_COLUMN);
-            return count($res) > 0 ? $res[0] : '';
-        } catch (\Exception $ex) {
+            $res = $stmt->fetchAll();
+            if(count($res) == 0 ) return '';
+            $segment = $res[0]['URLSegment'];
+            $parent_id = intval($res[0]['ParentID']);
 
+            $paths[]  = $segment;
+            do{
+                $sql = <<<SQL
+    SELECT URLSegment,ParentID FROM SiteTree
+    WHERE ID = :parent_id;
+SQL;
+                $stmt = $this->prepareRawSQL($sql);
+                $stmt->execute(['parent_id' => $parent_id]);
+                $res = $stmt->fetchAll();
+                if(count($res) == 0 ) break;
+                $segment = $res[0]['URLSegment'];
+                $parent_id = intval($res[0]['ParentID']);
+                $paths[]  = $segment;
+            } while($parent_id > 0);
+
+        } catch (\Exception $ex) {
+            return '';
         }
-        return '';
+        return join("/", array_reverse($paths));
     }
 
     /**
