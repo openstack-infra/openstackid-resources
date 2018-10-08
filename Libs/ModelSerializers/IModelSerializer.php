@@ -20,6 +20,7 @@ interface IModelSerializer
      * @param array $relations
      * @param array $params
      * @return array
+     * @throw HTTP403ForbiddenException
      */
     public function serialize($expand = null, array $fields = array(), array $relations = array(), array $params = array() );
 }

@@ -14,6 +14,7 @@
  **/
 
 use libs\utils\JsonUtils;
+use models\oauth2\IResourceServerContext;
 use models\utils\IEntity;
 
 /**
@@ -28,12 +29,18 @@ abstract class AbstractSerializer implements IModelSerializer
     protected $object;
 
     /**
+     * @var IResourceServerContext
+     */
+    protected $resource_server_context;
+
+    /**
      * AbstractSerializer constructor.
      * @param $object
+     * @param IResourceServerContext $resource_server_context
      */
-    public function __construct($object){
+    public function __construct($object, IResourceServerContext $resource_server_context){
         $this->object = $object;
-
+        $this->resource_server_context = $resource_server_context;
     }
 
     protected static $array_mappings    = [];
@@ -52,7 +59,7 @@ abstract class AbstractSerializer implements IModelSerializer
 
         foreach($hierarchy as $class_name){
             if($class_name === 'Libs\ModelSerializers\AbstractSerializer') continue;
-            $class    = new $class_name($this->object);
+            $class    = new $class_name($this->object, $this->resource_server_context);
             $mappings = array_merge($mappings, $class->getSelfAllowedFields());
         }
         $mappings  = array_merge($mappings, $this->getSelfAllowedFields());
@@ -73,7 +80,7 @@ abstract class AbstractSerializer implements IModelSerializer
 
         foreach($hierarchy as $class_name){
             if($class_name === 'Libs\ModelSerializers\AbstractSerializer') continue;
-            $class    = new $class_name($this->object);
+            $class    = new $class_name($this->object, $this->resource_server_context);
             $mappings = array_merge($mappings, $class->getSelfAllowedRelations());
         }
         $mappings  = array_merge($mappings, $this->getSelfAllowedRelations());
@@ -94,7 +101,7 @@ abstract class AbstractSerializer implements IModelSerializer
 
         foreach($hierarchy as $class_name){
             if($class_name === 'Libs\ModelSerializers\AbstractSerializer') continue;
-            $class    = new $class_name($this->object);
+            $class    = new $class_name($this->object, $this->resource_server_context);
             $mappings = array_merge($mappings, $class->getSelfMappings());
         }
         $mappings  = array_merge($mappings, $this->getSelfMappings());

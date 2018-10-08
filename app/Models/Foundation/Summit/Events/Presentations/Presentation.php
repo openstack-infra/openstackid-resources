@@ -719,7 +719,7 @@ class Presentation extends SummitEvent
      * @return bool
      */
     public function canEdit(PresentationSpeaker $speaker){
-        if($this->getCreatorId() == $speaker->getId()) return true;
+        if($this->getCreatorId() == $speaker->getMemberId()) return true;
         if($this->getModeratorId() == $speaker->getId()) return true;
         if($this->isSpeaker($speaker)) return true;
         return false;

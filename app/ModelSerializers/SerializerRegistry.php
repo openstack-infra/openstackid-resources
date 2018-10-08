@@ -55,6 +55,7 @@ use App\ModelSerializers\Summit\SummitLocationBannerSerializer;
 use App\ModelSerializers\Summit\TrackTagGroups\TrackTagGroupAllowedTagSerializer;
 use App\ModelSerializers\Summit\TrackTagGroups\TrackTagGroupSerializer;
 use Libs\ModelSerializers\IModelSerializer;
+use models\oauth2\IResourceServerContext;
 use ModelSerializers\ChatTeams\ChatTeamInvitationSerializer;
 use ModelSerializers\ChatTeams\ChatTeamMemberSerializer;
 use ModelSerializers\ChatTeams\ChatTeamPushNotificationMessageSerializer;
@@ -67,6 +68,7 @@ use ModelSerializers\Locations\SummitVenueFloorSerializer;
 use ModelSerializers\Locations\SummitVenueRoomSerializer;
 use ModelSerializers\Locations\SummitVenueSerializer;
 use App\ModelSerializers\Marketplace\ApplianceSerializer;
+use Illuminate\Support\Facades\App;
 /**
  * Class SerializerRegistry
  * @package ModelSerializers
@@ -77,6 +79,11 @@ final class SerializerRegistry
      * @var SerializerRegistry
      */
     private static $instance;
+
+    /**
+     * @var IResourceServerContext
+     */
+    private $resource_server_context;
 
     const SerializerType_Public  = 'PUBLIC';
     const SerializerType_Private = 'PRIVATE';
@@ -94,11 +101,12 @@ final class SerializerRegistry
         return self::$instance;
     }
 
-    private $registry = array();
+    private $registry = [];
 
     private function __construct()
     {
-        $this->registry['Summit']        =
+        $this->resource_server_context = App::make(IResourceServerContext::class);
+        $this->registry['Summit']      =
             [
                 self::SerializerType_Public  =>  SummitSerializer::class,
                 self::SerializerType_Private =>  AdminSummitSerializer::class
@@ -267,7 +275,6 @@ final class SerializerRegistry
             $serializer_class = $serializer_class[$type];
         }
 
-
-        return new $serializer_class($object);
+        return new $serializer_class($object, $this->resource_server_context);
     }
 }

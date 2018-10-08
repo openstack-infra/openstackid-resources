@@ -507,7 +507,7 @@ final class PresentationService
             if(is_null($current_speaker))
                 throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $member->getId()));
 
-            $presentation = $this->event_repository->getById($presentation_id);
+            $presentation = $this->presentation_repository->getById($presentation_id);
             if(is_null($presentation))
                 throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
 
