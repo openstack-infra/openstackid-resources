@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Exceptions\HTTP403ForbiddenException;
 use Exception;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
@@ -175,7 +176,12 @@ final class OAuth2SummitApiController extends OAuth2ProtectedController
             if (is_null($summit)) return $this->error404();
             $serializer_type = $this->serializer_type_selector->getSerializerType();
             return $this->ok(SerializerRegistry::getInstance()->getSerializer($summit, $serializer_type)->serialize($expand));
-        } catch (Exception $ex) {
+        }
+        catch(HTTP403ForbiddenException $ex1){
+            Log::warning($ex1);
+            return $this->error403();
+        }
+        catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);
         }

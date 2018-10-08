@@ -549,8 +549,7 @@ Route::group([
             // track tag groups
             Route::group(['prefix' => 'track-tag-groups'], function(){
 
-                Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
-                    'uses' => 'OAuth2SummitTrackTagGroupsApiController@getTrackTagGroupsBySummit']);
+                Route::get('', ['uses' => 'OAuth2SummitTrackTagGroupsApiController@getTrackTagGroupsBySummit']);
 
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators',
                     'uses' => 'OAuth2SummitTrackTagGroupsApiController@addTrackTagGroup']);
@@ -692,7 +691,8 @@ Route::group([
     Route::group(['prefix' => 'summits'], function () {
 
         Route::group(['prefix' => '{id}'], function () {
-            Route::get('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators|summit-room-administrators', 'uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
+
+            Route::get('', ['uses' => 'OAuth2SummitApiController@getSummit'])->where('id', 'current|[0-9]+');
             // events
             Route::group(['prefix' => 'events'], function () {
 

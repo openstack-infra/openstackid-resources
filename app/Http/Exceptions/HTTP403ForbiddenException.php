@@ -1,9 +1,10 @@
-<?php namespace ModelSerializers;
+<?php namespace App\Http\Exceptions;
+
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License atN
+ * You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -11,16 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use Libs\ModelSerializers\AbstractSerializer;
+use Exception;
 /**
- * Class SilverStripeSerializer
- * @package ModelSerializers
+ * Class HTTP403ForbiddenException
+ * @package App\Http\Exceptions
  */
-class SilverStripeSerializer extends AbstractSerializer
+final class HTTP403ForbiddenException extends Exception
 {
-    protected static $array_mappings = [
-        'Id'         => 'id:json_int',
-        'CreatedUTC' => 'created:datetime_epoch',
-        'LastEditedUTC' => 'last_edited:datetime_epoch',
-    ];
+
 }

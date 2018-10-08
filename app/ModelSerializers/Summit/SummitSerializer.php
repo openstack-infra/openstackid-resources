@@ -12,6 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Exceptions\HTTP403ForbiddenException;
+use App\Security\SummitScopes;
 use Illuminate\Support\Facades\Config;
 use models\summit\Summit;
 use DateTime;
@@ -22,7 +24,6 @@ use DateTime;
 class SummitSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-
         'Name'                                           => 'name:json_string',
         'BeginDate'                                      => 'start_date:datetime_epoch',
         'EndDate'                                        => 'end_date:datetime_epoch',
@@ -53,7 +54,6 @@ class SummitSerializer extends SilverStripeSerializer
     ];
 
     protected static $allowed_relations = [
-
         'ticket_types',
         'locations',
         'wifi_connections',
@@ -66,6 +66,7 @@ class SummitSerializer extends SilverStripeSerializer
      * @param array $relations
      * @param array $params
      * @return array
+     * @throws HTTP403ForbiddenException
      */
     public function serialize($expand = null, array $fields = [], array $relations = [], array $params = [])
     {
@@ -187,6 +188,16 @@ class SummitSerializer extends SilverStripeSerializer
                     }
                     break;
                     case 'schedule': {
+                        // only could get schedule expanded if summit its available to public or
+                        // we had proper scopes
+                        if(!$summit->isAvailableOnApi()) {
+                            $scopes = $this->resource_server_context->getCurrentScope();
+                            $current_realm = Config::get('app.url');
+                            $needed_scope = sprintf(SummitScopes::ReadAllSummitData, $current_realm);
+                            if (!in_array($needed_scope, $scopes))
+                                throw new HTTP403ForbiddenException;
+                        }
+
                         $event_types = [];
                         foreach ($summit->getEventTypes() as $event_type) {
                             $event_types[] = SerializerRegistry::getInstance()->getSerializer($event_type)->serialize();
