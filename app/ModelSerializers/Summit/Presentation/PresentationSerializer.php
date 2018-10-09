@@ -21,6 +21,7 @@ class PresentationSerializer extends SummitEventSerializer
     protected static $array_mappings = [
 
         'Level'                   => 'level',
+        'CreatorId'               => 'creator_id:json_int',
         'ModeratorId'             => 'moderator_speaker_id:json_int',
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
@@ -32,6 +33,7 @@ class PresentationSerializer extends SummitEventSerializer
 
     protected static $allowed_fields = [
         'track_id',
+        'creator_id',
         'moderator_speaker_id',
         'level',
         'problem_addressed',
@@ -43,7 +45,6 @@ class PresentationSerializer extends SummitEventSerializer
     ];
 
     protected static $allowed_relations = [
-
         'slides',
         'videos',
         'speakers',
@@ -125,6 +126,12 @@ class PresentationSerializer extends SummitEventSerializer
                         $values['speakers'] = $speakers;
                         if(isset($values['moderator_speaker_id']) && intval($values['moderator_speaker_id']) > 0 ){
                             $values['moderator'] = SerializerRegistry::getInstance()->getSerializer($presentation->getModerator())->serialize();
+                        }
+                    }
+                    case 'creator':{
+                        if($presentation->getCreatorId() > 0) {
+                            unset($values['creator_id']);
+                            $values['creator'] = SerializerRegistry::getInstance()->getSerializer($presentation->getCreator())->serialize();
                         }
                     }
                     break;
