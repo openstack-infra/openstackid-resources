@@ -452,12 +452,18 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
     /**
+     * @param $summit_id
      * @param $presentation_id
      * @return mixed
      */
-    public function deletePresentation($presentation_id){
+    public function deletePresentation($summit_id, $presentation_id){
         try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
             $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
             if (is_null($current_member_id))
                 return $this->error403();
@@ -467,7 +473,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             if(is_null($member))
                 return $this->error403();
 
-            $this->presentation_service->deletePresentation($member, $presentation_id);
+            $this->presentation_service->deletePresentation($summit, $member, $presentation_id);
 
             return $this->deleted();
 

@@ -493,21 +493,22 @@ final class PresentationService
     }
 
     /**
+     * @param Summit $summit
      * @param Member $member
      * @param int $presentation_id
      * @throws ValidationException
      * @throws EntityNotFoundException
      * @return void
      */
-    public function deletePresentation(Member $member, $presentation_id)
+    public function deletePresentation(Summit $summit, Member $member, $presentation_id)
     {
-        return $this->tx_service->transaction(function () use ($member, $presentation_id) {
+        return $this->tx_service->transaction(function () use ($summit, $member, $presentation_id) {
 
             $current_speaker = $this->speaker_repository->getByMember($member);
             if(is_null($current_speaker))
                 throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $member->getId()));
 
-            $presentation = $this->presentation_repository->getById($presentation_id);
+            $presentation = $summit->getEvent($presentation_id);
             if(is_null($presentation))
                 throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
 
@@ -520,7 +521,8 @@ final class PresentationService
                     $presentation_id
                 ));
 
-            $this->event_repository->delete($presentation);
+            $summit->removeEvent($presentation);
+
         });
     }
 

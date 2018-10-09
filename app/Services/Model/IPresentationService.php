@@ -80,11 +80,12 @@ interface IPresentationService
     public function completePresentationSubmission(Summit $summit, $presentation_id, Member $member);
 
     /**
+     * @param Summit $summit
      * @param Member $member
      * @param int $presentation_id
      * @throws ValidationException
      * @throws EntityNotFoundException
      * @return void
      */
-    public function deletePresentation(Member $member, $presentation_id);
+    public function deletePresentation(Summit $summit, Member $member, $presentation_id);
 }

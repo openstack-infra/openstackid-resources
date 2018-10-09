@@ -30,16 +30,10 @@ class OAuth2PresentationSubmissionTest extends ProtectedApiTest
             'social_description'  => 'this is a social description',
             'level'  => 'N/A',
             'attendees_expected_learnt'  => 'super duper',
-            'type_id'  => 171,
+            'type_id'  => 182,
             'track_id'  => 262,
             'attending_media' => true,
             'links' => ['https://www.google.com'],
-            'extra_questions' => [
-                [
-                    'id' => 24,
-                    'value' => 'test',
-                ]
-            ],
             'tags' => ['Upstream Development']
         ];
 
@@ -65,5 +59,35 @@ class OAuth2PresentationSubmissionTest extends ProtectedApiTest
         $this->assertTrue(!is_null($presentation));
         $this->assertEquals($title, $presentation->title);
         return $presentation;
+    }
+
+    /**
+     * @param int $summit_id
+     */
+    public function testDeletePresentation($summit_id = 25){
+        $new_presentation = $this->testSubmitPresentation($summit_id);
+        $params = [
+            'id' => $summit_id,
+            'presentation_id' => $new_presentation->id,
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "DELETE",
+            "OAuth2PresentationApiController@deletePresentation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            ''
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(204);
     }
 }

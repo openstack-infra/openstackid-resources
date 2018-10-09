@@ -674,8 +674,15 @@ class Summit extends SilverstripeBaseModel
      */
     public function addEvent(SummitEvent $event)
     {
+        if($this->events->contains($event)) return;
         $this->events->add($event);
         $event->setSummit($this);
+    }
+
+    public function removeEvent(SummitEvent $event){
+        if(!$this->events->contains($event)) return;
+        $this->events->removeElement($event);
+        $event->clearSummit();
     }
 
     /**
