@@ -32,6 +32,7 @@ use models\summit\PresentationType;
 use models\summit\PresentationVideo;
 use libs\utils\ITransactionService;
 use models\summit\Summit;
+
 /**
  * Class PresentationService
  * @package services\model
@@ -202,7 +203,7 @@ final class PresentationService
     public function getSubmissionLimitFor(Summit $summit)
     {
         $res = -1;
-        if($summit->isSubmissionOpen()) {
+        if ($summit->isSubmissionOpen()) {
             $res = intval($summit->getCurrentSelectionPlanByStatus(SelectionPlan::STATUS_SUBMISSION)->getMaxSubmissionAllowedPerUser());
         }
 
@@ -256,7 +257,7 @@ final class PresentationService
 
             $presentation->setProgress(Presentation::PHASE_SUMMARY);
 
-            $presentation =  $this->saveOrUpdatePresentation
+            $presentation = $this->saveOrUpdatePresentation
             (
                 $summit,
                 $current_selection_plan,
@@ -280,7 +281,8 @@ final class PresentationService
      * @throws ValidationException
      * @throws EntityNotFoundException
      */
-    public function updatePresentationSubmission(Summit $summit, $presentation_id, Member $member, array $data){
+    public function updatePresentationSubmission(Summit $summit, $presentation_id, Member $member, array $data)
+    {
         return $this->tx_service->transaction(function () use ($summit, $presentation_id, $member, $data) {
 
             $current_selection_plan = $summit->getCurrentSelectionPlanByStatus(SelectionPlan::STATUS_SUBMISSION);
@@ -311,7 +313,7 @@ final class PresentationService
                     ['presentation_id' => $presentation_id]
                 ));
 
-            if(!$presentation->canEdit($current_speaker))
+            if (!$presentation->canEdit($current_speaker))
                 throw new ValidationException(trans(
                     'validation_errors.PresentationService.updatePresentationSubmission.CurrentSpeakerCanNotEditPresentation',
                     ['presentation_id' => $presentation_id]
@@ -342,7 +344,8 @@ final class PresentationService
                                               Presentation $presentation,
                                               PresentationSpeaker $current_speaker,
                                               array $data
-    ){
+    )
+    {
         return $this->tx_service->transaction(function () use ($summit, $selection_plan, $presentation, $current_speaker, $data) {
             $event_type = $summit->getEventType(intval($data['type_id']));
             if (is_null($event_type)) {
@@ -354,14 +357,14 @@ final class PresentationService
                 );
             }
 
-            if(!$event_type instanceof PresentationType){
+            if (!$event_type instanceof PresentationType) {
                 throw new ValidationException(trans(
-                    'validation_errors.PresentationService.saveOrUpdatePresentation.invalidPresentationType',
-                    ['type_id' => $event_type->getIdentifier()])
+                        'validation_errors.PresentationService.saveOrUpdatePresentation.invalidPresentationType',
+                        ['type_id' => $event_type->getIdentifier()])
                 );
             }
 
-            if(!$event_type->isShouldBeAvailableOnCfp()){
+            if (!$event_type->isShouldBeAvailableOnCfp()) {
                 throw new ValidationException(trans(
                     'validation_errors.PresentationService.saveOrUpdatePresentation.notAvailableCFP',
                     ['type_id' => $event_type->getIdentifier()]));
@@ -377,7 +380,7 @@ final class PresentationService
                 );
             }
 
-            if(!$selection_plan->hasTrack($track)){
+            if (!$selection_plan->hasTrack($track)) {
                 throw new ValidationException(trans(
                     'validation_errors.PresentationService.saveOrUpdatePresentation.trackDontBelongToSelectionPlan',
                     [
@@ -386,19 +389,19 @@ final class PresentationService
                     ]));
             }
 
-            if(isset($data['title']))
+            if (isset($data['title']))
                 $presentation->setTitle(html_entity_decode(trim($data['title'])));
 
-            if(isset($data['description']))
+            if (isset($data['description']))
                 $presentation->setAbstract(html_entity_decode(trim($data['description'])));
 
-            if(isset($data['social_description']))
+            if (isset($data['social_description']))
                 $presentation->setSocialSummary(strip_tags(trim($data['social_description'])));
 
-            if(isset($data['level']))
+            if (isset($data['level']))
                 $presentation->setLevel($data['level']);
 
-            if(isset($data['attendees_expected_learnt']))
+            if (isset($data['attendees_expected_learnt']))
                 $presentation->setAttendeesExpectedLearnt(html_entity_decode($data['attendees_expected_learnt']));
 
             $presentation->setAttendingMedia(isset($data['attending_media']) ?
@@ -412,14 +415,14 @@ final class PresentationService
             if (isset($data['tags'])) {
                 $presentation->clearTags();
 
-                if(count($data['tags']) > 0){
-                    if($presentation->getProgress() == Presentation::PHASE_SUMMARY)
+                if (count($data['tags']) > 0) {
+                    if ($presentation->getProgress() == Presentation::PHASE_SUMMARY)
                         $presentation->setProgress(Presentation::PHASE_TAGS);
                 }
 
                 foreach ($data['tags'] as $tag_value) {
                     $tag = $track->getAllowedTagByVal($tag_value);
-                    if(is_null($tag)){
+                    if (is_null($tag)) {
                         throw new ValidationException(
                             trans(
                                 'validation_errors.PresentationService.saveOrUpdatePresentation.TagNotAllowed',
@@ -437,7 +440,7 @@ final class PresentationService
             if (isset($data['links'])) {
                 $presentation->clearLinks();
 
-                if(count($data['links']) > Presentation::MaxAllowedLinks){
+                if (count($data['links']) > Presentation::MaxAllowedLinks) {
                     throw new ValidationException(trans(
                         'validation_errors.PresentationService.saveOrUpdatePresentation.MaxAllowedLinks',
                         [
@@ -456,14 +459,14 @@ final class PresentationService
             // extra questions values
             if (isset($data['extra_questions'])) {
                 foreach ($data['extra_questions'] as $extra_question) {
-                    if(!isset($extra_question['id'])) continue;
-                    if(!isset($extra_question['value'])) continue;
+                    if (!isset($extra_question['id'])) continue;
+                    if (!isset($extra_question['value'])) continue;
 
                     $extra_question_id = $extra_question['id'];
                     $extra_question_value = $extra_question['value'];
 
                     $track_question = $track->getExtraQuestionById($extra_question_id);
-                    if(is_null($track_question)){
+                    if (is_null($track_question)) {
                         throw new EntityNotFoundException(
                             trans(
                                 'not_found_errors.PresentationService.saveOrUpdatePresentation.trackQuestionNotFound',
@@ -474,13 +477,13 @@ final class PresentationService
 
                     $answer = $presentation->getTrackExtraQuestionAnswer($track_question);
 
-                    if(is_null($answer)){
+                    if (is_null($answer)) {
                         $answer = new TrackAnswer();
                         $presentation->addAnswer($answer);
                         $track_question->addAnswer($answer);
                     }
 
-                    if(is_array($extra_question_value) ){
+                    if (is_array($extra_question_value)) {
                         $extra_question_value = str_replace('{comma}', ',', $extra_question_value);
                         $extra_question_value = implode(',', $extra_question_value);
                     }
@@ -505,17 +508,17 @@ final class PresentationService
         return $this->tx_service->transaction(function () use ($summit, $member, $presentation_id) {
 
             $current_speaker = $this->speaker_repository->getByMember($member);
-            if(is_null($current_speaker))
+            if (is_null($current_speaker))
                 throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $member->getId()));
 
             $presentation = $summit->getEvent($presentation_id);
-            if(is_null($presentation))
+            if (is_null($presentation))
                 throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
 
-            if(!$presentation instanceof Presentation)
+            if (!$presentation instanceof Presentation)
                 throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
 
-            if(!$presentation->canEdit($current_speaker))
+            if (!$presentation->canEdit($current_speaker))
                 throw new ValidationException(sprintf("member %s can not edit presentation %s",
                     $member->getId(),
                     $presentation_id
@@ -539,32 +542,48 @@ final class PresentationService
         return $this->tx_service->transaction(function () use ($summit, $member, $presentation_id) {
 
             $current_speaker = $this->speaker_repository->getByMember($member);
-            if(is_null($current_speaker))
+            if (is_null($current_speaker))
                 throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $member->getId()));
 
             $presentation = $summit->getEvent($presentation_id);
-            if(is_null($presentation))
+            if (is_null($presentation))
                 throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
 
-            if(!$presentation instanceof Presentation)
+            if (!$presentation instanceof Presentation)
                 throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
 
-            if(!$presentation->canEdit($current_speaker))
+            if (!$presentation->canEdit($current_speaker))
                 throw new ValidationException(sprintf("member %s can not edit presentation %s",
                     $member->getId(),
                     $presentation_id
                 ));
 
-           if($presentation->getProgress() != Presentation::PHASE_SPEAKERS){
-               throw new ValidationException
-               (
-                sprintf("presentation %s is not allowed to mark as completed", $presentation_id)
-               );
-           }
+            if ($presentation->getProgress() != Presentation::PHASE_SPEAKERS) {
+                throw new ValidationException
+                (
+                    sprintf("presentation %s is not allowed to mark as completed", $presentation_id)
+                );
+            }
 
-           $presentation->setProgress(Presentation::PHASE_COMPLETE);
+            $title = $presentation->getTitle();
+            $abtract = $presentation->getAbstract();
+            $level = $presentation->getLevel();
 
-           return $presentation;
+            if (empty($title)) {
+                throw new ValidationException('Title is Mandatory!');
+            }
+
+            if (empty($abtract)) {
+                throw new ValidationException('Abstract is mandatory!');
+            }
+
+            if (empty($level)) {
+                throw new ValidationException('Level is mandatory!');
+            }
+
+            $presentation->setProgress(Presentation::PHASE_COMPLETE);
+            $presentation->setStatus(Presentation::STATUS_RECEIVED);
+            return $presentation;
         });
     }
 }
