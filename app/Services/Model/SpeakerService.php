@@ -309,6 +309,12 @@ final class SpeakerService
 
         if(isset($data['willing_to_present_video']))
             $speaker->setWillingToPresentVideo(boolval($data['willing_to_present_video']));
+
+        if(isset($data['org_has_cloud']))
+            $speaker->setOrgHasCloud(boolval($data['org_has_cloud']));
+
+        if(isset($data['country']))
+            $speaker->setCountry(trim($data['country']));
     }
 
     /**

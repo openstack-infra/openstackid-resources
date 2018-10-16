@@ -27,6 +27,13 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
         'Bio'         => 'bio:json_string',
         'IRCHandle'   => 'irc:json_string',
         'TwitterName' => 'twitter:json_string',
+        'OrgHasCloud' => 'org_has_cloud:json_boolean',
+        'Country'     => 'country:json_string',
+        'AvailableForBureau'    => 'available_for_bureau:json_boolean',
+        'FundedTravel'          => 'funded_travel:json_boolean',
+        'WillingToTravel'       => 'willing_to_travel:json_boolean',
+        'WillingToPresentVideo' => 'willing_to_present_video:json_boolean',
+
     ];
 
     protected static $allowed_relations = [

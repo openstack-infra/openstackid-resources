@@ -406,6 +406,37 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     }
 
     /**
+     * @return mixed
+     */
+    public function updateMySpeaker()
+    {
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $member = $this->member_repository->getById($current_member_id);
+            if (is_null($member))
+                return $this->error403();
+
+            $speaker = $this->speaker_repository->getByMember($member);
+            if (is_null($speaker)) return $this->error404();
+
+            return $this->updateSpeaker($speaker->getId());
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
      * @param $speaker_id
      * @return mixed
      */
@@ -454,8 +485,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
 
-            $rules = array
-            (
+            $rules = [
                 'title' => 'required|string|max:100',
                 'first_name' => 'required|string|max:100',
                 'last_name' => 'required|string|max:100',
@@ -469,7 +499,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'is_confirmed' => 'sometimes|boolean',
                 'checked_in' => 'sometimes|boolean',
                 'registration_code' => 'sometimes|string',
-            );
+                'available_for_bureau' => 'sometimes|boolean',
+                'funded_travel' => 'sometimes|boolean',
+                'willing_to_travel' => 'sometimes|boolean',
+                'willing_to_present_video' => 'sometimes|boolean',
+                'org_has_cloud' => 'sometimes|boolean',
+                'country' => 'sometimes|country_iso_alpha2_code',
+            ];
 
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($data->all(), $rules);
@@ -520,8 +556,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = $this->speaker_repository->getById($speaker_id);
             if (is_null($speaker)) return $this->error404();
 
-            $rules = array
-            (
+            $rules = [
                 'title' => 'sometimes|string|max:100',
                 'first_name' => 'sometimes|string|max:100',
                 'last_name' => 'sometimes|string|max:100',
@@ -535,7 +570,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'is_confirmed' => 'sometimes|boolean',
                 'checked_in' => 'sometimes|boolean',
                 'registration_code' => 'sometimes|string',
-            );
+                'available_for_bureau' => 'sometimes|boolean',
+                'funded_travel' => 'sometimes|boolean',
+                'willing_to_travel' => 'sometimes|boolean',
+                'willing_to_present_video' => 'sometimes|boolean',
+                'org_has_cloud' => 'sometimes|boolean',
+                'country' => 'sometimes|country_iso_alpha2_code',
+            ];
 
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($data->all(), $rules);
@@ -657,6 +698,8 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'funded_travel' => 'sometimes|boolean',
                 'willing_to_travel' => 'sometimes|boolean',
                 'willing_to_present_video' => 'sometimes|boolean',
+                'org_has_cloud' => 'sometimes|boolean',
+                'country' => 'sometimes|country_iso_alpha2_code',
             ];
 
             // Creates a Validator instance and validates the data.
@@ -706,8 +749,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             $speaker = $this->speaker_repository->getById($speaker_id);
             if (is_null($speaker)) return $this->error404();
 
-            $rules = array
-            (
+            $rules = [
                 'title' => 'sometimes|string|max:100',
                 'first_name' => 'sometimes|string|max:100',
                 'last_name' => 'sometimes|string|max:100',
@@ -721,7 +763,9 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'funded_travel' => 'sometimes|boolean',
                 'willing_to_travel' => 'sometimes|boolean',
                 'willing_to_present_video' => 'sometimes|boolean',
-            );
+                'org_has_cloud' => 'sometimes|boolean',
+                'country' => 'sometimes|country_iso_alpha2_code',
+            ];
 
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($data->all(), $rules);
@@ -746,10 +790,10 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             return $this->updated(SerializerRegistry::getInstance()->getSerializer($speaker, SerializerRegistry::SerializerType_Private)->serialize());
         } catch (ValidationException $ex1) {
             Log::warning($ex1);
-            return $this->error412(array($ex1->getMessage()));
+            return $this->error412([$ex1->getMessage()]);
         } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
-            return $this->error404(array('message' => $ex2->getMessage()));
+            return $this->error404(['message' => $ex2->getMessage()]);
         } catch (Exception $ex) {
             Log::error($ex);
             return $this->error500($ex);

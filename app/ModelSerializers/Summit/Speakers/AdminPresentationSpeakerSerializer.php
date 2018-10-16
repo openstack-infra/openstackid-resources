@@ -19,11 +19,7 @@ use models\summit\PresentationSpeaker;
 final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerializer
 {
     protected static $array_mappings = [
-        'AvailableForBureau'    => 'available_for_bureau:json_boolean',
-        'FundedTravel'          => 'funded_travel:json_boolean',
-        'WillingToTravel'       => 'willing_to_travel:json_boolean',
-        'WillingToPresentVideo' => 'willing_to_present_video:json_boolean',
-        'Notes'                 => 'notes:json_string'
+        'Notes'=> 'notes:json_string'
     ];
 
     /**

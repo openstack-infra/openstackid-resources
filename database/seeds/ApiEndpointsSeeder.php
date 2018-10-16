@@ -386,22 +386,30 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteMySpeakersData, $current_realm)
                 ],
             ],
-            array(
+            [
                 'name' => 'create-my-speaker',
                 'route' => '/api/v1/speakers/me',
                 'http_method' => 'POST',
                 'scopes' => [
                     sprintf(SummitScopes::WriteMySpeakersData, $current_realm),
                 ],
-            ),
-            array(
+            ],
+            [
+                'name' => 'update-my-speaker',
+                'route' => '/api/v1/speakers/me',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WriteMySpeakersData, $current_realm),
+                ],
+            ],
+            [
                 'name' => 'merge-speakers',
                 'route' => '/api/v1/speakers/merge/{speaker_from_id}/{speaker_to_id}',
                 'http_method' => 'PUT',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 ],
-            ),
+            ],
             array(
                 'name' => 'get-speaker-by-summit',
                 'route' => '/api/v1/summits/{id}/speakers/{speaker_id}',
@@ -481,7 +489,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ),
-            array(
+            [
                 'name' => 'get-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}',
                 'http_method' => 'GET',
@@ -489,8 +497,8 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'get-published-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/published',
                 'http_method' => 'GET',
@@ -498,67 +506,67 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'add-event',
                 'route' => '/api/v1/summits/{id}/events',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteEventData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'update-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}',
                 'http_method' => 'PUT',
                 'scopes' => [sprintf(SummitScopes::WriteEventData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'update-events',
                 'route' => '/api/v1/summits/{id}/events',
                 'http_method' => 'PUT',
                 'scopes' => [sprintf(SummitScopes::WriteEventData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'publish-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/publish',
                 'http_method' => 'PUT',
                 'scopes' => [sprintf(SummitScopes::PublishEventData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'publish-events',
                 'route' => '/api/v1/summits/{id}/events/publish',
                 'http_method' => 'PUT',
                 'scopes' => [sprintf(SummitScopes::PublishEventData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'unpublish-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/publish',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::PublishEventData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'unpublish-events',
                 'route' => '/api/v1/summits/{id}/events/publish',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf(SummitScopes::PublishEventData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'delete-event',
                 'route' => '/api/v1/summits/{id}/events/{event_id}',
                 'http_method' => 'DELETE',
                 'scopes' => [sprintf('%s/summits/delete-event', $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'add-event-feedback',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/feedback',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
-            array(
+            ],
+            [
                 'name' => 'add-event-attachment',
                 'route' => '/api/v1/summits/{id}/events/{event_id}/attachment',
                 'http_method' => 'POST',
                 'scopes' => [sprintf(SummitScopes::WriteSummitData, $current_realm)],
-            ),
+            ],
             [
                 'name' => 'add-event-feedback-v2',
                 'route' => '/api/v2/summits/{id}/events/{event_id}/feedback',
