@@ -35,8 +35,6 @@ final class SummitScopes
 
     const WriteAttendeesData = '%s/attendees/write';
 
-    const WriteMemberData    = '%s/members/write';
-
     const WritePromoCodeData = '%s/promo-codes/write';
 
     const WriteEventTypeData = '%s/event-types/write';

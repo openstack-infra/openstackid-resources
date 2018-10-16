@@ -18,6 +18,7 @@ use models\main\Affiliation;
 use models\main\IOrganizationRepository;
 use models\main\Member;
 use DateTime;
+use models\main\Organization;
 /**
  * Class MemberService
  * @package App\Services\Model
@@ -77,6 +78,17 @@ final class MemberService
                 $org = $this->organization_repository->getById(intval($data['organization_id']));
                 if(is_null($org))
                     throw new EntityNotFoundException(sprintf("organization id %s not found", $data['organization_id']));
+                $affiliation->setOrganization($org);
+            }
+
+            if(isset($data['organization_name'])) {
+                $org = $this->organization_repository->getByName(trim($data['organization_name']));
+                if(is_null($org)){
+                    $org = new Organization();
+                    $org->setName(trim($data['organization_name']));
+                    $this->organization_repository->add($org);
+                }
+
                 $affiliation->setOrganization($org);
             }
 
@@ -145,10 +157,22 @@ final class MemberService
                 $end_date = intval($data['end_date']);
                 $affiliation->setEndDate($end_date > 0 ? new DateTime("@$end_date") : null);
             }
+
             if(isset($data['organization_id'])) {
                 $org = $this->organization_repository->getById(intval($data['organization_id']));
                 if(is_null($org))
                     throw new EntityNotFoundException(sprintf("organization id %s not found", $data['organization_id']));
+                $affiliation->setOrganization($org);
+            }
+
+            if(isset($data['organization_name'])) {
+                $org = $this->organization_repository->getByName(trim($data['organization_name']));
+                if(is_null($org)){
+                    $org = new Organization();
+                    $org->setName(trim($data['organization_name']));
+                    $this->organization_repository->add($org);
+                }
+
                 $affiliation->setOrganization($org);
             }
 

@@ -18,6 +18,7 @@ use LaravelDoctrine\ORM\Facades\EntityManager;
 use Illuminate\Support\Facades\DB;
 use App\Security\SummitScopes;
 use App\Security\OrganizationScopes;
+use App\Security\MemberScopes;
 /**
  * Class ApiScopesSeeder
  */
@@ -177,31 +178,26 @@ final class ApiScopesSeeder extends Seeder
         $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'members']);
 
         $scopes = [
-            array(
-                'name' => sprintf('%s/members/read', $current_realm),
+            [
+                'name' => sprintf(MemberScopes::ReadMemberData, $current_realm),
                 'short_description' => 'Get Members Data',
                 'description' => 'Grants read only access for Members Data',
-            ),
-            array(
-                'name' => sprintf('%s/members/read/me', $current_realm),
+            ],
+            [
+                'name' => sprintf(MemberScopes::ReadMyMemberData, $current_realm),
                 'short_description' => 'Get My Member Data',
                 'description' => 'Grants read only access for My Member',
-            ),
-            array(
-                'name' => sprintf('%s/members/invitations/read', $current_realm),
-                'short_description' => 'Allows read only access to invitations',
-                'description' => 'Allows read only access to invitations',
-            ),
-            array(
-                'name' => sprintf('%s/members/invitations/write', $current_realm),
-                'short_description' => 'Allows write only access to invitations',
-                'description' => 'Allows write only access to invitations',
-            ),
-            array(
-                'name' => sprintf(SummitScopes::WriteMemberData, $current_realm),
+            ],
+            [
+                'name' => sprintf(MemberScopes::WriteMemberData, $current_realm),
                 'short_description' => 'Allows write only access to members',
                 'description' => 'Allows write only access to memberss',
-            ),
+            ],
+            [
+                'name' => sprintf(MemberScopes::WriteMyMemberData, $current_realm),
+                'short_description' => 'Allows write only access to my Member Data',
+                'description' =>  'Allows write only access to my Member Data',
+            ],
         ];
 
         foreach ($scopes as $scope_info) {

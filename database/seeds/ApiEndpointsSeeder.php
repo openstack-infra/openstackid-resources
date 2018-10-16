@@ -17,6 +17,7 @@ use App\Models\ResourceServer\ApiEndpoint;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use App\Security\SummitScopes;
 use App\Security\OrganizationScopes;
+use App\Security\MemberScopes;
 /**
  * Class ApiEndpointsSeeder
  */
@@ -30,7 +31,6 @@ class ApiEndpointsSeeder extends Seeder
 
         $this->seedSummitEndpoints();
         $this->seedMemberEndpoints();
-        $this->seedTeamEndpoints();
         $this->seedTagsEndpoints();
         $this->seedCompaniesEndpoints();
         $this->seedGroupsEndpoints();
@@ -1929,6 +1929,38 @@ class ApiEndpointsSeeder extends Seeder
                     'http_method' => 'GET',
                     'scopes'      => [sprintf('%s/members/read/me', $current_realm)],
                ],
+               // my member affiliations
+                [
+                    'name'        => 'get-my-member-affiliations',
+                    'route'       => '/api/v1/members/me/affiliations',
+                    'http_method' => 'GET',
+                    'scopes' => [sprintf(MemberScopes::ReadMyMemberData, $current_realm)],
+                ],
+                [
+                    'name'        => 'add-my-member-affiliation',
+                    'route'       => '/api/v1/members/me/affiliations',
+                    'http_method' => 'POST',
+                    'scopes'      => [
+                        sprintf(MemberScopes::WriteMyMemberData, $current_realm)
+                    ],
+                ],
+                [
+                    'name'        => 'update-my-member-affiliation',
+                    'route'       => '/api/v1/members/me/affiliations/{affiliation_id}',
+                    'http_method' => 'PUT',
+                    'scopes'      => [
+                        sprintf(MemberScopes::WriteMyMemberData, $current_realm)
+                    ],
+                ],
+                [
+                    'name'        => 'delete-my-member-affiliation',
+                    'route'       => '/api/v1/members/me/affiliations/{affiliation_id}',
+                    'http_method' => 'DELETE',
+                    'scopes'      => [
+                        sprintf(MemberScopes::WriteMyMemberData, $current_realm)
+                    ],
+                ],
+               // member affiliations
                [
                     'name'        => 'get-member-affiliations',
                     'route'       => '/api/v1/members/{member_id}/affiliations',
@@ -1940,7 +1972,7 @@ class ApiEndpointsSeeder extends Seeder
                     'route'       => '/api/v1/members/{member_id}/affiliations',
                     'http_method' => 'POST',
                     'scopes'      => [
-                        sprintf(SummitScopes::WriteMemberData, $current_realm)
+                        sprintf(MemberScopes::WriteMemberData, $current_realm)
                     ],
                 ],
                [
@@ -1948,7 +1980,7 @@ class ApiEndpointsSeeder extends Seeder
                     'route'       => '/api/v1/members/{member_id}/affiliations/{affiliation_id}',
                     'http_method' => 'PUT',
                     'scopes'      => [
-                        sprintf(SummitScopes::WriteMemberData, $current_realm)
+                        sprintf(MemberScopes::WriteMemberData, $current_realm)
                     ],
                ],
                [
@@ -1956,7 +1988,7 @@ class ApiEndpointsSeeder extends Seeder
                     'route'       => '/api/v1/members/{member_id}/affiliations/{affiliation_id}',
                     'http_method' => 'DELETE',
                     'scopes'      => [
-                        sprintf(SummitScopes::WriteMemberData, $current_realm)
+                        sprintf(MemberScopes::WriteMemberData, $current_realm)
                     ],
                ],
                [
@@ -1964,7 +1996,7 @@ class ApiEndpointsSeeder extends Seeder
                     'route'       => '/api/v1/members/{member_id}/rsvp/{rsvp_id}',
                     'http_method' => 'DELETE',
                     'scopes'      => [
-                        sprintf(SummitScopes::WriteMemberData, $current_realm)
+                        sprintf(MemberScopes::WriteMemberData, $current_realm)
                     ],
                 ]
             ]
@@ -2054,103 +2086,6 @@ class ApiEndpointsSeeder extends Seeder
                         sprintf('%s/groups/read', $current_realm)
                     ],
                 ]
-            ]
-        );
-    }
-
-    private function seedTeamEndpoints(){
-        $current_realm = Config::get('app.url');
-
-        $this->seedApiEndpoints('teams', [
-                array(
-                    'name' => 'add-team',
-                    'route' => '/api/v1/teams',
-                    'http_method' => 'POST',
-                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
-                ),
-                array(
-                    'name' => 'update-team',
-                    'route' => '/api/v1/teams/{team_id}',
-                    'http_method' => 'PUT',
-                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
-                ),
-                array(
-                    'name' => 'delete-team',
-                    'route' => '/api/v1/teams/{team_id}',
-                    'http_method' => 'DELETE',
-                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
-                ),
-                array(
-                    'name' => 'get-teams',
-                    'route' => '/api/v1/teams',
-                    'http_method' => 'GET',
-                    'scopes' => [sprintf('%s/teams/read', $current_realm)],
-                ),
-                array(
-                    'name' => 'get-team',
-                    'route' => '/api/v1/teams/{team_id}',
-                    'http_method' => 'GET',
-                    'scopes' => [sprintf('%s/teams/read', $current_realm)],
-                ),
-                array(
-                    'name' => 'post-message-2-team',
-                    'route' => '/api/v1/teams/{team_id}/messages',
-                    'http_method' => 'POST',
-                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
-                ),
-                array(
-                    'name' => 'get-messages-from-team',
-                    'route' => '/api/v1/teams/{team_id}/messages',
-                    'http_method' => 'GET',
-                    'scopes' => [sprintf('%s/teams/read', $current_realm)],
-                ),
-
-                array(
-                    'name' => 'add-member-2-team',
-                    'route' => '/api/v1/teams/{team_id}/members/{member_id}',
-                    'http_method' => 'POST',
-                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
-                ),
-                array(
-                    'name' => 'remove-member-from-team',
-                    'route' => '/api/v1/teams/{team_id}/members/{member_id}',
-                    'http_method' => 'DELETE',
-                    'scopes' => [sprintf('%s/teams/write', $current_realm)],
-                ),
-            ]
-        );
-
-        $this->seedApiEndpoints('members', [
-                array(
-                    'name' => 'get-invitations',
-                    'route' => '/api/v1/members/me/team-invitations',
-                    'http_method' => 'GET',
-                    'scopes' => [sprintf('%s/members/invitations/read', $current_realm)],
-                ),
-                array(
-                    'name'        => 'get-pending-invitations',
-                    'route'       => '/api/v1/members/me/team-invitations/pending',
-                    'http_method' => 'GET',
-                    'scopes'      => [sprintf('%s/members/invitations/read', $current_realm)],
-                ),
-                array(
-                    'name' => 'get-accepted-invitations',
-                    'route' => '/api/v1/members/me/team-invitations/accepted',
-                    'http_method' => 'GET',
-                    'scopes' => [sprintf('%s/members/invitations/read', $current_realm)],
-                ),
-                array(
-                    'name' => 'accept-invitation',
-                    'route' => '/api/v1/members/me/team-invitations/{invitation_id}',
-                    'http_method' => 'PUT',
-                    'scopes' => [sprintf('%s/members/invitations/write', $current_realm)],
-                ),
-                array(
-                    'name' => 'decline-invitation',
-                    'route' => '/api/v1/members/me/team-invitations/{invitation_id}',
-                    'http_method' => 'DELETE',
-                    'scopes' => [sprintf('%s/members/invitations/write', $current_realm)],
-                ),
             ]
         );
     }

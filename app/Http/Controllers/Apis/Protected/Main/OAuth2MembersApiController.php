@@ -58,6 +58,9 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
         $this->member_service = $member_service;
     }
 
+    /**
+     * @return mixed
+     */
     public function getAll(){
 
         $values = Input::all();
@@ -163,6 +166,9 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @return mixed
+     */
     public function getMyMember(){
 
         $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -188,13 +194,24 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
 
 
     /**
+     * @return mixed
+     */
+    public function getMyMemberAffiliations(){
+        return $this->getMemberAffiliations('me');
+    }
+
+    /**
      * @param $member_id
      * @return mixed
      */
     public function getMemberAffiliations($member_id){
         try {
 
+            if(strtolower($member_id) == 'me'){
+                $member_id = $this->resource_server_context->getCurrentUserExternalId();
+            }
             $member = $this->repository->getById($member_id);
+
             if(is_null($member)) return $this->error404();
             $affiliations = $member->getAffiliations()->toArray();
 
@@ -228,20 +245,36 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @return mixed
+     */
+    public function addMyAffiliation(){
+        return $this->addAffiliation('me');
+    }
+
+    /**
+     * @param $member_id
+     * @return mixed
+     */
     public function addAffiliation($member_id){
         try {
             if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
+            if(strtolower($member_id) == 'me'){
+                $member_id = $this->resource_server_context->getCurrentUserExternalId();
+            }
+
             $member = $this->repository->getById($member_id);
             if(is_null($member)) return $this->error404();
 
             $rules = [
-                'is_current'      => 'required|boolean',
-                'start_date'      => 'required|date_format:U|valid_epoch',
-                'end_date'        => 'sometimes|after_or_null_epoch:start_date',
-                'organization_id' => 'required|integer',
-                'job_title'       => 'sometimes|string|max:255'
+                'is_current'        => 'required|boolean',
+                'start_date'        => 'required|date_format:U|valid_epoch',
+                'end_date'          => 'sometimes|after_or_null_epoch:start_date',
+                'organization_id'   => 'sometimes|integer|required_without:organization_name',
+                'organization_name' => 'sometimes|string|max:255|required_without:organization_id',
+                'job_title'         => 'sometimes|string|max:255'
             ];
 
             // Creates a Validator instance and validates the data.
@@ -278,6 +311,15 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
         }
     }
 
+
+    /**
+     * @param $affiliation_id
+     * @return mixed
+     */
+    public function updateMyAffiliation($affiliation_id){
+        return $this->updateAffiliation('me', $affiliation_id);
+    }
+
     /**
      * @param int $member_id
      * @param int $affiliation_id
@@ -288,15 +330,20 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
             if(!Request::isJson()) return $this->error400();
             $data = Input::json();
 
+            if(strtolower($member_id) == 'me'){
+                $member_id = $this->resource_server_context->getCurrentUserExternalId();
+            }
+
             $member = $this->repository->getById($member_id);
             if(is_null($member)) return $this->error404();
 
             $rules = [
-                'is_current'      => 'sometimes|boolean',
-                'start_date'      => 'sometimes|date_format:U|valid_epoch',
-                'end_date'        => 'sometimes|after_or_null_epoch:start_date',
-                'organization_id' => 'sometimes|integer',
-                'job_title'       => 'sometimes|string|max:255'
+                'is_current'        => 'sometimes|boolean',
+                'start_date'        => 'sometimes|date_format:U|valid_epoch',
+                'end_date'          => 'sometimes|after_or_null_epoch:start_date',
+                'organization_id'   => 'sometimes|integer',
+                'organization_name' => 'sometimes|string|max:255',
+                'job_title'         => 'sometimes|string|max:255'
             ];
 
             // Creates a Validator instance and validates the data.
@@ -332,6 +379,11 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
         }
     }
 
+
+    public function deleteMyAffiliation($affiliation_id){
+        return $this->deleteAffiliation('me', $affiliation_id);
+    }
+
     /**
      * @param $member_id
      * @param $affiliation_id
@@ -339,6 +391,10 @@ final class OAuth2MembersApiController extends OAuth2ProtectedController
      */
     public function deleteAffiliation($member_id, $affiliation_id){
         try{
+
+            if(strtolower($member_id) == 'me'){
+                $member_id = $this->resource_server_context->getCurrentUserExternalId();
+            }
 
             $member = $this->repository->getById($member_id);
             if(is_null($member)) return $this->error404();

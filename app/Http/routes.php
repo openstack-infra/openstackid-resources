@@ -30,14 +30,14 @@ Route::group([
         Route::group(['prefix'=>'me'], function(){
             // get my member info
             Route::get('', 'OAuth2MembersApiController@getMyMember');
-            // invitations
-            Route::group(['prefix'=>'team-invitations'], function(){
-                Route::get('', 'OAuth2TeamInvitationsApiController@getMyInvitations');
-                Route::get('pending', 'OAuth2TeamInvitationsApiController@getMyPendingInvitations');
-                Route::get('accepted', 'OAuth2TeamInvitationsApiController@getMyAcceptedInvitations');
-                Route::group(['prefix'=>'{invitation_id}'], function() {
-                    Route::put('', 'OAuth2TeamInvitationsApiController@acceptInvitation');
-                    Route::delete('', 'OAuth2TeamInvitationsApiController@declineInvitation');
+
+            // my affiliations
+            Route::group(['prefix' => 'affiliations'], function(){
+                Route::get('', [  'uses' => 'OAuth2MembersApiController@getMyMemberAffiliations']);
+                Route::post('', [ 'uses' => 'OAuth2MembersApiController@addMyAffiliation']);
+                Route::group(['prefix' => '{affiliation_id}'], function(){
+                    Route::put('',  ['uses' => 'OAuth2MembersApiController@updateMyAffiliation']);
+                    Route::delete('', [  'uses' => 'OAuth2MembersApiController@deleteMyAffiliation']);
                 });
             });
         });

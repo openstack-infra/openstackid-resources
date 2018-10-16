@@ -17,6 +17,7 @@ use models\oauth2\AccessToken;
 use App\Models\ResourceServer\IAccessTokenService;
 use App\Security\SummitScopes;
 use App\Security\OrganizationScopes;
+use App\Security\MemberScopes;
 /**
  * Class AccessTokenServiceStub
  */
@@ -60,7 +61,8 @@ class AccessTokenServiceStub implements IAccessTokenService
             sprintf(SummitScopes::WriteSpeakersData, $url),
             sprintf(SummitScopes::WriteMySpeakersData, $url),
             sprintf(SummitScopes::WriteAttendeesData, $url),
-            sprintf(SummitScopes::WriteMemberData, $url),
+            sprintf(MemberScopes::WriteMemberData, $url),
+            sprintf(MemberScopes::WriteMyMemberData, $url),
             sprintf(SummitScopes::WritePromoCodeData, $url),
             sprintf(OrganizationScopes::WriteOrganizationData, $url),
             sprintf(OrganizationScopes::ReadOrganizationData, $url),
@@ -111,7 +113,7 @@ class AccessTokenServiceStub2 implements IAccessTokenService
             sprintf(SummitScopes::WriteSpeakersData, $url),
             sprintf(SummitScopes::WriteMySpeakersData, $url),
             sprintf(SummitScopes::WriteAttendeesData, $url),
-            sprintf(SummitScopes::WriteMemberData, $url),
+            sprintf(Mem::WriteMemberData, $url),
             sprintf(SummitScopes::WritePromoCodeData, $url),
             sprintf(OrganizationScopes::WriteOrganizationData, $url),
             sprintf(OrganizationScopes::ReadOrganizationData, $url),
