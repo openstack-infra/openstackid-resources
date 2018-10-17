@@ -505,6 +505,14 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'willing_to_present_video' => 'sometimes|boolean',
                 'org_has_cloud' => 'sometimes|boolean',
                 'country' => 'sometimes|country_iso_alpha2_code',
+                // collections
+                'languages' => 'sometimes|int_array',
+                'areas_of_expertise' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|string_array',
+                'travel_preferences' => 'sometimes|string_array',
+                'organizational_roles' => 'sometimes|int_array',
+                'other_organizational_rol' => 'sometimes|string|max:255',
+                'active_involvements' => 'sometimes|int_array',
             ];
 
             // Creates a Validator instance and validates the data.
@@ -576,6 +584,14 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'willing_to_present_video' => 'sometimes|boolean',
                 'org_has_cloud' => 'sometimes|boolean',
                 'country' => 'sometimes|country_iso_alpha2_code',
+                // collections
+                'languages' => 'sometimes|int_array',
+                'areas_of_expertise' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|string_array',
+                'travel_preferences' => 'sometimes|string_array',
+                'organizational_roles' => 'sometimes|int_array',
+                'other_organizational_rol' => 'sometimes|string|max:255',
+                'active_involvements' => 'sometimes|int_array',
             ];
 
             // Creates a Validator instance and validates the data.
@@ -601,6 +617,33 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
         } catch (ValidationException $ex1) {
             Log::warning($ex1);
             return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    public function addMySpeakerPhoto(LaravelRequest $request){
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $member = $this->member_repository->getById($current_member_id);
+            if (is_null($member))
+                return $this->error403();
+
+            $speaker = $this->speaker_repository->getByMember($member);
+            if (is_null($speaker)) return $this->error404();
+
+           return $this->addSpeakerPhoto($request, $speaker->getId());
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
         } catch (EntityNotFoundException $ex2) {
             Log::warning($ex2);
             return $this->error404(array('message' => $ex2->getMessage()));
@@ -694,12 +737,20 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'twitter' => 'sometimes|string|max:50',
                 'member_id' => 'sometimes|integer',
                 'email' => 'sometimes|string|max:50',
-                'available_for_bureau' => 'sometimes|boolean',
                 'funded_travel' => 'sometimes|boolean',
                 'willing_to_travel' => 'sometimes|boolean',
                 'willing_to_present_video' => 'sometimes|boolean',
                 'org_has_cloud' => 'sometimes|boolean',
+                'available_for_bureau' => 'sometimes|boolean',
                 'country' => 'sometimes|country_iso_alpha2_code',
+                // collections
+                'languages' => 'sometimes|int_array',
+                'areas_of_expertise' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|string_array',
+                'travel_preferences' => 'sometimes|string_array',
+                'organizational_roles' => 'sometimes|int_array',
+                'other_organizational_rol' => 'sometimes|string|max:255',
+                'active_involvements' => 'sometimes|int_array',
             ];
 
             // Creates a Validator instance and validates the data.
@@ -765,6 +816,14 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'willing_to_present_video' => 'sometimes|boolean',
                 'org_has_cloud' => 'sometimes|boolean',
                 'country' => 'sometimes|country_iso_alpha2_code',
+                // collections
+                'languages' => 'sometimes|int_array',
+                'areas_of_expertise' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|string_array',
+                'travel_preferences' => 'sometimes|string_array',
+                'organizational_roles' => 'sometimes|int_array',
+                'other_organizational_rol' => 'sometimes|string|max:255',
+                'active_involvements' => 'sometimes|int_array',
             ];
 
             // Creates a Validator instance and validates the data.

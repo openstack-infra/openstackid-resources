@@ -33,7 +33,6 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
         'FundedTravel'          => 'funded_travel:json_boolean',
         'WillingToTravel'       => 'willing_to_travel:json_boolean',
         'WillingToPresentVideo' => 'willing_to_present_video:json_boolean',
-
     ];
 
     protected static $allowed_relations = [
@@ -94,7 +93,6 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
             $values['first_name'] = $first_name;
             $values['last_name']  = $last_name;
         }
-
 
         $affiliations = [];
         if($speaker->hasMember()) {

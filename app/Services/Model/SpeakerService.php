@@ -11,8 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\CountryCodes;
+use App\Models\Foundation\Main\Repositories\ILanguageRepository;
 use App\Models\Foundation\Summit\Factories\PresentationSpeakerSummitAssistanceConfirmationRequestFactory;
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
+use App\Models\Foundation\Summit\Repositories\ISpeakerActiveInvolvementRepository;
+use App\Models\Foundation\Summit\Repositories\ISpeakerOrganizationalRoleRepository;
 use App\Services\Model\AbstractService;
 use App\Services\Model\IFolderService;
 use Illuminate\Http\UploadedFile;
@@ -32,8 +36,12 @@ use models\summit\ISpeakerRepository;
 use models\summit\ISpeakerSummitRegistrationPromoCodeRepository;
 use models\summit\PresentationSpeaker;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
+use models\summit\SpeakerExpertise;
+use models\summit\SpeakerOrganizationalRole;
+use models\summit\SpeakerPresentationLink;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
+use models\summit\SpeakerTravelPreference;
 use models\summit\Summit;
 use App\Http\Utils\FileUploader;
 /**
@@ -80,6 +88,21 @@ final class SpeakerService
     private $speakers_assistance_repository;
 
     /**
+     * @var ILanguageRepository
+     */
+    private $language_repository;
+
+    /**
+     * @var ISpeakerOrganizationalRoleRepository
+     */
+    private $speaker_organizational_role_repository;
+
+    /**
+     * @var ISpeakerActiveInvolvementRepository
+     */
+    private $speaker_involvement_repository;
+
+    /**
      * SpeakerService constructor.
      * @param ISpeakerRepository $speaker_repository
      * @param IMemberRepository $member_repository
@@ -88,6 +111,9 @@ final class SpeakerService
      * @param IEmailCreationRequestRepository $email_creation_request_repository
      * @param IFolderService $folder_service
      * @param IPresentationSpeakerSummitAssistanceConfirmationRequestRepository $speakers_assistance_repository
+     * @param ILanguageRepository $language_repository
+     * @param ISpeakerOrganizationalRoleRepository $speaker_organizational_role_repository
+     * @param ISpeakerActiveInvolvementRepository $speaker_involvement_repository
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -99,6 +125,9 @@ final class SpeakerService
         IEmailCreationRequestRepository $email_creation_request_repository,
         IFolderService $folder_service,
         IPresentationSpeakerSummitAssistanceConfirmationRequestRepository $speakers_assistance_repository,
+        ILanguageRepository $language_repository,
+        ISpeakerOrganizationalRoleRepository $speaker_organizational_role_repository,
+        ISpeakerActiveInvolvementRepository $speaker_involvement_repository,
         ITransactionService $tx_service
     )
     {
@@ -110,6 +139,9 @@ final class SpeakerService
         $this->registration_code_repository            = $registration_code_repository;
         $this->email_creation_request_repository       = $email_creation_request_repository;
         $this->speakers_assistance_repository          = $speakers_assistance_repository;
+        $this->language_repository                     = $language_repository;
+        $this->speaker_organizational_role_repository  = $speaker_organizational_role_repository;
+        $this->speaker_involvement_repository          = $speaker_involvement_repository;
     }
 
     /**
@@ -275,6 +307,7 @@ final class SpeakerService
     /**
      * @param PresentationSpeaker $speaker
      * @param array $data
+     * @return PresentationSpeaker
      */
     private function updateSpeakerMainData(PresentationSpeaker $speaker, array $data){
         if(isset($data['title']))
@@ -315,6 +348,88 @@ final class SpeakerService
 
         if(isset($data['country']))
             $speaker->setCountry(trim($data['country']));
+
+        return $speaker;
+    }
+
+    /**
+     * @param PresentationSpeaker $speaker
+     * @param array $data
+     * @return PresentationSpeaker
+     */
+    private function updateSpeakerRelations(PresentationSpeaker $speaker, array $data){
+
+        // other_presentation_links
+
+        if(isset($data['other_presentation_links']) && is_array($data['other_presentation_links'])){
+            $speaker->clearOtherPresentationLinks();
+            foreach($data['other_presentation_links'] as $link) {
+                $speaker->addOtherPresentationLink(new SpeakerPresentationLink($link));
+            }
+        }
+        // languages
+
+        if(isset($data['languages']) && is_array($data['languages'])){
+            $speaker->clearLanguages();
+            foreach($data['languages'] as $lang_id) {
+                $language = $this->language_repository->getById(intval($lang_id));
+                if(is_null($language)) continue;
+                $speaker->addLanguage($language);
+            }
+        }
+
+        // travel_preferences
+
+        if(isset($data['travel_preferences']) && is_array($data['travel_preferences'])){
+            $speaker->clearTravelPreferences();
+            foreach($data['travel_preferences'] as $country) {
+                if(!isset(CountryCodes::$iso_3166_countryCodes[$country])) continue;
+                $speaker->addTravelPreference(new SpeakerTravelPreference($country));
+            }
+        }
+        // areas_of_expertise
+
+        if(isset($data['areas_of_expertise']) && is_array($data['areas_of_expertise'])){
+            $speaker->clearAreasOfExpertise();
+            foreach($data['areas_of_expertise'] as $expertise) {
+                $speaker->addAreaOfExpertise(new SpeakerExpertise(trim($expertise)));
+            }
+        }
+
+        // organizational_roles
+
+        if(isset($data['organizational_roles']) && is_array($data['organizational_roles'])){
+            $speaker->clearOrganizationalRoles();
+            foreach($data['organizational_roles'] as $org_role_id) {
+                $role = $this->speaker_organizational_role_repository->getById(intval($org_role_id));
+                if(is_null($role)) continue;
+                $speaker->addOrganizationalRole($role);
+            }
+
+            // other
+            if(isset($data['other_organizational_rol'])){
+                $role = $this->speaker_organizational_role_repository->getByRole(trim($data['other_organizational_rol']));
+                if(is_null($role)){
+                    // create it
+                    $role = new SpeakerOrganizationalRole(trim($data['other_organizational_rol']));
+                    $this->speaker_organizational_role_repository->add($role);
+                }
+                $speaker->addOrganizationalRole($role);
+            }
+        }
+
+        // active_involvements
+
+        if(isset($data['active_involvements']) && is_array($data['active_involvements'])){
+            $speaker->clearActiveInvolvements();
+            foreach($data['active_involvements'] as $involvement_id) {
+                $involvement = $this->speaker_involvement_repository->getById(intval($involvement_id));
+                if(is_null($involvement)) continue;
+                $speaker->addActiveInvolvement($involvement);
+            }
+        }
+
+        return $speaker;
     }
 
     /**
@@ -577,7 +692,6 @@ final class SpeakerService
                         )
                     );
 
-
                 $speaker->setMember($member);
             }
 
@@ -606,7 +720,7 @@ final class SpeakerService
                 }
             }
 
-            $this->speaker_repository->add($speaker);
+            $this->speaker_repository->add($this->updateSpeakerRelations($speaker, $data));
 
             $email_request = new SpeakerCreationEmailCreationRequest();
             $email_request->setSpeaker($speaker);
@@ -648,9 +762,8 @@ final class SpeakerService
                 $speaker->setMember($member);
             }
 
-            $this->updateSpeakerMainData($speaker, $data);
+            return $this->updateSpeakerRelations($this->updateSpeakerMainData($speaker, $data), $data);
 
-            return $speaker;
         });
     }
 

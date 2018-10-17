@@ -34,6 +34,16 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     private $speaker;
 
     /**
+     * SpeakerTravelPreference constructor.
+     * @param string $country
+     */
+    public function __construct($country)
+    {
+        parent::__construct();
+        $this->country = $country;
+    }
+
+    /**
      * @return int
      */
     public function getSpeakerId(){
@@ -76,4 +86,5 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     {
         $this->speaker = $speaker;
     }
+
 }

@@ -14,7 +14,7 @@
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSpeakerOrganizationalRoleRepository")
  * @ORM\Table(name="SpeakerOrganizationalRole")
  * Class SpeakerOrganizationalRole
  * @package models\summit
@@ -30,6 +30,18 @@ class SpeakerOrganizationalRole extends SilverstripeBaseModel
      * @ORM\Column(name="IsDefault", type="boolean")
      */
     private $is_default;
+
+    /**
+     * SpeakerOrganizationalRole constructor.
+     * @param string $role
+     * @param bool $is_default
+     */
+    public function __construct($role, $is_default = false)
+    {
+        parent::__construct();
+        $this->role = $role;
+        $this->is_default = $is_default;
+    }
 
     /**
      * @return mixed
@@ -62,5 +74,7 @@ class SpeakerOrganizationalRole extends SilverstripeBaseModel
     {
         $this->is_default = $is_default;
     }
+
+
 
 }
