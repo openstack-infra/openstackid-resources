@@ -78,42 +78,6 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
             $values['all_moderated_presentations'] = $speaker->getAllModeratedPresentationIds( false);
         }
 
-        $languages = [];
-        foreach ($speaker->getLanguages() as $language){
-            $languages[] = SerializerRegistry::getInstance()->getSerializer($language)->serialize();
-        }
-        $values['languages'] = $languages;
-
-        $other_presentation_links = [];
-        foreach ($speaker->getOtherPresentationLinks() as $link){
-            $other_presentation_links[] = SerializerRegistry::getInstance()->getSerializer($link)->serialize();
-        }
-        $values['other_presentation_links'] = $other_presentation_links;
-
-        $areas_of_expertise = [];
-        foreach ($speaker->getAreasOfExpertise() as $exp){
-            $areas_of_expertise[] = SerializerRegistry::getInstance()->getSerializer($exp)->serialize();
-        }
-        $values['areas_of_expertise'] = $areas_of_expertise;
-
-        $travel_preferences = [];
-        foreach ($speaker->getTravelPreferences() as $tp){
-            $travel_preferences[] = SerializerRegistry::getInstance()->getSerializer($tp)->serialize();
-        }
-        $values['travel_preferences'] = $travel_preferences;
-
-        $active_involvements = [];
-        foreach ($speaker->getActiveInvolvements() as $ai){
-            $active_involvements[] = SerializerRegistry::getInstance()->getSerializer($ai)->serialize();
-        }
-        $values['active_involvements'] = $active_involvements;
-
-        $organizational_roles = [];
-        foreach ($speaker->getOrganizationalRoles() as $or){
-            $organizational_roles[] = SerializerRegistry::getInstance()->getSerializer($or)->serialize();
-        }
-        $values['organizational_roles'] = $organizational_roles;
-
         $affiliations = [];
         if($speaker->hasMember()) {
             $member = $speaker->getMember();

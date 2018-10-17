@@ -1,4 +1,4 @@
-<?php namespace ModelSerializers;
+<?php namespace App\ModelSerializers;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,11 +11,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-final class SpeakerOrganizationalRoleSerializer
-    extends SilverStripeSerializer
+use ModelSerializers\SilverStripeSerializer;
+
+/**
+ * Class LanguageSerializer
+ * @package App\ModelSerializers
+ */
+final class LanguageSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-        'Role'      => 'role:json_string',
-        'Default'   => 'is_default:json_boolean',
+        'Name' => 'name:json_string',
+        'IsoCode(' => 'iso_code:json_string',
     ];
 }

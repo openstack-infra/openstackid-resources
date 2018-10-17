@@ -15,7 +15,8 @@ final class SpeakerTravelPreferenceSerializer
     extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-        'Country'   => 'country:json_string',
-        'SpeakerId' => 'speaker_id:json_int',
+        'Country'     => 'country_iso_code:json_string',
+        'CountryName' => 'country:json_string',
+        'SpeakerId'   => 'speaker_id:json_int',
     ];
 }

@@ -1,4 +1,4 @@
-<?php namespace ModelSerializers;
+<?php namespace App\Models\Foundation\Main\Repositories;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,11 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-final class SpeakerLanguageSerializer
-    extends SilverStripeSerializer
+use models\utils\IBaseRepository;
+/**
+ * Interface ILanguageRepository
+ * @package App\Models\Foundation\Main\Repositories
+ */
+interface ILanguageRepository extends IBaseRepository
 {
-    protected static $array_mappings = [
-        'Language' => 'language:json_string',
-        'SpeakerId' => 'speaker_id:json_int',
-    ];
+
 }

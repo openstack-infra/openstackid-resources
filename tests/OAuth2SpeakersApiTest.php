@@ -25,12 +25,21 @@ final class OAuth2SpeakersApiTest extends ProtectedApiTest
             "CONTENT_TYPE"        => "application/json"
         ];
 
+        $suffix = str_random(16);
+
         $data = [
 
             'title'      => 'Developer!',
             'first_name' => 'Sebastian',
             'last_name'  => 'Marcet',
-            'email'      => 'sebastian.ge4.marcet@gmail.com'
+            'email'      => "smarcet.{$suffix}@gmail.com",
+            'languages'  => [1,2],
+            'other_presentation_links' => ["https://www.openstack.org"],
+            'travel_preferences' => ["AF"],
+            "areas_of_expertise" => ["testing"],
+            "active_involvements" => [1],
+            "organizational_roles" => [1],
+            "other_organizational_rol" => "no se",
         ];
 
         $response = $this->action
@@ -45,8 +54,8 @@ final class OAuth2SpeakersApiTest extends ProtectedApiTest
             json_encode($data)
         );
 
-        $this->assertResponseStatus(201);
         $content = $response->getContent();
+        $this->assertResponseStatus(201);
         $speaker = json_decode($content);
         $this->assertTrue($speaker->id > 0);
         return $speaker;

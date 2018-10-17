@@ -39,6 +39,18 @@ class SpeakerPresentationLink extends SilverstripeBaseModel
     private $speaker;
 
     /**
+     * SpeakerPresentationLink constructor.
+     * @param string $link
+     * @param string|null $title
+     */
+    public function __construct($link, $title = null)
+    {
+        parent::__construct();
+        $this->link = $link;
+        $this->title = $title;
+    }
+
+    /**
      * @return string
      */
     public function getLink()
@@ -97,4 +109,6 @@ class SpeakerPresentationLink extends SilverstripeBaseModel
             return 0;
         }
     }
+
+
 }

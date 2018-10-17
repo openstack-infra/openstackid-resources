@@ -13,6 +13,7 @@
  **/
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
+use App\Models\Foundation\Main\CountryCodes;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SpeakerTravelPreference")
@@ -34,6 +35,16 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     private $speaker;
 
     /**
+     * SpeakerTravelPreference constructor.
+     * @param string $country
+     */
+    public function __construct($country)
+    {
+        parent::__construct();
+        $this->country = $country;
+    }
+
+    /**
      * @return int
      */
     public function getSpeakerId(){
@@ -51,6 +62,15 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     public function getCountry()
     {
         return $this->country;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountryName(){
+        if(isset(CountryCodes::$iso_3166_countryCodes[$this->country]))
+            return CountryCodes::$iso_3166_countryCodes[$this->country];
+        return '';
     }
 
     /**
@@ -76,4 +96,5 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     {
         $this->speaker = $speaker;
     }
+
 }

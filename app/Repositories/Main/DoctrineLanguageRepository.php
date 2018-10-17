@@ -1,4 +1,4 @@
-<?php namespace ModelSerializers;
+<?php namespace App\Repositories\Main;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,11 +11,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-final class SpeakerOrganizationalRoleSerializer
-    extends SilverStripeSerializer
+use App\Models\Foundation\Main\Language;
+use App\Models\Foundation\Main\Repositories\ILanguageRepository;
+use App\Repositories\SilverStripeDoctrineRepository;
+/**
+ * Class DoctrineLanguageRepository
+ * @package App\Repositories\Main
+ */
+final class DoctrineLanguageRepository
+    extends SilverStripeDoctrineRepository
+    implements ILanguageRepository
 {
-    protected static $array_mappings = [
-        'Role'      => 'role:json_string',
-        'Default'   => 'is_default:json_boolean',
-    ];
+
+    /**
+     * @return string
+     */
+    protected function getBaseEntity()
+    {
+        return Language::class;
+    }
 }

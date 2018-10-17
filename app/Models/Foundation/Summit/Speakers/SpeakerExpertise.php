@@ -27,6 +27,16 @@ class SpeakerExpertise extends SilverstripeBaseModel
     private $expertise;
 
     /**
+     * SpeakerExpertise constructor.
+     * @param string $expertise
+     */
+    public function __construct($expertise)
+    {
+        parent::__construct();
+        $this->expertise = $expertise;
+    }
+
+    /**
      * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="areas_of_expertise")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
      * @var PresentationSpeaker

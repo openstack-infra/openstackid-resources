@@ -14,7 +14,7 @@
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSpeakerActiveInvolvementRepository")
  * @ORM\Table(name="SpeakerActiveInvolvement")
  * Class SpeakerActiveInvolvement
  * @package models\summit

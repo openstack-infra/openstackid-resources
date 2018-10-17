@@ -606,6 +606,8 @@ Route::group([
              Route::get('', 'OAuth2SummitSpeakersApiController@getMySpeaker');
              Route::post('', 'OAuth2SummitSpeakersApiController@createMySpeaker');
              Route::put('', 'OAuth2SummitSpeakersApiController@updateMySpeaker');
+             Route::post('/photo', 'OAuth2SummitSpeakersApiController@addMySpeakerPhoto');
+
              Route::group(['prefix' => 'presentations'], function(){
 
                  Route::group(['prefix' => '{presentation_id}'], function(){

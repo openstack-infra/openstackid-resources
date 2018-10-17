@@ -1,4 +1,4 @@
-<?php namespace ModelSerializers;
+<?php namespace App\Models\Foundation\Summit\Repositories;
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,11 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-final class SpeakerOrganizationalRoleSerializer
-    extends SilverStripeSerializer
+use models\utils\IBaseRepository;
+/**
+ * Interface ISpeakerActiveInvolvementRepository
+ * @package App\Models\Foundation\Summit\Repositories
+ */
+interface ISpeakerActiveInvolvementRepository extends IBaseRepository
 {
-    protected static $array_mappings = [
-        'Role'      => 'role:json_string',
-        'Default'   => 'is_default:json_boolean',
-    ];
+
 }

@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\Language;
 use App\Models\Foundation\Summit\SelectionPlan;
 use Doctrine\ORM\Mapping AS ORM;
 use App\Events\PresentationSpeakerCreated;
@@ -179,8 +180,12 @@ class PresentationSpeaker extends SilverstripeBaseModel
     private $travel_preferences;
 
     /**
-     * @ORM\OneToMany(targetEntity="SpeakerLanguage", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
-     * @var SpeakerLanguage[]
+     * @ORM\ManyToMany(targetEntity="App\Models\Foundation\Main\Language", cascade={"persist"})
+     * @ORM\JoinTable(name="PresentationSpeaker_Languages",
+     *      joinColumns={@ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="LanguageID", referencedColumnName="ID")}
+     *      )
+     * @var Language[]
      */
     private $languages;
 
@@ -195,7 +200,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
     protected $organizational_roles;
 
     /**
-     * @ORM\ManyToMany(targetEntity="SpeakerOrganizationalRole", cascade={"persist"})
+     * @ORM\ManyToMany(targetEntity="SpeakerActiveInvolvement", cascade={"persist"})
      * @ORM\JoinTable(name="PresentationSpeaker_ActiveInvolvements",
      *      joinColumns={@ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="SpeakerActiveInvolvementID", referencedColumnName="ID")}
@@ -1387,6 +1392,10 @@ SQL;
         return $this->areas_of_expertise;
     }
 
+    public function clearAreasOfExpertise(){
+        $this->areas_of_expertise->clear();
+    }
+
     /**
      * @param SpeakerExpertise $area_of_expertise
      */
@@ -1411,6 +1420,11 @@ SQL;
         $link->setSpeaker($this);
     }
 
+
+    public function clearOtherPresentationLinks(){
+        $this->other_presentation_links->clear();
+    }
+
     /**
      * @return SpeakerTravelPreference[]
      */
@@ -1427,8 +1441,12 @@ SQL;
         $travel_preference->setSpeaker($this);
     }
 
+    public function clearTravelPreferences(){
+        $this->travel_preferences->clear();
+    }
+
     /**
-     * @return SpeakerLanguage[]
+     * @return Language[]
      */
     public function getLanguages()
     {
@@ -1436,11 +1454,18 @@ SQL;
     }
 
     /**
-     * @param SpeakerLanguage $language
+     * @param Language $language
      */
-    public function addLanguage(SpeakerLanguage $language){
+    public function addLanguage(Language $language){
+        if($this->languages->contains($language)) return;
         $this->languages->add($language);
-        $language->setSpeaker($this);
+    }
+
+    /**
+     *
+     */
+    public function clearLanguages(){
+        $this->languages->clear();
     }
 
     /**

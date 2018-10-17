@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Models\Foundation\Main\Language;
+use App\Models\Foundation\Main\Repositories\ILanguageRepository;
 use App\Models\Foundation\Summit\Defaults\DefaultSummitEventType;
 use App\Models\Foundation\Summit\DefaultTrackTagGroup;
 use App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackQuestionTemplate;
@@ -22,6 +24,8 @@ use App\Models\Foundation\Summit\Repositories\IPresentationCategoryGroupReposito
 use App\Models\Foundation\Summit\Repositories\IPresentationSpeakerSummitAssistanceConfirmationRequestRepository;
 use App\Models\Foundation\Summit\Repositories\IRSVPTemplateRepository;
 use App\Models\Foundation\Summit\Repositories\ISelectionPlanRepository;
+use App\Models\Foundation\Summit\Repositories\ISpeakerActiveInvolvementRepository;
+use App\Models\Foundation\Summit\Repositories\ISpeakerOrganizationalRoleRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitEventTypeRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationBannerRepository;
 use App\Models\Foundation\Summit\Repositories\ISummitLocationRepository;
@@ -45,6 +49,8 @@ use models\summit\ISummitTicketTypeRepository;
 use models\summit\PresentationCategory;
 use models\summit\PresentationCategoryGroup;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
+use models\summit\SpeakerActiveInvolvement;
+use models\summit\SpeakerOrganizationalRole;
 use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\SummitAbstractLocation;
@@ -362,6 +368,27 @@ final class RepositoriesProvider extends ServiceProvider
             ITrackQuestionTemplateRepository::class,
             function(){
                 return EntityManager::getRepository(TrackQuestionTemplate::class);
+            }
+        );
+
+        App::singleton(
+            ILanguageRepository::class,
+            function(){
+                return EntityManager::getRepository(Language::class);
+            }
+        );
+
+        App::singleton(
+            ISpeakerOrganizationalRoleRepository::class,
+            function(){
+                return EntityManager::getRepository(SpeakerOrganizationalRole::class);
+            }
+        );
+
+        App::singleton(
+            ISpeakerActiveInvolvementRepository::class,
+            function(){
+                return EntityManager::getRepository(SpeakerActiveInvolvement::class);
             }
         );
 

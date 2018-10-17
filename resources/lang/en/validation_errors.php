@@ -106,5 +106,13 @@ return [
     'TrackQuestionTemplateService.addTrackQuestionValueTemplate.ValueAlreadyExist' => 'value :value already exists on track question template :track_question_template_id',
     'TrackQuestionTemplateService.addTrackQuestionValueTemplate.LabelAlreadyExist' => 'label :label already exists on track question template :track_question_template_id',
     'TrackQuestionTemplateService.updateTrackQuestionValueTemplate.ValueAlreadyExist' => 'value :value already exists on track question template :track_question_template_id',
-    'TrackQuestionTemplateService.updateTrackQuestionValueTemplate.LabelAlreadyExist' => 'label :label already exists on track question template :track_question_template_id'
+    'TrackQuestionTemplateService.updateTrackQuestionValueTemplate.LabelAlreadyExist' => 'label :label already exists on track question template :track_question_template_id',
+    // SpeakerService
+    'SpeakerService.addSpeaker.MissingMemberOrEmail' => "you must provide an email or a member_id in order to create a speaker!",
+    'SpeakerService.addSpeaker.MemberAlreadyAssigned2Speaker' => "member id :member_id already has assigned speaker :speaker_id!",
+    'SpeakerService.updateSpeaker.MemberAlreadyAssigned2Speaker' => "member id :member_id already has assigned speaker :speaker_id!",
+    "SpeakerService.updateSpeakerRelations.InvalidLanguage" => "language :lang_id does not exists!",
+    "SpeakerService.updateSpeakerRelations.InvalidCountryCode" => "country :country does not exists!",
+    "SpeakerService.updateSpeakerRelations.InvalidOrganizationRole" => "organization role :role does not exists!",
+    "SpeakerService.updateSpeakerRelations.InvalidActiveInvolvement" => "involvement :involvement_id does not exists!"
 ];

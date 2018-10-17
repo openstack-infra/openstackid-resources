@@ -12,6 +12,7 @@
  * limitations under the License.
  **/
 use App\ModelSerializers\CCLA\TeamSerializer;
+use App\ModelSerializers\LanguageSerializer;
 use App\ModelSerializers\Marketplace\CloudServiceOfferedSerializer;
 use App\ModelSerializers\Marketplace\ConfigurationManagementTypeSerializer;
 use App\ModelSerializers\Marketplace\ConsultantClientSerializer;
@@ -122,6 +123,7 @@ final class SerializerRegistry
         $this->registry['PresentationCategoryGroup']  = PresentationCategoryGroupSerializer::class;
         $this->registry['PrivatePresentationCategoryGroup'] = PrivatePresentationCategoryGroupSerializer::class;
         $this->registry['Tag']                        = TagSerializer::class;
+        $this->registry['Language'] = LanguageSerializer::class;
         // track questions
         $this->registry['TrackAnswer']                = TrackAnswerSerializer::class;
         $this->registry['TrackQuestionValueTemplate'] = TrackQuestionValueTemplateSerializer::class;
@@ -166,7 +168,6 @@ final class SerializerRegistry
         $this->registry['RSVPDropDownQuestionTemplate']        = RSVPDropDownQuestionTemplateSerializer::class;
 
         $this->registry['SpeakerExpertise']           = SpeakerExpertiseSerializer::class;
-        $this->registry['SpeakerLanguage']            = SpeakerLanguageSerializer::class;
         $this->registry['SpeakerTravelPreference']    = SpeakerTravelPreferenceSerializer::class;
         $this->registry['SpeakerPresentationLink']    = SpeakerPresentationLinkSerializer::class;
         $this->registry['SpeakerActiveInvolvement']   = SpeakerActiveInvolvementSerializer::class;
