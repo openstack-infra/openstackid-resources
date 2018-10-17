@@ -13,9 +13,7 @@
  **/
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
-
 // public api ( without AUTHZ [OAUTH2.0])
-
 Route::group([
     'namespace' => 'App\Http\Controllers',
     'prefix'     => 'api/public/v1',
@@ -77,4 +75,15 @@ Route::group([
             Route::get('', 'PublicCloudsApiController@getAll');
         });
     });
+
+    // countries
+    Route::group(array('prefix' => 'countries'), function () {
+        Route::get('', 'CountriesApiController@getAll');
+    });
+
+    // languages
+    Route::group(array('prefix' => 'languages'), function () {
+        Route::get('', 'LanguagesApiController@getAll');
+    });
+
 });

@@ -1,4 +1,4 @@
-<?php namespace App\ModelSerializers;
+<?php
 /**
  * Copyright 2018 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,16 +11,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use ModelSerializers\SilverStripeSerializer;
 
-/**
- * Class LanguageSerializer
- * @package App\ModelSerializers
- */
-final class LanguageSerializer extends SilverStripeSerializer
+final class CountriesApiTest extends TestCase
 {
-    protected static $array_mappings = [
-        'Name' => 'name:json_string',
-        'IsoCode' => 'iso_code:json_string',
-    ];
+    public function testGetAllCountries()
+    {
+
+        $params = [
+
+        ];
+
+        $response = $this->action(
+            "GET",
+            "CountriesApiController@getAll",
+            $params,
+            [],
+            [],
+            [],
+            []
+        );
+
+        $content = $response->getContent();
+        $countries = json_decode($content);
+        $this->assertTrue(!is_null($countries));
+        $this->assertResponseStatus(200);
+    }
+
 }
