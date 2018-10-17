@@ -24,4 +24,9 @@ interface ISpeakerOrganizationalRoleRepository extends IBaseRepository
      * @return SpeakerOrganizationalRole|null
      */
     public function getByRole($role);
+
+    /**
+     * @return SpeakerOrganizationalRole[]
+     */
+    public function getDefaultOnes();
 }

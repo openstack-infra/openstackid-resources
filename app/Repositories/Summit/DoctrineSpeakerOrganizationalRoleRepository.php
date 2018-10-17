@@ -25,6 +25,14 @@ final class DoctrineSpeakerOrganizationalRoleRepository
 {
 
     /**
+     * @return SpeakerOrganizationalRole[]
+     */
+    public function getDefaultOnes()
+    {
+        return $this->findBy(["is_default" => true]);
+    }
+
+    /**
      * @return string
      */
     protected function getBaseEntity()

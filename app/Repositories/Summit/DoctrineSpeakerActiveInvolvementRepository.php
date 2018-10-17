@@ -30,4 +30,12 @@ final class DoctrineSpeakerActiveInvolvementRepository
     {
         return SpeakerActiveInvolvement::class;
     }
+
+    /**
+     * @return SpeakerActiveInvolvement[]
+     */
+    public function getDefaultOnes()
+    {
+        return $this->findBy(["is_default" => true]);
+    }
 }

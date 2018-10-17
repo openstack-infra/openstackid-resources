@@ -253,7 +253,7 @@ class ApiEndpointsSeeder extends Seeder
                 ],
             ],
             // speakers
-            array(
+           [
                 'name' => 'get-speakers',
                 'route' => '/api/v1/summits/{id}/speakers',
                 'http_method' => 'GET',
@@ -261,7 +261,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+            ],
             array(
                 'name' => 'add-speaker-by-summit',
                 'route' => '/api/v1/summits/{id}/speakers',
@@ -286,22 +286,22 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 ],
             ),
-            array(
+            [
                 'name' => 'add-speaker',
                 'route' => '/api/v1/speakers',
                 'http_method' => 'POST',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 ],
-            ),
-            array(
+            ],
+            [
                 'name' => 'update-speaker',
                 'route' => '/api/v1/speakers/{speaker_id}',
                 'http_method' => 'PUT',
                 'scopes' => [
                     sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 ],
-            ),
+            ],
             array(
                 'name' => 'delete-speaker',
                 'route' => '/api/v1/speakers/{speaker_id}',
@@ -310,7 +310,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::WriteSpeakersData, $current_realm),
                 ],
             ),
-            array(
+            [
                 'name' => 'get-all-speakers',
                 'route' => '/api/v1/speakers',
                 'http_method' => 'GET',
@@ -318,7 +318,25 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+            ],
+            [
+                'name' => 'get-speakers-active-involvements',
+                'route' => '/api/v1/speakers/active-involvements',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'get-speakers-organizational-roles',
+                'route' => '/api/v1/speakers/organizational-roles',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
             array(
                 'name' => 'get-speaker',
                 'route' => '/api/v1/speakers/{speaker_id}',

@@ -602,6 +602,14 @@ Route::group([
         Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeaker']);
         Route::put('merge/{speaker_from_id}/{speaker_to_id}', 'OAuth2SummitSpeakersApiController@merge');
 
+        Route::group(['prefix' => 'active-involvements'], function(){
+            Route::get('', 'OAuth2SpeakerActiveInvolvementApiController@getAll');
+        });
+
+        Route::group(['prefix' => 'organizational-roles'], function(){
+            Route::get('', 'OAuth2SpeakerOrganizationalRoleApiController@getAll');
+        });
+
         Route::group(['prefix' => 'me'], function(){
              Route::get('', 'OAuth2SummitSpeakersApiController@getMySpeaker');
              Route::post('', 'OAuth2SummitSpeakersApiController@createMySpeaker');

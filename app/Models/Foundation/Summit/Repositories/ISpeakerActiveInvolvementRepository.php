@@ -11,6 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use models\summit\SpeakerActiveInvolvement;
 use models\utils\IBaseRepository;
 /**
  * Interface ISpeakerActiveInvolvementRepository
@@ -18,5 +19,8 @@ use models\utils\IBaseRepository;
  */
 interface ISpeakerActiveInvolvementRepository extends IBaseRepository
 {
-
+    /**
+     * @return SpeakerActiveInvolvement[]
+     */
+    public function getDefaultOnes();
 }
