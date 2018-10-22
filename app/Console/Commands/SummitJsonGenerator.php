@@ -90,7 +90,7 @@ final class SummitJsonGenerator extends Command {
         $summit_id = $this->argument('summit_id');
 
         if(is_null($summit_id))// if we dont provide a summit id, then get current
-            $summit = $this->repository->getCurrent();
+            $summit = $this->repository->getCurrentAndAvailable();
         else
             $summit = $this->repository->getById(intval($summit_id));
 

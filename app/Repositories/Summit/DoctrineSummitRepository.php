@@ -32,7 +32,6 @@ final class DoctrineSummitRepository
             ->select("s")
             ->from(\models\summit\Summit::class, "s")
             ->where('s.active = 1')
-            ->andWhere('s.available_on_api = 1')
             ->orderBy('s.begin_date', 'DESC')
             ->getQuery()
             ->getResult();
@@ -115,6 +114,23 @@ final class DoctrineSummitRepository
             ->select("s")
             ->from(\models\summit\Summit::class, "s")
             ->where('s.active = 1')
+            ->orderBy('s.begin_date', 'DESC')
+            ->getQuery()
+            ->getResult();
+        if (count($res) == 0) return null;
+        return $res[0];
+    }
+
+    /**
+     * @return Summit
+     */
+    public function getCurrentAndAvailable()
+    {
+        $res = $this->getEntityManager()->createQueryBuilder()
+            ->select("s")
+            ->from(\models\summit\Summit::class, "s")
+            ->where('s.active = 1')
+            ->andWhere('s.available_on_api = 1')
             ->orderBy('s.begin_date', 'DESC')
             ->getQuery()
             ->getResult();

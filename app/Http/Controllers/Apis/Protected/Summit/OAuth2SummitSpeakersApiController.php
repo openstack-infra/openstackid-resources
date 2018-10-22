@@ -315,6 +315,47 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     }
 
     /**
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getMySummitSpeaker($summit_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $speaker = CheckSpeakerStrategyFactory::build(CheckSpeakerStrategyFactory::Me, $this->resource_server_context)->check('me', $summit);
+            if (is_null($speaker)) return $this->error404();
+
+            $serializer_type = $this->serializer_type_selector->getSerializerType();
+
+            return $this->ok
+            (
+                SerializerRegistry::getInstance()->getSerializer($speaker, $serializer_type)->serialize
+                (
+                    Request::input('expand', ''),
+                    [],
+                    [],
+                    [
+                        'summit_id' => $summit_id,
+                        'published' => Request::input('published', false),
+                        'summit'    => $summit
+                    ]
+                )
+            );
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412($ex1->getMessages());
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
      * @return mixed
      */
     public function getMySpeaker()

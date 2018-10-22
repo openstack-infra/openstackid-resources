@@ -26,6 +26,11 @@ interface ISummitRepository extends IBaseRepository
     /**
      * @return Summit
      */
+    public function getCurrentAndAvailable();
+
+    /**
+     * @return Summit
+     */
     public function getActive();
 
     /**

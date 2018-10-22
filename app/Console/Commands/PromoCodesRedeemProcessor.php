@@ -14,7 +14,6 @@
 use App\Services\Model\IAttendeeService;
 use Illuminate\Console\Command;
 use models\summit\ISummitRepository;
-
 /**
  * Class PromoCodesRedeemProcessor
  * @package App\Console\Commands
@@ -80,7 +79,7 @@ final class PromoCodesRedeemProcessor extends Command
         $summit_id = $this->argument('summit_id');
 
         if(is_null($summit_id))// if we dont provide a summit id, then get current
-            $summit = $this->repository->getCurrent();
+            $summit = $this->repository->getCurrentAndAvailable();
         else
             $summit = $this->repository->getById(intval($summit_id));
         $this->info(sprintf("starting to process promo codes for summit id %s", $summit->getIdentifier()));

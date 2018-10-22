@@ -169,7 +169,6 @@ Route::group([
                 });
             });
 
-
             Route::get('entity-events', 'OAuth2SummitApiController@getSummitEntityEvents');
 
             // attendees
@@ -223,9 +222,10 @@ Route::group([
 
                 Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@addSpeakerBySummit']);
                 Route::get('', 'OAuth2SummitSpeakersApiController@getSpeakers');
+                Route::get('me', 'OAuth2SummitSpeakersApiController@getMySummitSpeaker');
 
                 Route::group(['prefix' => '{speaker_id}'], function () {
-                    Route::get('', 'OAuth2SummitSpeakersApiController@getSummitSpeaker')->where('speaker_id', 'me|[0-9]+');
+                    Route::get('', 'OAuth2SummitSpeakersApiController@getSummitSpeaker')->where('speaker_id', '[0-9]+');
                     Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitSpeakersApiController@updateSpeakerBySummit'])->where('speaker_id', 'me|[0-9]+');
                 });
             });
