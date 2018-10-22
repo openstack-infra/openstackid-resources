@@ -60,7 +60,7 @@ final class DoctrineOrganizationRepository
     {
         try {
             return $this->getEntityManager()->createQueryBuilder()
-                ->select("t")
+                ->select("o")
                 ->from(\models\main\Organization::class, "o")
                 ->where('UPPER(TRIM(o.name)) = UPPER(TRIM(:name))')
                 ->setParameter('name', $name)

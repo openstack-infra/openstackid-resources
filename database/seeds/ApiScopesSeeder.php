@@ -122,7 +122,7 @@ final class ApiScopesSeeder extends Seeder
                 'description' => 'Grants write access for Speakers Data',
             ],
             [
-                'name' => sprintf(SummitScopes::ReadSpeakersDataSpeakersData, $current_realm),
+                'name' => sprintf(SummitScopes::ReadSpeakersData, $current_realm),
                 'short_description' => 'Read Speakers Data',
                 'description' => 'Grants read access for Speakers Data',
             ],
