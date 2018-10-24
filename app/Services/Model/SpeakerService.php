@@ -454,7 +454,7 @@ final class SpeakerService
         if (isset($data['other_presentation_links']) && is_array($data['other_presentation_links'])) {
             $speaker->clearOtherPresentationLinks();
             foreach ($data['other_presentation_links'] as $link) {
-                $speaker->addOtherPresentationLink(new SpeakerPresentationLink($link));
+                $speaker->addOtherPresentationLink(new SpeakerPresentationLink(trim($link['link']), trim($link['title'])));
             }
         }
         // languages

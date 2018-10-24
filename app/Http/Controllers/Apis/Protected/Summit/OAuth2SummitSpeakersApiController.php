@@ -549,7 +549,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 // collections
                 'languages' => 'sometimes|int_array',
                 'areas_of_expertise' => 'sometimes|string_array',
-                'other_presentation_links' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|link_array',
                 'travel_preferences' => 'sometimes|string_array',
                 'organizational_roles' => 'sometimes|int_array',
                 'other_organizational_rol' => 'sometimes|string|max:255',
@@ -628,7 +628,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 // collections
                 'languages' => 'sometimes|int_array',
                 'areas_of_expertise' => 'sometimes|string_array',
-                'other_presentation_links' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|link_array',
                 'travel_preferences' => 'sometimes|string_array',
                 'organizational_roles' => 'sometimes|int_array',
                 'other_organizational_rol' => 'sometimes|string|max:255',
@@ -787,7 +787,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 // collections
                 'languages' => 'sometimes|int_array',
                 'areas_of_expertise' => 'sometimes|string_array',
-                'other_presentation_links' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|link_array',
                 'travel_preferences' => 'sometimes|string_array',
                 'organizational_roles' => 'sometimes|int_array',
                 'other_organizational_rol' => 'sometimes|string|max:255',
@@ -860,7 +860,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 // collections
                 'languages' => 'sometimes|int_array',
                 'areas_of_expertise' => 'sometimes|string_array',
-                'other_presentation_links' => 'sometimes|string_array',
+                'other_presentation_links' => 'sometimes|link_array',
                 'travel_preferences' => 'sometimes|string_array',
                 'organizational_roles' => 'sometimes|int_array',
                 'other_organizational_rol' => 'sometimes|string|max:255',

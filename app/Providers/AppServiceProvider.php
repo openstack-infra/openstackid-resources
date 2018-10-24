@@ -225,6 +225,26 @@ class AppServiceProvider extends ServiceProvider
             return true;
         });
 
+        Validator::extend('link_array', function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('link_array', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf("%s should be an array of {title,link} tuple", $attribute);
+            });
+
+            if(!is_array($value)) return false;
+            foreach($value as $element)
+            {
+                // Creates a Validator instance and validates the data.
+                $validation = Validator::make($element, [
+                    'title' => 'required|string|max:255',
+                    'link'  => 'required|url',
+                ]);
+
+                if($validation->fails()) return false;
+            }
+            return true;
+        });
+
         Validator::extend('team_permission', function($attribute, $value, $parameters, $validator)
         {
             $validator->addReplacer('team_permission', function($message, $attribute, $rule, $parameters) use ($validator) {

@@ -28,17 +28,20 @@ final class OAuth2SpeakersApiTest extends ProtectedApiTest
         $suffix = str_random(16);
 
         $data = [
-
             'title'      => 'Developer!',
             'first_name' => 'Sebastian',
             'last_name'  => 'Marcet',
             'email'      => "smarcet.{$suffix}@gmail.com",
-            'languages'  => [1,2],
-            'other_presentation_links' => ["https://www.openstack.org"],
+            'languages'  => [1,2,3],
+            'other_presentation_links' => [
+                [
+                    'link' => 'https://www.openstack.org',
+                ]
+            ],
             'travel_preferences' => ["AF"],
             "areas_of_expertise" => ["testing"],
-            "active_involvements" => [1],
-            "organizational_roles" => [1],
+            "active_involvements" => [],
+            "organizational_roles" => [],
             "other_organizational_rol" => "no se",
         ];
 
