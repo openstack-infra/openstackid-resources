@@ -21,6 +21,12 @@ use models\main\SummitMemberSchedule;
 use models\utils\SilverstripeBaseModel;
 /**
  * @ORM\Entity
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="attendees"
+ *     )
+ * })
  * @ORM\Table(name="SummitAttendee")
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitAttendeeRepository")
  * Class SummitAttendee

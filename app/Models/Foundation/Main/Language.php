@@ -20,7 +20,7 @@ use models\utils\SilverstripeBaseModel;
  * Class Language
  * @package App\Models\Foundation\Main
  */
-final class Language extends SilverstripeBaseModel
+class Language extends SilverstripeBaseModel
 {
     /**
      * @ORM\Column(name="Name", type="string")

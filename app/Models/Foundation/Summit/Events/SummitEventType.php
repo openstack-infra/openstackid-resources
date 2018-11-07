@@ -15,6 +15,12 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEventTypeRepository")
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="event_types"
+ *     )
+ * })
  * @ORM\Table(name="SummitEventType")
  * @ORM\InheritanceType("JOINED")
  * @ORM\DiscriminatorColumn(name="ClassName", type="string")

@@ -13,7 +13,6 @@
  **/
 use Illuminate\Console\Command;
 use App\Services\Model\IAdminActionsCalendarSyncProcessingService;
-
 /**
  * Class AdminActionsCalendarSyncProcessingCommand
  * @package App\Console\Commands

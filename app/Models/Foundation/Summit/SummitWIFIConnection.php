@@ -16,6 +16,12 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="wifi_connections"
+ *     )
+ * })
  * @ORM\Table(name="SummitWIFIConnection")
  * Class SummitWIFIConnection
  * @package models\summit\SummitWIFIConnection

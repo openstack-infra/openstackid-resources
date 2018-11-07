@@ -23,6 +23,12 @@ use models\utils\SilverstripeBaseModel;
 use DateTime;
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSelectionPlanRepository")
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="selection_plans"
+ *     )
+ * })
  * @ORM\Table(name="SelectionPlan")
  * Class SelectionPlan
  * @package App\Models\Foundation\Summit

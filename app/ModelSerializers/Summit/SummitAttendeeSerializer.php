@@ -11,11 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use libs\utils\JsonUtils;
 use Illuminate\Support\Facades\Config;
 use models\summit\SummitAttendee;
-
 /**
  * Class SummitAttendeeSerializer
  * @package ModelSerializers

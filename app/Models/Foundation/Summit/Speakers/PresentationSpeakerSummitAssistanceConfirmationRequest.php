@@ -17,6 +17,12 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * Class PresentationSpeakerSummitAssistanceConfirmationRequest
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrinePresentationSpeakerSummitAssistanceConfirmationRequestRepository")
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="speaker_assistances"
+ *     )
+ * })
  * @ORM\Table(name="PresentationSpeakerSummitAssistanceConfirmationRequest")
  * @package models\summit
  */

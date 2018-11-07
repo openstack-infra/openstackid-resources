@@ -94,7 +94,8 @@ final class ServicesProvider extends ServiceProvider
         });
 
         // setting facade
-        $this->app['encryption'] = App::share(function ($app) {
+
+        App::singleton('encryption', function ($app) {
             return new \services\utils\EncryptionService(
                 Config::get("server.ss_encrypt_key", ''),
                 Config::get("server.ss_encrypt_cypher", '')

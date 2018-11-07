@@ -19,7 +19,7 @@ use models\summit\SummitAbstractLocation;
  * @ORM\Table(name="AdminSummitLocationActionSyncWorkRequest")
  * @package models\summit\CalendarSync\WorkQueue
  */
-final class AdminSummitLocationActionSyncWorkRequest
+class AdminSummitLocationActionSyncWorkRequest
 extends AdminScheduleSummitActionSyncWorkRequest
 {
     const SubType = 'ADMIN_LOCATION';

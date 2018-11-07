@@ -1,46 +1,22 @@
-<?php
-
-use Illuminate\Support\Facades\Redis;
-
-class TestCase extends Illuminate\Foundation\Testing\TestCase
+<?php namespace Tests;
+/**
+ * Copyright 2015 Openstack Foundation
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+/**
+ * Class TestCase
+ * @package Tests
+ */
+abstract class TestCase extends BaseTestCase
 {
-
-	//services
-	private $redis = null;
-	/**
-	 * Creates the application.
-	 *
-	 * @return \Illuminate\Foundation\Application
-	 */
-	public function createApplication()
-	{
-		//putenv('DB_DEFAULT=sqlite_testing');
-
-		$app = require __DIR__.'/../bootstrap/app.php';
-
-		$instance = $app->make('Illuminate\Contracts\Console\Kernel');
-		$app->loadEnvironmentFrom('.env.testing');
-		$instance->bootstrap();
-		return $app;
-	}
-
-	public function setUp()
-	{
-		parent::setUp();
-		$this->redis  = Redis::connection();
-		$this->redis->flushall();
-		$this->prepareForTests();
-	}
-
-	protected function prepareForTests()
-	{
-		Artisan::call('migrate');
-		$this->seed('TestSeeder');
-	}
-
-	public function tearDown()
-	{
-
-		parent::tearDown();
-	}
+    use CreatesApplication;
 }

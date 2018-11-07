@@ -11,7 +11,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
+use Tests\TestCase;
+/**
+ * Class CountriesApiTest
+ */
 final class CountriesApiTest extends TestCase
 {
     public function testGetAllCountries()

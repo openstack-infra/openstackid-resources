@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping AS ORM;
  * Class TrackTextBoxQuestionTemplate
  * @package App\Models\Foundation\Summit\Events\Presentations\TrackQuestions
  */
-final class TrackTextBoxQuestionTemplate extends TrackSingleValueTemplateQuestion
+class TrackTextBoxQuestionTemplate extends TrackSingleValueTemplateQuestion
 {
     const ClassName = 'TrackTextBoxQuestionTemplate';
 

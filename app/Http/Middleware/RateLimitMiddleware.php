@@ -62,7 +62,7 @@ final class RateLimitMiddleware extends ThrottleRequests
      */
     public function handle($request, Closure $next, $max_attempts = 0, $decay_minutes = 0)
     {
-        $route     = RequestUtils::getCurrentRoutePath($request);
+        $route     = RequestUtils::getCurrentRoutePath();
         $method    = $request->getMethod();
         $endpoint  = $this->endpoint_repository->getApiEndpointByUrlAndMethod($route, $method);
         $key       = $this->resolveRequestSignature($request);

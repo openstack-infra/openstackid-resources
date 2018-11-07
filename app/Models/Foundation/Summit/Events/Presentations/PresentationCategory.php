@@ -22,6 +22,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 /**
  * Class PresentationCategory
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitTrackRepository")
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="presentation_categories"
+ *     )
+ * })
  * @ORM\Table(name="PresentationCategory")
  * @package models\summit
  */

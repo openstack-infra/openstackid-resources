@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Config;
  * Class EndPointRateLimitByIP
  * @package App\Models\ResourceServer
  */
-final class EndPointRateLimitByIP extends ResourceServerEntity
+class EndPointRateLimitByIP extends ResourceServerEntity
 {
 
     /**

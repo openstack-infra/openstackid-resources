@@ -19,7 +19,7 @@ use models\utils\SilverstripeBaseModel;
  * Class MarketPlaceReview
  * @package App\Models\Foundation\Marketplace
  */
-final class MarketPlaceReview extends SilverstripeBaseModel
+class MarketPlaceReview extends SilverstripeBaseModel
 {
 
     /**
