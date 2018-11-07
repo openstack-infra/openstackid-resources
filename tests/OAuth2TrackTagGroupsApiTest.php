@@ -12,6 +12,9 @@
  * limitations under the License.
  **/
 
+/**
+ * Class OAuth2TrackTagGroupsApiTest
+ */
 final class OAuth2TrackTagGroupsApiTest extends ProtectedApiTest
 {
     public function testGetTrackTagGroups($summit_id = 25)

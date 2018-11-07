@@ -11,13 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Events\FileCreated;
 use App\Services\Model\IFolderService;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use models\main\File;
-use models\main\IFolderRepository;
 /**
  * Class FileUploader
  * @package App\Http\Utils
@@ -30,11 +28,17 @@ final class FileUploader
     private $folder_service;
 
     /**
+     * @var IBucket
+     */
+    private $bucket;
+
+    /**
      * FileUploader constructor.
      * @param IFolderService $folder_service
      */
-    public function __construct(IFolderService $folder_service){
+    public function __construct(IFolderService $folder_service, IBucket $bucket){
         $this->folder_service = $folder_service;
+        $this->bucket = $bucket;
     }
 
     /**
@@ -45,17 +49,27 @@ final class FileUploader
      */
     public function build(UploadedFile $file, $folder_name, $is_image = false){
         $attachment = new File();
-        $local_path = Storage::putFileAs(sprintf('/public/%s', $folder_name), $file, $file->getClientOriginalName());
-        $folder     = $this->folder_service->findOrMake($folder_name);
+        try {
 
-        $attachment->setParent($folder);
-        $attachment->setName($file->getClientOriginalName());
-        $attachment->setFilename(sprintf("assets/%s/%s",$folder_name, $file->getClientOriginalName()));
-        $attachment->setTitle(str_replace(array('-','_'),' ', preg_replace('/\.[^.]+$/', '', $file->getClientOriginalName())));
-        $attachment->setShowInSearch(true);
-        if($is_image)
-            $attachment->setImage();
-        Event::fire(new FileCreated($local_path, $file->getClientOriginalName(), $folder_name));
+            $local_path = Storage::putFileAs(sprintf('/public/%s', $folder_name), $file, $file->getClientOriginalName());
+            $folder = $this->folder_service->findOrMake($folder_name);
+
+            $attachment->setParent($folder);
+            $attachment->setName($file->getClientOriginalName());
+            $attachment->setFilename(sprintf("assets/%s/%s", $folder_name, $file->getClientOriginalName()));
+            $attachment->setTitle(str_replace(array('-', '_'), ' ', preg_replace('/\.[^.]+$/', '', $file->getClientOriginalName())));
+            $attachment->setShowInSearch(true);
+            if ($is_image) $attachment->setImage();
+            $this->bucket->put($attachment, $local_path);
+            $attachment->setCloudMeta('LastPut', time());
+            $attachment->setCloudStatus('Live');
+            $attachment->setCloudSize(filesize($local_path));
+
+        }
+        catch (\Exception $ex){
+            Log::error($ex);
+            $attachment->setCloudStatu('Error');
+        }
         return $attachment;
     }
 }

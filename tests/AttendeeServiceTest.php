@@ -12,6 +12,8 @@
  * limitations under the License.
  **/
 use App\Services\Model\IAttendeeService;
+use Tests\TestCase;
+use Illuminate\Support\Facades\App;
 /**
  * Class AttendeeServiceTest
  */

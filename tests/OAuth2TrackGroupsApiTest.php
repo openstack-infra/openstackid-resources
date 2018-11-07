@@ -111,7 +111,6 @@ final class OAuth2TrackGroupsApiTest extends ProtectedApiTest
         $track_group = json_decode($content);
         $this->assertTrue(!is_null($track_group));
         $this->assertResponseStatus(200);
-
     }
 
     /**

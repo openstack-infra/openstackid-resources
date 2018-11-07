@@ -36,7 +36,7 @@ final class PresentationSlideSerializer extends PresentationMaterialSerializer
         $values = parent::serialize($expand, $fields, $relations, $params);
         $slide  = $this->object;
         if(empty($values['link'])){
-            $values['link']  =  $slide->hasSlide() ? Config::get("server.assets_base_url", 'https://www.openstack.org/') . $slide->getSlide()->getFilename(): null;
+            $values['link']  =  $slide->hasSlide() ?  $slide->getSlide()->getUrl(): null;
         }
         return $values;
     }

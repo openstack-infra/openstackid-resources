@@ -31,7 +31,7 @@ final class SummitEventWithFileSerializer extends SummitEventSerializer
 
         $values = parent::serialize($expand, $fields, $relations, $params);
 
-        $values['attachment'] = $event->hasAttachment()? Config::get("server.assets_base_url", 'https://www.openstack.org/') . $event->getAttachment()->getFilename() : null;
+        $values['attachment'] = $event->hasAttachment()? $event->getAttachment()->getUrl() : null;
 
         return $values;
     }

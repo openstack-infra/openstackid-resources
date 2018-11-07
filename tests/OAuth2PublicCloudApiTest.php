@@ -12,7 +12,6 @@
  * limitations under the License.
  **/
 
-use models\marketplace\ICompanyServiceRepository;
 
 /**
  * Class OAuth2PublicCloudApiTest
@@ -26,14 +25,14 @@ class OAuth2PublicCloudApiTest extends ProtectedApiTest
         $params = array(
             'page' => 1,
             'per_page' => 10,
-            'status' => ICompanyServiceRepository::Status_active,
+            'status' => 'active',
         );
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
 
         $response = $this->action(
             "GET",
-            "OAuth2PublicCloudApiController@getClouds",
+            "PublicCloudsApiController@getAll",
             $params,
             array(),
             array(),
@@ -57,7 +56,7 @@ class OAuth2PublicCloudApiTest extends ProtectedApiTest
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2PublicCloudApiController@getCloud",
+            "PublicCloudsApiController@get",
             $params,
             array(),
             array(),
@@ -81,7 +80,7 @@ class OAuth2PublicCloudApiTest extends ProtectedApiTest
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2PublicCloudApiController@getCloud",
+            "PublicCloudsApiController@getCloud",
             $params,
             array(),
             array(),
@@ -105,7 +104,7 @@ class OAuth2PublicCloudApiTest extends ProtectedApiTest
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2PublicCloudApiController@getCloudDataCenters",
+            "PublicCloudsApiController@getCloudDataCenters",
             $params,
             array(),
             array(),

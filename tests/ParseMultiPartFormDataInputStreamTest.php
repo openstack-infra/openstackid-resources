@@ -11,8 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use Tests\TestCase;
 
-class ParseMultiPartFormDataInputStreamTest extends TestCase
+/**
+ * Class ParseMultiPartFormDataInputStreamTest
+ */
+final class ParseMultiPartFormDataInputStreamTest extends TestCase
 {
     public function testParse(){
         $input = <<<DATA

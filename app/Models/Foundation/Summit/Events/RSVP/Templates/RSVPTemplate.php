@@ -22,6 +22,12 @@ use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Table(name="RSVPTemplate")
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineRSVPTemplateRepository")
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="rsvp_templates"
+ *     )
+ * })
  * Class RSVPTemplate
  * @package App\Models\Foundation\Summit\Events\RSVP
  */

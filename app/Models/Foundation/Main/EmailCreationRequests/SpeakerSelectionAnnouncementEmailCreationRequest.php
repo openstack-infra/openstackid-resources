@@ -16,14 +16,13 @@ use models\summit\PresentationSpeaker;
 use models\summit\SpeakerAnnouncementSummitEmail;
 use models\summit\SummitOwned;
 use models\summit\SummitRegistrationPromoCode;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="SpeakerSelectionAnnouncementEmailCreationRequest")
  * Class SpeakerSelectionAnnouncementEmailCreationRequest
  * @package models\main
  */
-final class SpeakerSelectionAnnouncementEmailCreationRequest
+class SpeakerSelectionAnnouncementEmailCreationRequest
     extends EmailCreationRequest
 {
 

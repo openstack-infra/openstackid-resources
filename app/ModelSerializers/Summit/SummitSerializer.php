@@ -87,7 +87,7 @@ class SummitSerializer extends SilverStripeSerializer
         }
 
         $values['logo'] = ($summit->hasLogo()) ?
-            Config::get("server.assets_base_url", 'https://www.openstack.org/') . $summit->getLogo()->getFilename()
+            $summit->getLogo()->getUrl()
             : null;
 
         // pages info

@@ -26,6 +26,7 @@ use utils\Filter;
 use utils\Order;
 use utils\PagingInfo;
 use utils\PagingResponse;
+use models\summit\SummitVenueRoom;
 /**
  * Class DoctrineSummitLocationRepository
  * @package App\Repositories\Summit
@@ -35,8 +36,8 @@ final class DoctrineSummitLocationRepository
     implements ISummitLocationRepository
 {
 
-    private static $forbidded_classes = [
-        'models\\summit\\SummitVenueRoom',
+    private static $forbidden_classes = [
+        SummitVenueRoom::ClassName,
     ];
 
     /**
@@ -109,8 +110,15 @@ final class DoctrineSummitLocationRepository
             ->leftJoin(SummitHotel::class, 'h', 'WITH', 'h.id = el.id')
             ->leftJoin(SummitAirport::class, 'ap', 'WITH', 'ap.id = el.id')
             ->leftJoin('al.summit', 's')
-            ->where("s.id = :summit_id")
-            ->andWhere("not al INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')");
+            ->where("s.id = :summit_id");
+
+        $idx  = 1;
+        foreach(self::$forbidden_classes as $forbidden_class){
+            $query = $query
+                ->andWhere("not al INSTANCE OF :forbidden_class".$idx);
+            $query->setParameter("forbidden_class".$idx, $forbidden_class);
+            $idx++;
+        }
 
         $query->setParameter("summit_id", $summit->getId());
 
