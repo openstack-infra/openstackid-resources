@@ -14,10 +14,10 @@
 use App\Services\Apis\CalendarSync\Exceptions\RateLimitExceededException;
 use App\Services\Apis\CalendarSync\Exceptions\RevokedAccessException;
 use App\Services\Apis\CalendarSync\ICalendarSyncRemoteFacadeFactory;
-use CalDAVClient\Facade\Exceptions\ConflictException;
 use CalDAVClient\Facade\Exceptions\ForbiddenException;
 use CalDAVClient\Facade\Exceptions\NotFoundResourceException;
 use CalDAVClient\Facade\Exceptions\ServerErrorException;
+use models\exceptions\EntityNotFoundException;
 use models\main\CalendarSyncErrorEmailRequest;
 use models\main\IEmailCreationRequestRepository;
 use models\summit\CalendarSync\CalendarSyncInfo;
@@ -140,17 +140,23 @@ implements IMemberActionsCalendarSyncProcessingService
                     $request_type         = $request->getType();
                     $request_sub_type     = $request->getSubType();
 
-                    log::info(sprintf
-                    (
-                        "%s - processing work request %s - sub type %s - type %s - member %s - credential id %s -revoked credentials %s",
-                                $provider,
-                                $request->getIdentifier(),
-                                $request_sub_type,
-                                $request_type,
-                                $member->getIdentifier(),
-                                $calendar_sync_info->getId(),
-                                $calendar_sync_info->isRevoked()? 1 : 0
-                    ));
+                    try {
+                        log::info(sprintf
+                        (
+                            "%s - processing work request %s - sub type %s - type %s - member %s - credential id %s -revoked credentials %s",
+                            $provider,
+                            $request->getIdentifier(),
+                            $request_sub_type,
+                            $request_type,
+                            $member->getIdentifier(),
+                            $calendar_sync_info->getId(),
+                            $calendar_sync_info->isRevoked() ? 1 : 0
+                        ));
+                    }
+                    catch (Exception $ex8){
+                        Log::warning($ex8);
+                        continue;
+                    }
 
                     switch ($request_sub_type) {
 
