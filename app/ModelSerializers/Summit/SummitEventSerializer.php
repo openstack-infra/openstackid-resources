@@ -114,7 +114,7 @@ class SummitEventSerializer extends SilverStripeSerializer
                     case 'location': {
                         if($event->hasLocation()){
                             unset($values['location_id']);
-                            $values['location'] = SerializerRegistry::getInstance()->getSerializer($event->getLocation())->serialize();
+                            $values['location'] = SerializerRegistry::getInstance()->getSerializer($event->getLocation())->serialize($expand);
                         }
                     }
                     break;
