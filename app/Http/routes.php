@@ -612,6 +612,13 @@ Route::group([
                                 ->where('role', 'creator|speaker|moderator');
                          });
                      });
+
+                     Route::group(['prefix' => 'summits'], function(){
+                         Route::group(['prefix' => '{summit_id}'], function(){
+                             Route::get("", "OAuth2SummitSpeakersApiController@getMySpeakerPresentationsByRoleAndBySummit")
+                                 ->where('role', 'creator|speaker|moderator');
+                         });
+                     });
                  });
              });
         });

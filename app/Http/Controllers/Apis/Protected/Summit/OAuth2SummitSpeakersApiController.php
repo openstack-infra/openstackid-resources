@@ -927,7 +927,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
     /**
      * @param $role
      * @param $selection_plan_id
-     * @return mixed
+     * @return mixedf
      */
     public function getMySpeakerPresentationsByRoleAndBySelectionPlan($role, $selection_plan_id)
     {
@@ -960,6 +960,65 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                     break;
             }
             $presentations = $speaker->getPresentationsBySelectionPlanAndRole($selection_plan, $role);
+
+            $response = new PagingResponse
+            (
+                count($presentations),
+                count($presentations),
+                1,
+                1,
+                $presentations
+            );
+
+            return $this->ok($response->toArray($expand = Input::get('expand', '')));
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $role
+     * @param $summit_id
+     * @return mixed
+     */
+    public function getMySpeakerPresentationsByRoleAndBySummit($role, $summit_id)
+    {
+        try {
+            $current_member_id = $this->resource_server_context->getCurrentUserExternalId();
+            if (is_null($current_member_id))
+                return $this->error403();
+
+            $member = $this->member_repository->getById($current_member_id);
+            if (is_null($member))
+                return $this->error403();
+
+            $speaker = $this->speaker_repository->getByMember($member);
+            if (is_null($speaker))
+                return $this->error403();
+
+            $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404(['message' => 'missing selection summit']);
+
+
+            switch ($role) {
+                case 'creator':
+                    $role = PresentationSpeaker::ROLE_CREATOR;
+                    break;
+                case 'speaker':
+                    $role = PresentationSpeaker::ROLE_SPEAKER;
+                    break;
+                case 'moderator':
+                    $role = PresentationSpeaker::ROLE_MODERATOR;
+                    break;
+            }
+            $presentations = $speaker->getPresentationsBySummitAndRole($summit, $role);
 
             $response = new PagingResponse
             (

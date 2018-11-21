@@ -355,7 +355,7 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
             ),
-            array(
+           [
                 'name' => 'get-my-speaker-presentations-by-role-by-selection-plan',
                 'route' => '/api/v1/speakers/me/presentations/{role}/selection-plans/{selection_plan_id}',
                 'http_method' => 'GET',
@@ -363,7 +363,18 @@ class ApiEndpointsSeeder extends Seeder
                     sprintf(SummitScopes::ReadSummitData, $current_realm),
                     sprintf(SummitScopes::ReadAllSummitData, $current_realm)
                 ],
-            ),
+
+            ],
+            [
+                'name' => 'get-my-speaker-presentations-by-role-by-summit',
+                'route' => '/api/v1/speakers/me/presentations/{role}/summits/{summit_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+
+            ],
             [
                 'name' => 'add-speaker-2-my-presentation',
                 'route' => '/api/v1/speakers/me/presentations/{presentation_id}/speakers/{speaker_id}',

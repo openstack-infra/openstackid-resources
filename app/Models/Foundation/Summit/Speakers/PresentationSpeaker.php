@@ -405,7 +405,7 @@ class PresentationSpeaker extends SilverstripeBaseModel
 
     /**
      * @param SelectionPlan $selectionPlan
-     * @param $role
+     * @param string $role
      * @return array
      */
     public function getPresentationsBySelectionPlanAndRole(SelectionPlan $selectionPlan, $role){
@@ -426,6 +426,33 @@ class PresentationSpeaker extends SilverstripeBaseModel
 
         if($role == self::ROLE_MODERATOR){
             return $selectionPlan->getSummit()->getModeratedPresentationsBy($this, $selectionPlan);
+        }
+
+        return [];
+    }
+
+    /**
+     * @param Summit $summit
+     * @param string $role
+     * @return array
+     */
+    public function getPresentationsBySummitAndRole(Summit $summit, $role){
+
+        if($role == self::ROLE_SPEAKER){
+            $res = $this->presentations->filter(function(Presentation $presentation) use($summit){
+                if($presentation->getSummit()->getId() != $summit->getId()) return false;
+                if($presentation->getModeratorId() == $this->getId()) return false;
+                if($presentation->getCreatorId() == $this->getMemberId()) return false;
+            });
+            return $res->toArray();
+        }
+
+        if($role == self::ROLE_CREATOR){
+            return $summit->getCreatedPresentations($this);
+        }
+
+        if($role == self::ROLE_MODERATOR){
+            return $summit->getModeratedPresentationsBy($this);
         }
 
         return [];

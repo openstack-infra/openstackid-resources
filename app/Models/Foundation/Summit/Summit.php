@@ -853,38 +853,46 @@ class Summit extends SilverstripeBaseModel
 
     /**
      * @param PresentationSpeaker $speaker
-     * @param SelectionPlan $selectionPlan
+     * @param SelectionPlan|null $selectionPlan
      * @return array
      */
-    public function getModeratedPresentationsBy(PresentationSpeaker $speaker, SelectionPlan $selectionPlan){
+    public function getModeratedPresentationsBy(PresentationSpeaker $speaker, SelectionPlan $selectionPlan = null){
         $query = $this->createQuery("SELECT p from models\summit\Presentation p 
         JOIN p.summit s
         JOIN p.moderator m 
         JOIN p.selection_plan sp
         WHERE s.id = :summit_id and m.id = :moderator_id and sp.id = :selection_plan_id");
-        return $query
-                ->setParameter('summit_id', $this->getIdentifier())
-                ->setParameter('moderator_id', $speaker->getIdentifier())
-                ->setParameter('selection_plan_id', $selectionPlan->getIdentifier())
-                ->getResult();
+
+        $query = $query
+            ->setParameter('summit_id', $this->getIdentifier())
+            ->setParameter('moderator_id', $speaker->getIdentifier());
+
+        if(!is_null($selectionPlan)){
+            $query = $query->setParameter('selection_plan_id', $selectionPlan->getIdentifier());
+        }
+        return $query->getResult();
     }
 
     /**
      * @param PresentationSpeaker $speaker
-     * @param SelectionPlan $selectionPlan
+     * @param SelectionPlan|null $selectionPlan
      * @return array
      */
-    public function getCreatedPresentations(PresentationSpeaker $speaker, SelectionPlan $selectionPlan){
+    public function getCreatedPresentations(PresentationSpeaker $speaker, SelectionPlan $selectionPlan = null){
         $query = $this->createQuery("SELECT p from models\summit\Presentation p 
         JOIN p.summit s
         JOIN p.creator c 
         JOIN p.selection_plan sp
         WHERE s.id = :summit_id and c.id = :creator_id and sp.id = :selection_plan_id");
-        return $query
+        $query =  $query
             ->setParameter('summit_id', $this->getIdentifier())
-            ->setParameter('creator_id', $speaker->getMemberId())
-            ->setParameter('selection_plan_id', $selectionPlan->getIdentifier())
-            ->getResult();
+            ->setParameter('creator_id', $speaker->getMemberId());
+
+        if(!is_null($selectionPlan)){
+            $query = $query->setParameter('selection_plan_id', $selectionPlan->getIdentifier());
+        }
+
+        return $query->getResult();
     }
 
     /**
