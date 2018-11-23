@@ -419,6 +419,19 @@ class Presentation extends SummitEvent
     }
 
     /**
+     * @return int
+     */
+    public function getSelectionPlanId(){
+        try {
+            return !is_null($this->selection_plan)? $this->selection_plan->getId():0;
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+
+    /**
      * @return PresentationSpeaker
      */
     public function getModerator()
@@ -694,20 +707,6 @@ class Presentation extends SummitEvent
         try{
             if(is_null($this->creator)) return 0;
             return $this->creator->getId();
-        }
-        catch(\Exception $ex){
-            return 0;
-        }
-    }
-
-    /**
-     * @return int
-     */
-    public function getSelectionPlanId()
-    {
-        try{
-            if(is_null($this->selection_plan)) return 0;
-            return $this->selection_plan->getId();
         }
         catch(\Exception $ex){
             return 0;

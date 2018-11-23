@@ -23,6 +23,7 @@ class PresentationSerializer extends SummitEventSerializer
         'Level'                   => 'level',
         'CreatorId'               => 'creator_id:json_int',
         'ModeratorId'             => 'moderator_speaker_id:json_int',
+        'SelectionPlanId'         => 'selection_plan_id:json_int',
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
         'ToRecord'                => 'to_record:json_boolean',
@@ -35,6 +36,7 @@ class PresentationSerializer extends SummitEventSerializer
         'track_id',
         'creator_id',
         'moderator_speaker_id',
+        'selection_plan_id',
         'level',
         'problem_addressed',
         'attendees_expected_learnt',
@@ -132,6 +134,13 @@ class PresentationSerializer extends SummitEventSerializer
                         if($presentation->getCreatorId() > 0) {
                             unset($values['creator_id']);
                             $values['creator'] = SerializerRegistry::getInstance()->getSerializer($presentation->getCreator())->serialize();
+                        }
+                    }
+                    break;
+                    case 'selection_plan':{
+                        if($presentation->getSelectionPlanId() > 0) {
+                            unset($values['selection_plan_id']);
+                            $values['selection_plan'] = SerializerRegistry::getInstance()->getSerializer($presentation->getSelectionPlan())->serialize();
                         }
                     }
                     break;

@@ -857,11 +857,16 @@ class Summit extends SilverstripeBaseModel
      * @return array
      */
     public function getModeratedPresentationsBy(PresentationSpeaker $speaker, SelectionPlan $selectionPlan = null){
+        $selection_plan_cond = "";
+        if(!is_null($selectionPlan)){
+            $selection_plan_cond = " and sp.id = :selection_plan_id";
+        }
+
         $query = $this->createQuery("SELECT p from models\summit\Presentation p 
         JOIN p.summit s
         JOIN p.moderator m 
         JOIN p.selection_plan sp
-        WHERE s.id = :summit_id and m.id = :moderator_id and sp.id = :selection_plan_id");
+        WHERE s.id = :summit_id and m.id = :moderator_id".$selection_plan_cond);
 
         $query = $query
             ->setParameter('summit_id', $this->getIdentifier())
@@ -879,11 +884,18 @@ class Summit extends SilverstripeBaseModel
      * @return array
      */
     public function getCreatedPresentations(PresentationSpeaker $speaker, SelectionPlan $selectionPlan = null){
+        $selection_plan_cond = "";
+
+        if(!is_null($selectionPlan)){
+            $selection_plan_cond = " and sp.id = :selection_plan_id";
+        }
+
         $query = $this->createQuery("SELECT p from models\summit\Presentation p 
         JOIN p.summit s
         JOIN p.creator c 
         JOIN p.selection_plan sp
-        WHERE s.id = :summit_id and c.id = :creator_id and sp.id = :selection_plan_id");
+        WHERE s.id = :summit_id and c.id = :creator_id".$selection_plan_cond);
+
         $query =  $query
             ->setParameter('summit_id', $this->getIdentifier())
             ->setParameter('creator_id', $speaker->getMemberId());
