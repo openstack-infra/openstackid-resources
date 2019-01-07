@@ -1,5 +1,4 @@
 <?php namespace models\summit;
-
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,18 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-
 use Doctrine\ORM\Mapping AS ORM;
 use models\utils\SilverstripeBaseModel;
-
 /**
  * @ORM\Entity
  * @ORM\Table(name="RoomMetricSampleData")
  * Class RoomMetricSampleData
  * @package RoomMetricType\summit
  */
-final class RoomMetricSampleData extends SilverstripeBaseModel
+class RoomMetricSampleData extends SilverstripeBaseModel
 {
 
     /**

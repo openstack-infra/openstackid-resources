@@ -45,7 +45,7 @@ final class SummitVenueFloorSerializer extends SilverStripeSerializer
 
         // floor image
         $values['image']= ($floor->getImage() !== null) ?
-            Config::get("server.assets_base_url", 'https://www.openstack.org/').$floor->getImage()->getFilename()
+            $floor->getImage()->getUrl()
             : null;
         // rooms
         $rooms        = [];

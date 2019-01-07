@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Config;
@@ -23,7 +22,6 @@ use libs\utils\ConfigurationException;
 use libs\utils\ICacheService;
 use models\oauth2\AccessToken;
 use Illuminate\Support\Facades\Log;
-
 /**
  * Class AccessTokenService
  * @package App\Models\ResourceServer

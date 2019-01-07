@@ -16,6 +16,12 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\Common\Collections\ArrayCollection;
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitTicketTypeRepository")
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="ticket_types"
+ *     )
+ * })
  * @ORM\Table(name="SummitTicketType")
  * Class SummitTicketType
  * @package models\summit

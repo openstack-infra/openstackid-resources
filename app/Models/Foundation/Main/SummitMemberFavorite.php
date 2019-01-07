@@ -20,7 +20,7 @@ use models\summit\SummitEvent;
  * Class SummitMemberSchedule
  * @package models\main
  */
-final class SummitMemberFavorite extends BaseEntity
+class SummitMemberFavorite extends BaseEntity
 {
 
     /**

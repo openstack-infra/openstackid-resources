@@ -43,7 +43,7 @@ class SummitLocationImageSerializer  extends SilverStripeSerializer
         if($this->object->hasPicture())
         {
             $picture             = $this->object->getPicture();
-            $values['image_url'] = Config::get("server.assets_base_url", 'https://www.openstack.org/'). $picture->getFilename();
+            $values['image_url'] = $picture->getFilename()->getUrl();
         }
         else
         {

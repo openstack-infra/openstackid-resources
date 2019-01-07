@@ -11,13 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Support\Facades\App;
 use LaravelDoctrine\ORM\Facades\EntityManager;
 use App\Models\Utils\IntervalParser;
 use services\model\ISummitService;
 use utils\FilterParser;
-
+use Tests\TestCase;
 /**
  * Class SearchEmptySpotsTest
  */
@@ -57,7 +56,7 @@ final class SearchEmptySpotsTest extends TestCase
 
         $intervals           = IntervalParser::getInterval($start_datetime, $end_datetime);
 
-        $this->assertTrue(count($intervals) == 4);
+        $this->assertTrue(count($intervals) == 3);
     }
 
     public function testFindSpots(){

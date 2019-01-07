@@ -19,6 +19,12 @@ use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="track_tag_groups"
+ *     )
+ * })
  * @ORM\Table(name="TrackTagGroup")
  * Class TrackTagGroup
  * @package models\summit\TrackTagGroup

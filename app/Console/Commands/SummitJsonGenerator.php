@@ -11,14 +11,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Console\Command;
 use libs\utils\ICacheService;
 use models\summit\ISummitRepository;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISummitService;
 use Illuminate\Support\Facades\Config;
-
 /**
  * Class SummitJsonGenerator
  * @package App\Console\Commands

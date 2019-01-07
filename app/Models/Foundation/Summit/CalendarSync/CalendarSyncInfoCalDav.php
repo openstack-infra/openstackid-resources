@@ -11,17 +11,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Doctrine\ORM\Mapping AS ORM;
 use services\utils\Facades\Encryption;
-
 /**
  * Class CalendarSyncInfoCalDav
  * @ORM\Entity
  * @ORM\Table(name="CalendarSyncInfoCalDav")
  * @package models\summit\CalendarSync
  */
-final class CalendarSyncInfoCalDav extends CalendarSyncInfo
+class CalendarSyncInfoCalDav extends CalendarSyncInfo
 {
     /**
      * @ORM\Column(name="UserName", type="string")

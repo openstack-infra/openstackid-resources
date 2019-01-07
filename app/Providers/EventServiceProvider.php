@@ -13,9 +13,7 @@
  **/
 use App\EntityPersisters\AdminSummitEventActionSyncWorkRequestPersister;
 use App\EntityPersisters\AdminSummitLocationActionSyncWorkRequestPersister;
-use App\EntityPersisters\AssetSyncRequestPersister;
 use App\EntityPersisters\EntityEventPersister;
-use App\Factories\AssetsSyncRequest\FileCreatedAssetSyncRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\AdminSummitLocationActionSyncWorkRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventDeletedCalendarSyncWorkRequestFactory;
 use App\Factories\CalendarAdminActionSyncWorkRequest\SummitEventUpdatedCalendarSyncWorkRequestFactory;
@@ -40,7 +38,6 @@ use App\Factories\EntityEvents\SummitEventUpdatedEntityEventFactory;
 use App\Factories\EntityEvents\SummitTicketTypeActionEntityEventFactory;
 use App\Factories\EntityEvents\TrackActionEntityEventFactory;
 use App\Factories\EntityEvents\TrackGroupActionActionEntityEventFactory;
-use App\Services\Utils\SCPFileUploader;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 /**
@@ -121,12 +118,6 @@ final class EventServiceProvider extends ServiceProvider
         Event::listen(\App\Events\PresentationMaterialDeleted::class, function($event)
         {
             EntityEventPersister::persist(PresentationMaterialDeletedEntityEventFactory::build($event));
-        });
-
-        Event::listen(\App\Events\FileCreated::class, function($event)
-        {
-            SCPFileUploader::upload($event);
-            AssetSyncRequestPersister::persist(FileCreatedAssetSyncRequestFactory::build($event));
         });
 
         Event::listen(\App\Events\PresentationSpeakerCreated::class, function($event)

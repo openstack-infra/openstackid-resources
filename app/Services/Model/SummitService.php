@@ -18,6 +18,7 @@ use App\Events\MyScheduleRemove;
 use App\Events\SummitDeleted;
 use App\Events\SummitUpdated;
 use App\Http\Utils\FileUploader;
+use App\Http\Utils\SwiftBucket;
 use App\Models\Foundation\Summit\Factories\SummitFactory;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Utils\IntervalParser;
@@ -1282,7 +1283,7 @@ final class SummitService extends AbstractService implements ISummitService
                 throw new ValidationException(sprintf( "file exceeds max_file_size (%s MB).", ($max_file_size/1024)/1024));
             }
 
-            $uploader   = new FileUploader($this->folder_service);
+            $uploader   = new FileUploader($this->folder_service, new SwiftBucket);
             $attachment = $uploader->build($file, 'summit-event-attachments', true);
             $event->setAttachment($attachment);
 

@@ -45,9 +45,14 @@ final class SummitPushNotificationChannel {
         return in_array($channel, self::getPublicChannels());
     }
 }
-
 /**
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitNotificationRepository")
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="notifications"
+ *     )
+ * })
  * @ORM\Table(name="SummitPushNotification")
  * Class SummitPushNotification
  * @package models\summit

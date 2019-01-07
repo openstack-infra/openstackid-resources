@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping AS ORM;
  * Class TrackRadioButtonListQuestionTemplate
  * @package App\Models\Foundation\Summit\Events\Presentations\TrackQuestions
  */
-final class TrackRadioButtonListQuestionTemplate extends TrackMultiValueQuestionTemplate
+class TrackRadioButtonListQuestionTemplate extends TrackMultiValueQuestionTemplate
 {
     const ClassName = 'TrackRadioButtonListQuestionTemplate';
 

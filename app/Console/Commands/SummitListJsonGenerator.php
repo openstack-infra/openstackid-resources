@@ -11,7 +11,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use Illuminate\Support\Facades\Log;
 use libs\utils\ICacheService;
 use Mockery\Exception;
@@ -21,7 +20,6 @@ use services\model\ISummitService;
 use utils\PagingResponse;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
-
 /**
  * Class SummitListJsonGenerator
  * @package App\Console\Commands

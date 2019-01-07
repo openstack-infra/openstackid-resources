@@ -27,6 +27,8 @@ use utils\PagingInfo;
 use utils\PagingResponse;
 use Doctrine\ORM\Query\Expr\Join;
 use utils\DoctrineLeftJoinFilterMapping;
+use models\summit\SummitGroupEvent;
+use models\summit\Presentation;
 /**
  * Class DoctrineSummitEventRepository
  * @package App\Repositories\Summit
@@ -37,8 +39,8 @@ final class DoctrineSummitEventRepository
 {
 
 
-    private static $forbidded_classes = [
-        'models\\summit\\SummitGroupEvent'
+    private static $forbidden_classes = [
+        SummitGroupEvent::ClassName,
     ];
 
     /**
@@ -51,17 +53,26 @@ final class DoctrineSummitEventRepository
         $end_date   = $event->getEndDate();
         $start_date = $event->getStartDate();
 
-        return $this->getEntityManager()->createQueryBuilder()
+        $query =  $this->getEntityManager()->createQueryBuilder()
             ->select("e")
             ->from(\models\summit\SummitEvent::class, "e")
             ->join('e.summit', 's', Join::WITH, " s.id = :summit_id")
             ->where('e.published = 1')
             ->andWhere('e.start_date < :end_date')
-            ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')")
             ->andWhere('e.end_date > :start_date')
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('start_date', $start_date)
-            ->setParameter('end_date', $end_date)->getQuery()->getResult();
+            ->setParameter('end_date', $end_date);
+
+        $idx  = 1;
+        foreach(self::$forbidden_classes as $forbidden_class){
+            $query = $query
+            ->andWhere("not e INSTANCE OF :forbidden_class".$idx);
+            $query->setParameter("forbidden_class".$idx, $forbidden_class);
+            $idx++;
+        }
+
+        return $query->getQuery()->getResult();
     }
 
     /**
@@ -212,8 +223,13 @@ final class DoctrineSummitEventRepository
         $can_view_private_events = self::isCurrentMemberOnGroup(IGroup::SummitAdministrators);
 
         if(!$can_view_private_events){
-            $query = $query
-                ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')");
+            $idx  = 1;
+            foreach(self::$forbidden_classes as $forbidden_class){
+                $query = $query
+                    ->andWhere("not e INSTANCE OF :forbidden_class".$idx);
+                $query->setParameter("forbidden_class".$idx, $forbidden_class);
+                $idx++;
+            }
         }
 
         $query = $query
@@ -303,8 +319,13 @@ final class DoctrineSummitEventRepository
         $can_view_private_events = self::isCurrentMemberOnGroup(IGroup::SummitAdministrators);
 
         if(!$can_view_private_events){
-            $query = $query
-                ->andWhere("not e INSTANCE OF ('" . implode("','", self::$forbidded_classes) . "')");
+            $idx  = 1;
+            foreach(self::$forbidden_classes as $forbidden_class){
+                $query = $query
+                    ->andWhere("not e INSTANCE OF :forbidden_class".$idx);
+                $query->setParameter("forbidden_class".$idx, $forbidden_class);
+                $idx++;
+            }
         }
 
         $query = $query

@@ -16,6 +16,7 @@ use models\summit\ICalendarSyncInfoRepository;
 use models\summit\SummitEvent;
 use models\summit\CalendarSync\WorkQueue\AdminSummitEventActionSyncWorkRequest;
 use models\summit\CalendarSync\WorkQueue\AbstractCalendarSyncWorkRequest;
+use Tests\TestCase;
 /**
  * Class AdminActionsCalendarSyncPreProcessorTest
  */

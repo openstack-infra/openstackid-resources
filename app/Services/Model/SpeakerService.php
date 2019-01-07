@@ -570,7 +570,7 @@ final class SpeakerService
                 throw new ValidationException(sprintf("file exceeds max_file_size (%s MB).", ($max_file_size / 1024) / 1024));
             }
 
-            $uploader = new FileUploader($this->folder_service);
+            $uploader = new FileUploader($this->folder_service, new SwiftBucket);
             $photo = $uploader->build($file, 'profile-images', true);
             $speaker->setPhoto($photo);
 

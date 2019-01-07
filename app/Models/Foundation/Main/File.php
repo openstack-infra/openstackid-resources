@@ -13,6 +13,7 @@
  **/
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
+use Illuminate\Support\Facades\Config;
 /**
  * @ORM\Entity(repositoryClass="repositories\main\DoctrineFolderRepository")
  * @ORM\Table(name="File")
@@ -51,6 +52,21 @@ class File extends SilverstripeBaseModel
      * @var bool
      */
     private $show_in_search;
+
+    /**
+     * @ORM\Column(name="CloudStatus", type="string")
+     */
+    private $cloud_status;
+
+    /**
+     * @ORM\Column(name="CloudSize", type="int")
+     */
+    private $cloud_size;
+
+    /**
+     * @ORM\Column(name="CloudMetaJson", type="string")
+     */
+    private $cloud_metajson;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\File")
@@ -181,16 +197,119 @@ class File extends SilverstripeBaseModel
     public function __construct()
     {
         parent::__construct();
-        $this->class_name     = 'File';
+        $this->class_name     = 'CloudFile';
         $this->show_in_search = true;
     }
 
     public function setImage(){
-        $this->class_name = 'Image';
+        $this->class_name = 'CloudImage';
     }
 
     public function setFolder(){
         $this->class_name = 'Folder';
+    }
+
+    /**
+     * @return string
+     */
+    public function getCloudStatus()
+    {
+        return $this->cloud_status;
+    }
+
+    /**
+     * @param string $cloud_status
+     */
+    public function setCloudStatus($cloud_status): void
+    {
+        $this->cloud_status = $cloud_status;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCloudSize()
+    {
+        return $this->cloud_size;
+    }
+
+    /**
+     * @param int $cloud_size
+     */
+    public function setCloudSize($cloud_size): void
+    {
+        $this->cloud_size = $cloud_size;
+    }
+
+    /**
+     * @param string $cloud_metajson
+     */
+    public function setCloudMetaJSON($cloud_metajson): void
+    {
+        $this->cloud_metajson = $cloud_metajson;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        $local = Config::get("server.assets_base_url", 'https://www.openstack.org/').$this->getFilename();
+        return $this->cloud_status == 'Live' ? $this->getCloudLink() : $local;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRelativeLinkFor()
+    {
+        $fn = $this->getFilename();
+        return trim(str_replace("assets", '', $fn), '/');
+    }
+
+    /**
+     * @return string
+     */
+    public function getCloudLink()
+    {
+        return Config::get("cloudstorage.base_url") . $this->getRelativeLinkFor();
+    }
+
+    /**
+     * @param string|array $key - passing an array as the first argument replaces the meta data entirely
+     * @param mixed        $val
+     * @return File - chainable
+     */
+    public function setCloudMeta($key, $val = null)
+    {
+        if (is_array($key)) {
+            $data = $key;
+        } else {
+            $data = $this->getCloudMetaJSON();
+            $data[$key] = $val;
+        }
+
+        $this->cloud_metajson = json_encode($data);
+        return $this;
+    }
+
+
+    /**
+     * @param string $key [optional] - if not present returns the whole array
+     * @return array
+     */
+    public function getCloudMetaJSON($key = null)
+    {
+        $data = json_decode($this->cloud_metajson, true);
+        if (empty($data) || !is_array($data)) {
+            $data = array();
+        }
+
+        if (!empty($key)) {
+            return isset($data[$key]) ? $data[$key] : null;
+        } else {
+            return $data;
+        }
     }
 
 }

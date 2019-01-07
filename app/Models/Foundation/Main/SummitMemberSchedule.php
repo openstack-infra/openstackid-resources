@@ -21,7 +21,7 @@ use models\utils\IEntity;
  * Class SummitMemberSchedule
  * @package models\main
  */
-final class SummitMemberSchedule extends BaseEntity
+class SummitMemberSchedule extends BaseEntity
 {
 
     /**

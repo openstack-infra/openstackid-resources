@@ -11,14 +11,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\main\Member;
 use models\utils\IEntity;
 use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * @ORM\Entity
+ * @ORM\AssociationOverrides({
+ *     @ORM\AssociationOverride(
+ *          name="summit",
+ *          inversedBy="entity_events"
+ *     )
+ * })
  * @ORM\Table(name="SummitEntityEvent")
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSummitEntityEventRepository")
  * Class SummitEntityEvent

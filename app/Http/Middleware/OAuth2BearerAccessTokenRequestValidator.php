@@ -86,7 +86,7 @@ class OAuth2BearerAccessTokenRequestValidator
 
         try {
 
-            $route = RequestUtils::getCurrentRoutePath($request);
+            $route = RequestUtils::getCurrentRoutePath();
             if (!$route) {
                 throw new OAuth2ResourceServerException(
                     400,

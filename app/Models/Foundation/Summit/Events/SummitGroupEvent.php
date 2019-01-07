@@ -37,11 +37,12 @@ class SummitGroupEvent extends SummitEvent
      */
     private $groups;
 
+    const ClassName = 'SummitGroupEvent';
     /**
      * @return string
      */
     public function getClassName(){
-        return "SummitGroupEvent";
+        return self::ClassName;
     }
 
     public function __construct()
