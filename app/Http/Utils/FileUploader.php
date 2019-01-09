@@ -53,7 +53,7 @@ final class FileUploader
 
             $local_path = Storage::putFileAs(sprintf('/public/%s', $folder_name), $file, $file->getClientOriginalName());
             $folder = $this->folder_service->findOrMake($folder_name);
-
+            $local_path = Storage::disk()->path($local_path);
             $attachment->setParent($folder);
             $attachment->setName($file->getClientOriginalName());
             $attachment->setFilename(sprintf("assets/%s/%s", $folder_name, $file->getClientOriginalName()));
@@ -68,7 +68,7 @@ final class FileUploader
         }
         catch (\Exception $ex){
             Log::error($ex);
-            $attachment->setCloudStatu('Error');
+            $attachment->setCloudStatus('Error');
         }
         return $attachment;
     }

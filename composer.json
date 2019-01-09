@@ -25,7 +25,8 @@
         "smarcet/caldavclient": "1.1.6",
         "smarcet/outlook-rest-client": "dev-master",
         "idct/sftp-client": "dev-master",
-        "php-opencloud/openstack": "3.0.5"
+        "php-opencloud/openstack": "3.0.5",
+        "symfony/yaml": "4.2.2"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
