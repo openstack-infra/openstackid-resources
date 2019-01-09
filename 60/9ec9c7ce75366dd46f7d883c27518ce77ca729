@@ -1,0 +1,8 @@
+Code-Review+2: sebastian marcet <smarcet@gmail.com>
+Workflow+1: sebastian marcet <smarcet@gmail.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Wed, 09 Jan 2019 13:30:08 +0000
+Reviewed-on: https://review.openstack.org/629480
+Project: openstack-infra/openstackid-resources
+Branch: refs/heads/master
