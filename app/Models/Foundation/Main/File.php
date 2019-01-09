@@ -59,7 +59,7 @@ class File extends SilverstripeBaseModel
     private $cloud_status;
 
     /**
-     * @ORM\Column(name="CloudSize", type="int")
+     * @ORM\Column(name="CloudSize", type="integer")
      */
     private $cloud_size;
 

@@ -43,7 +43,7 @@ class SummitLocationImageSerializer  extends SilverStripeSerializer
         if($this->object->hasPicture())
         {
             $picture             = $this->object->getPicture();
-            $values['image_url'] = $picture->getFilename()->getUrl();
+            $values['image_url'] = $picture->getUrl();
         }
         else
         {
