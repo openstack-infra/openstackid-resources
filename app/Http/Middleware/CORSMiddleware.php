@@ -157,7 +157,7 @@ class CORSMiddleware
 					$real_method = $request->headers->get('Access-Control-Request-Method');
 					$request->setMethod($real_method);
 
-					$route_path = RequestUtils::getCurrentRoutePath();
+					$route_path = RequestUtils::getCurrentRoutePath($request);
 					if (!$route_path || !$this->checkEndPoint($route_path, $real_method))
 					{
 						$response = new Response();
