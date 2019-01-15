@@ -20,4 +20,6 @@ return [
     'api_key' => env('CLOUD_STORAGE_APIKEY', null),
     'project_name' => env('CLOUD_STORAGE_PROJECT_NAME', null),
     'region' => env('CLOUD_STORAGE_REGION', null),
+    'app_credential_id' => env('CLOUD_STORAGE_APP_CREDENTIAL_ID', null),
+    'app_credential_secret' => env('CLOUD_STORAGE_APP_CREDENTIAL_SECRET', null),
 ];

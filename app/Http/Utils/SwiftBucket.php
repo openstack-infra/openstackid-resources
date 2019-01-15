@@ -34,21 +34,41 @@ final class SwiftBucket implements IBucket
     protected function getContainer()
     {
         if (!isset($this->container)) {
-            $openstack = new OpenStack([
+
+            $configOptions = [
                 'authUrl' => Config::get("cloudstorage.auth_url"),
                 'region' => Config::get("cloudstorage.region"),
-                'user' => [
-                    'name' => Config::get("cloudstorage.user_name"),
-                    'password' => Config::get("cloudstorage.api_key"),
+            ];
+
+            $userName = Config::get("cloudstorage.user_name");
+            $userPassword = Config::get("cloudstorage.api_key");
+
+            if(!empty($userName) && !empty($userPassword)){
+                $configOptions['user'] = [
+                    'name' => $userName,
+                    'password' => $userPassword,
                     'domain' => ['id' => Config::get("cloudstorage.user_domain", "default")]
-                ],
-                'scope' => [
+                ];
+
+                $configOptions['scope' ] =  [
                     'project' => [
                         'name' =>  Config::get("cloudstorage.project_name"),
                         'domain' => ['id' => Config::get("cloudstorage.project_domain", "default")]
                     ],
-                ]
-            ]);
+                ];
+            }
+
+            $appCredentialId =  Config::get("cloudstorage.app_credential_id");
+            $appCredentialSecret = Config::get("cloudstorage.app_credential_secret");
+
+            if(isset($this->config[self::APP_CRED_ID])){
+                $configOptions['application_credential'] = [
+                    'id' => $appCredentialId,
+                    'secret' => $appCredentialSecret,
+                ];
+            }
+
+            $openstack = new OpenStack($configOptions);
 
             $this->container = $openstack->objectStoreV1()->getContainer( Config::get("cloudstorage.container"));
         }

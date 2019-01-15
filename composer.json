@@ -7,6 +7,12 @@
     ],
     "license": "MIT",
     "type": "project",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/OpenStackweb/openstack"
+        }
+    ],
     "require": {
         "php": "^7.1.3",
         "fideloper/proxy": "^4.0",
@@ -25,8 +31,8 @@
         "smarcet/caldavclient": "1.1.6",
         "smarcet/outlook-rest-client": "dev-master",
         "idct/sftp-client": "dev-master",
-        "php-opencloud/openstack": "3.0.5",
-        "symfony/yaml": "4.2.2"
+        "symfony/yaml": "4.2.2",
+        "php-opencloud/openstack": "dev-master"
     },
     "require-dev": {
         "filp/whoops": "^2.0",
