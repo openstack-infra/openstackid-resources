@@ -72,7 +72,7 @@ class ApiEndpointsSeeder extends Seeder
 
     private function seedSummitEndpoints()
     {
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
 
         $this->seedApiEndpoints('summits', [
             // summits
@@ -1967,7 +1967,7 @@ class ApiEndpointsSeeder extends Seeder
     }
 
     private function seedMemberEndpoints(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
 
         $this->seedApiEndpoints('members', [
                // members
@@ -2058,7 +2058,7 @@ class ApiEndpointsSeeder extends Seeder
     }
 
     private function seedTagsEndpoints(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
 
         $this->seedApiEndpoints('tags', [
                 // members
@@ -2077,7 +2077,7 @@ class ApiEndpointsSeeder extends Seeder
     }
 
     private function seedCompaniesEndpoints(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
 
         $this->seedApiEndpoints('companies', [
                 // members
@@ -2096,7 +2096,7 @@ class ApiEndpointsSeeder extends Seeder
     }
 
     private function seedOrganizationsEndpoints(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
 
         $this->seedApiEndpoints('organizations', [
                 // organizations
@@ -2126,7 +2126,7 @@ class ApiEndpointsSeeder extends Seeder
     }
 
     private function seedGroupsEndpoints(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
 
         $this->seedApiEndpoints('groups', [
                 // members
@@ -2145,7 +2145,7 @@ class ApiEndpointsSeeder extends Seeder
     }
 
     public function seedTrackQuestionTemplateEndpoints(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
 
         $this->seedApiEndpoints('track-question-templates', [
                 // track question templates
