@@ -42,7 +42,7 @@ final class ApiScopesSeeder extends Seeder
     private function seedSummitScopes()
     {
 
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
         $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'summits']);
 
         $scopes = [
@@ -184,7 +184,7 @@ final class ApiScopesSeeder extends Seeder
     }
 
     private function seedMembersScopes(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
         $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'members']);
 
         $scopes = [
@@ -225,7 +225,7 @@ final class ApiScopesSeeder extends Seeder
     }
 
     private function seedTagsScopes(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
         $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'organizations']);
 
         $scopes = [
@@ -251,7 +251,7 @@ final class ApiScopesSeeder extends Seeder
     }
 
     private function seedOrganizationScopes(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
         $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'companies']);
 
         $scopes = [
@@ -282,7 +282,7 @@ final class ApiScopesSeeder extends Seeder
     }
 
     private function seedCompaniesScopes(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
         $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'companies']);
 
         $scopes = [
@@ -308,7 +308,7 @@ final class ApiScopesSeeder extends Seeder
     }
 
     private function seedGroupsScopes(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
         $api           = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'groups']);
 
         $scopes = [
@@ -334,7 +334,7 @@ final class ApiScopesSeeder extends Seeder
     }
 
     private function seedTeamsScopes(){
-        $current_realm = Config::get('app.url');
+        $current_realm = Config::get('app.scope_base_realm');
         $api = EntityManager::getRepository(\App\Models\ResourceServer\Api::class)->findOneBy(['name' => 'teams']);
 
         $scopes = [

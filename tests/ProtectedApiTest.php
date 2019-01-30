@@ -31,7 +31,7 @@ class AccessTokenServiceStub implements IAccessTokenService
      */
     public function get($token_value)
     {
-        $url   = Config::get('app.url');
+        $url   = Config::get('app.scope_base_realm');
         $parts = @parse_url($url);
         $realm = $parts['host'];
 
@@ -82,7 +82,7 @@ class AccessTokenServiceStub2 implements IAccessTokenService
      */
     public function get($token_value)
     {
-        $url = Config::get('app.url');
+        $url = Config::get('app.scope_base_realm');
         $parts = @parse_url($url);
         $realm = $parts['host'];
 
