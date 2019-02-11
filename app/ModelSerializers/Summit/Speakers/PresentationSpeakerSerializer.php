@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 use Illuminate\Support\Facades\Config;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 
 /**
  * Class PresentationSpeakerSerializer
@@ -40,10 +40,10 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
     ];
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      * @return null|string|string[]
      */
-    protected function getSpeakerEmail(PresentationSpeaker $speaker){
+    protected function getSpeakerEmail(Speaker $speaker){
         $email = $speaker->getEmail();
         $em   = explode("@", $email);
         $name = implode(array_slice($em, 0, count($em) - 1), '@');
@@ -65,7 +65,7 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
         if(!count($relations)) $relations  = $this->getAllowedRelations();
 
         $speaker                           = $this->object;
-        if(!$speaker instanceof PresentationSpeaker) return [];
+        if(!$speaker instanceof Speaker) return [];
 
         $values                            = parent::serialize($expand, $fields, $relations, $params);
         $values['email']                   = $this->getSpeakerEmail($speaker);

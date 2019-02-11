@@ -15,7 +15,7 @@ use models\exceptions\EntityNotFoundException;
 use models\exceptions\ValidationException;
 use models\main\EmailCreationRequest;
 use models\main\File;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\Summit;
@@ -29,14 +29,14 @@ interface ISpeakerService
     /**
      * @param Summit $summit
      * @param array $data
-     * @return PresentationSpeaker
+     * @return Speaker
      * @throws ValidationException
      */
     public function addSpeakerBySummit(Summit $summit, array $data);
 
     /**
      * @param array $data
-     * @return PresentationSpeaker
+     * @return Speaker
      * @throws ValidationException
      */
     public function addSpeaker(array $data);
@@ -44,28 +44,28 @@ interface ISpeakerService
     /**
      * @param Summit $summit
      * @param array $data
-     * @param PresentationSpeaker $speaker
-     * @return PresentationSpeaker
+     * @param Speaker $speaker
+     * @return Speaker
      * @throws ValidationException
      */
-    public function updateSpeakerBySummit(Summit $summit, PresentationSpeaker $speaker, array $data);
+    public function updateSpeakerBySummit(Summit $summit, Speaker $speaker, array $data);
 
     /**
      * @param array $data
-     * @param PresentationSpeaker $speaker
-     * @return PresentationSpeaker
+     * @param Speaker $speaker
+     * @return Speaker
      * @throws ValidationException
      */
-    public function updateSpeaker(PresentationSpeaker $speaker, array $data);
+    public function updateSpeaker(Speaker $speaker, array $data);
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      * @param Summit $summit
      * @param string $reg_code
      * @return SpeakerSummitRegistrationPromoCode
      * @throws ValidationException
      */
-    public function registerSummitPromoCodeByValue(PresentationSpeaker $speaker, Summit $summit, $reg_code);
+    public function registerSummitPromoCodeByValue(Speaker $speaker, Summit $summit, $reg_code);
 
     /**
      * @param int $speaker_id
@@ -78,12 +78,12 @@ interface ISpeakerService
     public function addSpeakerPhoto($speaker_id, UploadedFile $file,  $max_file_size = 10485760);
 
     /**
-     * @param PresentationSpeaker $speaker_from
-     * @param PresentationSpeaker $speaker_to
+     * @param Speaker $speaker_from
+     * @param Speaker $speaker_to
      * @param array $data
      * @return void
      */
-    public function merge(PresentationSpeaker $speaker_from, PresentationSpeaker $speaker_to, array $data);
+    public function merge(Speaker $speaker_from, Speaker $speaker_to, array $data);
 
     /**
      * @param int $speaker_id

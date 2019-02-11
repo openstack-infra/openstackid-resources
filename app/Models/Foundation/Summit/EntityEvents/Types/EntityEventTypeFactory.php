@@ -100,7 +100,7 @@ final class EntityEventTypeFactory
                 return new SummitLocationEntityEventType($e, $ctx);
             }
             break;
-            case 'PresentationSpeaker':
+            case 'Speaker':
             {
                 return new PresentationSpeakerEntityEventType($e, $ctx);
             }
