@@ -15,7 +15,7 @@ use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use models\main\Member;
 use models\summit\ISpeakerRepository;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use models\summit\Summit;
 use App\Repositories\SilverStripeDoctrineRepository;
 use utils\Filter;
@@ -77,7 +77,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM PresentationSpeaker S
+	FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -93,7 +93,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM PresentationSpeaker S
+	FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -109,7 +109,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM PresentationSpeaker S
+	FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -157,7 +157,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM PresentationSpeaker S
+    FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN File F ON F.ID = S.PhotoID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
@@ -190,7 +190,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM PresentationSpeaker S
+    FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
     WHERE
@@ -222,7 +222,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM PresentationSpeaker S
+    FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
     WHERE
@@ -237,7 +237,7 @@ SUMMIT_SPEAKERS
 SQL;
 
         /*$rsm = new ResultSetMapping();
-        $rsm->addEntityResult(\models\summit\PresentationSpeaker::class, 's');
+        $rsm->addEntityResult(\models\summit\Speaker::class, 's');
         $rsm->addJoinedEntityResult(\models\main\File::class,'p', 's', 'photo');
         $rsm->addJoinedEntityResult(\models\main\Member::class,'m', 's', 'member');
 
@@ -253,7 +253,7 @@ SQL;
         $rsm->addFieldResult('m', 'MemberID', 'id');*/
 
         $rsm = new ResultSetMappingBuilder($this->_em);
-        $rsm->addRootEntityFromClassMetadata(\models\summit\PresentationSpeaker::class, 's', ['Title' => 'SpeakerTitle']);
+        $rsm->addRootEntityFromClassMetadata(\models\summit\Speaker::class, 's', ['Title' => 'SpeakerTitle']);
 
         // build rsm here
         $native_query = $this->_em->createNativeQuery($query, $rsm);
@@ -314,7 +314,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email,R.Email) AS Email
-	FROM PresentationSpeaker S
+	FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 )
@@ -356,7 +356,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM PresentationSpeaker S
+    FROM Speaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN File F ON F.ID = S.PhotoID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
@@ -366,7 +366,7 @@ SUMMIT_SPEAKERS
 SQL;
 
         /*$rsm = new ResultSetMapping();
-        $rsm->addEntityResult(\models\summit\PresentationSpeaker::class, 's');
+        $rsm->addEntityResult(\models\summit\Speaker::class, 's');
         $rsm->addJoinedEntityResult(\models\main\File::class,'p', 's', 'photo');
         $rsm->addJoinedEntityResult(\models\main\Member::class,'m', 's', 'member');
 
@@ -382,7 +382,7 @@ SQL;
         $rsm->addFieldResult('m', 'MemberID', 'id');*/
 
         $rsm = new ResultSetMappingBuilder($this->_em);
-        $rsm->addRootEntityFromClassMetadata(\models\summit\PresentationSpeaker::class, 's', ['Title' => 'SpeakerTitle']);
+        $rsm->addRootEntityFromClassMetadata(\models\summit\Speaker::class, 's', ['Title' => 'SpeakerTitle']);
 
         // build rsm here
         $native_query = $this->_em->createNativeQuery($query, $rsm);
@@ -402,19 +402,19 @@ SQL;
      */
     protected function getBaseEntity()
     {
-        return PresentationSpeaker::class;
+        return Speaker::class;
     }
 
     /**
      * @param Member $member
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getByMember(Member $member)
     {
         return $this->getEntityManager()
             ->createQueryBuilder()
             ->select("s")
-            ->from(PresentationSpeaker::class, "s")
+            ->from(Speaker::class, "s")
             ->where("s.member = :member")
             ->setParameter("member", $member)
             ->setMaxResults(1)

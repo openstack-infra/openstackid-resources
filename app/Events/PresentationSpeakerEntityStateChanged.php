@@ -13,7 +13,7 @@
  **/
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Illuminate\Queue\SerializesModels;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 /**
  * Class PresentationSpeakerEntityStateChanged
  * @package App\Events
@@ -24,7 +24,7 @@ class PresentationSpeakerEntityStateChanged extends Event
 
 
     /**
-     * @var PresentationSpeaker
+     * @var Speaker
      */
     protected $speaker;
 
@@ -35,17 +35,17 @@ class PresentationSpeakerEntityStateChanged extends Event
 
     /**
      * SummitEventEntityStateChanged constructor.
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      * @param LifecycleEventArgs $args
      */
-    public function __construct(PresentationSpeaker $speaker, LifecycleEventArgs $args)
+    public function __construct(Speaker $speaker, LifecycleEventArgs $args)
     {
         $this->speaker = $speaker;
         $this->args    = $args;
     }
 
     /**
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getPresentationSpeaker()
     {

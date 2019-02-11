@@ -85,7 +85,7 @@ return [
     'SummitSelectionPlanService.deleteTrackGroupToSelectionPlan.TrackGroupNotFound' => 'track group :track_group_id not found on summit :summit_id',
     // Presentations
     'PresentationService.saveOrUpdatePresentation.trackNotFound' => 'track :track_id not found.',
-    'PresentationService.submitPresentation.eventTypeNotFound' => 'event type :type_id not found.',
+    'PresentationService.saveOrUpdatePresentation.eventTypeNotFound' => 'event type :type_id not found.',
     'PresentationService.saveOrUpdatePresentation.trackQuestionNotFound' => 'extra question :question_id not found.',
     'PresentationService.updatePresentationSubmission.PresentationNotFound' => 'presentation :presentation_id not found',
     // track tag groups

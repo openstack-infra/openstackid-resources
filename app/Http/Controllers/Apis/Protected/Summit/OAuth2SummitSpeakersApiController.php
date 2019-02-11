@@ -27,7 +27,7 @@ use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use ModelSerializers\ISerializerTypeSelector;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISpeakerService;
@@ -950,13 +950,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             switch ($role) {
                 case 'creator':
-                    $role = PresentationSpeaker::ROLE_CREATOR;
+                    $role = Speaker::RoleCreator;
                     break;
                 case 'speaker':
-                    $role = PresentationSpeaker::ROLE_SPEAKER;
+                    $role = Speaker::RoleSpeaker;
                     break;
                 case 'moderator':
-                    $role = PresentationSpeaker::ROLE_MODERATOR;
+                    $role = Speaker::RoleModerator;
                     break;
             }
             $presentations = $speaker->getPresentationsBySelectionPlanAndRole($selection_plan, $role);
@@ -1009,13 +1009,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             switch ($role) {
                 case 'creator':
-                    $role = PresentationSpeaker::ROLE_CREATOR;
+                    $role = Speaker::RoleCreator;
                     break;
                 case 'speaker':
-                    $role = PresentationSpeaker::ROLE_SPEAKER;
+                    $role = Speaker::RoleSpeaker;
                     break;
                 case 'moderator':
-                    $role = PresentationSpeaker::ROLE_MODERATOR;
+                    $role = Speaker::RoleModerator;
                     break;
             }
             $presentations = $speaker->getPresentationsBySummitAndRole($summit, $role);
@@ -1053,7 +1053,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             if (is_null($current_member_id))
                 return $this->error403();
 
-            $this->summit_service->addSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
+            $this->summit_service->addSpeaker2PresentationByRole($current_member_id, $speaker_id, $presentation_id, Speaker::RoleSpeaker);
 
             return $this->updated();
 
@@ -1080,7 +1080,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             if (is_null($current_member_id))
                 return $this->error403();
 
-            $this->summit_service->addModerator2Presentation($current_member_id, $speaker_id, $presentation_id);
+            $this->summit_service->addSpeaker2PresentationByRole($current_member_id, $speaker_id, $presentation_id, Speaker::RoleModerator);
 
             return $this->updated();
 
@@ -1107,7 +1107,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             if (is_null($current_member_id))
                 return $this->error403();
 
-            $this->summit_service->removeSpeakerFromPresentation($current_member_id, $speaker_id, $presentation_id);
+            $this->summit_service->removeSpeakerFromPresentationByRole($current_member_id, $speaker_id, $presentation_id, Speaker::RoleSpeaker);
 
             return $this->deleted();
 
@@ -1134,7 +1134,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             if (is_null($current_member_id))
                 return $this->error403();
 
-            $this->summit_service->removeModeratorFromPresentation($current_member_id, $speaker_id, $presentation_id);
+            $this->summit_service->removeSpeakerFromPresentationByRole($current_member_id, $speaker_id, $presentation_id, Speaker::RoleModerator);
 
             return $this->deleted();
 
@@ -1149,5 +1149,6 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
             return $this->error500($ex);
         }
     }
+
 
 }
