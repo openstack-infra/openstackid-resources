@@ -32,9 +32,9 @@ class SpeakerPresentationLink extends SilverstripeBaseModel
     private $title;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="other_presentation_links")
+     * @ORM\ManyToOne(targetEntity="Speaker", inversedBy="other_presentation_links")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
-     * @var PresentationSpeaker
+     * @var Speaker
      */
     private $speaker;
 
@@ -83,7 +83,7 @@ class SpeakerPresentationLink extends SilverstripeBaseModel
     }
 
     /**
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getSpeaker()
     {
@@ -91,7 +91,7 @@ class SpeakerPresentationLink extends SilverstripeBaseModel
     }
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      */
     public function setSpeaker($speaker)
     {

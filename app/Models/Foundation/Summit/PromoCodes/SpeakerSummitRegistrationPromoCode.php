@@ -30,9 +30,9 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
     protected $type;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="promo_codes")
+     * @ORM\ManyToOne(targetEntity="Speaker", inversedBy="promo_codes")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
-     * @var PresentationSpeaker
+     * @var Speaker
      */
     protected $speaker;
 
@@ -53,7 +53,7 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
     }
 
     /**
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getSpeaker()
     {
@@ -61,7 +61,7 @@ class SpeakerSummitRegistrationPromoCode extends SummitRegistrationPromoCode
     }
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      */
     public function setSpeaker($speaker)
     {

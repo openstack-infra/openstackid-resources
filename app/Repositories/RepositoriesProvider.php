@@ -99,7 +99,7 @@ final class RepositoriesProvider extends ServiceProvider
         App::singleton(
             'models\summit\ISpeakerRepository',
             function(){
-                return  EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
+                return  EntityManager::getRepository(\models\summit\Speaker::class);
         });
 
         App::singleton(

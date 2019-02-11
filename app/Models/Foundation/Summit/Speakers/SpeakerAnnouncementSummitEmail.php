@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 use Doctrine\ORM\Mapping AS ORM;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use models\summit\SummitOwned;
 use models\utils\SilverstripeBaseModel;
 use DateTime;
@@ -51,9 +51,9 @@ class SpeakerAnnouncementSummitEmail extends SilverstripeBaseModel
     Use SummitOwned;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\PresentationSpeaker", inversedBy="announcement_summit_emails")
+     * @ORM\ManyToOne(targetEntity="models\summit\Speaker", inversedBy="announcement_summit_emails")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
-     * @var PresentationSpeaker
+     * @var Speaker
      */
     protected $speaker;
 
@@ -90,7 +90,7 @@ class SpeakerAnnouncementSummitEmail extends SilverstripeBaseModel
     }
 
     /**
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getSpeaker()
     {
@@ -98,7 +98,7 @@ class SpeakerAnnouncementSummitEmail extends SilverstripeBaseModel
     }
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      */
     public function setSpeaker($speaker)
     {

@@ -27,7 +27,7 @@ use models\summit\IEventFeedbackRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use ModelSerializers\ISerializerTypeSelector;
 use ModelSerializers\SerializerRegistry;
 use services\model\ISpeakerService;
@@ -950,13 +950,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             switch ($role) {
                 case 'creator':
-                    $role = PresentationSpeaker::ROLE_CREATOR;
+                    $role = Speaker::ROLE_CREATOR;
                     break;
                 case 'speaker':
-                    $role = PresentationSpeaker::ROLE_SPEAKER;
+                    $role = Speaker::ROLE_SPEAKER;
                     break;
                 case 'moderator':
-                    $role = PresentationSpeaker::ROLE_MODERATOR;
+                    $role = Speaker::ROLE_MODERATOR;
                     break;
             }
             $presentations = $speaker->getPresentationsBySelectionPlanAndRole($selection_plan, $role);
@@ -1009,13 +1009,13 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
 
             switch ($role) {
                 case 'creator':
-                    $role = PresentationSpeaker::ROLE_CREATOR;
+                    $role = Speaker::ROLE_CREATOR;
                     break;
                 case 'speaker':
-                    $role = PresentationSpeaker::ROLE_SPEAKER;
+                    $role = Speaker::ROLE_SPEAKER;
                     break;
                 case 'moderator':
-                    $role = PresentationSpeaker::ROLE_MODERATOR;
+                    $role = Speaker::ROLE_MODERATOR;
                     break;
             }
             $presentations = $speaker->getPresentationsBySummitAndRole($summit, $role);

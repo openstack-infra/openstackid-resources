@@ -143,11 +143,13 @@ final class SerializerRegistry
         $this->registry['PresentationLink']           = PresentationLinkSerializer::class;
         $this->registry['Company']                    = CompanySerializer::class;
 
-        $this->registry['PresentationSpeaker']        =
+        $this->registry['Speaker']        =
             [
-                self::SerializerType_Public  =>  PresentationSpeakerSerializer::class,
-                self::SerializerType_Private =>  AdminPresentationSpeakerSerializer::class
+                self::SerializerType_Public  =>  SpeakerSerializer::class,
+                self::SerializerType_Private =>  AdminSpeakerSerializer::class
             ];
+
+        $this->registry['PresentationSpeaker']  = PresentationSpeakerSerializer::class;
 
         // RSVP
         $this->registry['RSVP']                       = RSVPSerializer::class;

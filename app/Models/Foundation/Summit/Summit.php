@@ -852,11 +852,11 @@ class Summit extends SilverstripeBaseModel
 
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      * @param SelectionPlan|null $selectionPlan
      * @return array
      */
-    public function getModeratedPresentationsBy(PresentationSpeaker $speaker, SelectionPlan $selectionPlan = null){
+    public function getModeratedPresentationsBy(Speaker $speaker, SelectionPlan $selectionPlan = null){
         $selection_plan_cond = "";
         if(!is_null($selectionPlan)){
             $selection_plan_cond = " and sp.id = :selection_plan_id";
@@ -864,13 +864,14 @@ class Summit extends SilverstripeBaseModel
 
         $query = $this->createQuery("SELECT p from models\summit\Presentation p 
         JOIN p.summit s
-        JOIN p.moderator m 
+        JOIN p.speakers spk 
         JOIN p.selection_plan sp
-        WHERE s.id = :summit_id and m.id = :moderator_id".$selection_plan_cond);
+        WHERE s.id = :summit_id and spk.speaker.id = :speaker_id and spk.role = :role".$selection_plan_cond);
 
         $query = $query
             ->setParameter('summit_id', $this->getIdentifier())
-            ->setParameter('moderator_id', $speaker->getIdentifier());
+            ->setParameter('role', Speaker::RoleModerator)
+            ->setParameter('speaker_id', $speaker->getIdentifier());
 
         if(!is_null($selectionPlan)){
             $query = $query->setParameter('selection_plan_id', $selectionPlan->getIdentifier());
@@ -879,11 +880,11 @@ class Summit extends SilverstripeBaseModel
     }
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      * @param SelectionPlan|null $selectionPlan
      * @return array
      */
-    public function getCreatedPresentations(PresentationSpeaker $speaker, SelectionPlan $selectionPlan = null){
+    public function getCreatedPresentations(Speaker $speaker, SelectionPlan $selectionPlan = null){
         $selection_plan_cond = "";
 
         if(!is_null($selectionPlan)){
@@ -1107,14 +1108,16 @@ class Summit extends SilverstripeBaseModel
     private function buildModeratorsQuery($filter_published_events = true)
     {
         $query = $this->createQueryBuilder()
-            ->select('distinct ps')
-            ->from('models\summit\PresentationSpeaker', 'ps')
-            ->join('ps.moderated_presentations', 'p')
+            ->select('distinct spk')
+            ->from('models\summit\Speaker', 'spk')
+            ->join('spk.presentations', 'ps')
+            ->join('ps.presentation', 'p')
             ->join('p.summit', 's')
-            ->where("s.id = :summit_id");
+            ->where("s.id = :summit_id")
+            ->andWhere("ps.role  =:role");
         if ($filter_published_events)
             $query = $query->andWhere("p.published = 1");
-        return $query->setParameter('summit_id', $this->getId());
+        return $query->setParameter('summit_id', $this->getId())->setParameter("role", Speaker::RoleModerator);
     }
 
     /**
@@ -1124,15 +1127,17 @@ class Summit extends SilverstripeBaseModel
     private function buildSpeakersQuery($filter_published_events = true)
     {
         $query = $this->createQueryBuilder()
-            ->select('distinct ps')
-            ->from('models\summit\PresentationSpeaker', 'ps')
-            ->join('ps.presentations', 'p')
+            ->select('distinct spk')
+            ->from('models\summit\Speaker', 'spk')
+            ->join('spk.presentations', 'ps')
+            ->join('ps.presentation', 'o')
             ->join('p.summit', 's')
-            ->where("s.id = :summit_id");
+            ->where("s.id = :summit_id")
+            ->andWhere("ps.role  =:role");;
 
         if ($filter_published_events)
             $query = $query->andWhere("p.published = 1");
-        return $query->setParameter('summit_id', $this->getId());
+        return $query->setParameter('summit_id', $this->getId())->setParameter("role", Speaker::RoleModerator);
     }
 
     /**
@@ -1141,43 +1146,38 @@ class Summit extends SilverstripeBaseModel
     private function buildSpeakerSummitAttendanceQuery()
     {
         return $this->createQueryBuilder()
-            ->select('distinct ps')
-            ->from('models\summit\PresentationSpeaker', 'ps')
-            ->join('ps.summit_assistances', 'a')
+            ->select('distinct spk')
+            ->from('models\summit\Speaker', 'spk')
+            ->join('spk.summit_assistances', 'a')
             ->join('a.summit', 's')
             ->where("s.id = :summit_id")
             ->setParameter('summit_id', $this->getId());
     }
 
     /**
-     * @return PresentationSpeaker[]
+     * @return Speaker[]
      */
     public function getSpeakers()
     {
-        // moderators
-        $moderators = $this->buildModeratorsQuery()->getQuery()->getResult();
-        // get moderators ids to exclude from speakers
-        $moderators_ids = array();
-        foreach ($moderators as $m) {
-            $moderators_ids[] = $m->getId();
-        }
+        // mix of all roles but once time
+        $query = $this->createQueryBuilder()
+            ->select('distinct spk')
+            ->from('models\summit\Speaker', 'spk')
+            ->join('spk.presentations', 'sp')
+            ->join('sp.presentation', 'p')
+            ->join('p.summit', 's')
+            ->where("s.id = :summit_id")
+            ->andWhere("p.published = 1");
 
-        // speakers
-        $sbuilder = $this->buildSpeakersQuery();
+        $query->setParameter('summit_id', $this->getId());
 
-        if (count($moderators_ids) > 0) {
-            $moderators_ids = implode(', ', $moderators_ids);
-            $sbuilder = $sbuilder->andWhere("ps.id not in ({$moderators_ids})");
-        }
+        return $query->getQuery()->getResult();
 
-        $speakers = $sbuilder->getQuery()->getResult();
-
-        return array_merge($speakers, $moderators);
     }
 
     /**
      * @param Member $member
-     * @return PresentationSpeaker|null
+     * @return Speaker|null
      */
     public function getSpeakerByMember(Member $member)
     {
@@ -1187,14 +1187,14 @@ class Summit extends SilverstripeBaseModel
     /**`
      * @param int $member_id
      * @param bool $filter_published_events
-     * @return PresentationSpeaker|null
+     * @return Speaker|null
      */
     public function getSpeakerByMemberId($member_id, $filter_published_events = true)
     {
         // moderators
         $moderator = $this->buildModeratorsQuery($filter_published_events)
-            ->join('ps.member', 'mb')
-            ->andWhere('mb.id = :member_id')
+            ->join('spk.member', 'm')
+            ->andWhere('m.id = :member_id')
             ->setParameter('member_id', $member_id)
             ->getQuery()->getOneOrNullResult();
 
@@ -1202,8 +1202,8 @@ class Summit extends SilverstripeBaseModel
 
         // speakers
         $speaker = $this->buildSpeakersQuery($filter_published_events)
-            ->join('ps.member', 'mb')
-            ->andWhere('mb.id = :member_id')
+            ->join('spk.member', 'm')
+            ->andWhere('m.id = :member_id')
             ->setParameter('member_id', $member_id)
             ->getQuery()->getOneOrNullResult();
 
@@ -1211,7 +1211,7 @@ class Summit extends SilverstripeBaseModel
 
         // assistance
         $speaker = $this->buildSpeakerSummitAttendanceQuery()
-            ->join('ps.member', 'mb')
+            ->join('spk.member', 'm')
             ->andWhere('mb.id = :member_id')
             ->setParameter('member_id', $member_id)
             ->getQuery()->getOneOrNullResult();
@@ -1224,13 +1224,13 @@ class Summit extends SilverstripeBaseModel
     /**
      * @param int $speaker_id
      * @param bool $filter_published_events
-     * @return PresentationSpeaker|null
+     * @return Speaker|null
      */
     public function getSpeaker($speaker_id, $filter_published_events = true)
     {
         // moderators
         $moderator = $this->buildModeratorsQuery($filter_published_events)
-            ->andWhere('ps.id = :speaker_id')
+            ->andWhere('spk.id = :speaker_id')
             ->setParameter('speaker_id', $speaker_id)
             ->getQuery()->getOneOrNullResult();
 
@@ -1238,7 +1238,7 @@ class Summit extends SilverstripeBaseModel
 
         // speakers
         $speaker = $this->buildSpeakersQuery($filter_published_events)
-            ->andWhere('ps.id = :speaker_id')
+            ->andWhere('spk.id = :speaker_id')
             ->setParameter('speaker_id', $speaker_id)
             ->getQuery()->getOneOrNullResult();
 
@@ -1246,7 +1246,7 @@ class Summit extends SilverstripeBaseModel
 
         // attendance
         $speaker = $this->buildSpeakerSummitAttendanceQuery()
-            ->andWhere('ps.id = :speaker_id')
+            ->andWhere('spk.id = :speaker_id')
             ->setParameter('speaker_id', $speaker_id)
             ->getQuery()->getOneOrNullResult();
 
@@ -1456,7 +1456,19 @@ SQL;
      */
     public function getSpeakersCount()
     {
-        return count($this->getSpeakers());
+        $query = $this->createQueryBuilder()
+            ->select('count (distinct spk)')
+            ->from('models\summit\Speaker', 'spk')
+            ->join('spk.presentations', 'sp')
+            ->join('sp.presentation', 'p')
+            ->join('p.summit', 's')
+            ->where("s.id = :summit_id")
+            ->andWhere("p.published = 1");
+
+        $query->setParameter('summit_id', $this->getId());
+
+        $res = $query->getQuery()->getSingleResult();
+        return intval($res[1]);
     }
 
     /**

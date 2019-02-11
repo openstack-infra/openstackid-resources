@@ -985,9 +985,9 @@ final class SummitService extends AbstractService implements ISummitService
 
                 // check speakers collisions
                 if ($event instanceof Presentation && $c_event instanceof Presentation && $event->getId() != $c_event->getId()) {
-                    foreach ($event->getSpeakers() as $current_speaker) {
-                        foreach ($c_event->getSpeakers() as $c_speaker) {
-                            if (intval($c_speaker->getId()) === intval($current_speaker->getId())) {
+                    foreach ($event->getSpeakers() as $current_presentation_speaker) {
+                        foreach ($c_event->getSpeakers() as $c_presentation_speaker) {
+                            if (intval($c_presentation_speaker->getSpeaker()->getId()) === intval($current_presentation_speaker->getSpeaker()->getId())) {
                                 throw new ValidationException
                                 (
                                     sprintf
@@ -995,7 +995,7 @@ final class SummitService extends AbstractService implements ISummitService
                                         "You can't publish Event %s (%s) on this timeframe, speaker %s its presention in room %s at this time.",
                                         $event->getTitle(),
                                         $event->getId(),
-                                        $current_speaker->getFullName(),
+                                        $current_presentation_speaker->getSpeaker()->getFullName(),
                                         $c_event->getLocationName()
                                     )
                                 );

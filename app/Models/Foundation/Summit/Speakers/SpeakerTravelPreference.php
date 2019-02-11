@@ -28,9 +28,9 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     private $country;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="travel_preferences")
+     * @ORM\ManyToOne(targetEntity="Speaker", inversedBy="travel_preferences")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
-     * @var PresentationSpeaker
+     * @var Speaker
      */
     private $speaker;
 
@@ -82,7 +82,7 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     }
 
     /**
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getSpeaker()
     {
@@ -90,7 +90,7 @@ class SpeakerTravelPreference extends SilverstripeBaseModel
     }
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      */
     public function setSpeaker($speaker)
     {
