@@ -53,8 +53,9 @@ trait TimeZoneEntity
      * @param DateTime $value
      * @return null|DateTime
      */
-    public function convertDateFromUTC2TimeZone(DateTime $value)
+    public function convertDateFromUTC2TimeZone(?DateTime $value)
     {
+        if(is_null($value)) return null;
         $time_zone = $this->getTimeZone();
         if (is_null($time_zone)) return null;
 
@@ -69,8 +70,9 @@ trait TimeZoneEntity
      * @param DateTime $value
      * @return null|DateTime
      */
-    public function convertDateFromTimeZone2UTC(DateTime $value)
+    public function convertDateFromTimeZone2UTC(?DateTime $value)
     {
+        if(is_null($value)) return null;
         $time_zone = $this->getTimeZone();
         if (is_null($time_zone)) return null;
 
