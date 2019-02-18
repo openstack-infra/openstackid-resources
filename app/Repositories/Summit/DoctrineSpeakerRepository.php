@@ -77,7 +77,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM Speaker S
+	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -87,29 +87,13 @@ FROM (
 		INNER JOIN Presentation P ON E.ID = P.ID
 		INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
 		WHERE E.SummitID = {$summit->getId()} AND PS.PresentationSpeakerID = S.ID
-	)
+	)	
 	UNION
 	SELECT S.ID,
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM Speaker S
-	LEFT JOIN Member M ON M.ID = S.MemberID
-	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
-	WHERE
-	EXISTS
-	(
-		SELECT E.ID FROM SummitEvent E
-		INNER JOIN Presentation P ON E.ID = P.ID
-		INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
-		WHERE E.SummitID = {$summit->getId()} AND P.ModeratorID = S.ID
-	)
-	UNION
-	SELECT S.ID,
-	IFNULL(S.FirstName, M.FirstName) AS FirstName,
-	IFNULL(S.LastName, M.Surname) AS LastName,
-	IFNULL(M.Email, R.Email) AS Email
-	FROM Speaker S
+	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -157,7 +141,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM Speaker S
+    FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN File F ON F.ID = S.PhotoID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
@@ -190,39 +174,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM Speaker S
-	LEFT JOIN Member M ON M.ID = S.MemberID
-    LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
-    WHERE
-	EXISTS
-	(
-		SELECT E.ID FROM SummitEvent E
-		INNER JOIN Presentation P ON E.ID = P.ID
-		INNER JOIN Presentation_Speakers PS ON PS.PresentationID = P.ID
-		WHERE E.SummitID = {$summit->getId()} AND P.ModeratorID = S.ID
-	)
-	UNION
-	SELECT
-    S.ID,
-    S.ClassName,
-    S.Created,
-    S.LastEdited,
-    S.Title AS SpeakerTitle,
-    S.Bio,
-    S.IRCHandle,
-    S.AvailableForBureau,
-    S.FundedTravel,
-    S.Country,
-    S.MemberID,
-    S.WillingToTravel,
-    S.WillingToPresentVideo,
-    S.Notes,
-    S.TwitterName,
-    IFNULL(S.FirstName, M.FirstName) AS FirstName,
-	IFNULL(S.LastName, M.Surname) AS LastName,
-    IFNULL(M.Email,R.Email) AS Email,
-    S.PhotoID
-    FROM Speaker S
+    FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
     WHERE
@@ -314,7 +266,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email,R.Email) AS Email
-	FROM Speaker S
+	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 )
@@ -356,7 +308,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM Speaker S
+    FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN File F ON F.ID = S.PhotoID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
