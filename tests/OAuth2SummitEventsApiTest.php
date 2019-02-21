@@ -1351,46 +1351,4 @@ final class OAuth2SummitEventsApiTest extends ProtectedApiTest
 
     }
 
-    public function testGetFilteredEvents($summit_id = 25)
-    {
-        $params = array
-        (
-            'id' => $summit_id ,
-            'expand' => 'speakers,type',
-            'filter' => [
-
-                'title=@kubernets',
-                'abstract=@kubernets',
-                'tags=@kubernets',
-                'speaker=@kubernets',
-                'speaker_email=@kubernets',
-                'id==kubernets'
-            ]
-        );
-
-        $headers = array
-        (
-            "HTTP_Authorization" => " Bearer " . $this->access_token,
-            "CONTENT_TYPE" => "application/json"
-        );
-
-
-        $response = $this->action
-        (
-            "GET",
-            "OAuth2SummitEventsApiController@getEvents",
-            $params,
-            array(),
-            array(),
-            array(),
-            $headers
-        );
-
-        $content = $response->getContent();
-        $this->assertResponseStatus(200);
-
-        $events = json_decode($content);
-        $this->assertTrue(!is_null($events));
-    }
-
 }
