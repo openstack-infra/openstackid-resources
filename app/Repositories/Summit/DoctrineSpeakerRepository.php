@@ -77,7 +77,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM Speaker S
+	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -93,7 +93,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM Speaker S
+	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -109,7 +109,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email, R.Email) AS Email
-	FROM Speaker S
+	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 	WHERE
@@ -173,7 +173,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM Speaker S
+    FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN File F ON F.ID = S.PhotoID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
@@ -206,7 +206,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM Speaker S
+    FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
     WHERE
@@ -238,7 +238,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM Speaker S
+    FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
     WHERE
@@ -362,7 +362,7 @@ FROM (
 	IFNULL(S.FirstName, M.FirstName) AS FirstName,
 	IFNULL(S.LastName, M.Surname) AS LastName,
 	IFNULL(M.Email,R.Email) AS Email
-	FROM Speaker S
+	FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
 )
@@ -404,7 +404,7 @@ FROM (
 	IFNULL(S.LastName, M.Surname) AS LastName,
     IFNULL(M.Email,R.Email) AS Email,
     S.PhotoID
-    FROM Speaker S
+    FROM PresentationSpeaker S
 	LEFT JOIN Member M ON M.ID = S.MemberID
 	LEFT JOIN File F ON F.ID = S.PhotoID
     LEFT JOIN SpeakerRegistrationRequest R ON R.SpeakerID = S.ID
