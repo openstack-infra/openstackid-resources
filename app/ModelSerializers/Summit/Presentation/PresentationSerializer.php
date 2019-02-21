@@ -22,6 +22,7 @@ class PresentationSerializer extends SummitEventSerializer
 
         'Level'                   => 'level',
         'CreatorId'               => 'creator_id:json_int',
+        'ModeratorId'             => 'moderator_speaker_id:json_int',
         'SelectionPlanId'         => 'selection_plan_id:json_int',
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
@@ -34,6 +35,7 @@ class PresentationSerializer extends SummitEventSerializer
     protected static $allowed_fields = [
         'track_id',
         'creator_id',
+        'moderator_speaker_id',
         'selection_plan_id',
         'level',
         'problem_addressed',
@@ -70,11 +72,8 @@ class PresentationSerializer extends SummitEventSerializer
         $values = parent::serialize($expand, $fields, $relations, $params);
 
         if(in_array('speakers', $relations)) {
-            $values['speakers'] = $presentation->getSpeakerIdsAndRole();
+            $values['speakers'] = $presentation->getSpeakerIds();
         }
-
-        // todo: legacy should be removed
-        $values['moderator_speaker_id'] = 0;
 
         if(in_array('slides', $relations))
         {
@@ -123,13 +122,13 @@ class PresentationSerializer extends SummitEventSerializer
                 switch (trim($relation)) {
                     case 'speakers': {
                         $speakers = [];
-                        foreach ($presentation->getSpeakers() as $presentation_speaker) {
-                            $speakers[] = SerializerRegistry::getInstance()->getSerializer($presentation_speaker)->serialize
-                            (
-                                'speaker'
-                            );
+                        foreach ($presentation->getSpeakers() as $s) {
+                            $speakers[] = SerializerRegistry::getInstance()->getSerializer($s)->serialize();
                         }
                         $values['speakers'] = $speakers;
+                        if(isset($values['moderator_speaker_id']) && intval($values['moderator_speaker_id']) > 0 ){
+                            $values['moderator'] = SerializerRegistry::getInstance()->getSerializer($presentation->getModerator())->serialize();
+                        }
                     }
                     case 'creator':{
                         if($presentation->getCreatorId() > 0) {

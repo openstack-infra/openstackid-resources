@@ -333,7 +333,6 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
     public function addEvent($summit_id)
     {
         try {
-            $expand    = Request::input('expand', '');
             $summit = SummitFinderStrategyFactory::build($this->repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
             if(!Request::isJson()) return $this->error400();
@@ -360,7 +359,8 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'attendees_expected_learnt'      =>  'sometimes|string|max:1000',
                 'attending_media'                =>  'sometimes|boolean',
                 'to_record'                      =>  'sometimes|boolean',
-                'speakers'                       =>  'sometimes|speakers_dto_array',
+                'speakers'                       =>  'sometimes|int_array',
+                'moderator_speaker_id'           =>  'sometimes|integer',
                 // group event
                 'groups'                         =>  'sometimes|int_array',
             ];
@@ -385,7 +385,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             $event = $this->service->addEvent($summit, HTMLCleaner::cleanData($data->all(), $fields));
 
-            return $this->created(SerializerRegistry::getInstance()->getSerializer($event)->serialize($expand));
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($event)->serialize());
         }
         catch (ValidationException $ex1) {
             Log::warning($ex1);
@@ -414,8 +414,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
             if (is_null($summit)) return $this->error404();
 
             if(!Request::isJson()) return $this->error400();
-            $data   = Input::json();
-            $expand = Request::input('expand', '');
+            $data = Input::json();
 
             $current_member = null;
             $member_id = $this->resource_server_context->getCurrentUserExternalId();
@@ -445,7 +444,8 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
                 'attendees_expected_learnt'      => 'sometimes|string|max:1000',
                 'attending_media'                => 'sometimes|boolean',
                 'to_record'                      => 'sometimes|boolean',
-                'speakers'                       => 'sometimes|speakers_dto_array',
+                'speakers'                       => 'sometimes|int_array',
+                'moderator_speaker_id'           => 'sometimes|integer',
                 // group event
                 'groups'                         => 'sometimes|int_array',
                 'occupancy'                      => 'sometimes|in:EMPTY,25%,50%,75%,FULL'
@@ -471,7 +471,7 @@ final class OAuth2SummitEventsApiController extends OAuth2ProtectedController
 
             $event = $this->service->updateEvent($summit, $event_id, HTMLCleaner::cleanData($data->all(), $fields), $current_member);
 
-            return $this->ok(SerializerRegistry::getInstance()->getSerializer($event)->serialize($expand));
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($event)->serialize());
 
         }
         catch (ValidationException $ex1)

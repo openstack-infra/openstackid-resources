@@ -148,7 +148,7 @@ final class DoctrineTest extends TestCase
         $summit   = $repo->getById(6);
         $speakers = $summit->getSpeakers();
         $sponsors = $summit->getSponsors();
-        $repo     = EntityManager::getRepository(\models\summit\Speaker::class);
+        $repo     = EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
         $speakers = $repo->getSpeakersBySummit($summit, new PagingInfo(1,10))->getItems();
         $this->assertTrue(count($speakers) > 0);
         $speaker = $speakers[0];
@@ -157,7 +157,7 @@ final class DoctrineTest extends TestCase
     }
 
     public function testGetSpeakerPublishedRegularPresentations($speaker_id = 1759){
-        $repo1     = EntityManager::getRepository(\models\summit\Speaker::class);
+        $repo1     = EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
         $repo2     = EntityManager::getRepository(\models\summit\Summit::class);
         $summit    = $repo2->getById(23);
         $speaker   = $repo1->getById($speaker_id);
@@ -170,7 +170,7 @@ final class DoctrineTest extends TestCase
     }
 
     public function testGetSpeakerAlternatePresentations($speaker_id = 70){
-        $repo1     = EntityManager::getRepository(\models\summit\Speaker::class);
+        $repo1     = EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
         $repo2     = EntityManager::getRepository(\models\summit\Summit::class);
         $summit    = $repo2->getById(23);
         $speaker   = $repo1->getById($speaker_id);
@@ -183,7 +183,7 @@ final class DoctrineTest extends TestCase
     }
 
     public function testGetSpeakerRejectedPresentations($speaker_id = 70){
-        $repo1     = EntityManager::getRepository(\models\summit\Speaker::class);
+        $repo1     = EntityManager::getRepository(\models\summit\PresentationSpeaker::class);
         $repo2     = EntityManager::getRepository(\models\summit\Summit::class);
         $summit    = $repo2->getById(23);
         $speaker   = $repo1->getById($speaker_id);

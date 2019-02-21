@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 use Doctrine\ORM\Mapping AS ORM;
-use models\summit\Speaker;
+use models\summit\PresentationSpeaker;
 /**
  * @ORM\Entity
  * @ORM\Table(name="SpeakerCreationEmailCreationRequest")
@@ -22,9 +22,9 @@ use models\summit\Speaker;
 class SpeakerCreationEmailCreationRequest extends EmailCreationRequest
 {
     /**
-     * @ORM\ManyToOne(targetEntity="models\summit\Speaker")
+     * @ORM\ManyToOne(targetEntity="models\summit\PresentationSpeaker")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
-     * @var Speaker
+     * @var PresentationSpeaker
      */
     protected $speaker;
 
@@ -35,7 +35,7 @@ class SpeakerCreationEmailCreationRequest extends EmailCreationRequest
     }
 
     /**
-     * @return Speaker
+     * @return PresentationSpeaker
      */
     public function getSpeaker()
     {
@@ -43,7 +43,7 @@ class SpeakerCreationEmailCreationRequest extends EmailCreationRequest
     }
 
     /**
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      */
     public function setSpeaker($speaker)
     {

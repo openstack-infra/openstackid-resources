@@ -31,10 +31,10 @@ use Doctrine\Common\Collections\Criteria;
  * @ORM\Table(name="PresentationSpeaker")
  * @ORM\Entity(repositoryClass="App\Repositories\Summit\DoctrineSpeakerRepository")
  * @ORM\HasLifecycleCallbacks
- * Class Speaker
+ * Class PresentationSpeaker
  * @package models\summit
  */
-class Speaker extends SilverstripeBaseModel
+class PresentationSpeaker extends SilverstripeBaseModel
 {
 
     const AnnouncementEmailAccepted          = 'ACCEPTED';
@@ -43,14 +43,9 @@ class Speaker extends SilverstripeBaseModel
     const AnnouncementEmailAcceptedAlternate = 'ACCEPTED_ALTERNATE';
     const AnnouncementEmailAcceptedRejected  = 'ACCEPTED_REJECTED';
     const AnnouncementEmailAlternateRejected = 'ALTERNATE_REJECTED';
-    const RoleSpeaker                        = 'Speaker';
-    const RoleModerator                      = 'Moderator';
-    const RoleCreator                        = 'Creator';
+    const RoleSpeaker                        = 'SPEAKER';
+    const RoleModerator                      = 'MODERATOR';
 
-    public static $AvailableRoles = [
-        self::RoleSpeaker,
-        self::RoleModerator,
-    ];
     /**
      * @ORM\Column(name="FirstName", type="string")
      */
@@ -141,10 +136,16 @@ class Speaker extends SilverstripeBaseModel
     private $promo_codes;
 
     /**
-     * @ORM\OneToMany(targetEntity="PresentationSpeaker", mappedBy="speaker", cascade={"persist"}, orphanRemoval=true)
-     * @var PresentationSpeaker[]
+     * @ORM\ManyToMany(targetEntity="models\summit\Presentation", mappedBy="speakers")
+     * @var Presentation[]
      */
     private $presentations;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Presentation", mappedBy="moderator", cascade={"persist"})
+     * @var Presentation[]
+     */
+    private $moderated_presentations;
 
     /**
      * @ORM\ManyToOne(targetEntity="models\main\File", cascade={"persist"})
@@ -319,6 +320,7 @@ class Speaker extends SilverstripeBaseModel
         $this->funded_travel              = false;
         $this->org_has_cloud              = false;
         $this->presentations              = new ArrayCollection;
+        $this->moderated_presentations    = new ArrayCollection;
         $this->summit_assistances         = new ArrayCollection;
         $this->promo_codes                = new ArrayCollection;
         $this->areas_of_expertise         = new ArrayCollection;
@@ -334,11 +336,7 @@ class Speaker extends SilverstripeBaseModel
      * @param Presentation $presentation
      */
     public function addPresentation(Presentation $presentation){
-        $presentationSpeaker = new PresentationSpeaker();
-        $presentationSpeaker->setRole(Speaker::RoleSpeaker);
-        $presentationSpeaker->setPresentation($presentation);
-        $presentationSpeaker->setSpeaker($this);
-        $this->presentations->add($presentationSpeaker);
+        $this->presentations->add($presentation);
     }
 
     public function clearPresentations(){
@@ -388,17 +386,22 @@ class Speaker extends SilverstripeBaseModel
     /**
      * @param null|int $summit_id
      * @param bool|true $published_ones
-     * @return PresentationSpeaker[]
+     * @return Presentation[]
      */
     public function presentations($summit_id, $published_ones = true)
     {
+
         return $this->presentations
-            ->filter(function(PresentationSpeaker $presentationSpeaker) use($published_ones, $summit_id){
-                $res = $published_ones? $presentationSpeaker->getPresentation()->isPublished(): true;
-                $res &= is_null($summit_id)? true : $presentationSpeaker->getPresentation()->getSummit()->getId() == $summit_id;
+            ->filter(function($p) use($published_ones, $summit_id){
+                $res = $published_ones? $p->isPublished(): true;
+                $res &= is_null($summit_id)? true : $p->getSummit()->getId() == $summit_id;
                 return $res;
-        });
+            });
     }
+
+    const ROLE_SPEAKER = 'ROLE_SPEAKER';
+    const ROLE_CREATOR = 'ROLE_CREATOR';
+    const ROLE_MODERATOR ='ROLE_MODERATOR';
 
     /**
      * @param SelectionPlan $selectionPlan
@@ -407,26 +410,21 @@ class Speaker extends SilverstripeBaseModel
      */
     public function getPresentationsBySelectionPlanAndRole(SelectionPlan $selectionPlan, $role){
 
-        if($role == self::RoleSpeaker){
-            $criteria = Criteria::create();
-            $criteria->where(Criteria::expr()->eq('role', self::RoleSpeaker));
-            $res = $this->presentations->matching($criteria)->filter(
-                function(PresentationSpeaker $presentationSpeaker) use($selectionPlan) {
-                    $presentation = $presentationSpeaker->getPresentation();
-                    if($presentation->getSelectionPlanId() != $selectionPlan->getId()) return false;
-                    if($presentation->getCreatorId() == $this->getMemberId()) return false;
-                    return true;
-                }
-            );
-
+        if($role == self::ROLE_SPEAKER){
+            $res = $this->presentations->filter(function(Presentation $presentation) use($selectionPlan){
+                if($presentation->getSelectionPlanId() != $selectionPlan->getId()) return false;
+                if($presentation->getSummit()->getId() != $selectionPlan->getSummitId()) return false;
+                if($presentation->getModeratorId() == $this->getId()) return false;
+                if($presentation->getCreatorId() == $this->getMemberId()) return false;
+            });
             return $res->toArray();
         }
 
-        if($role == self::RoleCreator){
+        if($role == self::ROLE_CREATOR){
             return $selectionPlan->getSummit()->getCreatedPresentations($this, $selectionPlan);
         }
 
-        if($role == self::RoleModerator){
+        if($role == self::ROLE_MODERATOR){
             return $selectionPlan->getSummit()->getModeratedPresentationsBy($this, $selectionPlan);
         }
 
@@ -440,25 +438,20 @@ class Speaker extends SilverstripeBaseModel
      */
     public function getPresentationsBySummitAndRole(Summit $summit, $role){
 
-        if($role == self::RoleSpeaker){
-            $criteria = Criteria::create();
-            $criteria->where(Criteria::expr()->eq('role', self::RoleSpeaker));
-            $res = $this->presentations->matching($criteria)->filter(
-                function(PresentationSpeaker $presentationSpeaker) use($summit) {
-                    $presentation = $presentationSpeaker->getPresentation();
-                    if($presentation->getSummit()->getId() != $summit->getId()) return false;
-                    if($presentation->getCreatorId() == $this->getMemberId()) return false;
-                    return true;
-                }
-            );
+        if($role == self::ROLE_SPEAKER){
+            $res = $this->presentations->filter(function(Presentation $presentation) use($summit){
+                if($presentation->getSummit()->getId() != $summit->getId()) return false;
+                if($presentation->getModeratorId() == $this->getId()) return false;
+                if($presentation->getCreatorId() == $this->getMemberId()) return false;
+            });
             return $res->toArray();
         }
 
-        if($role == self::RoleCreator){
+        if($role == self::ROLE_CREATOR){
             return $summit->getCreatedPresentations($this);
         }
 
-        if($role == self::RoleModerator){
+        if($role == self::ROLE_MODERATOR){
             return $summit->getModeratedPresentationsBy($this);
         }
 
@@ -475,7 +468,7 @@ class Speaker extends SilverstripeBaseModel
     public function hasPublishedRegularPresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles = false,
         array $excluded_tracks = []
     )
@@ -494,7 +487,7 @@ class Speaker extends SilverstripeBaseModel
     public function getPublishedRegularPresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles = false,
         array $excluded_tracks = []
     )
@@ -508,11 +501,11 @@ class Speaker extends SilverstripeBaseModel
             $excluded_tracks
         );
 
-        if($include_sub_roles && $role == Speaker::RoleModerator){
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
             $presentations = $this->getPublishedPresentationsByType
             (
                 $summit,
-                Speaker::RoleSpeaker,
+                PresentationSpeaker::RoleSpeaker,
                 [IPresentationType::Keynotes, IPresentationType::Panel, IPresentationType::Presentation],
                 true,
                 $excluded_tracks
@@ -536,7 +529,7 @@ class Speaker extends SilverstripeBaseModel
     public function hasPublishedLightningPresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles = false,
         array $excluded_tracks = []
     )
@@ -560,15 +553,15 @@ class Speaker extends SilverstripeBaseModel
     public function getPublishedLightningPresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles = false,
         array $excluded_tracks = []
     )
     {
         $list = $this->getPublishedPresentationsByType($summit, $role, [IPresentationType::LightingTalks], true , $excluded_tracks);
 
-        if($include_sub_roles && $role == Speaker::RoleModerator){
-            $presentations = $this->getPublishedPresentationsByType($summit, Speaker::RoleSpeaker, [IPresentationType::LightingTalks], true, $excluded_tracks) ;
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
+            $presentations = $this->getPublishedPresentationsByType($summit, PresentationSpeaker::RoleSpeaker, [IPresentationType::LightingTalks], true, $excluded_tracks) ;
             if($presentations) {
                 foreach ($presentations as $speaker_presentation) {
                     $list[] = $speaker_presentation;
@@ -590,7 +583,7 @@ class Speaker extends SilverstripeBaseModel
     public function hasAlternatePresentations
     (
         Summit $summit,
-        $role                  = Speaker::RoleSpeaker,
+        $role                  = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles     = false,
         array $excluded_tracks = [],
         $published_ones = false
@@ -610,7 +603,7 @@ class Speaker extends SilverstripeBaseModel
     public function getAlternatePresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles = false,
         array $excluded_tracks = [],
         $published_ones = false
@@ -623,18 +616,26 @@ class Speaker extends SilverstripeBaseModel
             $exclude_category_dql = ' AND p.category NOT IN (:exclude_tracks)';
         }
 
-        $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+        if($role == PresentationSpeaker::RoleSpeaker) {
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
             JOIN p.summit s
             JOIN p.speakers sp 
             WHERE s.id = :summit_id 
             AND p.published = :published
-            AND sp.role = :role
-            AND sp.speaker.id = :speaker_id".$exclude_category_dql);
+            AND sp.id = :speaker_id".$exclude_category_dql);
+        }
+        else{
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.moderator m 
+            WHERE s.id = :summit_id 
+            AND p.published = :published
+            AND m.id = :speaker_id".$exclude_category_dql);
+        }
 
         $query
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('speaker_id', $this->id)
-            ->setParameter('role', $role)
             ->setParameter('published', $published_ones ? 1 : 0);
 
         if(count($excluded_tracks) > 0){
@@ -650,8 +651,8 @@ class Speaker extends SilverstripeBaseModel
         }
 
         // if role is moderator, add also the ones that belongs to role speaker ( if $include_sub_roles is true)
-        if($include_sub_roles && $role == Speaker::RoleModerator){
-            $presentations = $this->getAlternatePresentations($summit,Speaker::RoleSpeaker, $include_sub_roles, $excluded_tracks);
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
+            $presentations = $this->getAlternatePresentations($summit,PresentationSpeaker::RoleSpeaker, $include_sub_roles, $excluded_tracks);
             if($presentations) {
                 foreach ($presentations as $speaker_presentation)
                     $alternate_presentations[] = $speaker_presentation;
@@ -671,7 +672,7 @@ class Speaker extends SilverstripeBaseModel
     public function hasRejectedPresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles = false,
         array $excluded_tracks = []
     )
@@ -689,13 +690,13 @@ class Speaker extends SilverstripeBaseModel
     public function getRejectedPresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $include_sub_roles = false,
         array $excluded_tracks = []
     ){
         $list = $this->getUnacceptedPresentations($summit, $role, true, $excluded_tracks);
-        if($include_sub_roles && $role == Speaker::RoleModerator){
-            $presentations = $this->getUnacceptedPresentations($summit, Speaker::RoleSpeaker, true, $excluded_tracks);
+        if($include_sub_roles && $role == PresentationSpeaker::RoleModerator){
+            $presentations = $this->getUnacceptedPresentations($summit, PresentationSpeaker::RoleSpeaker, true, $excluded_tracks);
             if($presentations) {
                 foreach ($presentations as $speaker_presentation) {
                     $list[] = $speaker_presentation;
@@ -715,7 +716,7 @@ class Speaker extends SilverstripeBaseModel
     public function getUnacceptedPresentations
     (
         Summit $summit,
-        $role = Speaker::RoleSpeaker,
+        $role = PresentationSpeaker::RoleSpeaker,
         $exclude_privates_tracks = true,
         array $excluded_tracks = []
     )
@@ -746,17 +747,25 @@ class Speaker extends SilverstripeBaseModel
             $exclude_category_dql = ' AND p.category NOT IN (:exclude_tracks)';
         }
 
-        $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+        if($role == PresentationSpeaker::RoleSpeaker) {
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
             JOIN p.summit s
             JOIN p.speakers sp 
             WHERE s.id = :summit_id 
             AND p.published = 0
-            AND sp.role = :role
-            AND sp.speaker.id = :speaker_id".$exclude_category_dql);
+            AND sp.id = :speaker_id".$exclude_category_dql);
+        }
+        else{
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.moderator m 
+            WHERE s.id = :summit_id 
+            AND p.published = 0
+            AND m.id = :speaker_id".$exclude_category_dql);
+        }
 
         $query
             ->setParameter('summit_id', $summit->getId())
-            ->setParameter('role', $role)
             ->setParameter('speaker_id', $this->id);
 
         if(count($excluded_tracks) > 0){
@@ -785,7 +794,7 @@ class Speaker extends SilverstripeBaseModel
     public function getPublishedPresentationsByType
     (
         Summit $summit,
-        $role                    = Speaker::RoleSpeaker,
+        $role                    = PresentationSpeaker::RoleSpeaker,
         array $types_slugs       = [IPresentationType::Keynotes, IPresentationType::Panel, IPresentationType::Presentation, IPresentationType::LightingTalks],
         $exclude_privates_tracks = true,
         array $excluded_tracks   = []
@@ -827,18 +836,26 @@ class Speaker extends SilverstripeBaseModel
             $exclude_category_dql = ' and p.category NOT IN (:exclude_tracks)';
         }
 
-        $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+        if($role == PresentationSpeaker::RoleSpeaker) {
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
             JOIN p.summit s
             JOIN p.speakers sp 
             WHERE s.id = :summit_id 
-            and sp.speaker.id = :speaker_id
-            and sp.role = :role
+            and sp.id = :speaker_id
             and p.published = 1 and p.type IN (:types)".$exclude_category_dql);
+        }
+        else{
+            $query = $this->createQuery("SELECT p from models\summit\Presentation p 
+            JOIN p.summit s
+            JOIN p.moderator m 
+            WHERE s.id = :summit_id 
+            and m.id = :speaker_id
+            and p.published = 1 and p.type IN (:types)".$exclude_category_dql);
+        }
 
         $query
             ->setParameter('summit_id', $summit->getId())
             ->setParameter('types', $types)
-            ->setParameter('role', $role)
             ->setParameter('speaker_id', $this->id);
 
         if(count($excluded_tracks) > 0){
@@ -852,18 +869,17 @@ class Speaker extends SilverstripeBaseModel
     /**
      * @param null|int $summit_id
      * @param bool|true $published_ones
-     * @return PresentationSpeaker[]
+     * @return Presentation[]
      */
     public function moderated_presentations($summit_id, $published_ones = true)
     {
-        return $this->presentations->filter(
-            function(PresentationSpeaker $presentationSpeaker) use($published_ones, $summit_id){
-                $res = $published_ones? $presentationSpeaker->getPresentation()->isPublished(): true;
-                $res &= is_null($summit_id)? true : $presentationSpeaker->getPresentation()->getSummit()->getId() == $summit_id;
-                $res &= $presentationSpeaker->getRole() == Speaker::RoleModerator;
+
+        return $this->moderated_presentations
+            ->filter(function($p) use($published_ones, $summit_id){
+                $res = $published_ones? $p->isPublished(): true;
+                $res &= is_null($summit_id)? true : $p->getSummit()->getId() == $summit_id;
                 return $res;
-            }
-        );
+            });
     }
 
     /**
@@ -882,8 +898,19 @@ class Speaker extends SilverstripeBaseModel
      */
     public function getPresentationIds($summit_id, $published_ones = true)
     {
-        return $this->presentations($summit_id, $published_ones)->map(function(PresentationSpeaker $presentationSpeaker)  {
-            return $presentationSpeaker->getPresentation()->getId();
+        return $this->presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity->getId();
+        })->toArray();
+    }
+
+    /**
+     * @param bool|true $published_ones
+     * @return array
+     */
+    public function getAllPresentationIds($published_ones = true)
+    {
+        return $this->presentations(null, $published_ones)->map(function($entity)  {
+            return $entity->getId();
         })->toArray();
     }
 
@@ -892,58 +919,21 @@ class Speaker extends SilverstripeBaseModel
      * @param bool|true $published_ones
      * @return array
      */
-    public function getPresentationIdsAndRole($summit_id, $published_ones = true)
+    public function getPresentations($summit_id, $published_ones = true)
     {
-        return $this->presentations($summit_id, $published_ones)->map(function(PresentationSpeaker $presentationSpeaker)  {
-            return [
-                'id' => $presentationSpeaker->getPresentation()->getId(),
-                'role' => $presentationSpeaker->getRole()
-            ];
+        return $this->presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity;
         })->toArray();
     }
 
     /**
      * @param bool|true $published_ones
-     * @return int[]
+     * @return array
      */
-    public function getAllPresentationIds($published_ones = true): array
+    public function getAllPresentations($published_ones = true)
     {
-        return $this->presentations(null, $published_ones)->map(function(PresentationSpeaker $presentationSpeaker)  {
-            return $presentationSpeaker->getPresentation()->getId();
-        })->toArray();
-    }
-
-    /**
-     * @param null $summit_id
-     * @param bool|true $published_ones
-     * @return Presentation[]
-     */
-    public function getPresentations($summit_id, $published_ones = true) : array
-    {
-        return $this->presentations($summit_id, $published_ones)->map(function(PresentationSpeaker $presentationSpeaker)  {
-            return $presentationSpeaker->getPresentation();
-        })->toArray();
-    }
-
-    /**
-     * @param null $summit_id
-     * @param bool|true $published_ones
-     * @return Presentation[]
-     */
-    public function getSpeakerPresentations($summit_id, $published_ones = true) : array
-    {
-        return $this->presentations($summit_id, $published_ones);
-    }
-
-
-    /**
-     * @param bool|true $published_ones
-     * @return Presentation[]
-     */
-    public function getAllPresentations($published_ones = true):array
-    {
-        return $this->presentations(null, $published_ones)->map(function(PresentationSpeaker $presentationSpeaker)  {
-            return $presentationSpeaker->getPresentation();
+        return $this->presentations(null, $published_ones)->map(function($entity)  {
+            return $entity;
         })->toArray();
     }
 
@@ -951,46 +941,46 @@ class Speaker extends SilverstripeBaseModel
     /**
      * @param null $summit_id
      * @param bool|true $published_ones
-     * @return int[]
+     * @return array
      */
-    public function getModeratedPresentationIds($summit_id, $published_ones = true):array
+    public function getModeratedPresentationIds($summit_id, $published_ones = true)
     {
-        return $this->moderated_presentations($summit_id, $published_ones)->map(function(PresentationSpeaker $ps)  {
-            return $ps->getPresentation()->getId();
+        return $this->moderated_presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity->getId();
         })->toArray();
     }
 
     /**
      * @param bool|true $published_ones
-     * @return int[]
+     * @return array
      */
     public function getAllModeratedPresentationIds($published_ones = true)
     {
-        return $this->moderated_presentations(null, $published_ones)->map(function(PresentationSpeaker $ps)  {
-            return $ps->getPresentation()->getId();
+        return $this->moderated_presentations(null, $published_ones)->map(function($entity)  {
+            return $entity->getId();
         })->toArray();
     }
 
     /**
      * @param null $summit_id
      * @param bool|true $published_ones
-     * @return Presentation[]
+     * @return array
      */
     public function getModeratedPresentations($summit_id, $published_ones = true)
     {
-        return $this->moderated_presentations($summit_id, $published_ones)->map(function(PresentationSpeaker $ps)  {
-            return $ps->getPresentation();
+        return $this->moderated_presentations($summit_id, $published_ones)->map(function($entity)  {
+            return $entity;
         })->toArray();
     }
 
     /**
      * @param bool|true $published_ones
-     * @return Presentation[]
+     * @return array
      */
-    public function getAllModeratedPresentations($published_ones = true): array
+    public function getAllModeratedPresentations($published_ones = true)
     {
-        return $this->moderated_presentations(null, $published_ones)->map(function(PresentationSpeaker $ps)  {
-            return $ps->getPresentation();
+        return $this->moderated_presentations(null, $published_ones)->map(function($entity)  {
+            return $entity;
         })->toArray();
     }
 
@@ -1266,7 +1256,7 @@ SQL;
         (
             [
                 'id'         => $this->id,
-                'class_name' => "Speaker",
+                'class_name' => "PresentationSpeaker",
                 'summits'    => $this->getRelatedSummits(),
             ]
         );
@@ -1544,11 +1534,8 @@ SQL;
      * @param Presentation $presentation
      */
     public function addModeratedPresentation(Presentation $presentation){
-        $presentationSpeaker = new PresentationSpeaker();
-        $presentationSpeaker->setRole(Speaker::RoleModerator);
-        $presentationSpeaker->setPresentation($presentation);
-        $presentationSpeaker->setSpeaker($this);
-        $this->presentations->add($presentationSpeaker);
+        $this->moderated_presentations->add($presentation);
+        $presentation->setModerator($this);
     }
 
     /**
@@ -1557,9 +1544,8 @@ SQL;
      */
     public function isModeratorFor(Summit $summit){
         $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('presentation.summit', $summit));
-        $criteria->where(Criteria::expr()->eq('role', self::RoleModerator));
-        return $this->presentations->matching($criteria)->count() > 0;
+        $criteria->where(Criteria::expr()->eq('summit', $summit));
+        return $this->moderated_presentations->matching($criteria)->count() > 0;
     }
 
     /**

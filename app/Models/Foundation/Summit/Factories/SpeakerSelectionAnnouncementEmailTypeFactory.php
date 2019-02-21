@@ -1,5 +1,5 @@
 <?php namespace models\summit\factories;
-use models\summit\Speaker;
+use models\summit\PresentationSpeaker;
 use models\summit\SpeakerAnnouncementSummitEmail;
 use models\summit\Summit;
 
@@ -19,7 +19,7 @@ use models\summit\Summit;
 final class SpeakerSelectionAnnouncementEmailTypeFactory
 {
 
-    public static function build(Summit $summit, Speaker $speaker, $role = Speaker::RoleSpeaker)
+    public static function build(Summit $summit, PresentationSpeaker $speaker, $role = PresentationSpeaker::RoleSpeaker)
     {
         $has_published = $speaker->hasPublishedRegularPresentations($summit, $role, true, $summit->getExcludedCategoriesForAcceptedPresentations()) ||
                          $speaker->hasPublishedLightningPresentations($summit, $role, true, $summit->getExcludedCategoriesForAcceptedPresentations());

@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\summit\Speaker;
+use models\summit\PresentationSpeaker;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\Summit;
 
@@ -23,11 +23,11 @@ final class PresentationSpeakerSummitAssistanceConfirmationRequestFactory
 {
     /**
      * @param Summit $summit
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      * @param array $data
      * @return PresentationSpeakerSummitAssistanceConfirmationRequest
      */
-    public static function build(Summit $summit, Speaker $speaker, array $data){
+    public static function build(Summit $summit, PresentationSpeaker $speaker, array $data){
 
         $request = new PresentationSpeakerSummitAssistanceConfirmationRequest();
         $request->setSummit($summit);

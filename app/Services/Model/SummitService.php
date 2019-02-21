@@ -53,7 +53,6 @@ use models\summit\ISummitEventRepository;
 use models\summit\ISummitRepository;
 use models\summit\Presentation;
 use models\summit\PresentationType;
-use models\summit\Speaker;
 use models\summit\Summit;
 use models\summit\SummitAttendee;
 use models\summit\SummitAttendeeTicket;
@@ -857,38 +856,42 @@ final class SummitService extends AbstractService implements ISummitService
         $event->setToRecord(isset($data['to_record'])?
             filter_var($data['to_record'], FILTER_VALIDATE_BOOLEAN): 0);
 
-        // speakers by role
-        foreach (Speaker::$AvailableRoles as $availableRole){
-            if($event_type instanceof PresentationType && $event_type->shouldUseRole($availableRole)) {
+        // speakers
 
-                $speakers = isset($data['speakers']) ? $data['speakers'] : [];
-                $speakers = array_filter($speakers, function ($person) use ($availableRole) {
-                    return ($person['role'] == $availableRole);
-                });
+        if($event_type instanceof PresentationType && $event_type->isUseSpeakers()) {
+            $speakers = isset($data['speakers']) ?
+                        $data['speakers'] : [];
 
-                $speakerCount = count($speakers);
+            if ($event_type->isAreSpeakersMandatory() && count($speakers) == 0) {
+                throw new ValidationException('speakers are mandatory!');
+            }
 
-                if ($event_type->isRoleMandatory($availableRole) && $speakerCount == 0) {
-                    throw new ValidationException(sprintf('%s are mandatory!', $availableRole));
+            if (count($speakers) > 0 && $event instanceof Presentation) {
+                $event->clearSpeakers();
+                foreach ($speakers as $speaker_id) {
+                    $speaker = $this->speaker_repository->getById(intval($speaker_id));
+                    if (is_null($speaker)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_id));
+                    $event->addSpeaker($speaker);
                 }
+            }
+        }
 
-                if($speakerCount < $event_type->getMinByRole($availableRole)){
-                    throw new ValidationException(sprintf('%s min qty is %s!', $availableRole, $event_type->getMinByRole($availableRole)));
-                }
+        // moderator
 
-                if($speakerCount > $event_type->getMaxByRole($availableRole)){
-                    throw new ValidationException(sprintf('%s max qty is %s!', $availableRole, $event_type->getMaxByRole($availableRole)));
-                }
+        if($event_type instanceof PresentationType && $event_type->isUseModerator()) {
+            $moderator_id = isset($data['moderator_speaker_id']) ? intval($data['moderator_speaker_id']) : 0;
 
-                if ($speakerCount > 0 && $event instanceof Presentation) {
+            if ($event_type->isModeratorMandatory() && $moderator_id == 0) {
+                throw new ValidationException('moderator_speaker_id is mandatory!');
+            }
 
-                    $event->clearSpeakersByRole($availableRole);
-
-                    foreach ($speakers as $speaker_dto) {
-                        $speaker = $this->speaker_repository->getById(intval($speaker_dto['id']));
-                        if (is_null($speaker)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_dto['id']));
-                        $event->addSpeakerByRole($speaker, $availableRole);
-                    }
+            if ($moderator_id > 0) {
+                $speaker_id = intval($data['moderator_speaker_id']);
+                if ($speaker_id === 0) $event->unsetModerator();
+                else {
+                    $moderator = $this->speaker_repository->getById($speaker_id);
+                    if (is_null($moderator)) throw new EntityNotFoundException(sprintf('speaker id %s', $speaker_id));
+                    $event->setModerator($moderator);
                 }
             }
         }
@@ -982,9 +985,9 @@ final class SummitService extends AbstractService implements ISummitService
 
                 // check speakers collisions
                 if ($event instanceof Presentation && $c_event instanceof Presentation && $event->getId() != $c_event->getId()) {
-                    foreach ($event->getSpeakers() as $current_presentation_speaker) {
-                        foreach ($c_event->getSpeakers() as $c_presentation_speaker) {
-                            if (intval($c_presentation_speaker->getSpeaker()->getId()) === intval($current_presentation_speaker->getSpeaker()->getId())) {
+                    foreach ($event->getSpeakers() as $current_speaker) {
+                        foreach ($c_event->getSpeakers() as $c_speaker) {
+                            if (intval($c_speaker->getId()) === intval($current_speaker->getId())) {
                                 throw new ValidationException
                                 (
                                     sprintf
@@ -992,7 +995,7 @@ final class SummitService extends AbstractService implements ISummitService
                                         "You can't publish Event %s (%s) on this timeframe, speaker %s its presention in room %s at this time.",
                                         $event->getTitle(),
                                         $event->getId(),
-                                        $current_presentation_speaker->getSpeaker()->getFullName(),
+                                        $current_speaker->getFullName(),
                                         $c_event->getLocationName()
                                     )
                                 );
@@ -1657,14 +1660,13 @@ final class SummitService extends AbstractService implements ISummitService
      * @param int $current_member_id
      * @param int $speaker_id
      * @param int $presentation_id
-     * @param string $role
-     * @throws EntityNotFoundException
      * @throws ValidationException
+     * @throws EntityNotFoundException
      * @return void
      */
-    public function addSpeaker2PresentationByRole(int $current_member_id, int $speaker_id, int $presentation_id, string $role)
+    public function addSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id)
     {
-        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id, $role) {
+        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id) {
             $current_member = $this->member_repository->getById($current_member_id);
             if(is_null($current_member))
                 throw new EntityNotFoundException(sprintf("member %s not found", $current_member_id));
@@ -1686,18 +1688,6 @@ final class SummitService extends AbstractService implements ISummitService
                     $presentation_id
                     ));
 
-            $presentationType = $presentation->getType();
-
-            if(!$presentationType instanceof PresentationType){
-                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
-            }
-
-            $maxByRole = $presentationType->getMaxByRole($role);
-            $countByRole = $presentation->getSpeakerCountByRole($role);
-            if($countByRole + 1 > $maxByRole){
-                throw new ValidationException(sprintf("%s max qty is %s.", $role, $maxByRole));
-            }
-
             $speaker = $this->speaker_repository->getById(intval($speaker_id));
             if (is_null($speaker))
                 throw new EntityNotFoundException(sprintf('speaker %s not found', $speaker_id));
@@ -1705,8 +1695,7 @@ final class SummitService extends AbstractService implements ISummitService
             if($presentation->getProgress() == Presentation::PHASE_TAGS)
                 $presentation->setProgress(Presentation::PHASE_SPEAKERS);
 
-
-            $presentation->addSpeakerByRole($speaker, $role);
+            $presentation->addSpeaker($speaker);
         });
     }
 
@@ -1714,14 +1703,13 @@ final class SummitService extends AbstractService implements ISummitService
      * @param int $current_member_id
      * @param int $speaker_id
      * @param int $presentation_id
-     * @param string $role
-     * @throws EntityNotFoundException
      * @throws ValidationException
+     * @throws EntityNotFoundException
      * @return void
      */
-    public function removeSpeakerFromPresentationByRole(int $current_member_id, int $speaker_id, int $presentation_id, string $role)
+    public function removeSpeakerFromPresentation($current_member_id, $speaker_id, $presentation_id)
     {
-        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id, $role) {
+        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id) {
 
                 $current_member = $this->member_repository->getById($current_member_id);
                 if(is_null($current_member))
@@ -1752,6 +1740,93 @@ final class SummitService extends AbstractService implements ISummitService
                     $presentation->setProgress(Presentation::PHASE_SPEAKERS);
 
                 $presentation->removeSpeaker($speaker);
+        });
+    }
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function addModerator2Presentation($current_member_id, $speaker_id, $presentation_id)
+    {
+        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id) {
+            $current_member = $this->member_repository->getById($current_member_id);
+            if(is_null($current_member))
+                throw new EntityNotFoundException(sprintf("member %s not found", $current_member_id));
+
+            $current_speaker = $this->speaker_repository->getByMember($current_member);
+            if(is_null($current_speaker))
+                throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $current_member_id));
+
+            $presentation = $this->event_repository->getById($presentation_id);
+            if(is_null($presentation))
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation instanceof Presentation)
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation->canEdit($current_speaker))
+                throw new ValidationException(sprintf("member %s can not edit presentation %s",
+                    $current_member_id,
+                    $presentation_id
+                ));
+
+            $speaker = $this->speaker_repository->getById(intval($speaker_id));
+            if (is_null($speaker))
+                throw new EntityNotFoundException(sprintf('speaker %s not found', $speaker_id));
+
+            if($presentation->getProgress() == Presentation::PHASE_TAGS)
+                $presentation->setProgress(Presentation::PHASE_SPEAKERS);
+
+            $presentation->setModerator($speaker);
+        });
+    }
+
+    /**
+     * @param int $current_member_id
+     * @param int $speaker_id
+     * @param int $presentation_id
+     * @throws ValidationException
+     * @throws EntityNotFoundException
+     * @return void
+     */
+    public function removeModeratorFromPresentation($current_member_id, $speaker_id, $presentation_id)
+    {
+        return $this->tx_service->transaction(function () use ($current_member_id, $speaker_id, $presentation_id) {
+
+            $current_member = $this->member_repository->getById($current_member_id);
+            if(is_null($current_member))
+                throw new EntityNotFoundException(sprintf("member %s not found", $current_member_id));
+
+            $current_speaker = $this->speaker_repository->getByMember($current_member);
+            if(is_null($current_speaker))
+                throw new EntityNotFoundException(sprintf("member %s does not has a speaker profile", $current_member_id));
+
+            $presentation = $this->event_repository->getById($presentation_id);
+            if(is_null($presentation))
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation instanceof Presentation)
+                throw new EntityNotFoundException(sprintf("presentation %s not found", $presentation_id));
+
+            if(!$presentation->canEdit($current_speaker))
+                throw new ValidationException(sprintf("member %s can not edit presentation %s",
+                    $current_member_id,
+                    $presentation_id
+                ));
+
+            $speaker = $this->speaker_repository->getById(intval($speaker_id));
+            if (is_null($speaker))
+                throw new EntityNotFoundException(sprintf('speaker %s not found', $speaker_id));
+
+            if($presentation->getProgress() == Presentation::PHASE_TAGS)
+                $presentation->setProgress(Presentation::PHASE_SPEAKERS);
+
+            $presentation->unsetModerator();
         });
     }
 

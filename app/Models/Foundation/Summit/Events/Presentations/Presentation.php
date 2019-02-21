@@ -114,6 +114,14 @@ class Presentation extends SummitEvent
     protected $attending_media;
 
     /**
+     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="moderated_presentations")
+     * @ORM\JoinColumn(name="ModeratorID", referencedColumnName="ID", onDelete="SET NULL")
+     * @var PresentationSpeaker
+     */
+    private $moderator;
+
+
+    /**
      * @ORM\ManyToOne(targetEntity="models\main\Member")
      * @ORM\JoinColumn(name="CreatorID", referencedColumnName="ID", onDelete="SET NULL")
      * @var Member
@@ -134,8 +142,16 @@ class Presentation extends SummitEvent
     private $materials;
 
     /**
-     * @ORM\OneToMany(targetEntity="PresentationSpeaker", mappedBy="presentation", cascade={"persist"}, orphanRemoval=true)
-     * @var PresentationSpeaker[]
+     * @ORM\ManyToMany(targetEntity="models\summit\PresentationSpeaker", inversedBy="presentations")
+     * @ORM\JoinTable(name="Presentation_Speakers",
+     *  joinColumns={
+     *     @ORM\JoinColumn(name="PresentationID", referencedColumnName="ID", onDelete="CASCADE")
+     * },
+     * inverseJoinColumns={
+     *      @ORM\JoinColumn(name="PresentationSpeakerID", referencedColumnName="ID",  onDelete="CASCADE")
+     *
+     * }
+     * )
      */
     private $speakers;
 
@@ -251,67 +267,25 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @param Speaker $speaker
-     * @param string $role
-     * @return $this
+     * @param PresentationSpeaker $speaker
      */
-    public function addSpeakerByRole(Speaker $speaker, string $role){
-        if($this->isSpeaker($speaker, $role)) return $this;
-        $presentationSpeaker = new PresentationSpeaker;
-        $presentationSpeaker->setPresentation($this);
-        $presentationSpeaker->setSpeaker($speaker);
-        $presentationSpeaker->setRole($role);
-        $this->speakers->add($presentationSpeaker);
-        return $this;
+    public function addSpeaker(PresentationSpeaker $speaker){
+        if($this->speakers->contains($speaker)) return;
+        $this->speakers->add($speaker);
+        $speaker->addPresentation($this);
     }
 
-
-    /**
-     * @param PresentationSpeaker $presentationSpeaker
-     * @return $this
-     */
-    public function addPresentationSpeaker(PresentationSpeaker $presentationSpeaker){
-        if($this->speakers->contains($presentationSpeaker)) return $this;
-        $this->speakers->add($presentationSpeaker);
-        return $this;
-    }
-
-    /**
-     * @param string $role
-     * @return $this
-     */
-    public function clearSpeakersByRole(string $role){
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('role', $role));
-        $speakersByRole = $this->speakers->matching($criteria);
-        foreach($speakersByRole as $speaker){
-            $this->speakers->removeElement($speaker);
-        }
-        return $this;
+    public function clearSpeakers(){
+        $this->speakers->clear();
     }
 
     /**
      * @return int[]
      */
-    public function getSpeakerIds(): array
+    public function getSpeakerIds()
     {
-        return $this->speakers->map(function(PresentationSpeaker $entity)  {
-            return $entity->getSpeaker()->getId();
-        })->toArray();
-    }
-
-
-    /**
-     * @return array
-     */
-    public function getSpeakerIdsAndRole(): array
-    {
-        return $this->speakers->map(function(PresentationSpeaker $entity)  {
-            return
-            [
-                'id'   => $entity->getSpeaker()->getId() ,
-                'role' => $entity->getRole()
-            ];
+        return $this->speakers->map(function($entity)  {
+            return $entity->getId();
         })->toArray();
     }
 
@@ -370,53 +344,19 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @param Speaker $speaker
-     * @return $this
+     * @param PresentationSpeaker $speaker
      */
-    public function removeSpeaker(Speaker $speaker){
-        if(!$this->isSpeaker($speaker)) return $this;
-        $presentation_speaker = $this->getPresentationSpeakerByRole
-        (
-            $speaker, Speaker::RoleSpeaker
-        );
-        if(is_null($presentation_speaker)) return $this;
-        $this->speakers->removeElement($presentation_speaker);
-        return $this;
-    }
-
-
-    /**
-     * @param Speaker $speaker
-     * @param string $role
-     * @return PresentationSpeaker
-     */
-    public function getPresentationSpeakerByRole(Speaker $speaker, string $role):PresentationSpeaker {
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('speaker', $speaker));
-        $criteria->andWhere(Criteria::expr()->eq('role', $role));
-        return $this->speakers->matching($criteria)->first();
+    public function removeSpeaker(PresentationSpeaker $speaker){
+        if(!$this->speakers->contains($speaker)) return;
+        $this->speakers->removeElement($speaker);
     }
 
     /**
-     * @param Speaker $speaker
-     * @param string $role
+     * @param PresentationSpeaker $speaker
      * @return bool
      */
-    public function isSpeaker(Speaker $speaker, string $role = Speaker::RoleSpeaker){
-        $criteria = Criteria::create();
-        $criteria->where(Criteria::expr()->eq('speaker', $speaker));
-        $criteria->andWhere(Criteria::expr()->eq('role', $role));
-        return $this->speakers->matching($criteria)->count() > 0;
-    }
-
-    /**
-     * @param string $role
-     * @return int
-     */
-    public function getSpeakerCountByRole(string $role = Speaker::RoleSpeaker):int {
-        $criteria = Criteria::create();
-        $criteria->andWhere(Criteria::expr()->eq('role', $role));
-        return $this->speakers->matching($criteria)->count();
+    public function isSpeaker(PresentationSpeaker $speaker){
+        return $this->speakers->contains($speaker);
     }
 
     /**
@@ -466,6 +406,17 @@ class Presentation extends SummitEvent
         $link->setPresentation($this);
     }
 
+    /**
+     * @return int
+     */
+    public function getModeratorId(){
+        try {
+            return !is_null($this->moderator)? $this->moderator->getId():0;
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
 
     /**
      * @return int
@@ -477,6 +428,27 @@ class Presentation extends SummitEvent
         catch(\Exception $ex){
             return 0;
         }
+    }
+
+
+    /**
+     * @return PresentationSpeaker
+     */
+    public function getModerator()
+    {
+        return $this->moderator;
+    }
+
+    /**
+     * @param PresentationSpeaker $moderator
+     */
+    public function setModerator(PresentationSpeaker $moderator)
+    {
+        $this->moderator = $moderator;
+    }
+
+    public function unsetModerator(){
+        $this->moderator = null;
     }
 
     /**
@@ -742,13 +714,13 @@ class Presentation extends SummitEvent
     }
 
     /**
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      * @return bool
      */
-    public function canEdit(Speaker $speaker){
+    public function canEdit(PresentationSpeaker $speaker){
         if($this->getCreatorId() == $speaker->getMemberId()) return true;
-        if($this->isSpeaker($speaker, Speaker::RoleModerator)) return true;
-        if($this->isSpeaker($speaker, Speaker::RoleSpeaker)) return true;
+        if($this->getModeratorId() == $speaker->getId()) return true;
+        if($this->isSpeaker($speaker)) return true;
         return false;
     }
 
