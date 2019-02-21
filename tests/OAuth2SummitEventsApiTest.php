@@ -213,60 +213,44 @@ final class OAuth2SummitEventsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(412);
     }
 
-    public function testPostPresentation($summit_id = 26)
+    public function testPostPresentation($start_date = 1461510000, $end_date = 1461513600)
     {
-        $params =
-        [
-            'id' => $summit_id,
-            'expand' => 'speakers'
-        ];
+        $params = array
+        (
+            'id' => 7,
+        );
 
-        $headers = [
-
+        $headers = array
+        (
             "HTTP_Authorization" => " Bearer " . $this->access_token,
             "CONTENT_TYPE" => "application/json"
-        ];
+        );
 
-        $title       = str_random(16).'_presentation';
-        $data = [
-            'title'          => $title,
-            'description'    => 'test description',
+        $data = array
+        (
+            'title' => 'test presentation BCN',
+            'description' => 'test presentation BCN',
             'allow_feedback' => true,
-            'tags'           => ['tag#1', 'tag#2'],
-            'type_id'        => 184,
-            'track_id'       => 294,
-            'speakers'       => [
-                [
-                   'id'=> 1,
-                   'role'  => 'Moderator'
-                ],
-                [
-                    'id'=> 2,
-                    'role' => 'Moderator'
-                ],
-                [
-                    'id'=> 3,
-                    'role' => 'Speaker'
-                ],
-             ],
-        ];
+            'type_id' => 86,
+            'tags' => ['tag#1', 'tag#2'],
+            'speakers' => [1, 2, 3],
+        );
 
         $response = $this->action
         (
             "POST",
             "OAuth2SummitEventsApiController@addEvent",
             $params,
-            [],
-            [],
-            [],
+            array(),
+            array(),
+            array(),
             $headers,
             json_encode($data)
         );
 
-        $content = $response->getContent();
-
         $this->assertResponseStatus(201);
 
+        $content = $response->getContent();
         $presentation = json_decode($content);
 
         $this->assertTrue($presentation->getId() > 0);

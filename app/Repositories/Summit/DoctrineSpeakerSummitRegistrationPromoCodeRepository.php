@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 use models\summit\ISpeakerSummitRegistrationPromoCodeRepository;
-use models\summit\Speaker;
+use models\summit\PresentationSpeaker;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\Summit;
 
@@ -33,11 +33,11 @@ final class DoctrineSpeakerSummitRegistrationPromoCodeRepository
     }
 
     /**
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      * @param Summit $summit
      * @return SpeakerSummitRegistrationPromoCode
      */
-    public function getBySpeakerAndSummit(Speaker $speaker, Summit $summit)
+    public function getBySpeakerAndSummit(PresentationSpeaker $speaker, Summit $summit)
     {
         if($speaker->getId() == 0) return null;
         return $this->getEntityManager()

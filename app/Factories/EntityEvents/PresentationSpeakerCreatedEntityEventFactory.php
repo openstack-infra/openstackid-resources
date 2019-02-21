@@ -34,7 +34,7 @@ final class PresentationSpeakerCreatedEntityEventFactory
         foreach($event->getPresentationSpeaker()->getRelatedSummits() as $summit) {
 
             $entity_event = new SummitEntityEvent;
-            $entity_event->setEntityClassName("Speaker");
+            $entity_event->setEntityClassName("PresentationSpeaker");
             $entity_event->setEntityId($event->getPresentationSpeaker()->getId());
             $entity_event->setType('INSERT');
 

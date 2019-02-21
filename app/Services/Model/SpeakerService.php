@@ -35,7 +35,7 @@ use models\summit\factories\SpeakerSelectionAnnouncementEmailTypeFactory;
 use models\summit\ISpeakerRegistrationRequestRepository;
 use models\summit\ISpeakerRepository;
 use models\summit\ISpeakerSummitRegistrationPromoCodeRepository;
-use models\summit\Speaker;
+use models\summit\PresentationSpeaker;
 use models\summit\PresentationSpeakerSummitAssistanceConfirmationRequest;
 use models\summit\SpeakerExpertise;
 use models\summit\SpeakerOrganizationalRole;
@@ -149,14 +149,14 @@ final class SpeakerService
     /**
      * @param array $data
      * @throws ValidationException
-     * @return Speaker
+     * @return PresentationSpeaker
      */
     public function addSpeaker(array $data)
     {
 
         return $this->tx_service->transaction(function () use ($data) {
 
-            $speaker = new Speaker();
+            $speaker = new PresentationSpeaker();
             $speaker->setCreatedFromApi(true);
             $member_id = 0;
 
@@ -222,7 +222,7 @@ final class SpeakerService
      * @param Summit $summit
      * @param array $data
      * @throws ValidationException
-     * @return Speaker
+     * @return PresentationSpeaker
      */
     public function addSpeakerBySummit(Summit $summit, array $data)
     {
@@ -247,11 +247,11 @@ final class SpeakerService
 
     /**
      * @param array $data
-     * @param Speaker $speaker
-     * @return Speaker
+     * @param PresentationSpeaker $speaker
+     * @return PresentationSpeaker
      * @throws ValidationException
      */
-    public function updateSpeaker(Speaker $speaker, array $data)
+    public function updateSpeaker(PresentationSpeaker $speaker, array $data)
     {
         return $this->tx_service->transaction(function () use ($speaker, $data) {
             $member_id = isset($data['member_id']) ? intval($data['member_id']) : null;
@@ -283,12 +283,12 @@ final class SpeakerService
     /**
      * @param Summit $summit
      * @param array $data
-     * @param Speaker $speaker
-     * @return Speaker
+     * @param PresentationSpeaker $speaker
+     * @return PresentationSpeaker
      * @throws ValidationException
      * @throws EntityNotFoundException
      */
-    public function updateSpeakerBySummit(Summit $summit, Speaker $speaker, array $data)
+    public function updateSpeakerBySummit(Summit $summit, PresentationSpeaker $speaker, array $data)
     {
         return $this->tx_service->transaction(function () use ($summit, $speaker, $data) {
 
@@ -314,12 +314,12 @@ final class SpeakerService
     }
 
     /**
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      * @param string $email
      * @return SpeakerRegistrationRequest
      * @throws ValidationException
      */
-    private function registerSpeaker(Speaker $speaker, $email)
+    private function registerSpeaker(PresentationSpeaker $speaker, $email)
     {
 
         if ($this->speaker_registration_request_repository->existByEmail($email))
@@ -337,13 +337,13 @@ final class SpeakerService
     }
 
     /**
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      * @param Summit $summit
      * @param string $reg_code
      * @return SpeakerSummitRegistrationPromoCode
      * @throws ValidationException
      */
-    public function registerSummitPromoCodeByValue(Speaker $speaker, Summit $summit, $reg_code)
+    public function registerSummitPromoCodeByValue(PresentationSpeaker $speaker, Summit $summit, $reg_code)
     {
 
         return $this->tx_service->transaction(function () use ($speaker, $summit, $reg_code) {
@@ -393,11 +393,11 @@ final class SpeakerService
     }
 
     /**
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      * @param array $data
-     * @return Speaker
+     * @return PresentationSpeaker
      */
-    private function updateSpeakerMainData(Speaker $speaker, array $data)
+    private function updateSpeakerMainData(PresentationSpeaker $speaker, array $data)
     {
         if (isset($data['title']))
             $speaker->setTitle(trim($data['title']));
@@ -442,11 +442,11 @@ final class SpeakerService
     }
 
     /**
-     * @param Speaker $speaker
+     * @param PresentationSpeaker $speaker
      * @param array $data
-     * @return Speaker
+     * @return PresentationSpeaker
      */
-    private function updateSpeakerRelations(Speaker $speaker, array $data)
+    private function updateSpeakerRelations(PresentationSpeaker $speaker, array $data)
     {
 
         // other_presentation_links
@@ -579,13 +579,12 @@ final class SpeakerService
     }
 
     /**
-     * @param Speaker $speaker_from
-     * @param Speaker $speaker_to
+     * @param PresentationSpeaker $speaker_from
+     * @param PresentationSpeaker $speaker_to
      * @param array $data
-     * @return mixed|void
-     * @throws \Exception
+     * @return void
      */
-    public function merge(Speaker $speaker_from, Speaker $speaker_to, array $data)
+    public function merge(PresentationSpeaker $speaker_from, PresentationSpeaker $speaker_to, array $data)
     {
         return $this->tx_service->transaction(function () use ($speaker_from, $speaker_to, $data) {
 
@@ -887,7 +886,7 @@ final class SpeakerService
             $speaker = $speaker_assistance->getSpeaker();
 
             $role = $speaker->isModeratorFor($summit) ?
-                Speaker::RoleModerator : Speaker::RoleSpeaker;
+                PresentationSpeaker::RoleModerator : PresentationSpeaker::RoleSpeaker;
 
             /*
             if($speaker->announcementEmailAlreadySent($summit))

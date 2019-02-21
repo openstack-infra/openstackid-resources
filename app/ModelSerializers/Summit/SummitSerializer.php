@@ -1,4 +1,5 @@
 <?php namespace ModelSerializers;
+
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -133,8 +134,8 @@ class SummitSerializer extends SilverStripeSerializer
         }
 
         if (!empty($expand)) {
-            $relations = explode(',', $expand);
-            foreach ($relations as $relation) {
+            $expand = explode(',', $expand);
+            foreach ($expand as $relation) {
                 switch (trim($relation)) {
                     case 'event_types':{
                         $event_types = [];
@@ -190,9 +191,9 @@ class SummitSerializer extends SilverStripeSerializer
                         // only could get schedule expanded if summit its available to public or
                         // we had proper scopes
                         if(!$summit->isAvailableOnApi()) {
-                            $scopes         = $this->resource_server_context->getCurrentScope();
-                            $current_realm  = Config::get('app.scope_base_realm');
-                            $needed_scope   = sprintf(SummitScopes::ReadAllSummitData, $current_realm);
+                            $scopes = $this->resource_server_context->getCurrentScope();
+                            $current_realm = Config::get('app.url');
+                            $needed_scope = sprintf(SummitScopes::ReadAllSummitData, $current_realm);
                             if (!in_array($needed_scope, $scopes))
                                 throw new HTTP403ForbiddenException;
                         }
@@ -218,7 +219,7 @@ class SummitSerializer extends SilverStripeSerializer
 
                         $schedule = [];
                         foreach ($summit->getScheduleEvents() as $event) {
-                            $schedule[] = SerializerRegistry::getInstance()->getSerializer($event)->serialize($expand);
+                            $schedule[] = SerializerRegistry::getInstance()->getSerializer($event)->serialize();
                         }
                         $values['schedule'] = $schedule;
 

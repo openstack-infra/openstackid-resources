@@ -157,75 +157,11 @@ SQL;
     }
 
     /**
-     * @param string $role
-     * @return bool
-     */
-    public function shouldUseRole(string $role){
-        switch ($role){
-            case Speaker::RoleSpeaker:
-                return $this->use_speakers;
-            break;
-            case Speaker::RoleModerator:
-                return $this->use_moderator;
-                break;
-        }
-        return false;
-    }
-
-    /**
      * @return bool
      */
     public function isAreSpeakersMandatory()
     {
         return $this->are_speakers_mandatory;
-    }
-
-    /**
-     * @param string $role
-     * @return bool
-     */
-    public function isRoleMandatory(string $role){
-        switch ($role){
-            case Speaker::RoleSpeaker:
-                return $this->are_speakers_mandatory;
-                break;
-            case Speaker::RoleModerator:
-                return $this->is_moderator_mandatory;
-                break;
-        }
-        return false;
-    }
-
-    /**
-     * @param string $role
-     * @return int
-     */
-    public function getMinByRole(string $role){
-        switch ($role){
-            case Speaker::RoleSpeaker:
-                return $this->min_speakers;
-                break;
-            case Speaker::RoleModerator:
-                return $this->min_moderators;
-                break;
-        }
-        return 0;
-    }
-
-    /**
-     * @param string $role
-     * @return int
-     */
-    public function getMaxByRole(string $role){
-        switch ($role){
-            case Speaker::RoleSpeaker:
-                return $this->max_speakers;
-                break;
-            case Speaker::RoleModerator:
-                return $this->max_moderators;
-                break;
-        }
-        return 0;
     }
 
     /**
