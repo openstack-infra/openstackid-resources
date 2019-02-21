@@ -386,7 +386,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2SummitSpeakersApiController@getAll",
+            "OAuth2SummitSpeakersApiController@getAllSpeakers",
             $params,
             array(),
             array(),
