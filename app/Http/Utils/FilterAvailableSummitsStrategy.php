@@ -27,7 +27,7 @@ final class FilterAvailableSummitsStrategy
      */
     static public function shouldReturnAllSummits(IResourceServerContext $resource_server_ctx){
         $scopes         = $resource_server_ctx->getCurrentScope();
-        $current_realm  = Config::get('app.url');
+        $current_realm  = Config::get('app.scope_base_realm');
         $needed_scope   = sprintf(SummitScopes::ReadAllSummitData, $current_realm);
         return in_array($needed_scope, $scopes);
     }
