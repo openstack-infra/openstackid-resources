@@ -586,7 +586,7 @@ class AppServiceProvider extends ServiceProvider
             $validator->addReplacer('country_iso_alpha2_code', function($message, $attribute, $rule, $parameters) use ($validator) {
                 return sprintf("%s should be a valid country iso code", $attribute);
             });
-
+            if(!is_string($value)) return false;
             $value = trim($value);
             return isset($countries[$value]);
         });

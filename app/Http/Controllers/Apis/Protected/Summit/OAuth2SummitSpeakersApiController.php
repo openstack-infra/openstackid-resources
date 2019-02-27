@@ -545,7 +545,7 @@ final class OAuth2SummitSpeakersApiController extends OAuth2ProtectedController
                 'willing_to_travel' => 'sometimes|boolean',
                 'willing_to_present_video' => 'sometimes|boolean',
                 'org_has_cloud' => 'sometimes|boolean',
-                'country' => 'sometimes|country_iso_alpha2_code',
+                'country' => 'sometimes|string|country_iso_alpha2_code',
                 // collections
                 'languages' => 'sometimes|int_array',
                 'areas_of_expertise' => 'sometimes|string_array',
