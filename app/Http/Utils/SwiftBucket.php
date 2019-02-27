@@ -61,7 +61,7 @@ final class SwiftBucket implements IBucket
             $appCredentialId =  Config::get("cloudstorage.app_credential_id");
             $appCredentialSecret = Config::get("cloudstorage.app_credential_secret");
 
-            if(isset($this->config[self::APP_CRED_ID])){
+            if(!empty($appCredentialId) && !empty($appCredentialSecret)){
                 $configOptions['application_credential'] = [
                     'id' => $appCredentialId,
                     'secret' => $appCredentialSecret,
