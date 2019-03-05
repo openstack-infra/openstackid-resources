@@ -18,7 +18,7 @@ class OAuth2PresentationSubmissionTest extends ProtectedApiTest
      * @param int $summit_id
      * @return mixed
      */
-    public function testSubmitPresentation($summit_id = 25){
+    public function testSubmitPresentation($summit_id = 26){
         $params = [
             'id' => $summit_id,
         ];
@@ -30,8 +30,8 @@ class OAuth2PresentationSubmissionTest extends ProtectedApiTest
             'social_description'  => 'this is a social description',
             'level'  => 'N/A',
             'attendees_expected_learnt'  => 'super duper',
-            'type_id'  => 182,
-            'track_id'  => 262,
+            'type_id'  => 184,
+            'track_id'  => 294,
             'attending_media' => true,
             'links' => ['https://www.google.com'],
             'tags' => ['Upstream Development']
@@ -61,10 +61,36 @@ class OAuth2PresentationSubmissionTest extends ProtectedApiTest
         return $presentation;
     }
 
+
+    public function testAddSpeaker2Presentation($summit_id = 26){
+        $new_presentation = $this->testSubmitPresentation($summit_id);
+        $params = [
+            'id' => $summit_id,
+            'presentation_id' => $new_presentation->id,
+            'speaker_id' => 1
+        ];
+
+        $headers = [
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE"        => "application/json"
+        ];
+
+        $response = $this->action(
+            "PUT",
+            "OAuth2SummitSpeakersApiController@addSpeakerToMyPresentation",
+            $params,
+            [],
+            [],
+            [],
+            $headers,
+            ''
+        );
+
+    }
     /**
      * @param int $summit_id
      */
-    public function testDeletePresentation($summit_id = 25){
+    public function testDeletePresentation($summit_id = 26){
         $new_presentation = $this->testSubmitPresentation($summit_id);
         $params = [
             'id' => $summit_id,

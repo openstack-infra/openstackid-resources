@@ -74,12 +74,57 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertResponseStatus(200);
     }
 
-    public function testGetSummit($summit_id = 25)
+    public function testGetSummitExpandSchedule($summit_id = 26)
     {
 
         $params = [
 
             'expand' => 'schedule',
+            'id'     => $summit_id
+        ];
+
+        $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
+        $start = time();
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitApiController@getSummit",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+        $end   = time();
+        $delta = $end - $start;
+        echo "execution call " . $delta . " seconds ...";
+        $content = $response->getContent();
+        $summit = json_decode($content);
+        $this->assertTrue(!is_null($summit));
+        $this->assertResponseStatus(200);
+
+        $response = $this->action(
+            "GET",
+            "OAuth2SummitApiController@getSummit",
+            $params,
+            array(),
+            array(),
+            array(),
+            $headers
+        );
+
+        $content = $response->getContent();
+        $summit  = json_decode($content);
+        $this->assertTrue(!is_null($summit));
+        $this->assertTrue(count($summit->schedule) > 0);
+        $this->assertResponseStatus(200);
+    }
+
+    public function testGetSummitExpandSpeakers($summit_id = 25)
+    {
+
+        $params = [
+
+            'expand' => 'speakers',
             'id'     => $summit_id
         ];
 
@@ -379,14 +424,14 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
             'page'     => 1,
             'per_page' => 15,
-            'filter'   => 'first_name=@John,last_name=@Bryce,email=@sebastian@',
+            'filter'   => 'first_name=@Seb,last_name=@Mar,email=@sebastian@',
             'order'    => '+first_name,-last_name'
         ];
 
         $headers = array("HTTP_Authorization" => " Bearer " . $this->access_token);
         $response = $this->action(
             "GET",
-            "OAuth2SummitSpeakersApiController@getAllSpeakers",
+            "OAuth2SummitSpeakersApiController@getAll",
             $params,
             array(),
             array(),

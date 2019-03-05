@@ -11,22 +11,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 /**
- * Class AdminPresentationSpeakerSerializer
+ * Class AdminSpeakerSerializer
  * @package ModelSerializers
  */
-final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerializer
+final class AdminSpeakerSerializer extends SpeakerSerializer
 {
     protected static $array_mappings = [
         'Notes'=> 'notes:json_string'
     ];
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      * @return null|string|string[]
      */
-    protected function getSpeakerEmail(PresentationSpeaker $speaker){
+    protected function getSpeakerEmail(Speaker $speaker){
         return $speaker->getEmail();
     }
 
@@ -42,7 +42,7 @@ final class AdminPresentationSpeakerSerializer extends PresentationSpeakerSerial
         if(!count($relations)) $relations  = $this->getAllowedRelations();
 
         $speaker                           = $this->object;
-        if(!$speaker instanceof PresentationSpeaker) return [];
+        if(!$speaker instanceof Speaker) return [];
 
         $values          = parent::serialize($expand, $fields, $relations, $params);
         $summit          = isset($params['summit'])? $params['summit']:null;

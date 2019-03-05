@@ -12,6 +12,8 @@
  * limitations under the License.
  **/
 use models\summit\Presentation;
+use models\summit\Speaker;
+
 /**
  * Class PresentationSerializer
  * @package ModelSerializers
@@ -22,7 +24,6 @@ class PresentationSerializer extends SummitEventSerializer
 
         'Level'                   => 'level',
         'CreatorId'               => 'creator_id:json_int',
-        'ModeratorId'             => 'moderator_speaker_id:json_int',
         'SelectionPlanId'         => 'selection_plan_id:json_int',
         'ProblemAddressed'        => 'problem_addressed:json_string',
         'AttendeesExpectedLearnt' => 'attendees_expected_learnt:json_string',
@@ -35,7 +36,6 @@ class PresentationSerializer extends SummitEventSerializer
     protected static $allowed_fields = [
         'track_id',
         'creator_id',
-        'moderator_speaker_id',
         'selection_plan_id',
         'level',
         'problem_addressed',
@@ -50,6 +50,7 @@ class PresentationSerializer extends SummitEventSerializer
         'slides',
         'videos',
         'speakers',
+        'hosts',
         'links',
         'extra_questions',
     ];
@@ -73,6 +74,18 @@ class PresentationSerializer extends SummitEventSerializer
 
         if(in_array('speakers', $relations)) {
             $values['speakers'] = $presentation->getSpeakerIds();
+        }
+
+        if(in_array('hosts', $relations)) {
+            $values['hosts'] = $presentation->getSpeakerIdsAndRole();
+        }
+
+        $values['moderator_speaker_id'] = 0;
+        $firstModerator = null;
+        $moderators = $presentation->getSpeakersByRole(Speaker::RoleModerator);
+        if(count($moderators) > 0){
+            $firstModerator = array_pop($moderators);
+            $values['moderator_speaker_id'] = $firstModerator->getId();
         }
 
         if(in_array('slides', $relations))
@@ -121,14 +134,27 @@ class PresentationSerializer extends SummitEventSerializer
             foreach (explode(',', $expand) as $relation) {
                 switch (trim($relation)) {
                     case 'speakers': {
+                        if(!is_null($firstModerator)){
+                            unset($values['moderator_speaker_id']);
+                            $values['moderator'] = SerializerRegistry::getInstance()->getSerializer($firstModerator)->serialize();
+                        }
                         $speakers = [];
-                        foreach ($presentation->getSpeakers() as $s) {
-                            $speakers[] = SerializerRegistry::getInstance()->getSerializer($s)->serialize();
+                        foreach ($presentation->getSpeakersByRole(Speaker::RoleSpeaker) as $speaker) {
+                            $speakers[] = SerializerRegistry::getInstance()->getSerializer($speaker)->serialize
+                            (
+                                'speaker'
+                            );
                         }
                         $values['speakers'] = $speakers;
-                        if(isset($values['moderator_speaker_id']) && intval($values['moderator_speaker_id']) > 0 ){
-                            $values['moderator'] = SerializerRegistry::getInstance()->getSerializer($presentation->getModerator())->serialize();
+
+                        $speakers = [];
+                        foreach ($presentation->getSpeakers() as $presentation_speaker) {
+                            $speakers[] = SerializerRegistry::getInstance()->getSerializer($presentation_speaker)->serialize
+                            (
+                                'speaker'
+                            );
                         }
+                        $values['hosts'] = $speakers;
                     }
                     case 'creator':{
                         if($presentation->getCreatorId() > 0) {

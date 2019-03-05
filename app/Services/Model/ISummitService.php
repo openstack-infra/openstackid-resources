@@ -227,40 +227,23 @@ interface ISummitService
      * @param int $current_member_id
      * @param int $speaker_id
      * @param int $presentation_id
-     * @throws ValidationException
+     * @param string $role
      * @throws EntityNotFoundException
+     * @throws ValidationException
      * @return void
      */
-    public function addSpeaker2Presentation($current_member_id, $speaker_id, $presentation_id);
+    public function addSpeaker2PresentationByRole(int $current_member_id, int $speaker_id, int $presentation_id, string $role);
 
     /**
      * @param int $current_member_id
      * @param int $speaker_id
      * @param int $presentation_id
-     * @throws ValidationException
+     * @param string $role
      * @throws EntityNotFoundException
+     * @throws ValidationException
      * @return void
      */
-    public function addModerator2Presentation($current_member_id, $speaker_id, $presentation_id);
+    public function removeSpeakerFromPresentationByRole(int $current_member_id, int $speaker_id, int $presentation_id, string $role);
 
-    /**
-     * @param int $current_member_id
-     * @param int $speaker_id
-     * @param int $presentation_id
-     * @throws ValidationException
-     * @throws EntityNotFoundException
-     * @return void
-     */
-    public function removeSpeakerFromPresentation($current_member_id, $speaker_id, $presentation_id);
-
-    /**
-     * @param int $current_member_id
-     * @param int $speaker_id
-     * @param int $presentation_id
-     * @throws ValidationException
-     * @throws EntityNotFoundException
-     * @return void
-     */
-    public function removeModeratorFromPresentation($current_member_id, $speaker_id, $presentation_id);
 
 }

@@ -13,7 +13,6 @@
  **/
 use App\Models\Foundation\Main\IGroup;
 use Doctrine\ORM\Tools\Pagination\Paginator;
-use models\main\Group;
 use models\summit\ISummitEventRepository;
 use models\summit\SummitEvent;
 use App\Repositories\SilverStripeDoctrineRepository;
@@ -28,7 +27,6 @@ use utils\PagingResponse;
 use Doctrine\ORM\Query\Expr\Join;
 use utils\DoctrineLeftJoinFilterMapping;
 use models\summit\SummitGroupEvent;
-use models\summit\Presentation;
 /**
  * Class DoctrineSummitEventRepository
  * @package App\Repositories\Summit
@@ -119,14 +117,10 @@ final class DoctrineSummitEventRepository
                 "l.id :operator :value"
             ),
             'speaker' => new DoctrineFilterMapping
-            (
-                "( concat(sp.first_name, ' ', sp.last_name) :operator ':value' ".
-                "OR concat(spm.first_name, ' ', spm.last_name) :operator ':value' ".
+            (  "( concat(sp.first_name, ' ', sp.last_name) :operator ':value' ".
                 "OR concat(spmm.first_name, ' ', spmm.last_name) :operator ':value' ".
                 "OR sp.first_name :operator ':value' ".
                 "OR sp.last_name :operator ':value' ".
-                "OR spm.first_name :operator ':value' ".
-                "OR spm.last_name :operator ':value' ".
                 "OR spmm.first_name :operator ':value' ".
                 "OR spmm.last_name :operator ':value' )"
             ),
@@ -136,7 +130,7 @@ final class DoctrineSummitEventRepository
             ),
             'speaker_id' => new DoctrineFilterMapping
             (
-                "(sp.id :operator :value OR spm.id :operator :value)"
+                "(sp.id :operator :value)"
             ),
             'selection_status' => new DoctrineSwitchFilterMapping([
                  'selected' => new DoctrineCaseFilterMapping(
@@ -212,10 +206,10 @@ final class DoctrineSummitEventRepository
         if($class == \models\summit\Presentation::class) {
             $query = $query->innerJoin("e.category", "cc", Join::WITH);
             $query = $query->leftJoin("e.location", "loc", Join::WITH);
-            $query = $query->leftJoin("e.speakers", "sp", Join::WITH);
+            $query = $query->leftJoin("e.speakers", "spk", Join::WITH);
+            $query = $query->leftJoin("spk.speaker", "sp", Join::WITH);
             $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
             $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
-            $query = $query->leftJoin('e.moderator', "spm", Join::LEFT_JOIN);
             $query = $query->leftJoin('sp.member', "spmm", Join::LEFT_JOIN);
             $query = $query->leftJoin('sp.registration_request', "sprr", Join::LEFT_JOIN);
         }
@@ -307,14 +301,13 @@ final class DoctrineSummitEventRepository
 
         if($class == \models\summit\Presentation::class) {
             $query = $query->innerJoin("e.category", "cc", Join::WITH);
-            $query = $query->leftJoin("e.speakers", "sp", Join::WITH);
+            $query = $query->leftJoin("e.speakers", "spk", Join::WITH);
+            $query = $query->leftJoin("spk.speaker", "sp", Join::WITH);
             $query = $query->leftJoin('e.selected_presentations', "ssp", Join::LEFT_JOIN);
             $query = $query->leftJoin('ssp.list', "sspl", Join::LEFT_JOIN);
-            $query = $query->leftJoin('e.moderator', "spm", Join::LEFT_JOIN);
             $query = $query->leftJoin('sp.member', "spmm", Join::LEFT_JOIN);
             $query = $query->leftJoin('sp.registration_request', "sprr", Join::LEFT_JOIN);
         }
-
 
         $can_view_private_events = self::isCurrentMemberOnGroup(IGroup::SummitAdministrators);
 
