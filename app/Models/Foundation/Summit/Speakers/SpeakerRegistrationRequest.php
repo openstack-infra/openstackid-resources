@@ -44,9 +44,9 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
     private $confirmation_date;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker")
+     * @ORM\ManyToOne(targetEntity="Speaker")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
-     * @var PresentationSpeaker
+     * @var Speaker
      */
     private $speaker;
 
@@ -117,7 +117,7 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
     }
 
     /**
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getSpeaker()
     {
@@ -125,7 +125,7 @@ class SpeakerRegistrationRequest extends SilverstripeBaseModel
     }
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      */
     public function setSpeaker($speaker)
     {

@@ -12,7 +12,7 @@
  * limitations under the License.
  **/
 
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use models\summit\Summit;
 
 /**
@@ -24,7 +24,7 @@ interface ICheckSpeakerStrategy
     /**
      * @param mixed $speaker_id
      * @param Summit $summit
-     * @return null|PresentationSpeaker
+     * @return null|Speaker
      */
     public function check($speaker_id, Summit $summit);
 }

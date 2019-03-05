@@ -13,7 +13,7 @@
  **/
 
 use models\oauth2\IResourceServerContext;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use models\summit\Summit;
 
 /**
@@ -40,7 +40,7 @@ class CheckMeSpeakerStrategy implements ICheckSpeakerStrategy
     /**
      * @param int $speaker_id
      * @param Summit $summit
-     * @return null|PresentationSpeaker
+     * @return null|Speaker
      */
     public function check($speaker_id, Summit $summit)
     {

@@ -213,44 +213,60 @@ final class OAuth2SummitEventsApiTest extends ProtectedApiTest
         $this->assertResponseStatus(412);
     }
 
-    public function testPostPresentation($start_date = 1461510000, $end_date = 1461513600)
+    public function testPostPresentation($summit_id = 26)
     {
-        $params = array
-        (
-            'id' => 7,
-        );
+        $params =
+        [
+            'id' => $summit_id,
+            'expand' => 'speakers'
+        ];
 
-        $headers = array
-        (
+        $headers = [
+
             "HTTP_Authorization" => " Bearer " . $this->access_token,
             "CONTENT_TYPE" => "application/json"
-        );
+        ];
 
-        $data = array
-        (
-            'title' => 'test presentation BCN',
-            'description' => 'test presentation BCN',
+        $title       = str_random(16).'_presentation';
+        $data = [
+            'title'          => $title,
+            'description'    => 'test description',
             'allow_feedback' => true,
-            'type_id' => 86,
-            'tags' => ['tag#1', 'tag#2'],
-            'speakers' => [1, 2, 3],
-        );
+            'tags'           => ['tag#1', 'tag#2'],
+            'type_id'        => 184,
+            'track_id'       => 294,
+            'speakers'       => [
+                [
+                   'id'=> 1,
+                   'role'  => 'Moderator'
+                ],
+                [
+                    'id'=> 2,
+                    'role' => 'Moderator'
+                ],
+                [
+                    'id'=> 3,
+                    'role' => 'Speaker'
+                ],
+             ],
+        ];
 
         $response = $this->action
         (
             "POST",
             "OAuth2SummitEventsApiController@addEvent",
             $params,
-            array(),
-            array(),
-            array(),
+            [],
+            [],
+            [],
             $headers,
             json_encode($data)
         );
 
+        $content = $response->getContent();
+
         $this->assertResponseStatus(201);
 
-        $content = $response->getContent();
         $presentation = json_decode($content);
 
         $this->assertTrue($presentation->getId() > 0);
@@ -1333,6 +1349,89 @@ final class OAuth2SummitEventsApiTest extends ProtectedApiTest
         $content = $response->getContent();
         $this->assertResponseStatus(204);
 
+    }
+
+    /**
+     * @param int $summit_id
+     */
+    public function testGetFilteredEventsANDFilter($summit_id = 26)
+    {
+        $params = array
+        (
+            'id' => $summit_id ,
+            'expand' => 'speakers,type',
+            'filter' => [
+                'title=@kuber',
+                'abstract=@kuber',
+                'tags=@kuber',
+                'speaker=@kuber',
+                'speaker_email=@kuber',
+                'id==kuber'
+            ]
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getEvents",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events = json_decode($content);
+        $this->assertTrue(!is_null($events));
+    }
+
+    /**
+     * @param int $summit_id
+     */
+    public function testGetFilteredEventsORFilter($summit_id = 26)
+    {
+        $params = array
+        (
+            'id' => $summit_id ,
+            'expand' => 'speakers,type',
+            'filter' => [
+                'title=@kuber,abstract=@kuber,tags=@kuber,speaker=@kuber,speaker_email=@kuber,id==kuber'
+            ]
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+
+        $response = $this->action
+        (
+            "GET",
+            "OAuth2SummitEventsApiController@getEvents",
+            $params,
+            [],
+            [],
+            [],
+            $headers
+        );
+
+        $content = $response->getContent();
+        $this->assertResponseStatus(200);
+
+        $events = json_decode($content);
+        $this->assertTrue(!is_null($events));
     }
 
 }
