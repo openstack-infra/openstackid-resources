@@ -37,7 +37,7 @@ interface ISpeakerRepository extends IBaseRepository
 
     /**
      * @param Member $member
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getByMember(Member $member);
 }

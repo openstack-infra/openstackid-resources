@@ -20,11 +20,11 @@ interface ISpeakerSummitRegistrationPromoCodeRepository
     extends IBaseRepository
 {
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      * @param Summit $summit
      * @return SpeakerSummitRegistrationPromoCode
      */
-    public function getBySpeakerAndSummit(PresentationSpeaker $speaker, Summit $summit);
+    public function getBySpeakerAndSummit(Speaker $speaker, Summit $summit);
 
     /**
      * @param string $code
