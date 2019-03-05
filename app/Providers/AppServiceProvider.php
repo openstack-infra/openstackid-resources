@@ -36,8 +36,18 @@ class AppServiceProvider extends ServiceProvider
         'feature_cloud',
         'to_record',
         'speakers',
-        'moderator_speaker_id',
         'groups'
+    ];
+
+    static $speaker_dto_fields = [
+        'id',
+        'role'
+    ];
+
+    static $speaker_dto_validation_rules = [
+        // speaker dto rules
+        'id'                      => 'required|integer',
+        'role'                    => 'sometimes|string|in:Moderator,Speaker',
     ];
 
     static $event_dto_fields_publish = [
@@ -74,8 +84,7 @@ class AppServiceProvider extends ServiceProvider
         'attendees_expected_learnt' =>  'sometimes|string|max:100',
         'feature_cloud'             =>  'sometimes|boolean',
         'to_record'                 =>  'sometimes|boolean',
-        'speakers'                  =>  'sometimes|int_array',
-        'moderator_speaker_id'      =>  'sometimes|integer',
+        'speakers'                  =>  'sometimes|speakers_dto_array',
         // group event
         'groups'                    =>  'sometimes|int_array',
     ];
@@ -111,6 +120,33 @@ class AppServiceProvider extends ServiceProvider
             foreach($value as $element)
             {
                 if(!is_int($element)) return false;
+            }
+            return true;
+        });
+
+        Validator::extend('speakers_dto_array',  function($attribute, $value, $parameters, $validator)
+        {
+            $validator->addReplacer('speakers_dto_array', function($message, $attribute, $rule, $parameters) use ($validator) {
+                return sprintf
+                (
+                    "%s should be an array of speaker data {id : int, role: string [Moderator|Speaker]}",
+                    $attribute);
+            });
+
+            if(!is_array($value)) return false;
+
+            foreach($value as $element)
+            {
+                if(!is_array($element)) return false;
+
+                foreach($element as $key => $element_val){
+                    if(!in_array($key, self::$speaker_dto_fields)) return false;
+                }
+
+                // Creates a Validator instance and validates the data.
+                $validation = Validator::make($element, self::$speaker_dto_validation_rules);
+
+                if($validation->fails()) return false;
             }
             return true;
         });
