@@ -59,9 +59,9 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
     private $confirmation_date;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresentationSpeaker", inversedBy="summit_assistances")
+     * @ORM\ManyToOne(targetEntity="Speaker", inversedBy="summit_assistances")
      * @ORM\JoinColumn(name="SpeakerID", referencedColumnName="ID")
-     * @var PresentationSpeaker
+     * @var Speaker
      */
     private $speaker;
 
@@ -137,7 +137,7 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
     }
 
     /**
-     * @return PresentationSpeaker
+     * @return Speaker
      */
     public function getSpeaker()
     {
@@ -145,7 +145,7 @@ class PresentationSpeakerSummitAssistanceConfirmationRequest extends Silverstrip
     }
 
     /**
-     * @param PresentationSpeaker $speaker
+     * @param Speaker $speaker
      */
     public function setSpeaker($speaker)
     {

@@ -27,7 +27,7 @@ use models\summit\ISpeakerRepository;
 use models\summit\ISummitEventRepository;
 use models\summit\Presentation;
 use models\summit\PresentationLink;
-use models\summit\PresentationSpeaker;
+use models\summit\Speaker;
 use models\summit\PresentationType;
 use models\summit\PresentationVideo;
 use libs\utils\ITransactionService;
@@ -240,9 +240,9 @@ final class PresentationService
             // check qty
 
             $limit = $this->getSubmissionLimitFor($summit);
-            $count = count($current_speaker->getPresentationsBySelectionPlanAndRole($current_selection_plan, PresentationSpeaker::ROLE_CREATOR)) +
-                count($current_speaker->getPresentationsBySelectionPlanAndRole($current_selection_plan, PresentationSpeaker::ROLE_MODERATOR)) +
-                count($current_speaker->getPresentationsBySelectionPlanAndRole($current_selection_plan, PresentationSpeaker::ROLE_SPEAKER));
+            $count = count($current_speaker->getPresentationsBySelectionPlanAndRole($current_selection_plan, Speaker::RoleCreator)) +
+                count($current_speaker->getPresentationsBySelectionPlanAndRole($current_selection_plan, Speaker::RoleModerator)) +
+                count($current_speaker->getPresentationsBySelectionPlanAndRole($current_selection_plan, Speaker::RoleSpeaker));
 
             if ($count >= $limit)
                 throw new ValidationException(trans(
@@ -265,7 +265,6 @@ final class PresentationService
                 $current_speaker,
                 $data
             );
-
 
             return $presentation;
         });
@@ -334,7 +333,7 @@ final class PresentationService
      * @param Summit $summit
      * @param SelectionPlan $selection_plan
      * @param Presentation $presentation
-     * @param PresentationSpeaker $current_speaker
+     * @param Speaker $current_speaker
      * @param array $data
      * @return Presentation
      * @throws \Exception
@@ -342,7 +341,7 @@ final class PresentationService
     private function saveOrUpdatePresentation(Summit $summit,
                                               SelectionPlan $selection_plan,
                                               Presentation $presentation,
-                                              PresentationSpeaker $current_speaker,
+                                              Speaker $current_speaker,
                                               array $data
     )
     {
@@ -410,7 +409,7 @@ final class PresentationService
             $presentation->setType($event_type);
             $presentation->setCategory($track);
             // add me as speaker
-            $presentation->addSpeaker($current_speaker);
+            $presentation->addSpeakerByRole($current_speaker, Speaker::RoleSpeaker);
 
             if (isset($data['tags'])) {
                 $presentation->clearTags();
