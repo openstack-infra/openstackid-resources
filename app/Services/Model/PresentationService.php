@@ -410,7 +410,7 @@ final class PresentationService
             $presentation->setType($event_type);
             $presentation->setCategory($track);
             // add me as speaker
-            $presentation->addSpeaker($current_speaker);
+            //$presentation->addSpeaker($current_speaker);
 
             if (isset($data['tags'])) {
                 $presentation->clearTags();
@@ -562,6 +562,13 @@ final class PresentationService
                 throw new ValidationException
                 (
                     sprintf("presentation %s is not allowed to mark as completed", $presentation_id)
+                );
+            }
+
+            if (!$presentation->fulfilSpeakersConditions()) {
+                throw new ValidationException
+                (
+                    sprintf("presentation %s is not allowed to mark as completed because does not fulfil speakers conditions", $presentation_id)
                 );
             }
 

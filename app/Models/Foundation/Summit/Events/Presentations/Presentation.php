@@ -724,4 +724,30 @@ class Presentation extends SummitEvent
         return false;
     }
 
+    /**
+     * @return bool
+     */
+    public function fulfilSpeakersConditions(): bool {
+        $type = $this->type;
+        if(!$type instanceof PresentationType) return false;
+
+        if($type->isUseModerator()){
+            $count  = $this->getModeratorId() > 0 ? 1 : 0;
+            $max    = $type->getMaxModerators();
+            $min    = $type->getMinModerators();
+            if($type->isModeratorMandatory() && $min > $count) return false;
+            if( $count > $max ) return false;
+        }
+
+        if($type->isUseSpeakers()){
+            $count  = $this->speakers->count();
+            $max    = $type->getMaxSpeakers();
+            $min    = $type->getMinSpeakers();
+            if($type->isAreSpeakersMandatory() && $min > $count) return false;
+            if( $count > $max ) return false;
+        }
+
+        return true;
+    }
+
 }
