@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+use App\Http\Utils\SwiftBucket;
 use App\Models\Foundation\Main\CountryCodes;
 use App\Models\Foundation\Main\Repositories\ILanguageRepository;
 use App\Models\Foundation\Summit\Factories\PresentationSpeakerSummitAssistanceConfirmationRequestFactory;
@@ -570,7 +571,7 @@ final class SpeakerService
                 throw new ValidationException(sprintf("file exceeds max_file_size (%s MB).", ($max_file_size / 1024) / 1024));
             }
 
-            $uploader = new FileUploader($this->folder_service, new SwiftBucket);
+            $uploader = new FileUploader($this->folder_service, new SwiftBucket());
             $photo = $uploader->build($file, 'profile-images', true);
             $speaker->setPhoto($photo);
 
