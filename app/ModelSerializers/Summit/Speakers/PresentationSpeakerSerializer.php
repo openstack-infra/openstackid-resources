@@ -21,14 +21,14 @@ use models\summit\PresentationSpeaker;
 class PresentationSpeakerSerializer extends SilverStripeSerializer
 {
     protected static $array_mappings = [
-        'FirstName'   => 'first_name:json_string',
-        'LastName'    => 'last_name:json_string',
-        'Title'       => 'title:json_string',
-        'Bio'         => 'bio:json_string',
-        'IRCHandle'   => 'irc:json_string',
-        'TwitterName' => 'twitter:json_string',
-        'OrgHasCloud' => 'org_has_cloud:json_boolean',
-        'Country'     => 'country:json_string',
+        'FirstName'             => 'first_name:json_string',
+        'LastName'              => 'last_name:json_string',
+        'Title'                 => 'title:json_string',
+        'Bio'                   => 'bio:json_string',
+        'IRCHandle'             => 'irc:json_string',
+        'TwitterName'           => 'twitter:json_string',
+        'OrgHasCloud'           => 'org_has_cloud:json_boolean',
+        'Country'               => 'country:json_string',
         'AvailableForBureau'    => 'available_for_bureau:json_boolean',
         'FundedTravel'          => 'funded_travel:json_boolean',
         'WillingToTravel'       => 'willing_to_travel:json_boolean',
@@ -76,7 +76,7 @@ class PresentationSpeakerSerializer extends SilverStripeSerializer
             $values['moderated_presentations'] = $speaker->getModeratedPresentationIds($summit_id, $published);
         }
 
-        $values['pic']                     = Config::get("server.assets_base_url", 'https://www.openstack.org/') . 'profile_images/speakers/' . $speaker->getId();
+        $values['pic'] = $speaker->getProfilePhotoUrl();
 
         if (in_array('member', $relations) && $speaker->hasMember())
         {
