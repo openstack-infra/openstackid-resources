@@ -70,7 +70,7 @@ final class SwiftBucket implements IBucket
 
             $openstack = new OpenStack($configOptions);
 
-            $this->container = $openstack->objectStoreV1()->getContainer( Config::get("cloudstorage.container"));
+            $this->container = $openstack->objectStoreV1()->getContainer( Config::get("cloudstorage.assets_container"));
         }
 
         return $this->container;
