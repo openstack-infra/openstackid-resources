@@ -1578,4 +1578,25 @@ SQL;
 
         return $email ? $email->getType() : null;
     }
+
+    /**
+     * @return string
+     */
+    public function getProfilePhotoUrl():string{
+        $photoUrl = null;
+        if($photo = $this->getPhoto()){
+            $photoUrl =  $photo->getUrl();
+        }
+        if(empty($photo_url)  && $this->hasMember() && $photo = $this->member->getPhoto()){
+            $photoUrl =  $photo->getUrl();
+        }
+        if(empty($photo_url) && !empty($this->getTwitterName()) ){
+            $twitterName = $this->getTwitterName();
+            $photoUrl =  'https://twitter.com/' . trim(trim($twitterName, '@')) . '/profile_image?size=original';
+        }
+        if(empty($photoUrl)){
+            $photoUrl = File::getCloudLinkForImages("generic-speaker-icon.png");
+        }
+        return $photoUrl;
+    }
 }

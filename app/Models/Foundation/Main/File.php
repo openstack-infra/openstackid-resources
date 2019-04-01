@@ -11,8 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\utils\SilverstripeBaseModel;
 use Doctrine\ORM\Mapping AS ORM;
+use models\utils\SilverstripeBaseModel;
 use Illuminate\Support\Facades\Config;
 /**
  * @ORM\Entity(repositoryClass="repositories\main\DoctrineFolderRepository")
@@ -272,7 +272,24 @@ class File extends SilverstripeBaseModel
      */
     public function getCloudLink()
     {
-        return Config::get("cloudstorage.base_url") . $this->getRelativeLinkFor();
+        return
+            sprintf("%s/%s/%s",
+                Config::get("cloudstorage.base_url") ,
+                Config::get("cloudstorage.assets_container"),
+                $this->getRelativeLinkFor());
+    }
+
+    /**
+     * @param string $imageRelativePath
+     * @return string
+     */
+    public static function getCloudLinkForImages(string $imageRelativePath):string {
+        return
+            sprintf("%s/%s/%s",
+                Config::get("cloudstorage.base_url") ,
+                Config::get("cloudstorage.images_container"),
+                $imageRelativePath
+            );
     }
 
     /**

@@ -14,7 +14,8 @@
 
 return [
     'base_url' => env('CLOUD_STORAGE_BASE_URL', null),
-    'container' => env('CLOUD_STORAGE_CONTAINER', null),
+    'assets_container' => env('CLOUD_STORAGE_ASSETS_CONTAINER', null),
+    'images_container' => env('CLOUD_STORAGE_IMAGES_CONTAINER', null),
     'auth_url' => env('CLOUD_STORAGE_AUTH_URL', null),
     'user_name' => env('CLOUD_STORAGE_USERNAME', null),
     'api_key' => env('CLOUD_STORAGE_APIKEY', null),

@@ -58,7 +58,7 @@ class AbstractMemberSerializer extends SilverStripeSerializer
         if(!count($relations)) $relations = $this->getAllowedRelations();
 
         $values           = parent::serialize($expand, $fields, $relations, $params);
-        $values['pic']    = Config::get("server.assets_base_url", 'https://www.openstack.org/'). 'profile_images/members/'. $member->getId();
+        $values['pic']    = $member->getProfilePhotoUrl();
 
         if(in_array('groups', $relations))
             $values['groups'] = $member->getGroupsIds();
