@@ -1580,14 +1580,35 @@ SQL;
     }
 
     /**
+     * @return bool
+     */
+    public function hasPhoto(){
+        return $this->getPhotoId() > 0;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPhotoId()
+    {
+        try{
+            if(is_null($this->photo)) return 0;
+            return $this->photo->getId();
+        }
+        catch(\Exception $ex){
+            return 0;
+        }
+    }
+
+    /**
      * @return string
      */
     public function getProfilePhotoUrl():string{
         $photoUrl = null;
-        if($photo = $this->getPhoto()){
+        if($this->hasPhoto() && $photo = $this->getPhoto()){
             $photoUrl =  $photo->getUrl();
         }
-        if(empty($photo_url)  && $this->hasMember() && $photo = $this->member->getPhoto()){
+        if(empty($photo_url)  && $this->hasMember() && $this->member->hasPhoto() && $photo = $this->member->getPhoto()){
             $photoUrl =  $photo->getUrl();
         }
         if(empty($photo_url) && !empty($this->getTwitterName()) ){
