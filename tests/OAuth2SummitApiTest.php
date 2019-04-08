@@ -12,12 +12,33 @@
  * limitations under the License.
  **/
 use LaravelDoctrine\ORM\Facades\EntityManager;
-
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 /**
  * Class OAuth2SummitApiTest
  */
 final class OAuth2SummitApiTest extends ProtectedApiTest
 {
+
+    public function tearDown()
+    {
+        Mockery::close();
+    }
+
+    public function createApplication()
+    {
+        $app = parent::createApplication();
+
+        $fileUploaderMock = Mockery::mock(\App\Http\Utils\IFileUploader::class)
+            ->shouldIgnoreMissing();
+
+        $fileUploaderMock->shouldReceive('build')->andReturn(new \models\main\File());
+
+        $app->instance(\App\Http\Utils\IFileUploader::class, $fileUploaderMock);
+
+
+        return $app;
+    }
 
     public function testGetSummits()
     {
@@ -902,12 +923,15 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
         $this->assertTrue(!is_null($attendee));
     }
 
-    public function testAddPresentationVideo($summit_id = 7, $presentation_id = 15404)
+    public function testAddPresentationVideo($summit_id = 25)
     {
+        $repo   =  EntityManager::getRepository(\models\summit\Summit::class);
+        $summit = $repo->getById($summit_id);
+        $presentation = $summit->getPublishedPresentations()[0];
         $params = array
         (
             'id' => $summit_id,
-            'presentation_id' => $presentation_id
+            'presentation_id' => $presentation->getId()
         );
 
         $headers = array
@@ -943,7 +967,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testUpdatePresentationVideo()
     {
-        $video_id = $this->testAddPresentationVideo(7, 15404);
+        $video_id = $this->testAddPresentationVideo($summit_id = 25);
 
         $params = array
         (
@@ -1017,7 +1041,7 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
 
     public function testDeletePresentationVideo()
     {
-        $video_id = $this->testAddPresentationVideo(7, 15404);
+        $video_id = $this->testAddPresentationVideo($summit_id = 25);
 
         $params = array
         (
@@ -1243,5 +1267,47 @@ final class OAuth2SummitApiTest extends ProtectedApiTest
     }
 
 
+    public function testAddPresentationSlide($summit_id=25){
+
+        $repo   =  EntityManager::getRepository(\models\summit\Summit::class);
+        $summit = $repo->getById($summit_id);
+        $presentation = $summit->getPublishedPresentations()[0];
+        $params = array
+        (
+            'id' => $summit_id,
+            'presentation_id' => $presentation->getId(),
+        );
+
+        $headers = array
+        (
+            "HTTP_Authorization" => " Bearer " . $this->access_token,
+            "CONTENT_TYPE" => "application/json"
+        );
+
+        $video_data = array
+        (
+            'name' => 'test slide',
+            'description' => 'test slide',
+            'display_on_site' => true,
+        );
+
+        $response = $this->action
+        (
+            "POST",
+            "OAuth2PresentationApiController@addPresentationSlide",
+            $params,
+            array(),
+            array(),
+            [
+                'file' => UploadedFile::fake()->image('slide.pdf')
+            ],
+            $headers,
+            json_encode($video_data)
+        );
+
+        $video_id = $response->getContent();
+        $this->assertResponseStatus(201);
+        return intval($video_id);
+    }
 
 }

@@ -1,4 +1,4 @@
-<?php namespace factories;
+<?php namespace App\Models\Foundation\Summit\Factories;
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -11,35 +11,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
-use models\summit\factories\IPresentationVideoFactory;
 use models\summit\PresentationVideo;
-
 /**
  * Class PresentationVideoFactory
  * @package factories
  */
-final class PresentationVideoFactory implements IPresentationVideoFactory
+final class PresentationVideoFactory
 {
     /**
      * @param array $data
      * @return PresentationVideo
      */
-    public function build(array $data){
-        $video               = new PresentationVideo;
-        $utc_now             = new \DateTime();
+    public static function build(array $data){
+        return self::populate(new PresentationVideo, $data);
+    }
 
-        $video->setYoutubeId(trim($data['you_tube_id']));
-        $video->setDateUploaded($utc_now);
+    /**
+     * @param PresentationVideo $video
+     * @param array $data
+     * @return PresentationVideo
+     */
+    public static function populate(PresentationVideo $video, array $data){
 
-        if(isset($data['name']))
-            $video->setName(trim($data['name']));
-
-        if(isset($data['description']))
-            $video->setDescription(trim($data['description']));
-
-        $video->setDisplayOnSite(isset($data['display_on_site']) ? (bool)$data['display_on_site'] : true);
-
+        PresentationMaterialFactory::populate($video, $data);
+        if(isset($data['you_tube_id']))
+            $video->setYoutubeId(trim($data['you_tube_id']));
+        if($video->getId() == 0)
+            $video->setDateUploaded(new \DateTime());
         return $video;
     }
 }

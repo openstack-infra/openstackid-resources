@@ -11,10 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use models\main\File;
-use models\main\Image;
-use Config;
 use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
@@ -39,7 +36,7 @@ class PresentationSlide extends PresentationMaterial
     private $link;
 
     /**
-     * @ORM\ManyToOne(targetEntity="models\main\File")
+     * @ORM\ManyToOne(targetEntity="models\main\File", cascade={"persist"})
      * @ORM\JoinColumn(name="SlideID", referencedColumnName="ID")
      * @var File
      */
@@ -89,7 +86,7 @@ class PresentationSlide extends PresentationMaterial
      */
     public function getSlideId(){
         try{
-            return !is_null($this->slide)?$this->slide->getId():0;
+            return !is_null($this->slide) ? $this->slide->getId():0;
         }
         catch(\Exception $ex){
             return 0;

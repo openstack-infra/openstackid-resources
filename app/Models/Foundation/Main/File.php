@@ -199,6 +199,9 @@ class File extends SilverstripeBaseModel
         parent::__construct();
         $this->class_name     = 'CloudFile';
         $this->show_in_search = true;
+        $this->cloud_metajson = "";
+        $this->cloud_status = "Local";
+        $this->cloud_size = 0;
     }
 
     public function setImage(){

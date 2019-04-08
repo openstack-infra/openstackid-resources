@@ -11,12 +11,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-
 use App\Events\PresentationMaterialCreated;
+use App\Models\Foundation\Main\IOrderable;
 use models\utils\SilverstripeBaseModel;
-use Doctrine\ORM\Mapping AS ORM;
 use Illuminate\Support\Facades\Event;
-
+use Doctrine\ORM\Mapping AS ORM;
 /**
  * @ORM\Entity
  * @ORM\Table(name="PresentationMaterial")
@@ -27,7 +26,7 @@ use Illuminate\Support\Facades\Event;
  * Class PresentationMaterial
  * @package models\summit
  */
-abstract class PresentationMaterial extends SilverstripeBaseModel
+abstract class PresentationMaterial extends SilverstripeBaseModel implements IOrderable
 {
 
     /**
@@ -197,7 +196,7 @@ abstract class PresentationMaterial extends SilverstripeBaseModel
      * @ORM\PostPersist
      */
     public function inserted($args){
-        Event::fire(new PresentationMaterialCreated($this, $args));
+        Event::fire(new PresentationMaterialCreated($this));
     }
 
     public function clearPresentation(){

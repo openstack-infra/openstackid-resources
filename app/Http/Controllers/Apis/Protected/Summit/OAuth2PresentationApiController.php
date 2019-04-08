@@ -112,11 +112,26 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
         }
     }
 
-
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $video_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function getPresentationVideo($summit_id, $presentation_id, $video_id){
         try {
             $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
             if (is_null($summit)) return $this->error404();
+
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if (is_null($presentation)) return $this->error404();
+
+            $video = $presentation-getVideoBy($video_id);
+
+            if (is_null($video)) return $this->error404();
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($video)->serialize());
 
         } catch (Exception $ex) {
             Log::error($ex);
@@ -124,6 +139,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $presentation_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function addVideo(LaravelRequest $request, $summit_id, $presentation_id){
         try {
 
@@ -139,6 +160,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'you_tube_id'     => 'required|alpha_dash',
                 'name'            => 'sometimes|required|text:512',
                 'description'     => 'sometimes|required|text|max:512',
+                'featured'        => 'sometimes|required|boolean',
                 'display_on_site' => 'sometimes|required|boolean',
             );
 
@@ -173,6 +195,13 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $video_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function updateVideo(LaravelRequest $request, $summit_id, $presentation_id, $video_id){
         try {
 
@@ -189,6 +218,8 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'name'            => 'sometimes|required|text:512',
                 'description'     => 'sometimes|required|text|max:512',
                 'display_on_site' => 'sometimes|required|boolean',
+                'featured'        => 'sometimes|required|boolean',
+                'order'           => 'sometimes|integer|min:1',
             );
 
             $data = $data->all();
@@ -222,6 +253,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
         }
     }
 
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $video_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
     public function deleteVideo($summit_id, $presentation_id, $video_id){
         try {
 
@@ -484,6 +521,424 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             Log::warning($ex2);
             return $this->error404(array('message' => $ex2->getMessage()));
         } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    // Slides
+
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function getPresentationSlides($summit_id, $presentation_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if (is_null($presentation)) return $this->error404();
+
+            $slides = $presentation-getSlides();
+
+            $items = [];
+            foreach($slides as $i)
+            {
+                if($i instanceof IEntity)
+                {
+                    $i = SerializerRegistry::getInstance()->getSerializer($i)->serialize();
+                }
+                $items[] = $i;
+            }
+
+            return $this->ok($items);
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $slide_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function getPresentationSlide($summit_id, $presentation_id, $slide_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if (is_null($presentation)) return $this->error404();
+
+            $slide = $presentation-getSlideBy($slide_id);
+
+            if (is_null($slide)) return $this->error404();
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($slide)->serialize());
+
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $presentation_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function addPresentationSlide(LaravelRequest $request, $summit_id, $presentation_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $data  = $request->all();
+            $rules = [
+                'file'            => 'required_without:link',
+                'link'            => 'required_without:file|text:512',
+                'name'            => 'required|text:512',
+                'description'     => 'sometimes|required|text|max:512',
+                'display_on_site' => 'sometimes|required|boolean',
+                'featured'        => 'sometimes|required|boolean',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException;
+                $ex->setMessages($validation->messages()->toArray());
+                throw $ex;
+            }
+
+            $slide = $this->presentation_service->addSlideTo($request, $presentation_id, $data);
+
+            return $this->created($slide->getId());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $slide_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function updatePresentationSlide(LaravelRequest $request, $summit_id, $presentation_id, $slide_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $data  = $request->all();
+
+            $rules = [
+                'link'            => 'sometimes|required|text:512',
+                'name'            => 'sometimes|required|text:512',
+                'description'     => 'sometimes|required|text|max:512',
+                'display_on_site' => 'sometimes|required|boolean',
+                'featured'        => 'sometimes|required|boolean',
+                'order'           => 'sometimes|integer|min:1',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException;
+                $ex->setMessages($validation->messages()->toArray());
+                throw $ex;
+            }
+
+            $this->presentation_service->updateSlide($request, $presentation_id, $slide_id, $data);
+
+            return $this->updated();
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $slide_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function deletePresentationSlide($summit_id, $presentation_id, $slide_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->presentation_service->deleteSlide($presentation_id, $slide_id);
+
+            return $this->deleted();
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    // Links
+
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function getPresentationLinks($summit_id, $presentation_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if (is_null($presentation)) return $this->error404();
+
+            $links = $presentation-getLinks();
+
+            $items = [];
+            foreach($links as $i)
+            {
+                if($i instanceof IEntity)
+                {
+                    $i = SerializerRegistry::getInstance()->getSerializer($i)->serialize();
+                }
+                $items[] = $i;
+            }
+
+            return $this->ok($items);
+
+        } catch (ValidationException $ex1) {
+            Log::warning($ex1);
+            return $this->error412(array($ex1->getMessage()));
+        } catch (EntityNotFoundException $ex2) {
+            Log::warning($ex2);
+            return $this->error404(array('message' => $ex2->getMessage()));
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $link_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function getPresentationLink($summit_id, $presentation_id, $link_id){
+        try {
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $presentation = $this->presentation_repository->getById($presentation_id);
+
+            if (is_null($presentation)) return $this->error404();
+
+            $link = $presentation-getLinkBy($link_id);
+
+            if (is_null($link)) return $this->error404();
+
+            return $this->ok(SerializerRegistry::getInstance()->getSerializer($link)->serialize());
+
+        } catch (Exception $ex) {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $presentation_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function addPresentationLink(LaravelRequest $request, $summit_id, $presentation_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $data  = $request->all();
+            $rules = [
+                'link'            => 'required|text:512',
+                'name'            => 'required|text:512',
+                'description'     => 'sometimes|required|text|max:512',
+                'display_on_site' => 'sometimes|required|boolean',
+                'featured'        => 'sometimes|required|boolean',
+            ];
+
+            $data = $data->all();
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException;
+                $ex->setMessages($validation->messages()->toArray());
+                throw $ex;
+            }
+
+            $link = $this->presentation_service->addLinkTo($request, $presentation_id, $data);
+
+            return $this->created($link->getId());
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param LaravelRequest $request
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $link_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function updatePresentationLink(LaravelRequest $request, $summit_id, $presentation_id, $link_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $data  = $request->all();
+
+            $rules = [
+                'link'            => 'sometimes|required|text:512',
+                'name'            => 'sometimes|required|text:512',
+                'description'     => 'sometimes|required|text|max:512',
+                'display_on_site' => 'sometimes|required|boolean',
+                'featured'        => 'sometimes|required|boolean',
+                'order'           => 'sometimes|integer|min:1',
+            ];
+
+            // Creates a Validator instance and validates the data.
+            $validation = Validator::make($data, $rules);
+
+            if ($validation->fails()) {
+                $ex = new ValidationException;
+                $ex->setMessages($validation->messages()->toArray());
+                throw $ex;
+            }
+
+            $this->presentation_service->updateLink($request, $presentation_id, $link_id, $data);
+
+            return $this->updated();
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
+            Log::error($ex);
+            return $this->error500($ex);
+        }
+    }
+
+    /**
+     * @param $summit_id
+     * @param $presentation_id
+     * @param $link_id
+     * @return \Illuminate\Http\JsonResponse|mixed
+     */
+    public function deletePresentationLink($summit_id, $presentation_id, $link_id){
+        try {
+
+            $summit = SummitFinderStrategyFactory::build($this->summit_repository, $this->resource_server_context)->find($summit_id);
+            if (is_null($summit)) return $this->error404();
+
+            $this->presentation_service->deleteLink($presentation_id, $link_id);
+
+            return $this->deleted();
+        }
+        catch (EntityNotFoundException $ex1)
+        {
+            Log::warning($ex1);
+            return $this->error404();
+        }
+        catch (ValidationException $ex2)
+        {
+            Log::warning($ex2);
+            return $this->error412($ex2->getMessages());
+        }
+        catch (Exception $ex)
+        {
             Log::error($ex);
             return $this->error500($ex);
         }

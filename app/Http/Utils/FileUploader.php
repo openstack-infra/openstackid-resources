@@ -20,7 +20,7 @@ use models\main\File;
  * Class FileUploader
  * @package App\Http\Utils
  */
-final class FileUploader
+final class FileUploader implements IFileUploader
 {
     /**
      * @var IFolderService
@@ -35,6 +35,7 @@ final class FileUploader
     /**
      * FileUploader constructor.
      * @param IFolderService $folder_service
+     * @param IBucket $bucket
      */
     public function __construct(IFolderService $folder_service, IBucket $bucket){
         $this->folder_service = $folder_service;
@@ -43,9 +44,10 @@ final class FileUploader
 
     /**
      * @param UploadedFile $file
-     * @param string $folder_name
+     * @param $folder_name
      * @param bool $is_image
      * @return File
+     * @throws \Exception
      */
     public function build(UploadedFile $file, $folder_name, $is_image = false){
         $attachment = new File();
@@ -59,7 +61,9 @@ final class FileUploader
             $attachment->setFilename(sprintf("assets/%s/%s", $folder_name, $file->getClientOriginalName()));
             $attachment->setTitle(str_replace(array('-', '_'), ' ', preg_replace('/\.[^.]+$/', '', $file->getClientOriginalName())));
             $attachment->setShowInSearch(true);
-            if ($is_image) $attachment->setImage();
+            if ($is_image) // set className
+                $attachment->setImage();
+
             $this->bucket->put($attachment, $local_path);
             $attachment->setCloudMeta('LastPut', time());
             $attachment->setCloudStatus('Live');
@@ -68,7 +72,7 @@ final class FileUploader
         }
         catch (\Exception $ex){
             Log::error($ex);
-            $attachment->setCloudStatus('Error');
+            throw $ex;
         }
         return $attachment;
     }

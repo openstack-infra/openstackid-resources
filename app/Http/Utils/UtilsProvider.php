@@ -1,6 +1,6 @@
-<?php namespace factories;
+<?php namespace App\Http\Utils;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2019 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,10 +14,10 @@
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\App;
 /**
- * Class FactoriesProvider
- * @package factories
+ * Class UtilsProvider
+ * @package App\Http\Utils
  */
-final class FactoriesProvider extends ServiceProvider
+final class UtilsProvider extends ServiceProvider
 {
     protected $defer = false;
 
@@ -27,6 +27,8 @@ final class FactoriesProvider extends ServiceProvider
 
     public function register()
     {
-
+        // file uploadedr service
+        App::singleton(IBucket::class, SwiftBucket::class);
+        App::singleton(IFileUploader ::class, FileUploader::class);
     }
 }

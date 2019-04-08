@@ -1,6 +1,6 @@
-<?php namespace models\summit\factories;
+<?php namespace App\Http\Utils;
 /**
- * Copyright 2016 OpenStack Foundation
+ * Copyright 2019 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,17 +11,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use models\summit\PresentationVideo;
-
+use Illuminate\Http\UploadedFile;
+use models\main\File;
 /**
- * Interface IPresentationVideoFactory
- * @package models\summit\factories
+ * Interface IFileUploader
+ * @package App\Http\Utils
  */
-interface IPresentationVideoFactory
+interface IFileUploader
 {
     /**
-     * @param array $data
-     * @return PresentationVideo
+     * @param UploadedFile $file
+     * @param $folder_name
+     * @param bool $is_image
+     * @return File
+     * @throws \Exception
      */
-    public function build(array $data);
+    public function build(UploadedFile $file, $folder_name, $is_image = false);
 }

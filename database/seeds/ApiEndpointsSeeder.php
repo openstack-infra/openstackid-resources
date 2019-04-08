@@ -1568,19 +1568,123 @@ class ApiEndpointsSeeder extends Seeder
                 'name' => 'create-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos',
                 'http_method' => 'POST',
-                'scopes' => [sprintf(SummitScopes::WriteVideoData, $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::WriteVideoData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationVideosData, $current_realm)
+                ],
             ],
             [
                 'name' => 'update-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos/{video_id}',
                 'http_method' => 'PUT',
-                'scopes' => [sprintf(SummitScopes::WriteVideoData, $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::WriteVideoData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationVideosData, $current_realm)
+                ],
             ],
             [
                 'name' => 'delete-presentation-video',
                 'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/videos/{video_id}',
                 'http_method' => 'DELETE',
-                'scopes' => [sprintf(SummitScopes::WriteVideoData, $current_realm)],
+                'scopes' => [
+                    sprintf(SummitScopes::WriteVideoData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationVideosData, $current_realm)
+                ],
+            ],
+            // links
+            [
+                'name' => 'get-presentation-links',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/links',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'get-presentation-link',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/links/{link_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'create-presentation-link',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/links',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationLinksData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-presentation-link',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/links/{link_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationLinksData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-presentation-link',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/links/{link_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationLinksData, $current_realm)
+                ],
+            ],
+            // slides
+            [
+                'name' => 'get-presentation-slides',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/slides',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'get-presentation-slide',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/slides/{slide_id}',
+                'http_method' => 'GET',
+                'scopes' => [
+                    sprintf(SummitScopes::ReadSummitData, $current_realm),
+                    sprintf(SummitScopes::ReadAllSummitData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'create-presentation-slide',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/slides',
+                'http_method' => 'POST',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationSlidesData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'update-presentation-slide',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/slides/{slide_id}',
+                'http_method' => 'PUT',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationSlidesData, $current_realm)
+                ],
+            ],
+            [
+                'name' => 'delete-presentation-slide',
+                'route' => '/api/v1/summits/{id}/presentations/{presentation_id}/slides/{slide_id}',
+                'http_method' => 'DELETE',
+                'scopes' => [
+                    sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                    sprintf(SummitScopes::WritePresentationSlidesData, $current_realm)
+                ],
             ],
             //members
             [

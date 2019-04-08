@@ -851,6 +851,12 @@ class Summit extends SilverstripeBaseModel
     }
 
 
+    public function getPublishedPresentations()
+    {
+        $query = $this->createQuery("SELECT p from models\summit\Presentation p JOIN p.summit s WHERE s.id = :summit_id and p.published = 1");
+        return $query->setParameter('summit_id', $this->getIdentifier())->getResult();
+    }
+
     /**
      * @param PresentationSpeaker $speaker
      * @param SelectionPlan|null $selectionPlan

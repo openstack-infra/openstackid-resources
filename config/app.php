@@ -155,6 +155,7 @@ return [
         App\Repositories\RepositoriesProvider::class,
         services\ServicesProvider::class,
         factories\FactoriesProvider::class,
+        App\Http\Utils\UtilsProvider::class,
         libs\utils\CustomDoctrineServiceProvider::class,
         LaravelDoctrine\Extensions\BeberleiExtensionsServiceProvider::class,
     ],

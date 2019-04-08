@@ -24,7 +24,7 @@ use App\Events\LocationUpdated;
 use App\Events\SummitVenueRoomDeleted;
 use App\Events\SummitVenueRoomInserted;
 use App\Events\SummitVenueRoomUpdated;
-use App\Http\Utils\FileUploader;
+use App\Http\Utils\IFileUploader;
 use App\Models\Foundation\Summit\Factories\SummitLocationBannerFactory;
 use App\Models\Foundation\Summit\Factories\SummitLocationFactory;
 use App\Models\Foundation\Summit\Factories\SummitLocationImageFactory;
@@ -71,10 +71,11 @@ final class SummitLocationService
     private $folder_service;
 
     /**
-     * LocationService constructor.
+     * SummitLocationService constructor.
      * @param ISummitLocationRepository $location_repository
      * @param IGeoCodingAPI $geo_coding_api
      * @param IFolderService $folder_service
+     * @param IFileUploader $file_uploader
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -82,12 +83,14 @@ final class SummitLocationService
         ISummitLocationRepository $location_repository,
         IGeoCodingAPI $geo_coding_api,
         IFolderService $folder_service,
+        IFileUploader $file_uploader,
         ITransactionService $tx_service
     )
     {
         parent::__construct($tx_service);
         $this->location_repository = $location_repository;
         $this->geo_coding_api      = $geo_coding_api;
+        $this->file_uploader       = $file_uploader;
         $this->folder_service      = $folder_service;
     }
 
@@ -1172,8 +1175,7 @@ final class SummitLocationService
                 );
             }
 
-            $uploader = new FileUploader($this->folder_service, new SwiftBucket);
-            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/maps', $location->getSummitId(), $location->getId()), true);
+            $pic      = $this->file_uploader->build($file, sprintf('summits/%s/locations/%s/maps', $location->getSummitId(), $location->getId()), true);
             $map      = SummitLocationImageFactory::buildMap($metadata);
             $map->setPicture($pic);
             $location->addMap($map);
@@ -1276,8 +1278,7 @@ final class SummitLocationService
                     );
                 }
 
-                $uploader = new FileUploader($this->folder_service, new SwiftBucket);
-                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/maps', $location->getSummitId(), $location->getId()), true);
+                $pic = $this->file_uploader->build($file, sprintf('summits/%s/locations/%s/maps', $location->getSummitId(), $location->getId()), true);
                 $map->setPicture($pic);
             }
 
@@ -1443,8 +1444,7 @@ final class SummitLocationService
                 );
             }
 
-            $uploader = new FileUploader($this->folder_service, new SwiftBucket);
-            $pic      = $uploader->build($file, sprintf('summits/%s/locations/%s/images', $location->getSummitId(), $location->getId()), true);
+            $pic      = $this->file_uploader->build($file, sprintf('summits/%s/locations/%s/images', $location->getSummitId(), $location->getId()), true);
             $image    = SummitLocationImageFactory::buildImage($metadata);
             $image->setPicture($pic);
             $location->addImage($image);
@@ -1547,8 +1547,7 @@ final class SummitLocationService
                     );
                 }
 
-                $uploader = new FileUploader($this->folder_service, new SwiftBucket);
-                $pic = $uploader->build($file, sprintf('summits/%s/locations/%s/images', $location->getSummitId(), $location->getId()), true);
+                $pic = $this->file_uploader->build($file, sprintf('summits/%s/locations/%s/images', $location->getSummitId(), $location->getId()), true);
                 $image->setPicture($pic);
             }
 

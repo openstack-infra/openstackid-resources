@@ -11,6 +11,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
+
+use App\Models\Foundation\Main\OrderableChilds;
 use Doctrine\ORM\Mapping AS ORM;
 use App\Models\Foundation\Summit\Events\Presentations\TrackQuestions\TrackAnswer;
 use App\Models\Foundation\Summit\SelectionPlan;
@@ -315,6 +317,8 @@ class Presentation extends SummitEvent
     public function addVideo(PresentationVideo $video){
         $this->materials->add($video);
         $video->setPresentation($this);
+        $video->setOrder($this->getMaterialsMaxOrder() + 1);
+        return $this;
     }
 
      /**
@@ -336,11 +340,49 @@ class Presentation extends SummitEvent
     }
 
     /**
+     * @param int $slide_id
+     * @return PresentationSlide
+     */
+    public function getSlideBy($slide_id){
+        $res = $this->materials
+            ->filter(function( $element) use($slide_id) { return $element instanceof PresentationSlide && $element->getId() == $slide_id; })
+            ->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
+     * @param int $link_id
+     * @return PresentationLink
+     */
+    public function getLinkBy($link_id){
+        $res = $this->materials
+            ->filter(function( $element) use($link_id) { return $element instanceof PresentationLink && $element->getId() == $link_id; })
+            ->first();
+        return $res === false ? null : $res;
+    }
+
+    /**
      * @param PresentationVideo $video
      */
     public function removeVideo(PresentationVideo $video){
         $this->materials->removeElement($video);
         $video->unsetPresentation();
+    }
+
+    /**
+     * @param PresentationSlide $slide
+     */
+    public function removeSlide(PresentationSlide $slide){
+        $this->materials->removeElement($slide);
+        $slide->unsetPresentation();
+    }
+
+    /**
+     * @param PresentationLink  $link
+     */
+    public function removeLink(PresentationLink  $link){
+        $this->materials->removeElement($link);
+        $link->unsetPresentation();
     }
 
     /**
@@ -374,6 +416,18 @@ class Presentation extends SummitEvent
     public function addSlide(PresentationSlide $slide){
         $this->materials->add($slide);
         $slide->setPresentation($this);
+        $slide->setOrder($this->getMaterialsMaxOrder() + 1);
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    private function getMaterialsMaxOrder(){
+        $criteria = Criteria::create();
+        $criteria->orderBy(['order' => 'DESC']);
+        $material = $this->materials->matching($criteria)->first();
+        return $material === false ? 0 : $material->getOrder();
     }
 
     /**
@@ -404,6 +458,8 @@ class Presentation extends SummitEvent
     public function addLink(PresentationLink $link){
         $this->materials->add($link);
         $link->setPresentation($this);
+        $link->setOrder($this->getMaterialsMaxOrder() + 1);
+        return $this;
     }
 
     /**
@@ -749,5 +805,16 @@ class Presentation extends SummitEvent
 
         return true;
     }
+
+    /**
+     * @param PresentationMaterial $material
+     * @param int $new_order
+     * @throws ValidationException
+     */
+    public function recalculateMaterialOrder(PresentationMaterial $material, $new_order){
+        self::recalculateOrderForSelectable($this->materials, $material, $new_order);
+    }
+
+    use OrderableChilds;
 
 }

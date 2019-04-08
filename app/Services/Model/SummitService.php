@@ -17,8 +17,7 @@ use App\Events\MyScheduleAdd;
 use App\Events\MyScheduleRemove;
 use App\Events\SummitDeleted;
 use App\Events\SummitUpdated;
-use App\Http\Utils\FileUploader;
-use App\Http\Utils\SwiftBucket;
+use App\Http\Utils\IFileUploader;
 use App\Models\Foundation\Summit\Factories\SummitFactory;
 use App\Models\Foundation\Summit\Repositories\IDefaultSummitEventTypeRepository;
 use App\Models\Utils\IntervalParser;
@@ -168,6 +167,11 @@ final class SummitService extends AbstractService implements ISummitService
     private $permissions_manager;
 
     /**
+     * @var IFileUploader
+     */
+    private $file_uploader;
+
+    /**
      * SummitService constructor.
      * @param ISummitRepository $summit_repository
      * @param ISummitEventRepository $event_repository
@@ -182,9 +186,10 @@ final class SummitService extends AbstractService implements ISummitService
      * @param IEventbriteAPI $eventbrite_api
      * @param IFolderService $folder_service
      * @param ICompanyRepository $company_repository
-     * @param IGroupRepository $group_repository,
+     * @param IGroupRepository $group_repository
      * @param IDefaultSummitEventTypeRepository $default_event_types_repository
      * @param IPermissionsManager $permissions_manager
+     * @param IFileUploader $file_uploader
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -205,6 +210,7 @@ final class SummitService extends AbstractService implements ISummitService
         IGroupRepository                  $group_repository,
         IDefaultSummitEventTypeRepository $default_event_types_repository,
         IPermissionsManager               $permissions_manager,
+        IFileUploader                     $file_uploader,
         ITransactionService               $tx_service
     )
     {
@@ -225,6 +231,7 @@ final class SummitService extends AbstractService implements ISummitService
         $this->group_repository                      = $group_repository;
         $this->default_event_types_repository        = $default_event_types_repository;
         $this->permissions_manager                   = $permissions_manager;
+        $this->file_uploader                         = $file_uploader;
     }
 
     /**
@@ -1283,8 +1290,7 @@ final class SummitService extends AbstractService implements ISummitService
                 throw new ValidationException(sprintf( "file exceeds max_file_size (%s MB).", ($max_file_size/1024)/1024));
             }
 
-            $uploader   = new FileUploader($this->folder_service, new SwiftBucket);
-            $attachment = $uploader->build($file, 'summit-event-attachments', true);
+            $attachment = $this->file_uploader->build($file, 'summit-event-attachments', true);
             $event->setAttachment($attachment);
 
             return $attachment;

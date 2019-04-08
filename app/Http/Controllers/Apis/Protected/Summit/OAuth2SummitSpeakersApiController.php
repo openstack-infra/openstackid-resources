@@ -1,5 +1,4 @@
 <?php namespace App\Http\Controllers;
-
 /**
  * Copyright 2016 OpenStack Foundation
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +36,6 @@ use utils\OrderParser;
 use utils\PagingInfo;
 use Illuminate\Http\Request as LaravelRequest;
 use utils\PagingResponse;
-
 /**
  * Class OAuth2SummitSpeakersApiController
  * @package App\Http\Controllers

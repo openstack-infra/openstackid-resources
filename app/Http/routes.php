@@ -93,6 +93,7 @@ Route::group([
             });
         });
         Route::post('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@addSummit']);
+
         Route::group(['prefix' => '{id}'], function () {
             Route::put('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@updateSummit']);
             Route::delete('', [ 'middleware' => 'auth.user:administrators|summit-front-end-administrators', 'uses' => 'OAuth2SummitApiController@deleteSummit']);
@@ -268,14 +269,36 @@ Route::group([
 
                     Route::delete('', 'OAuth2PresentationApiController@deletePresentation');
 
+                    // videos
                     Route::group(['prefix' => 'videos'], function () {
-
                         Route::get('', 'OAuth2PresentationApiController@getPresentationVideos');
-                        Route::get('{video_id}', 'OAuth2PresentationApiController@getPresentationVideo');
                         Route::post('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@addVideo' ]);
                         Route::group(['prefix' => '{video_id}'], function () {
+                            Route::get('', 'OAuth2PresentationApiController@getPresentationVideo');
                             Route::put('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@updateVideo' ]);
                             Route::delete('', [ 'middleware' => 'auth.user:administrators|video-admins', 'uses' => 'OAuth2PresentationApiController@deleteVideo' ]);
+                        });
+                    });
+
+                    // slides
+                    Route::group(['prefix' => 'slides'], function () {
+                        Route::get('', 'OAuth2PresentationApiController@getPresentationSlides');
+                        Route::post('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2PresentationApiController@addPresentationSlide' ]);
+                        Route::group(['prefix' => '{slide_id}'], function () {
+                            Route::get('', 'OAuth2PresentationApiController@getPresentationSlide');
+                            Route::put('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2PresentationApiController@updatePresentationSlide' ]);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2PresentationApiController@deletePresentationSlide' ]);
+                        });
+                    });
+
+                    // links
+                    Route::group(['prefix' => 'links'], function () {
+                        Route::get('', 'OAuth2PresentationApiController@getPresentationLinks');
+                        Route::post('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2PresentationApiController@addPresentationLink' ]);
+                        Route::group(['prefix' => '{link_id}'], function () {
+                            Route::get('', 'OAuth2PresentationApiController@getPresentationLink');
+                            Route::put('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2PresentationApiController@updatePresentationLink' ]);
+                            Route::delete('', [ 'middleware' => 'auth.user:administrators', 'uses' => 'OAuth2PresentationApiController@deletePresentationLink' ]);
                         });
                     });
                 });

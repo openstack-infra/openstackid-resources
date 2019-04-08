@@ -166,6 +166,26 @@ final class ApiScopesSeeder extends Seeder
                 'short_description' => 'Write Summit Track Question Template Data',
                 'description' => 'Grants write access for Summit Track Question Template Data',
             ],
+            [
+                'name' => sprintf(SummitScopes::WritePresentationVideosData, $current_realm),
+                'short_description' => 'Write Summit Presentation Videos Data',
+                'description' => 'Grants write access for Summit Presentation Videos Data',
+            ],
+            [
+                'name' => sprintf(SummitScopes::WritePresentationSlidesData, $current_realm),
+                'short_description' => 'Write Summit Presentation Slides Data',
+                'description' => 'Grants write access for Summit Presentation Slides Data',
+            ],
+            [
+                'name' => sprintf(SummitScopes::WritePresentationLinksData, $current_realm),
+                'short_description' => 'Write Summit Presentation Links Data',
+                'description' => 'Grants write access for Summit Presentation Links Data',
+            ],
+            [
+                'name' => sprintf(SummitScopes::WritePresentationMaterialsData, $current_realm),
+                'short_description' => 'Write Summit Presentation Materials Data',
+                'description' => 'Grants write access for Summit Materials Links Data',
+            ],
         ];
 
         foreach ($scopes as $scope_info) {

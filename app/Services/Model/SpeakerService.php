@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  **/
-use App\Http\Utils\SwiftBucket;
 use App\Models\Foundation\Main\CountryCodes;
 use App\Models\Foundation\Main\Repositories\ILanguageRepository;
 use App\Models\Foundation\Summit\Factories\PresentationSpeakerSummitAssistanceConfirmationRequestFactory;
@@ -45,7 +44,7 @@ use models\summit\SpeakerRegistrationRequest;
 use models\summit\SpeakerSummitRegistrationPromoCode;
 use models\summit\SpeakerTravelPreference;
 use models\summit\Summit;
-use App\Http\Utils\FileUploader;
+use App\Http\Utils\IFileUploader;
 
 /**
  * Class SpeakerService
@@ -106,6 +105,11 @@ final class SpeakerService
     private $speaker_involvement_repository;
 
     /**
+     * @var IFileUploader
+     */
+    private $file_uploader;
+
+    /**
      * SpeakerService constructor.
      * @param ISpeakerRepository $speaker_repository
      * @param IMemberRepository $member_repository
@@ -117,6 +121,7 @@ final class SpeakerService
      * @param ILanguageRepository $language_repository
      * @param ISpeakerOrganizationalRoleRepository $speaker_organizational_role_repository
      * @param ISpeakerActiveInvolvementRepository $speaker_involvement_repository
+     * @param IFileUploader $file_uploader
      * @param ITransactionService $tx_service
      */
     public function __construct
@@ -131,6 +136,7 @@ final class SpeakerService
         ILanguageRepository $language_repository,
         ISpeakerOrganizationalRoleRepository $speaker_organizational_role_repository,
         ISpeakerActiveInvolvementRepository $speaker_involvement_repository,
+        IFileUploader $file_uploader,
         ITransactionService $tx_service
     )
     {
@@ -145,6 +151,7 @@ final class SpeakerService
         $this->language_repository = $language_repository;
         $this->speaker_organizational_role_repository = $speaker_organizational_role_repository;
         $this->speaker_involvement_repository = $speaker_involvement_repository;
+        $this->file_uploader = $file_uploader;
     }
 
     /**
@@ -571,8 +578,7 @@ final class SpeakerService
                 throw new ValidationException(sprintf("file exceeds max_file_size (%s MB).", ($max_file_size / 1024) / 1024));
             }
 
-            $uploader = new FileUploader($this->folder_service, new SwiftBucket());
-            $photo = $uploader->build($file, 'profile-images', true);
+            $photo = $this->file_uploader->build($file, 'profile-images', true);
             $speaker->setPhoto($photo);
 
             return $photo;

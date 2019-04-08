@@ -31,9 +31,14 @@ final class SummitScopes
     const WriteMySpeakersData  = '%s/speakers/write/me';
     const ReadMySpeakersData  = '%s/speakers/read/me';
 
-    const PublishEventData   = '%s/summits/publish-event';
-    const WriteEventData     = '%s/summits/write-event';
-    const WriteVideoData     = '%s/summits/write-videos';
+    const PublishEventData                = '%s/summits/publish-event';
+    const WriteEventData                  = '%s/summits/write-event';
+    const WriteVideoData                  = '%s/summits/write-videos';
+    const WritePresentationVideosData     = '%s/summits/write-presentation-videos';
+    const WritePresentationLinksData      = '%s/summits/write-presentation-links';
+    const WritePresentationSlidesData     = '%s/summits/write-presentation-slides';
+    const WritePresentationMaterialsData  = '%s/summits/write-presentation-materials';
+
 
     const WriteAttendeesData = '%s/attendees/write';
 
