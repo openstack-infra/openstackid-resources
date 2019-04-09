@@ -1116,7 +1116,7 @@ SQL;
         }
         if(empty($photo_url) && !empty($this->getTwitterHandle()) ){
             $twitterName = $this->getTwitterHandle();
-            $photoUrl =  'https://twitter.com/' . trim(trim($twitterName, '@')) . '/profile_image?size=original';
+            $photoUrl = sprintf("https://avatars.io/twitter/%s", trim(trim($twitterName, '@')));
         }
         if(empty($photoUrl)){
             $photoUrl = File::getCloudLinkForImages("generic-profile-photo.png");
