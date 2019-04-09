@@ -1,5 +1,6 @@
 <?php namespace App\Providers;
 
+use App\Http\Utils\Logs\LaravelMailerHandler;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -97,7 +98,7 @@ class AppServiceProvider extends ServiceProvider
 
         if (!empty($to) && !empty($from)) {
             $subject = 'openstackid-resource-server error';
-            $handler = new NativeMailerHandler($to, $subject, $from);
+            $handler = new LaravelMailerHandler($to, $subject, $from);
             $handler->setLevel(Config::get('log.email_level', 'error'));
             $logger->pushHandler($handler);
         }
