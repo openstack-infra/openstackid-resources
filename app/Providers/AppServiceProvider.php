@@ -1,5 +1,6 @@
 <?php namespace App\Providers;
 
+use App\Http\Utils\Logs\LaravelMailerHandler;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
@@ -7,7 +8,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use models\main\ChatTeamPermission;
 use models\main\PushNotificationMessagePriority;
-use Monolog\Handler\NativeMailerHandler;
 
 /**
  * Class AppServiceProvider
@@ -96,8 +96,8 @@ class AppServiceProvider extends ServiceProvider
         $from = Config::get('log.from_email', '');
 
         if (!empty($to) && !empty($from)) {
-            $subject = 'openstackid-resource-server error';
-            $handler = new NativeMailerHandler($to, $subject, $from);
+            $subject = Config::get('log.email_subject', 'openstackid-resource-server error');
+            $handler = new LaravelMailerHandler($to, $subject, $from);
             $handler->setLevel(Config::get('log.email_level', 'error'));
             $logger->pushHandler($handler);
         }
