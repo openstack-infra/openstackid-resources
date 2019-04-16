@@ -862,7 +862,7 @@ final class PresentationService
             if (is_null($link))
                 throw new EntityNotFoundException('link not found!');
 
-            if (!$link instanceof PresentationSlide)
+            if (!$link instanceof PresentationLink)
                 throw new EntityNotFoundException('link not found!');
 
             $presentation->removeLink($link);

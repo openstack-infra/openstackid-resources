@@ -181,7 +181,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
             $video = $this->presentation_service->addVideoTo($presentation_id, HTMLCleaner::cleanData($data, $fields));
 
-            return $this->created($video->getId());
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($video)->serialize());
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -241,9 +241,9 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'description',
             ];
 
-            $this->presentation_service->updateVideo($presentation_id, $video_id, HTMLCleaner::cleanData($data, $fields));
+            $video = $this->presentation_service->updateVideo($presentation_id, $video_id, HTMLCleaner::cleanData($data, $fields));
 
-            return $this->updated();
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($video)->serialize());
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -643,7 +643,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
             $slide = $this->presentation_service->addSlideTo($request, $presentation_id, HTMLCleaner::cleanData($data, $fields));
 
-            return $this->created($slide->getId());
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($slide)->serialize());
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -700,9 +700,9 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'description',
             ];
 
-            $this->presentation_service->updateSlide($request, $presentation_id, $slide_id, HTMLCleaner::cleanData($data, $fields));
+            $slide = $this->presentation_service->updateSlide($request, $presentation_id, $slide_id, HTMLCleaner::cleanData($data, $fields));
 
-            return $this->updated();
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($slide)->serialize());
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -861,7 +861,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
             $link = $this->presentation_service->addLinkTo($presentation_id, HTMLCleaner::cleanData($data, $fields));
 
-            return $this->created($link->getId());
+            return $this->created(SerializerRegistry::getInstance()->getSerializer($link)->serialize());
         }
         catch (EntityNotFoundException $ex1)
         {
@@ -918,9 +918,9 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'description',
             ];
 
-            $this->presentation_service->updateLink($presentation_id, $link_id, HTMLCleaner::cleanData($data, $fields));
+            $link = $this->presentation_service->updateLink($presentation_id, $link_id, HTMLCleaner::cleanData($data, $fields));
 
-            return $this->updated();
+            return $this->updated(SerializerRegistry::getInstance()->getSerializer($link)->serialize());
         }
         catch (EntityNotFoundException $ex1)
         {

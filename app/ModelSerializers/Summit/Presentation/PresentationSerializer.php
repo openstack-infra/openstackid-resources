@@ -102,7 +102,7 @@ class PresentationSerializer extends SummitEventSerializer
             $videos = [];
             foreach ($presentation->getVideos() as $video) {
                 $video_values   = SerializerRegistry::getInstance()->getSerializer($video)->serialize();
-                if(empty($video_values['youtube_id'])) continue;
+                if(empty($video_values['you_tube_id'])) continue;
                 $videos[] = $video_values;
             }
             $values['videos'] = $videos;
