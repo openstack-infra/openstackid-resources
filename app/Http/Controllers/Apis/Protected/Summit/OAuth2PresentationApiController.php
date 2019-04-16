@@ -859,7 +859,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'description',
             ];
 
-            $link = $this->presentation_service->addLinkTo($request, $presentation_id, HTMLCleaner::cleanData($data, $fields));
+            $link = $this->presentation_service->addLinkTo($presentation_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->created($link->getId());
         }
@@ -918,7 +918,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'description',
             ];
 
-            $this->presentation_service->updateLink($request, $presentation_id, $link_id, HTMLCleaner::cleanData($data, $fields));
+            $this->presentation_service->updateLink($presentation_id, $link_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->updated();
         }
