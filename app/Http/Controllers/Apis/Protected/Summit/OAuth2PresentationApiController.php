@@ -155,14 +155,14 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
             $data = Input::json();
 
-            $rules = array
-            (
+            $rules =
+            [
                 'you_tube_id'     => 'required|alpha_dash',
                 'name'            => 'sometimes|required|text:512',
-                'description'     => 'sometimes|required|text|max:512',
+                'description'     => 'sometimes|required|string',
                 'featured'        => 'sometimes|required|boolean',
                 'display_on_site' => 'sometimes|required|boolean',
-            );
+            ];
 
             $data = $data->all();
             // Creates a Validator instance and validates the data.
@@ -174,7 +174,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                throw $ex;
             }
 
-            $video = $this->presentation_service->addVideoTo($presentation_id, $data);
+            $fields = [
+                'name',
+                'description',
+            ];
+
+            $video = $this->presentation_service->addVideoTo($presentation_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->created($video->getId());
         }
@@ -212,15 +217,14 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
             $data = Input::json();
 
-            $rules = array
-            (
+            $rules = [
                 'you_tube_id'     => 'required|alpha_dash',
                 'name'            => 'sometimes|required|text:512',
-                'description'     => 'sometimes|required|text|max:512',
+                'description'     => 'sometimes|required|string',
                 'display_on_site' => 'sometimes|required|boolean',
                 'featured'        => 'sometimes|required|boolean',
                 'order'           => 'sometimes|integer|min:1',
-            );
+            ];
 
             $data = $data->all();
             // Creates a Validator instance and validates the data.
@@ -232,7 +236,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 throw $ex;
             }
 
-            $this->presentation_service->updateVideo($presentation_id, $video_id, $data);
+            $fields = [
+                'name',
+                'description',
+            ];
+
+            $this->presentation_service->updateVideo($presentation_id, $video_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->updated();
         }
@@ -611,9 +620,9 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             $data  = $request->all();
             $rules = [
                 'file'            => 'required_without:link',
-                'link'            => 'required_without:file|text:512',
+                'link'            => 'required_without:file|url',
                 'name'            => 'required|text:512',
-                'description'     => 'sometimes|required|text|max:512',
+                'description'     => 'sometimes|required|string',
                 'display_on_site' => 'sometimes|required|boolean',
                 'featured'        => 'sometimes|required|boolean',
             ];
@@ -627,7 +636,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 throw $ex;
             }
 
-            $slide = $this->presentation_service->addSlideTo($request, $presentation_id, $data);
+            $fields = [
+                'name',
+                'description',
+            ];
+
+            $slide = $this->presentation_service->addSlideTo($request, $presentation_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->created($slide->getId());
         }
@@ -664,9 +678,9 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             $data  = $request->all();
 
             $rules = [
-                'link'            => 'sometimes|required|text:512',
+                'link'            => 'sometimes|required|url',
                 'name'            => 'sometimes|required|text:512',
-                'description'     => 'sometimes|required|text|max:512',
+                'description'     => 'sometimes|required|string',
                 'display_on_site' => 'sometimes|required|boolean',
                 'featured'        => 'sometimes|required|boolean',
                 'order'           => 'sometimes|integer|min:1',
@@ -681,7 +695,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 throw $ex;
             }
 
-            $this->presentation_service->updateSlide($request, $presentation_id, $slide_id, $data);
+            $fields = [
+                'name',
+                'description',
+            ];
+
+            $this->presentation_service->updateSlide($request, $presentation_id, $slide_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->updated();
         }
@@ -819,9 +838,9 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
             $data  = $request->all();
             $rules = [
-                'link'            => 'required|text:512',
+                'link'            => 'required|url',
                 'name'            => 'required|text:512',
-                'description'     => 'sometimes|required|text|max:512',
+                'description'     => 'sometimes|required|string',
                 'display_on_site' => 'sometimes|required|boolean',
                 'featured'        => 'sometimes|required|boolean',
             ];
@@ -836,7 +855,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 throw $ex;
             }
 
-            $link = $this->presentation_service->addLinkTo($request, $presentation_id, $data);
+            $fields = [
+                'name',
+                'description',
+            ];
+
+            $link = $this->presentation_service->addLinkTo($request, $presentation_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->created($link->getId());
         }
@@ -873,9 +897,9 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
             $data  = $request->all();
 
             $rules = [
-                'link'            => 'sometimes|required|text:512',
+                'link'            => 'sometimes|required|url',
                 'name'            => 'sometimes|required|text:512',
-                'description'     => 'sometimes|required|text|max:512',
+                'description'     => 'sometimes|required|string',
                 'display_on_site' => 'sometimes|required|boolean',
                 'featured'        => 'sometimes|required|boolean',
                 'order'           => 'sometimes|integer|min:1',
@@ -890,7 +914,12 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 throw $ex;
             }
 
-            $this->presentation_service->updateLink($request, $presentation_id, $link_id, $data);
+            $fields = [
+                'name',
+                'description',
+            ];
+
+            $this->presentation_service->updateLink($request, $presentation_id, $link_id, HTMLCleaner::cleanData($data, $fields));
 
             return $this->updated();
         }
