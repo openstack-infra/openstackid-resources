@@ -691,7 +691,7 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
 
             if ($validation->fails()) {
                 $ex = new ValidationException;
-                $ex->setMessages($validation->messages()->toArray());
+                $ex->setMessages($validation->messaupdateSlideges()->toArray());
                 throw $ex;
             }
 
@@ -845,7 +845,6 @@ final class OAuth2PresentationApiController extends OAuth2ProtectedController
                 'featured'        => 'sometimes|required|boolean',
             ];
 
-            $data = $data->all();
             // Creates a Validator instance and validates the data.
             $validation = Validator::make($data, $rules);
 

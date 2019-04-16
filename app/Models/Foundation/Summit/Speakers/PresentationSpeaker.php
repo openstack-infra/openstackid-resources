@@ -1613,7 +1613,7 @@ SQL;
         }
         if(empty($photo_url) && !empty($this->getTwitterName()) ){
             $twitterName = $this->getTwitterName();
-            $photoUrl = sprintf("https://avatars.io/twitter/%s", rim(trim($twitterName, '@')));
+            $photoUrl = sprintf("https://avatars.io/twitter/%s", trim(trim($twitterName, '@')));
         }
         if(empty($photoUrl)){
             $photoUrl = File::getCloudLinkForImages("generic-speaker-icon.png");
