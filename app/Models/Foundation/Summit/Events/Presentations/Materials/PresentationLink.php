@@ -12,7 +12,6 @@
  * limitations under the License.
  **/
 use Doctrine\ORM\Mapping AS ORM;
-
 /**
  * Class PresentationLink
  * @ORM\Entity
